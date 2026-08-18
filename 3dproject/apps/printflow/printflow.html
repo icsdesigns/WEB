@@ -270,7 +270,7 @@ svg.ic{flex-shrink:0;display:inline-block;vertical-align:middle}
 .flow-empty{display:flex;flex-direction:column;align-items:center;gap:14px;padding:38px;text-align:center;width:100%;color:var(--eg)}
 .flow-empty p{font-size:14px;color:var(--tx3);max-width:280px;line-height:1.6}
 
-/* ════════ POPOVER (etapas) ════════ */
+/* ════════ POPOVER (pasos) ════════ */
 .tip{
   position:fixed;z-index:9999;background:var(--sf);color:var(--tx);
   border-radius:var(--r-m);padding:0;font-size:13px;line-height:1.5;
@@ -375,6 +375,44 @@ svg.ic{flex-shrink:0;display:inline-block;vertical-align:middle}
 .act-main b{font-weight:700}
 .act-proj{font-size:12px;color:var(--tx3)}
 .act-time{font-size:13px;color:var(--tx3);flex-shrink:0}
+
+/* ── Tareas en curso (inicio) ── */
+.now-list{display:flex;flex-direction:column;gap:9px}
+.now-item{display:flex;align-items:center;gap:13px;padding:13px 15px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-m);cursor:pointer;box-shadow:var(--shadow-card);transition:border-color .15s,transform .15s}
+.now-item:hover{border-color:var(--hl-bd);transform:translateX(3px)}
+.now-dot{width:10px;height:10px;border-radius:4px;flex-shrink:0;align-self:flex-start;margin-top:5px}
+.now-main{flex:1;min-width:0}
+.now-hd{display:flex;align-items:baseline;gap:9px;min-width:0}
+.now-hd b{font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.now-proj{font-size:12px;color:var(--tx3);flex-shrink:0}
+.now-step{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--tx2);margin-top:3px}
+.now-step .ic{color:var(--ac);flex-shrink:0}
+.now-step b{color:var(--tx);font-weight:600}
+.now-bar{height:5px;background:var(--sf3);border-radius:3px;overflow:hidden;margin-top:8px;max-width:320px}
+.now-bar>i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--teal-500),var(--teal-300));transition:width .4s var(--ease)}
+.now-btn{flex-shrink:0}
+.now-more{font-size:13px;color:var(--tx3);margin-top:10px;padding-left:2px}
+
+/* ── Paso en curso en la tarjeta de tarea ── */
+.sc-now{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;padding-top:13px;border-top:1px solid var(--bd)}
+.sc-now-tx{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--tx2);flex:1;min-width:0}
+.sc-now-tx .ic{color:var(--ac);flex-shrink:0}
+.sc-now-tx b{color:var(--tx);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-now.ok .sc-now-tx{color:var(--dn-tx)}
+.sc-now.ok .sc-now-tx .ic{color:var(--dn-tx)}
+
+/* ── Paso en curso dentro del panel ampliado ── */
+.dtl-next{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;padding:14px 16px;background:var(--dn-bg);border:1px solid var(--dn-bd);border-radius:var(--r-m)}
+.dtl-next-tx{flex:1;min-width:0}
+.dtl-next-tx span{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--dn-tx);opacity:.8}
+.dtl-next-tx b{font-size:15.5px;font-weight:700;color:var(--tx)}
+.dtl-next .btn{flex-shrink:0}
+
+/* ── Flujo plegable ── */
+.flow-tgl{display:inline-flex;align-items:center;gap:6px;background:var(--sf2);border:1px solid var(--bd);border-radius:999px;padding:5px 12px 5px 9px;font-size:12.5px;font-weight:600;color:var(--tx2);transition:background .15s,color .15s,border-color .15s}
+.flow-tgl:hover{background:var(--sf3);color:var(--tx);border-color:var(--bd2)}
+.flow-sec.closed{margin-bottom:22px}
+.flow-hint{font-size:13px;color:var(--tx3)}
 .hero{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:26px;flex-wrap:wrap}
 .hero h1{font-size:30px;font-weight:800}
 .hero p{font-size:14.5px;color:var(--tx3);margin-top:4px}
@@ -467,6 +505,14 @@ svg.ic{flex-shrink:0;display:inline-block;vertical-align:middle}
 @media(max-width:720px){
   .scards{grid-template-columns:1fr}
   .hero h1{font-size:24px}
+  /* En pantallas estrechas el botón de verificar baja a su propia línea */
+  .now-item{flex-wrap:wrap}
+  .now-main{flex:1 1 100%}
+  .now-btn{margin-left:23px}
+  .now-bar{max-width:none}
+  .dtl-next{align-items:stretch}
+  .dtl-next .btn{width:100%;justify-content:center}
+  .sc-now .btn{width:100%;justify-content:center}
 }
 @media(max-width:560px){
   .side{position:absolute;top:0;bottom:0;z-index:50;box-shadow:0 0 50px rgba(0,0,0,.3)}
@@ -551,7 +597,7 @@ option{background-color:#161922;color:#E8EBF4}
     <div class="bar-sp"></div>
     <div class="gsrch">
       <svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="gsrch" type="text" placeholder="Buscar muestras en todos los proyectos…">
+      <input id="gsrch" type="text" placeholder="Buscar tareas en todos los proyectos…">
     </div>
     <button class="pill-btn" id="fileBtn" onclick="fileBtnClick()" title="Vincular un archivo de la carpeta para guardar/cargar automáticamente"></button>
     <button class="pill-btn" onclick="window.DPHelp&&DPHelp.open()" title="Cómo usar esta app" aria-label="Ayuda" style="width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.3"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4"/><circle cx="12" cy="17.3" r=".6" fill="currentColor"/></svg></button>
@@ -611,9 +657,12 @@ const ICONS={
   'home':'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
   'folder':'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   'folders':'<path d="M7 8a2 2 0 0 1 2-2h3l1.5 1.5H19a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"/><path d="M17 6V5a2 2 0 0 0-2-2H8L6.5 4.5H4a2 2 0 0 0-2 2V14"/>',
-  'tube':'<path d="M8 3h8"/><path d="M9 3v14a3 3 0 0 0 6 0V3"/><line x1="9.5" y1="12" x2="14.5" y2="12"/>',
-  'flask':'<path d="M9 3h6"/><path d="M10 3v6l-5 9a1.6 1.6 0 0 0 1.4 2.4h11.2A1.6 1.6 0 0 0 19 18l-5-9V3"/><line x1="8" y1="15" x2="16" y2="15"/>',
-  'flask-off':'<path d="M9 3h6"/><path d="M14 3v6l4.5 8.1"/><path d="M10 3v6l-5 9a1.6 1.6 0 0 0 1.4 2.4h9"/><line x1="4" y1="4" x2="20" y2="20"/>',
+  'task':'<rect x="5.5" y="4" width="13" height="17" rx="2.2"/><path d="M9 4.5V3.2h6v1.3"/><polyline points="9.2 12.4 11.2 14.4 15 10.6"/>',
+  'task-off':'<rect x="5.5" y="4" width="13" height="17" rx="2.2"/><path d="M9 4.5V3.2h6v1.3"/><line x1="4" y1="3.6" x2="20" y2="21"/>',
+  'tasks':'<rect x="3" y="4.5" width="7" height="6.5" rx="1.6"/><rect x="3" y="13.5" width="7" height="6.5" rx="1.6"/><line x1="13" y1="7.7" x2="21" y2="7.7"/><line x1="13" y1="16.7" x2="21" y2="16.7"/>',
+  'cart':'<circle cx="9.5" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/><path d="M2.5 4h2.2l2.3 10.2a1.6 1.6 0 0 0 1.6 1.3h7.6a1.6 1.6 0 0 0 1.6-1.25L19.5 8H5.6"/>',
+  'chevron-down':'<polyline points="6 9.5 12 15.5 18 9.5"/>',
+  'chevron-up':'<polyline points="6 14.5 12 8.5 18 14.5"/>',
   'branch':'<circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="8" r="2.5"/><path d="M6 8.5v7"/><path d="M18 10.5c0 4-6 1.5-6 5"/>',
   'fork':'<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M6 8.5c0 4 6 2 6 7"/><path d="M18 8.5c0 4-6 2-6 7"/>',
   'check':'<polyline points="5 12 10 17 19 7"/>',
@@ -678,6 +727,39 @@ function progress(smp,p){return allSteps(p).filter(st=>smp.validations?.[st.id])
 function totalSt(p){return allSteps(p).length;}
 function lastActivity(s){const ds=Object.values(s.validations||{});if(!ds.length)return s.createdAt||'';return ds.sort().slice(-1)[0];}
 function pctOf(s,p){const t=totalSt(p);return t>0?Math.round(progress(s,p)/t*100):0;}
+/* Primer paso sin verificar: el que la tarea tiene "en curso" ahora mismo. */
+function nextPending(s,p){return allSteps(p).find(st=>!(s.validations||{})[st.id])||null;}
+/* Lista de tareas activas (con algún paso pendiente) de todos los proyectos. */
+function activeTasks(){
+  const out=[];
+  S.projects.forEach(p=>{
+    const tot=totalSt(p);
+    (p.samples||[]).forEach(s=>{
+      const nx=nextPending(s,p); if(!nx)return;
+      out.push({pid:p.id,sid:s.id,pname:p.name,color:p.color,code:s.code,desc:s.desc||'',
+                step:nx.name,pct:tot?Math.round(progress(s,p)/tot*100):0,when:lastActivity(s)});
+    });
+  });
+  out.sort((a,b)=>(b.when||'').localeCompare(a.when||''));
+  return out;
+}
+/* Verifica el paso en curso de una tarea sin abrir su panel ampliado. */
+function verifyNext(pid,sid){
+  const p=proj(pid),s=p&&(p.samples||[]).find(x=>x.id===sid);
+  if(!p||!s)return;
+  const st=nextPending(s,p);
+  if(!st){toast('Esta tarea ya está al día',{icon:'circle-check'});return;}
+  if(!s.validations)s.validations={};
+  s.validations[st.id]=new Date().toISOString();
+  save();afterVerify(sid);
+  toast('«'+st.name+'» verificado · '+s.code,{icon:'check',actionLabel:'Deshacer',
+    onAction:()=>{delete s.validations[st.id];save();afterVerify(sid);}});
+}
+function afterVerify(sid){
+  if(V.page==='home')renderMain();
+  else{applySamples();refreshFlow();}
+  if(V.sid===sid)renderDrawer();
+}
 
 function ring(pct,size,stroke){
   size=size||72;stroke=stroke||7;
@@ -773,12 +855,12 @@ function goHome(){V={page:'home',pid:null,sid:null,filter:'all',sort:'recent',q:
 function renderHome(c){
   if(!S.projects.length){
     c.innerHTML=`<div class="welcome">
-      <div class="wicon">${ic('flask',50)}</div>
+      <div class="wicon">${ic('tasks',50)}</div>
       <h2>Bienvenido a PrintFlow</h2>
-      <p>Diseña flujos de trabajo de laboratorio y haz seguimiento de cada muestra, etapa por etapa.</p>
+      <p>Organiza tus tareas, compras y registros por proyectos y ve marcando cada paso a medida que lo completas.</p>
       <div class="wfeat">
-        <span>${ic('branch',16)}Flujos con ramas paralelas</span>
-        <span>${ic('tube',16)}Seguimiento de muestras</span>
+        <span>${ic('branch',16)}Pasos, con opciones en paralelo</span>
+        <span>${ic('task',16)}Cada tarea con su progreso</span>
         <span>${ic('export',16)}Exportación CSV / JSON</span>
       </div>
       <button class="btn btn-p" onclick="openModal('proj')">${ic('plus',17)} Crear primer proyecto</button>
@@ -788,9 +870,10 @@ function renderHome(c){
   let totS=0,totC=0,totP=0;
   S.projects.forEach(p=>{const tot=totalSt(p);(p.samples||[]).forEach(s=>{totS++;const pr=progress(s,p);if(tot>0&&pr===tot)totC++;else if(pr>0)totP++;});});
   const acts=[];
-  S.projects.forEach(p=>{const nm={};allSteps(p).forEach(st=>nm[st.id]=st.name);(p.samples||[]).forEach(s=>{Object.entries(s.validations||{}).forEach(([k,v])=>acts.push({pid:p.id,sid:s.id,pname:p.name,color:p.color,code:s.code,step:nm[k]||'etapa',when:v}));});});
+  S.projects.forEach(p=>{const nm={};allSteps(p).forEach(st=>nm[st.id]=st.name);(p.samples||[]).forEach(s=>{Object.entries(s.validations||{}).forEach(([k,v])=>acts.push({pid:p.id,sid:s.id,pname:p.name,color:p.color,code:s.code,step:nm[k]||'paso',when:v}));});});
   acts.sort((a,b)=>(b.when||'').localeCompare(a.when||''));
-  const recent=acts.slice(0,7);
+  const recent=acts.slice(0,6);
+  const activos=activeTasks(), activosTop=activos.slice(0,8);
   const hour=new Date().getHours();const greet=hour<6?'Buenas noches':hour<13?'Buenos días':hour<20?'Buenas tardes':'Buenas noches';
 
   const cards=S.projects.map(p=>{
@@ -801,8 +884,8 @@ function renderHome(c){
       <div class="pcard-hd"><span class="pcard-dot" style="background:${p.color}"></span><span class="pcard-name">${esc(p.name)}</span></div>
       <div class="pcard-body">
         <div class="pcard-stats">
-          <span>${ic('tube',17)}<b>${sm.length}</b> muestras</span>
-          <span>${ic('branch',17)}<b>${p.steps.length}</b> etapas</span>
+          <span>${ic('task',17)}<b>${sm.length}</b> tareas</span>
+          <span>${ic('branch',17)}<b>${p.steps.length}</b> pasos</span>
           <span>${ic('circle-check',17)}<b>${comp}</b> completas</span>
         </div>
         ${ring(avg,80,8)}
@@ -812,15 +895,33 @@ function renderHome(c){
 
   c.innerHTML=`<div class="wrap">
     <div class="hero">
-      <div><h1>${greet}</h1><p>Tienes ${S.projects.length} proyecto(s) y ${totS} muestras en seguimiento.</p></div>
+      <div><h1>${greet}</h1><p>${activos.length?`Tienes <b>${activos.length}</b> tarea(s) pendientes en ${S.projects.length} proyecto(s).`:`Todo al día: las ${totS} tarea(s) de tus ${S.projects.length} proyecto(s) están completas.`}</p></div>
       <button class="btn btn-p" onclick="openModal('proj')">${ic('plus',17)} Nuevo proyecto</button>
     </div>
     <div class="stats">
       <div class="stat"><div class="stat-ic" style="background:var(--acl);color:var(--act)">${ic('folders',25)}</div><div><div class="stat-l">Proyectos</div><div class="stat-v">${S.projects.length}</div></div></div>
-      <div class="stat"><div class="stat-ic" style="background:var(--acl);color:var(--act)">${ic('tube',25)}</div><div><div class="stat-l">Muestras totales</div><div class="stat-v">${totS}</div></div></div>
+      <div class="stat"><div class="stat-ic" style="background:var(--acl);color:var(--act)">${ic('task',25)}</div><div><div class="stat-l">Tareas totales</div><div class="stat-v">${totS}</div></div></div>
       <div class="stat"><div class="stat-ic" style="background:var(--dn-bg);color:var(--dn-tx)">${ic('circle-check',25)}</div><div><div class="stat-l">Completadas</div><div class="stat-v" style="color:var(--ac)">${totC}</div></div></div>
-      <div class="stat"><div class="stat-ic" style="background:var(--pr-bg);color:var(--pr-tx)">${ic('progress',25)}</div><div><div class="stat-l">En progreso</div><div class="stat-v" style="color:var(--amber)">${totP}</div></div></div>
+      <div class="stat"><div class="stat-ic" style="background:var(--pr-bg);color:var(--pr-tx)">${ic('progress',25)}</div><div><div class="stat-l">En curso</div><div class="stat-v" style="color:var(--amber)">${totP}</div></div></div>
     </div>
+    ${activosTop.length?`<div class="section">
+      <div class="sec-hd">
+        <div class="sec-ico">${ic('task',19)}</div>
+        <h2>Tareas en curso <span class="cnt">${activos.length}</span></h2>
+        <span class="sec-hint">${ic('pointer',15)}verifica el paso sin salir de aquí</span>
+      </div>
+      <div class="now-list">${activosTop.map(a=>`
+        <div class="now-item" onclick="openSampleFrom('${a.pid}','${a.sid}')" title="Abrir la ficha completa de ${esc(a.code)}">
+          <span class="now-dot" style="background:${a.color}"></span>
+          <div class="now-main">
+            <div class="now-hd"><b>${esc(a.code)}</b><span class="now-proj">${esc(a.pname)}</span></div>
+            <div class="now-step">${ic('circle-dot',14)}Ahora: <b>${esc(a.step)}</b></div>
+            <div class="now-bar"><i style="width:${a.pct}%"></i></div>
+          </div>
+          <button class="btn btn-val sm now-btn" title="Marcar «${esc(a.step)}» como hecho" onclick="event.stopPropagation();verifyNext('${a.pid}','${a.sid}')">${ic('check',15)} Verificar</button>
+        </div>`).join('')}</div>
+      ${activos.length>activosTop.length?`<p class="now-more">y ${activos.length-activosTop.length} tarea(s) más en sus proyectos.</p>`:''}
+    </div>`:''}
     <div class="section">
       <div class="sec-hd"><div class="sec-ico">${ic('folders',19)}</div><h2>Tus proyectos</h2></div>
       <div class="home-grid">${cards}</div>
@@ -832,7 +933,7 @@ function renderHome(c){
           <div class="act-ic" style="background:${a.color}1F;color:${a.color}">${ic('check',18)}</div>
           <div class="act-main"><b>${esc(a.code)}</b> · ${esc(a.step)}<div class="act-proj">${esc(a.pname)}</div></div>
           <div class="act-time">${relTime(a.when)}</div>
-        </div>`).join(''):'<div class="empty"><div class="empty-ic">'+ic('history',40)+'</div><p>Aún no hay validaciones registradas.</p></div>'}</div>
+        </div>`).join(''):'<div class="empty"><div class="empty-ic">'+ic('history',40)+'</div><p>Aún no hay pasos verificados.</p></div>'}</div>
     </div>
   </div>`;
 }
@@ -847,6 +948,7 @@ function renderProj(c){
   const inp=sm.filter(s=>{const pr=progress(s,p);return pr>0&&(pr<tot||tot===0);}).length;
   const pend=sm.length-comp-inp;
   const avg=sm.length?Math.round(sm.reduce((a,s)=>a+(tot>0?progress(s,p)/tot:0),0)/sm.length*100):0;
+  const flowOpen=(S.flowOpen!==false);
 
   c.innerHTML=`<div class="wrap">
     <div class="crumb" style="margin-bottom:14px"><button class="crumb-link" onclick="goHome()">${ic('home',18)} Inicio</button><span style="color:var(--tx3)">/</span><span style="color:var(--tx2)">Proyecto</span></div>
@@ -855,7 +957,7 @@ function renderProj(c){
       <h1>${esc(p.name)}</h1>
       ${ring(avg,64,7)}
     </div>
-    <div class="sub-line">${sm.length} muestras · ${p.steps.length} etapas · ${avg}% de avance medio</div>
+    <div class="sub-line">${sm.length} tareas · ${p.steps.length} pasos · ${avg}% de avance medio</div>
     <div class="controls" style="margin-bottom:26px">
       <button class="btn btn-g sm" onclick="openModal('proj','${p.id}')">${ic('edit',15)} Editar</button>
       <button class="btn btn-g sm" onclick="exportProjectCSV('${p.id}')">${ic('sheet',15)} Exportar CSV</button>
@@ -863,55 +965,58 @@ function renderProj(c){
     </div>
 
     <div class="stats">
-      <div class="stat"><div class="stat-ic" style="background:var(--acl);color:var(--act)">${ic('tube',25)}</div><div><div class="stat-l">Total muestras</div><div class="stat-v">${sm.length}</div></div></div>
+      <div class="stat"><div class="stat-ic" style="background:var(--acl);color:var(--act)">${ic('task',25)}</div><div><div class="stat-l">Total tareas</div><div class="stat-v">${sm.length}</div></div></div>
       <div class="stat"><div class="stat-ic" style="background:var(--dn-bg);color:var(--dn-tx)">${ic('circle-check',25)}</div><div><div class="stat-l">Completadas</div><div class="stat-v" style="color:var(--ac)">${comp}</div></div></div>
-      <div class="stat"><div class="stat-ic" style="background:var(--pr-bg);color:var(--pr-tx)">${ic('progress',25)}</div><div><div class="stat-l">En progreso</div><div class="stat-v" style="color:var(--amber)">${inp}</div></div></div>
-      <div class="stat"><div class="stat-ic" style="background:var(--pd-bg);color:var(--pd-tx)">${ic('clock',25)}</div><div><div class="stat-l">Pendientes</div><div class="stat-v" style="color:var(--tx3)">${pend}</div></div></div>
+      <div class="stat"><div class="stat-ic" style="background:var(--pr-bg);color:var(--pr-tx)">${ic('progress',25)}</div><div><div class="stat-l">En curso</div><div class="stat-v" style="color:var(--amber)">${inp}</div></div></div>
+      <div class="stat"><div class="stat-ic" style="background:var(--pd-bg);color:var(--pd-tx)">${ic('clock',25)}</div><div><div class="stat-l">Sin empezar</div><div class="stat-v" style="color:var(--tx3)">${pend}</div></div></div>
     </div>
 
     <div class="section">
       <div class="sec-hd">
-        <div class="sec-ico">${ic('branch',19)}</div>
-        <h2>Flujo de trabajo <span class="cnt">${p.steps.length}</span></h2>
-        <span class="sec-hint">${ic('pointer',15)}pasa el cursor por una etapa para opciones</span>
+        <div class="sec-ico">${ic('task',19)}</div>
+        <h2>Tareas <span class="cnt">${sm.length}</span></h2>
+        <span class="sec-hint">${ic('pointer',15)}pulsa una tarea para ver todos sus pasos</span>
         <div class="sp"></div>
-        <button class="btn btn-p sm" onclick="openModal('step','${p.id}')">${ic('plus',16)} Añadir etapa</button>
-      </div>
-      <div class="flow-wrap" id="flowWrap">${buildFlow(p)}</div>
-    </div>
-
-    <div class="section">
-      <div class="sec-hd">
-        <div class="sec-ico">${ic('tube',19)}</div>
-        <h2>Muestras <span class="cnt">${sm.length}</span></h2>
-        <div class="sp"></div>
-        <button class="btn btn-p sm" onclick="openModal('sample','${p.id}')">${ic('plus',16)} Añadir muestra</button>
+        <button class="btn btn-p sm" onclick="openModal('sample','${p.id}')">${ic('plus',16)} Añadir tarea</button>
       </div>
       <div class="controls">
-        <div class="srch-w">${ic('search',18)}<input class="srch" id="srch" type="text" placeholder="Buscar por código o descripción…  ( / )" value="${esc(V.q)}" oninput="applySamples()"></div>
+        <div class="srch-w">${ic('search',18)}<input class="srch" id="srch" type="text" placeholder="Buscar por nombre o descripción…  ( / )" value="${esc(V.q)}" oninput="applySamples()"></div>
         <select class="sel" onchange="V.sort=this.value;applySamples()">
           <option value="recent"${V.sort==='recent'?' selected':''}>Más recientes</option>
-          <option value="code"${V.sort==='code'?' selected':''}>Código (A-Z)</option>
+          <option value="code"${V.sort==='code'?' selected':''}>Nombre (A-Z)</option>
           <option value="progress"${V.sort==='progress'?' selected':''}>Más avanzadas</option>
           <option value="progress-asc"${V.sort==='progress-asc'?' selected':''}>Menos avanzadas</option>
         </select>
       </div>
       <div class="controls">
         <div class="seg">
-          ${['all','Todas','done','Completas','prog','En progreso','pend','Pendientes'].reduce((acc,_,i,arr)=>{if(i%2)return acc;const k=arr[i],l=arr[i+1];return acc+`<button class="seg-btn${V.filter===k?' on':''}" onclick="V.filter='${k}';applySamples()">${l}</button>`;},'')}
+          ${[['all','Todas'],['done','Completas'],['prog','En curso'],['pend','Sin empezar']].map(([k,l])=>`<button class="seg-btn${V.filter===k?' on':''}" data-f="${k}" onclick="V.filter='${k}';applySamples()">${l}</button>`).join('')}
         </div>
       </div>
       <div class="scards" id="sgrid"></div>
+    </div>
+
+    <div class="section flow-sec${flowOpen?'':' closed'}">
+      <div class="sec-hd">
+        <div class="sec-ico">${ic('branch',19)}</div>
+        <h2>Flujo de trabajo <span class="cnt">${p.steps.length}</span></h2>
+        <button class="flow-tgl" onclick="toggleFlow()" title="Mostrar u ocultar el flujo">${ic(flowOpen?'chevron-up':'chevron-down',16)}${flowOpen?'Ocultar':'Mostrar'}</button>
+        <span class="sec-hint">${ic('pointer',15)}pasa el cursor por un paso para editarlo</span>
+        <div class="sp"></div>
+        <button class="btn btn-p sm" onclick="openModal('step','${p.id}')">${ic('plus',16)} Añadir paso</button>
+      </div>
+      ${flowOpen?`<div class="flow-wrap" id="flowWrap">${buildFlow(p)}</div>`:'<p class="flow-hint">Los pasos definidos aquí son los que verifica cada tarea del proyecto.</p>'}
     </div>
   </div>`;
   applySamples();
 }
 
 function refreshFlow(){const w=document.getElementById('flowWrap'),p=proj(V.pid);if(w&&p)w.innerHTML=buildFlow(p);}
+function toggleFlow(){S.flowOpen=(S.flowOpen===false);save();renderMain();}
 
 function buildFlow(p){
   const steps=p.steps||[];
-  if(!steps.length)return`<div class="flow-empty">${ic('branch',46)}<p>Este proyecto no tiene etapas todavía. Añade la primera para construir el flujo.</p><button class="btn btn-p sm" onclick="openModal('step','${p.id}')">${ic('plus',16)} Añadir etapa</button></div>`;
+  if(!steps.length)return`<div class="flow-empty">${ic('branch',46)}<p>Este proyecto no tiene pasos todavía. Añade el primero para construir el flujo.</p><button class="btn btn-p sm" onclick="openModal('step','${p.id}')">${ic('plus',16)} Añadir paso</button></div>`;
   const sm=p.samples||[];
   let html='<div class="flow-row">';
   steps.forEach((s,i)=>{
@@ -923,14 +1028,14 @@ function buildFlow(p){
       <div class="fnode-body">
         <div class="fnode-tagrow">${i===0?'<span class="fnode-tag">INICIO</span>':`<span class="fnode-num">${i+1}</span>`}</div>
         <div class="fnode-lbl">${esc(s.name)}</div>
-        <div class="fnode-meta">${ic('circle-check',13)}${valCount}/${sm.length} validadas</div>
+        <div class="fnode-meta">${ic('circle-check',13)}${valCount}/${sm.length} verificadas</div>
       </div>
     </div>`;
     html+=`<div class="fbranch-stem"></div><div class="fbranch-col">`;
     (s.branches||[]).forEach(b=>{
       html+=`<div class="fbnode" data-bid="${b.id}" data-sid="${s.id}" data-pid="${p.id}" tabindex="0" onmouseenter="showBranchTip(event,this)" onmouseleave="hideTip()" onfocus="showBranchTip(event,this)" onblur="hideTip()"><span class="bi">${ic('branch',15)}</span><span class="fbnode-lbl">${esc(b.name)}</span></div>`;
     });
-    html+=`<button class="fadd-branch" onclick="openModal('branch','${p.id}','${s.id}')">${ic('fork',15)} Rama paralela</button>`;
+    html+=`<button class="fadd-branch" onclick="openModal('branch','${p.id}','${s.id}')">${ic('fork',15)} Paso en paralelo</button>`;
     html+=`</div></div>`;
   });
   html+=`</div>`;return html;
@@ -942,23 +1047,23 @@ function showNodeTip(ev,elm){
   const idx=(p.steps||[]).findIndex(x=>x.id===sid),s=p.steps[idx];if(!s)return;
   const total=(p.samples||[]).length,validated=(p.samples||[]).filter(sm=>sm.validations?.[sid]).length;
   const pct=total?Math.round(validated/total*100):0,nb=(s.branches||[]).length;
-  const brHtml=nb?`<div class="tip-bh">Ramas paralelas (${nb})</div>${s.branches.map(b=>`<div class="tip-bi">${ic('branch',13)}${esc(b.name)}</div>`).join('')}`:'';
+  const brHtml=nb?`<div class="tip-bh">Pasos en paralelo (${nb})</div>${s.branches.map(b=>`<div class="tip-bi">${ic('branch',13)}${esc(b.name)}</div>`).join('')}`:'';
   const first=idx===0,last=idx===p.steps.length-1;
   showTip(ev,`
-    <div class="tip-hd"><div class="tip-hd-ic">${ic('circle-dot',17)}</div><div class="tip-hd-tx"><div class="tip-title">${esc(s.name)}</div><div class="tip-sub">Etapa ${idx+1} de ${p.steps.length}</div></div></div>
+    <div class="tip-hd"><div class="tip-hd-ic">${ic('circle-dot',17)}</div><div class="tip-hd-tx"><div class="tip-title">${esc(s.name)}</div><div class="tip-sub">Paso ${idx+1} de ${p.steps.length}</div></div></div>
     <div class="tip-body">
-      <div class="tip-row"><span class="tip-lbl">Muestras validadas</span><span class="tip-val">${validated} / ${total}</span></div>
+      <div class="tip-row"><span class="tip-lbl">Tareas que lo han verificado</span><span class="tip-val">${validated} / ${total}</span></div>
       <div class="tip-mini"><i style="width:${pct}%"></i></div>
       ${brHtml}
     </div>
-    <div class="tip-move"><span>Reordenar etapa</span>
+    <div class="tip-move"><span>Reordenar paso</span>
       <button ${first?'disabled':''} onclick="moveStep('${pid}','${sid}',-1)" title="Mover izquierda">${ic('arrow-left',16)}</button>
       <button ${last?'disabled':''} onclick="moveStep('${pid}','${sid}',1)" title="Mover derecha">${ic('arrow-right',16)}</button>
     </div>
     <div class="tip-menu">
-      <button class="tip-mi" onclick="hideTip();openModal('step','${pid}','${sid}')">${ic('edit',17)} Editar etapa</button>
-      <button class="tip-mi" onclick="hideTip();openModal('branch','${pid}','${sid}')">${ic('fork',17)} Añadir rama paralela</button>
-      <button class="tip-mi dng" onclick="hideTip();delStep('${pid}','${sid}')">${ic('trash',17)} Eliminar etapa</button>
+      <button class="tip-mi" onclick="hideTip();openModal('step','${pid}','${sid}')">${ic('edit',17)} Editar paso</button>
+      <button class="tip-mi" onclick="hideTip();openModal('branch','${pid}','${sid}')">${ic('fork',17)} Añadir paso en paralelo</button>
+      <button class="tip-mi dng" onclick="hideTip();delStep('${pid}','${sid}')">${ic('trash',17)} Eliminar paso</button>
     </div>`);
 }
 function showBranchTip(ev,elm){
@@ -966,10 +1071,10 @@ function showBranchTip(ev,elm){
   const bid=elm.dataset.bid,sid=elm.dataset.sid,pid=elm.dataset.pid,p=proj(pid);
   const st=(p.steps||[]).find(x=>x.id===sid),b=(st?.branches||[]).find(x=>x.id===bid);if(!b)return;
   showTip(ev,`
-    <div class="tip-hd"><div class="tip-hd-ic">${ic('branch',17)}</div><div class="tip-hd-tx"><div class="tip-title">${esc(b.name)}</div><div class="tip-sub">Rama de ${esc(st?.name||'')}</div></div></div>
+    <div class="tip-hd"><div class="tip-hd-ic">${ic('branch',17)}</div><div class="tip-hd-tx"><div class="tip-title">${esc(b.name)}</div><div class="tip-sub">En paralelo a ${esc(st?.name||'')}</div></div></div>
     <div class="tip-menu">
-      <button class="tip-mi" onclick="hideTip();openModal('editBranch','${pid}','${sid}','${bid}')">${ic('edit',17)} Editar rama</button>
-      <button class="tip-mi dng" onclick="hideTip();delBranch('${pid}','${sid}','${bid}')">${ic('trash',17)} Eliminar rama</button>
+      <button class="tip-mi" onclick="hideTip();openModal('editBranch','${pid}','${sid}','${bid}')">${ic('edit',17)} Editar paso paralelo</button>
+      <button class="tip-mi dng" onclick="hideTip();delBranch('${pid}','${sid}','${bid}')">${ic('trash',17)} Eliminar paso paralelo</button>
     </div>`);
 }
 function moveStep(pid,sid,dir){
@@ -989,33 +1094,38 @@ function applySamples(){
   else if(V.sort==='progress')list.sort((a,b)=>pctOf(b,p)-pctOf(a,p));
   else if(V.sort==='progress-asc')list.sort((a,b)=>pctOf(a,p)-pctOf(b,p));
   else list.sort((a,b)=>(lastActivity(b)||'').localeCompare(lastActivity(a)||''));
-  document.querySelectorAll('.seg-btn').forEach(b=>{const map={Todas:'all',Completas:'done','En progreso':'prog',Pendientes:'pend'};b.classList.toggle('on',map[b.textContent.trim()]===V.filter);});
+  document.querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.f===V.filter));
   const g=document.getElementById('sgrid');if(g)g.innerHTML=renderSCards(p,list);
 }
 function renderSCards(p,samples){
-  if(!samples.length)return`<div class="empty"><div class="empty-ic">${ic('flask-off',40)}</div><h3>Sin muestras</h3><p>No hay muestras que coincidan con el filtro o la búsqueda.</p></div>`;
+  if(!samples.length)return`<div class="empty"><div class="empty-ic">${ic('task-off',40)}</div><h3>Sin tareas</h3><p>No hay tareas que coincidan con el filtro o la búsqueda.</p></div>`;
   const tot=totalSt(p),aSt=allSteps(p);
   return samples.map(s=>{
     const done=progress(s,p),pct=tot>0?Math.round(done/tot*100):0;
-    const badge=pct===100&&tot>0?'<span class="badge b-done">Completa</span>':done>0?'<span class="badge b-prog">En progreso</span>':'<span class="badge b-pend">Pendiente</span>';
+    const badge=pct===100&&tot>0?'<span class="badge b-done">Completa</span>':done>0?'<span class="badge b-prog">En curso</span>':'<span class="badge b-pend">Sin empezar</span>';
     const strip=aSt.map(st=>{const v=s.validations?.[st.id];return`<span class="${v?'d':''}${st._br?' br':''}" title="${esc(st.name)}${v?' ✓':' — pendiente'}"></span>`;}).join('');
     const la=lastActivity(s);
+    const nx=nextPending(s,p);
     return`<div class="scard" onclick="openSample('${s.id}')">
       <div class="sc-top">
         <div class="sc-info">
           <div class="sc-hd"><span class="sc-code">${esc(s.code)}</span>${badge}
             <div class="sc-acts">
-              <button class="sc-ibtn" title="Editar muestra" onclick="event.stopPropagation();openModal('sample','${p.id}','${s.id}')">${ic('edit',18)}</button>
-              <button class="sc-ibtn" title="Duplicar muestra" onclick="event.stopPropagation();dupSample('${p.id}','${s.id}')">${ic('copy',18)}</button>
-              <button class="sc-ibtn" title="Eliminar muestra" onclick="event.stopPropagation();delSample('${p.id}','${s.id}')">${ic('trash',18)}</button>
+              <button class="sc-ibtn" title="Editar tarea" onclick="event.stopPropagation();openModal('sample','${p.id}','${s.id}')">${ic('edit',18)}</button>
+              <button class="sc-ibtn" title="Duplicar tarea" onclick="event.stopPropagation();dupSample('${p.id}','${s.id}')">${ic('copy',18)}</button>
+              <button class="sc-ibtn" title="Eliminar tarea" onclick="event.stopPropagation();delSample('${p.id}','${s.id}')">${ic('trash',18)}</button>
             </div>
           </div>
           <div class="sc-desc">${esc(s.desc||'Sin descripción')}</div>
-          <div class="sc-meta">${ic('list-check',15)}<b>${done}</b>/${tot} etapas${la?`<span style="opacity:.4">·</span>${ic('clock',15)}${relTime(la)}`:''}</div>
+          <div class="sc-meta">${ic('list-check',15)}<b>${done}</b>/${tot} pasos${la?`<span style="opacity:.4">·</span>${ic('clock',15)}${relTime(la)}`:''}</div>
         </div>
         ${ring(pct,68,7)}
       </div>
       <div class="strip">${strip}</div>
+      <div class="sc-now ${nx?'':'ok'}">
+        <span class="sc-now-tx">${nx?`${ic('circle-dot',15)}Ahora: <b>${esc(nx.name)}</b>`:`${ic('circle-check',15)}Todos los pasos verificados`}</span>
+        ${nx?`<button class="btn btn-val sm" title="Marcar «${esc(nx.name)}» como hecho" onclick="event.stopPropagation();verifyNext('${p.id}','${s.id}')">${ic('check',15)} Verificar</button>`:''}
+      </div>
     </div>`;
   }).join('');
 }
@@ -1037,15 +1147,16 @@ function renderDrawer(){
   const r=document.getElementById('drawerRoot');
   if(!p||!s){r.innerHTML='';return;}
   const tot=totalSt(p),done=progress(s,p),pct=tot>0?Math.round(done/tot*100):0;
+  const nx=nextPending(s,p);
 
   function stepRow(st,br){
     const v=s.validations?.[st.id];
     return`<div class="dtl-step ${v?'done':''}">
       <div class="dtl-circ ${v?'done':'pend'}">${v?ic('check',17):ic('point',17)}</div>
       <div class="dtl-body2">
-        <div class="dtl-name">${esc(st.name)}${br?'<span class="dtl-br-tag">rama</span>':''}</div>
+        <div class="dtl-name">${esc(st.name)}${br?'<span class="dtl-br-tag">en paralelo</span>':''}</div>
         <div class="dtl-sub ${v?'done-c':''}">${v?`${ic('calendar-check',15)}${fmtDate(v)} · ${relTime(v)}`:`${ic('clock',15)}Pendiente`}</div>
-        ${v?`<button class="btn btn-unv sm" onclick="toggleVal('${p.id}','${s.id}','${st.id}',false)">${ic('x',15)} Desvalidar</button>`:`<button class="btn btn-val sm" onclick="toggleVal('${p.id}','${s.id}','${st.id}',true)">${ic('check',15)} Validar</button>`}
+        ${v?`<button class="btn btn-unv sm" onclick="toggleVal('${p.id}','${s.id}','${st.id}',false)">${ic('x',15)} Deshacer</button>`:`<button class="btn btn-val sm" onclick="toggleVal('${p.id}','${s.id}','${st.id}',true)">${ic('check',15)} Verificar</button>`}
       </div>
     </div>`;
   }
@@ -1057,9 +1168,9 @@ function renderDrawer(){
     <div class="drawer-hd">
       <span class="phead-dot" style="background:${p.color}"></span>
       <span class="drawer-code">${esc(s.code)}</span>
-      <button class="icon-btn" title="Editar muestra" onclick="openModal('sample','${p.id}','${s.id}')">${ic('edit',19)}</button>
-      <button class="icon-btn" title="Duplicar muestra" onclick="dupSample('${p.id}','${s.id}')">${ic('copy',19)}</button>
-      <button class="icon-btn" title="Eliminar muestra" onclick="delSample('${p.id}','${s.id}')">${ic('trash',19)}</button>
+      <button class="icon-btn" title="Editar tarea" onclick="openModal('sample','${p.id}','${s.id}')">${ic('edit',19)}</button>
+      <button class="icon-btn" title="Duplicar tarea" onclick="dupSample('${p.id}','${s.id}')">${ic('copy',19)}</button>
+      <button class="icon-btn" title="Eliminar tarea" onclick="delSample('${p.id}','${s.id}')">${ic('trash',19)}</button>
       <button class="icon-btn" title="Cerrar" onclick="closeDrawer()">${ic('x',20)}</button>
     </div>
     <div class="drawer-body">
@@ -1067,15 +1178,19 @@ function renderDrawer(){
       <div class="dtl-hero">
         ${ring(pct,108,10)}
         <div class="mini">
-          <div><span class="mic" style="background:var(--dn-bg);color:var(--dn-tx)">${ic('circle-check',17)}</span><b>${done}</b> validadas</div>
+          <div><span class="mic" style="background:var(--dn-bg);color:var(--dn-tx)">${ic('circle-check',17)}</span><b>${done}</b> verificados</div>
           <div><span class="mic" style="background:var(--pd-bg);color:var(--pd-tx)">${ic('clock',17)}</span><b>${tot-done}</b> pendientes</div>
         </div>
       </div>
+      ${nx?`<div class="dtl-next">
+        <div class="dtl-next-tx"><span>Paso en curso</span><b>${esc(nx.name)}</b></div>
+        <button class="btn btn-val" onclick="verifyNext('${p.id}','${s.id}')">${ic('check',16)} Verificar este paso</button>
+      </div>`:''}
       ${tot>0?`<div class="bulk">
-        <button class="btn btn-val sm" onclick="validateAll('${p.id}','${s.id}')" ${done===tot?'disabled style="opacity:.5"':''}>${ic('checks',15)} Validar todo</button>
+        <button class="btn btn-val sm" onclick="validateAll('${p.id}','${s.id}')" ${done===tot?'disabled style="opacity:.5"':''}>${ic('checks',15)} Verificar todo</button>
         <button class="btn btn-g sm" onclick="resetSample('${p.id}','${s.id}')" ${done===0?'disabled style="opacity:.5"':''}>${ic('rotate',15)} Reiniciar</button>
       </div>`:''}
-      <div>${stepsH||'<div class="empty"><div class="empty-ic">'+ic('branch',40)+'</div><p>Define etapas en el flujo para empezar a validar.</p></div>'}</div>
+      <div>${stepsH||'<div class="empty"><div class="empty-ic">'+ic('branch',40)+'</div><p>Define los pasos del flujo para empezar a verificar.</p></div>'}</div>
     </div>
   </aside>`;
 }
@@ -1090,12 +1205,12 @@ function validateAll(pid,sid){
   const p=proj(pid),s=(p.samples||[]).find(x=>x.id===sid);
   if(!s.validations)s.validations={};const now=new Date().toISOString();
   allSteps(p).forEach(st=>{if(!s.validations[st.id])s.validations[st.id]=now;});
-  save();renderDrawer();refreshFlow();toast('Todas las etapas validadas',{icon:'checks'});
+  save();renderDrawer();refreshFlow();toast('Todos los pasos verificados',{icon:'checks'});
 }
 function resetSample(pid,sid){
   const p=proj(pid),s=(p.samples||[]).find(x=>x.id===sid);
   const snap=JSON.parse(JSON.stringify(s.validations||{}));s.validations={};save();renderDrawer();refreshFlow();
-  toast('Validaciones reiniciadas',{icon:'rotate',actionLabel:'Deshacer',onAction:()=>{s.validations=snap;save();renderDrawer();refreshFlow();}});
+  toast('Verificaciones reiniciadas',{icon:'rotate',actionLabel:'Deshacer',onAction:()=>{s.validations=snap;save();renderDrawer();refreshFlow();}});
 }
 
 /* ════════ MODALS ════════ */
@@ -1118,7 +1233,7 @@ function openModal(type,...args){
     const cp=COLS.map((cc,i)=>`<div class="cdot${(p?p.color===cc:i===0)?' on':''}" style="background:${cc}" onclick="pickCol(this,'pc')"></div>`).join('');
     root.innerHTML=wrap(`<div class="modal">
       <div class="mtit"><span class="mtit-ic">${ic('folder',20)}</span>${p?'Editar proyecto':'Nuevo proyecto'}</div>
-      <div class="mfld"><label class="mlbl">Nombre del proyecto</label><input class="minp" id="pn" type="text" value="${p?esc(p.name):''}" placeholder="Ej: Análisis PCR 2025"></div>
+      <div class="mfld"><label class="mlbl">Nombre del proyecto</label><input class="minp" id="pn" type="text" value="${p?esc(p.name):''}" placeholder="Ej: Compras de taller"></div>
       <div class="mfld"><label class="mlbl">Color identificativo</label><div class="cpick">${cp}</div><input type="hidden" id="pc" value="${p?p.color:COLS[0]}"></div>
       <div class="mact"><button class="btn btn-g" onclick="closeModal()">${ic('x',16)} Cancelar</button>
         <button class="btn btn-p" onclick="${p?`saveProj('${pid}')`:'newProj()'}">${p?ic('check',16)+' Guardar cambios':ic('plus',16)+' Crear proyecto'}</button></div>
@@ -1127,30 +1242,30 @@ function openModal(type,...args){
   if(type==='step'){
     const pid=args[0],sid=args[1],p=proj(pid),st=sid?(p.steps||[]).find(x=>x.id===sid):null;
     root.innerHTML=wrap(`<div class="modal">
-      <div class="mtit"><span class="mtit-ic">${ic('circle-dot',20)}</span>${st?'Editar etapa':'Nueva etapa'}</div>
-      <div class="mfld"><label class="mlbl">Nombre de la etapa</label><input class="minp" id="sn" type="text" value="${st?esc(st.name):''}" placeholder="Ej: Extracción de ADN"></div>
+      <div class="mtit"><span class="mtit-ic">${ic('circle-dot',20)}</span>${st?'Editar paso':'Nuevo paso'}</div>
+      <div class="mfld"><label class="mlbl">Nombre del paso</label><input class="minp" id="sn" type="text" value="${st?esc(st.name):''}" placeholder="Ej: Pedido realizado"></div>
       <div class="mact"><button class="btn btn-g" onclick="closeModal()">${ic('x',16)} Cancelar</button>
-        <button class="btn btn-p" onclick="${st?`saveStep('${pid}','${sid}')`:`newStep('${pid}')`}">${st?ic('check',16)+' Guardar':ic('plus',16)+' Añadir etapa'}</button></div>
+        <button class="btn btn-p" onclick="${st?`saveStep('${pid}','${sid}')`:`newStep('${pid}')`}">${st?ic('check',16)+' Guardar':ic('plus',16)+' Añadir paso'}</button></div>
     </div>`);
   }
   if(type==='branch'){
     const pid=args[0],preId=args[1],p=proj(pid);
     const items=(p.steps||[]).map(s=>`<div class="bfrom-item${preId===s.id?' on':''}" onclick="selBFrom(this,'${s.id}')" data-id="${s.id}">${ic('circle-dot',17)}${esc(s.name)}</div>`).join('');
     root.innerHTML=wrap(`<div class="modal">
-      <div class="mtit"><span class="mtit-ic">${ic('fork',20)}</span>Nueva rama paralela</div>
-      <div class="mfld"><label class="mlbl">Etapa de origen</label><div class="bfrom-list">${items||'<p style="font-size:13px;color:var(--tx3)">Crea etapas primero.</p>'}</div><input type="hidden" id="bfrom" value="${preId||''}"></div>
-      <div class="mfld"><label class="mlbl">Nombre de la rama</label><input class="minp" id="bn" type="text" placeholder="Ej: Secuenciación paralela"></div>
+      <div class="mtit"><span class="mtit-ic">${ic('fork',20)}</span>Nuevo paso en paralelo</div>
+      <div class="mfld"><label class="mlbl">Paso del que sale</label><div class="bfrom-list">${items||'<p style="font-size:13px;color:var(--tx3)">Crea antes algún paso.</p>'}</div><input type="hidden" id="bfrom" value="${preId||''}"></div>
+      <div class="mfld"><label class="mlbl">Nombre del paso paralelo</label><input class="minp" id="bn" type="text" placeholder="Ej: Solicitar presupuesto alternativo"></div>
       <div class="mact"><button class="btn btn-g" onclick="closeModal()">${ic('x',16)} Cancelar</button>
-        <button class="btn btn-p" onclick="newBranch('${pid}')">${ic('fork',16)} Añadir rama</button></div>
+        <button class="btn btn-p" onclick="newBranch('${pid}')">${ic('fork',16)} Añadir paso paralelo</button></div>
     </div>`);
   }
   if(type==='editBranch'){
     const pid=args[0],sid=args[1],bid=args[2],p=proj(pid);
     const st=(p.steps||[]).find(x=>x.id===sid),b=(st?.branches||[]).find(x=>x.id===bid);
     root.innerHTML=wrap(`<div class="modal">
-      <div class="mtit"><span class="mtit-ic">${ic('branch',20)}</span>Editar rama</div>
-      <p style="font-size:13px;color:var(--tx3);margin-bottom:16px">Rama de: <b style="color:var(--tx)">${esc(st?.name||'')}</b></p>
-      <div class="mfld"><label class="mlbl">Nombre de la rama</label><input class="minp" id="bn" type="text" value="${b?esc(b.name):''}"></div>
+      <div class="mtit"><span class="mtit-ic">${ic('branch',20)}</span>Editar paso paralelo</div>
+      <p style="font-size:13px;color:var(--tx3);margin-bottom:16px">En paralelo a: <b style="color:var(--tx)">${esc(st?.name||'')}</b></p>
+      <div class="mfld"><label class="mlbl">Nombre del paso paralelo</label><input class="minp" id="bn" type="text" value="${b?esc(b.name):''}"></div>
       <div class="mact"><button class="btn btn-g" onclick="closeModal()">${ic('x',16)} Cancelar</button>
         <button class="btn btn-p" onclick="saveBranch('${pid}','${sid}','${bid}')">${ic('check',16)} Guardar</button></div>
     </div>`);
@@ -1158,11 +1273,11 @@ function openModal(type,...args){
   if(type==='sample'){
     const pid=args[0],sid=args[1],p=proj(pid),s=sid?(p.samples||[]).find(x=>x.id===sid):null;
     root.innerHTML=wrap(`<div class="modal">
-      <div class="mtit"><span class="mtit-ic">${ic('tube',20)}</span>${s?'Editar muestra':'Nueva muestra'}</div>
-      <div class="mfld"><label class="mlbl">Código de la muestra</label><input class="minp" id="mc" type="text" value="${s?esc(s.code):''}" placeholder="Ej: MU-2025-001" oninput="document.getElementById('mcHint').classList.remove('show')"><div class="mhint" id="mcHint">${ic('alert',15)}Ya existe una muestra con ese código.</div></div>
-      <div class="mfld"><label class="mlbl">Descripción <span style="color:var(--tx3);font-weight:400">(opcional)</span></label><input class="minp" id="md" type="text" value="${s?esc(s.desc||''):''}" placeholder="Ej: Paciente #12, biopsia hepática"></div>
+      <div class="mtit"><span class="mtit-ic">${ic('task',20)}</span>${s?'Editar tarea':'Nueva tarea'}</div>
+      <div class="mfld"><label class="mlbl">Nombre o referencia</label><input class="minp" id="mc" type="text" value="${s?esc(s.code):''}" placeholder="Ej: Bobinas PLA negro" oninput="document.getElementById('mcHint').classList.remove('show')"><div class="mhint" id="mcHint">${ic('alert',15)}Ya existe una tarea con ese nombre.</div></div>
+      <div class="mfld"><label class="mlbl">Descripción <span style="color:var(--tx3);font-weight:400">(opcional)</span></label><input class="minp" id="md" type="text" value="${s?esc(s.desc||''):''}" placeholder="Ej: 4 kg, proveedor habitual"></div>
       <div class="mact"><button class="btn btn-g" onclick="closeModal()">${ic('x',16)} Cancelar</button>
-        <button class="btn btn-p" onclick="${s?`saveSample('${pid}','${sid}')`:`newSample('${pid}')`}">${s?ic('check',16)+' Guardar':ic('plus',16)+' Añadir muestra'}</button></div>
+        <button class="btn btn-p" onclick="${s?`saveSample('${pid}','${sid}')`:`newSample('${pid}')`}">${s?ic('check',16)+' Guardar':ic('plus',16)+' Añadir tarea'}</button></div>
     </div>`);
   }
   setTimeout(()=>{const f=root.querySelector('input[type=text]');if(f){f.focus();f.select&&f.select();}},40);
@@ -1193,16 +1308,16 @@ function delProj(pid){
 }
 function newStep(pid){const name=(document.getElementById('sn').value||'').trim();if(!name){document.getElementById('sn').focus();return;}const p=proj(pid);if(!p.steps)p.steps=[];p.steps.push({id:uid(),name,branches:[]});save();closeModal();renderMain();}
 function saveStep(pid,sid){const name=(document.getElementById('sn').value||'').trim();if(!name)return;const p=proj(pid),s=p.steps.find(x=>x.id===sid);s.name=name;save();closeModal();renderMain();}
-function delStep(pid,sid){const p=proj(pid),i=(p.steps||[]).findIndex(x=>x.id===sid);if(i<0)return;const removed=p.steps[i];p.steps.splice(i,1);save();renderMain();toast('Etapa eliminada',{icon:'trash',actionLabel:'Deshacer',onAction:()=>{p.steps.splice(i,0,removed);save();renderMain();}});}
+function delStep(pid,sid){const p=proj(pid),i=(p.steps||[]).findIndex(x=>x.id===sid);if(i<0)return;const removed=p.steps[i];p.steps.splice(i,1);save();renderMain();toast('Paso eliminado',{icon:'trash',actionLabel:'Deshacer',onAction:()=>{p.steps.splice(i,0,removed);save();renderMain();}});}
 function newBranch(pid){
   const stepId=(document.getElementById('bfrom').value||'').trim(),name=(document.getElementById('bn').value||'').trim();
-  if(!stepId){toast('Selecciona una etapa de origen',{icon:'alert'});return;}
+  if(!stepId){toast('Selecciona el paso del que sale',{icon:'alert'});return;}
   if(!name){document.getElementById('bn').focus();return;}
   const p=proj(pid),st=(p.steps||[]).find(x=>x.id===stepId);if(!st)return;if(!st.branches)st.branches=[];
   st.branches.push({id:uid(),name});save();closeModal();renderMain();
 }
 function saveBranch(pid,sid,bid){const name=(document.getElementById('bn').value||'').trim();if(!name)return;const p=proj(pid),st=(p.steps||[]).find(x=>x.id===sid),b=(st.branches||[]).find(x=>x.id===bid);b.name=name;save();closeModal();renderMain();}
-function delBranch(pid,sid,bid){const p=proj(pid),st=(p.steps||[]).find(x=>x.id===sid),i=(st.branches||[]).findIndex(x=>x.id===bid);if(i<0)return;const removed=st.branches[i];st.branches.splice(i,1);save();renderMain();toast('Rama eliminada',{icon:'trash',actionLabel:'Deshacer',onAction:()=>{st.branches.splice(i,0,removed);save();renderMain();}});}
+function delBranch(pid,sid,bid){const p=proj(pid),st=(p.steps||[]).find(x=>x.id===sid),i=(st.branches||[]).findIndex(x=>x.id===bid);if(i<0)return;const removed=st.branches[i];st.branches.splice(i,1);save();renderMain();toast('Paso paralelo eliminado',{icon:'trash',actionLabel:'Deshacer',onAction:()=>{st.branches.splice(i,0,removed);save();renderMain();}});}
 function newSample(pid){
   const code=(document.getElementById('mc').value||'').trim();if(!code){document.getElementById('mc').focus();return;}
   const p=proj(pid);
@@ -1217,14 +1332,14 @@ function saveSample(pid,sid){
 }
 function dupSample(pid,sid){
   const p=proj(pid),s=(p.samples||[]).find(x=>x.id===sid);if(!s)return;
-  let base=s.code+'-copia',code=base,n=2;while((p.samples||[]).some(o=>o.code.toLowerCase()===code.toLowerCase())){code=base+n;n++;}
+  let base=s.code+' (copia)',code=base,n=2;while((p.samples||[]).some(o=>o.code.toLowerCase()===code.toLowerCase())){code=base+n;n++;}
   const copy={id:uid(),code,desc:s.desc,validations:{},createdAt:new Date().toISOString()};
-  const i=p.samples.findIndex(x=>x.id===sid);p.samples.splice(i+1,0,copy);save();renderMain();toast('Muestra duplicada (sin validaciones)',{icon:'copy'});
+  const i=p.samples.findIndex(x=>x.id===sid);p.samples.splice(i+1,0,copy);save();renderMain();toast('Tarea duplicada (sin pasos verificados)',{icon:'copy'});
 }
 function delSample(pid,sid){
   const p=proj(pid),i=(p.samples||[]).findIndex(x=>x.id===sid);if(i<0)return;const removed=p.samples[i];p.samples.splice(i,1);
   if(V.sid===sid)closeDrawer();save();renderMain();
-  toast(`Muestra "${removed.code}" eliminada`,{icon:'trash',actionLabel:'Deshacer',duration:6000,onAction:()=>{p.samples.splice(i,0,removed);save();renderMain();}});
+  toast(`Tarea "${removed.code}" eliminada`,{icon:'trash',actionLabel:'Deshacer',duration:6000,onAction:()=>{p.samples.splice(i,0,removed);save();renderMain();}});
 }
 
 /* ════════ IMPORT / EXPORT ════════ */
@@ -1232,7 +1347,7 @@ function download(name,content,mime){const blob=new Blob([content],{type:mime||'
 function exportData(){
   if(!S.projects.length){toast('No hay datos que exportar',{icon:'alert'});return;}
   const stamp=new Date().toISOString().slice(0,10);
-  download(`bioflow-${stamp}.json`,JSON.stringify({app:'bioflow',version:1,exportedAt:new Date().toISOString(),projects:S.projects},null,2));
+  download(`printflow-${stamp}.json`,JSON.stringify({app:'printflow',version:1,exportedAt:new Date().toISOString(),projects:S.projects},null,2));
   toast('Copia de seguridad descargada',{icon:'download'});
 }
 function importData(ev){
@@ -1252,7 +1367,7 @@ function importData(ev){
 }
 function exportProjectCSV(pid){
   const p=proj(pid);if(!p)return;const steps=allSteps(p),tot=steps.length;
-  const head=['Codigo','Descripcion','Progreso_%','Validadas','Total',...steps.map(s=>s.name)];const rows=[head];
+  const head=['Tarea','Descripcion','Progreso_%','Verificados','Total',...steps.map(s=>s.name)];const rows=[head];
   (p.samples||[]).forEach(s=>{const done=progress(s,p),pct=tot>0?Math.round(done/tot*100):0;rows.push([s.code,s.desc||'',pct,done,tot,...steps.map(st=>s.validations?.[st.id]?fmtDate(s.validations[st.id]):'')]);});
   const csv='﻿'+rows.map(r=>r.map(c=>{c=String(c==null?'':c);return /[",;\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c;}).join(';')).join('\n');
   download(`${p.name.replace(/[^\w-]+/g,'_')}.csv`,csv,'text/csv');toast('CSV exportado',{icon:'sheet'});
@@ -1261,12 +1376,12 @@ function exportProjectCSV(pid){
 /* ════════ DEMO ════════ */
 function seedDemo(){
   if(S.projects.length)return;const pid=uid();const d=n=>new Date(Date.now()-n*864e5).toISOString();
-  S.projects.push({id:pid,name:'Proyecto PCR 2025',color:'#12A793',createdAt:d(10),
-    steps:[{id:'s1',name:'Recepción',branches:[]},{id:'s2',name:'Extracción ADN',branches:[{id:'b1',name:'Extracción ARN'},{id:'b2',name:'Extracción proteínas'}]},{id:'s3',name:'Cuantificación',branches:[]},{id:'s4',name:'PCR / Amplificación',branches:[{id:'b3',name:'Secuenciación'}]},{id:'s5',name:'Análisis',branches:[]},{id:'s6',name:'Informe final',branches:[]}],
-    samples:[{id:'m1',code:'MU-2025-001',desc:'Paciente #1 — biopsia hepática',validations:{s1:d(8),s2:d(7),b1:d(6),b2:d(6),s3:d(5),s4:d(4),b3:d(3),s5:d(2),s6:d(1)}},{id:'m2',code:'MU-2025-002',desc:'Paciente #2 — sangre periférica',validations:{s1:d(5),s2:d(4),b1:d(3),s3:d(2)}},{id:'m3',code:'MU-2025-003',desc:'Paciente #3 — tejido tumoral',validations:{s1:d(2),s2:d(1)}},{id:'m4',code:'MU-2025-004',desc:'Control negativo',validations:{}}]});
-  S.projects.push({id:uid(),name:'Secuenciación NGS',color:'#2E86D4',createdAt:d(6),
-    steps:[{id:'n1',name:'Prep. biblioteca',branches:[]},{id:'n2',name:'Secuenciación',branches:[{id:'nb1',name:'Control calidad'}]},{id:'n3',name:'Análisis bioinf.',branches:[]},{id:'n4',name:'Validación',branches:[]}],
-    samples:[{id:'nm1',code:'NGS-001',desc:'Muestra clínica A',validations:{n1:d(3)}},{id:'nm2',code:'NGS-002',desc:'Muestra clínica B',validations:{}}]});
+  S.projects.push({id:pid,name:'Compras de taller',color:'#F26430',createdAt:d(10),
+    steps:[{id:'s1',name:'Solicitado',branches:[]},{id:'s2',name:'Presupuesto',branches:[{id:'b1',name:'Comparar proveedores'}]},{id:'s3',name:'Pedido realizado',branches:[]},{id:'s4',name:'Recibido',branches:[{id:'b3',name:'Revisar el estado'}]},{id:'s5',name:'Guardado en almacén',branches:[]},{id:'s6',name:'Registrado en gastos',branches:[]}],
+    samples:[{id:'m1',code:'Bobinas PLA negro',desc:'4 kg · proveedor habitual',validations:{s1:d(8),s2:d(7),b1:d(6),s3:d(5),s4:d(4),b3:d(3),s5:d(2),s6:d(1)}},{id:'m2',code:'Boquillas 0.4 mm',desc:'Repuesto de la impresora grande',validations:{s1:d(5),s2:d(4),b1:d(3),s3:d(2)}},{id:'m3',code:'Resina translúcida',desc:'1 L · para las piezas de exposición',validations:{s1:d(2),s2:d(1)}},{id:'m4',code:'Cinta de cama caliente',desc:'Aún por pedir',validations:{}}]});
+  S.projects.push({id:uid(),name:'Tareas de casa',color:'#2E86D4',createdAt:d(6),
+    steps:[{id:'n1',name:'Anotado',branches:[]},{id:'n2',name:'En marcha',branches:[{id:'nb1',name:'Pedir ayuda'}]},{id:'n3',name:'Terminado',branches:[]},{id:'n4',name:'Revisado',branches:[]}],
+    samples:[{id:'nm1',code:'Renovar el seguro',desc:'Antes de fin de mes',validations:{n1:d(3)}},{id:'nm2',code:'Ordenar el trastero',desc:'Fin de semana',validations:{}}]});
   save();V={page:'proj',pid,sid:null,filter:'all',sort:'recent',q:''};S.lastPid=pid;
 }
 
@@ -1303,7 +1418,7 @@ async function writeFile(){
   fileBusy=true;
   try{
     const w=await fileHandle.createWritable();
-    await w.write(JSON.stringify({app:'bioflow',version:1,savedAt:new Date().toISOString(),projects:S.projects},null,2));
+    await w.write(JSON.stringify({app:'printflow',version:1,savedAt:new Date().toISOString(),projects:S.projects},null,2));
     await w.close();
   }catch(e){fileLinked=false;updateFileBtn();toast('No se pudo escribir en el archivo vinculado',{icon:'alert'});}
   fileBusy=false;
@@ -1351,7 +1466,7 @@ function fileDialog(){
 async function linkNewFile(){
   closeModal();
   try{
-    const handle=await window.showSaveFilePicker({suggestedName:'bioflow-datos.json',types:[{description:'Datos BioFlow',accept:{'application/json':['.json']}}]});
+    const handle=await window.showSaveFilePicker({suggestedName:'printflow-datos.json',types:[{description:'Datos PrintFlow',accept:{'application/json':['.json']}}]});
     fileHandle=handle;fileLinked=true;filePending=false;await idbSet(IDB_KEY,handle);await writeFile();updateFileBtn();
     toast('Archivo vinculado. Tus datos se guardan ahí automáticamente.',{icon:'circle-check'});
   }catch(e){if(e&&e.name!=='AbortError')toast('No se pudo crear el archivo. Si abriste la app con doble clic, prueba a abrirla desde Chrome/Edge.',{icon:'alert'});}
@@ -1359,7 +1474,7 @@ async function linkNewFile(){
 async function openExistingFile(){
   closeModal();
   try{
-    const picked=await window.showOpenFilePicker({types:[{description:'Datos BioFlow',accept:{'application/json':['.json']}}]});
+    const picked=await window.showOpenFilePicker({types:[{description:'Datos PrintFlow',accept:{'application/json':['.json']}}]});
     const handle=picked[0];fileHandle=handle;
     if(!await verifyPerm(handle,true)){toast('Permiso denegado al archivo.',{icon:'alert'});return;}
     fileLinked=true;filePending=false;await idbSet(IDB_KEY,handle);
@@ -1445,19 +1560,30 @@ load();
 </script>
 
 <script>
-/* Deep-link desde el centro de notificaciones de la suite: ?pffocus=CODIGO abre la muestra */
+/* Deep-link desde el centro de notificaciones de la suite: ?pffocus=NOMBRE abre la tarea */
 (function(){
   try{
-    var code=new URLSearchParams(location.search).get('pffocus'); if(!code) return;
-    code=code.trim().toLowerCase(); if(!code) return;
+    var q=new URLSearchParams(location.search);
+    var code=(q.get('pffocus')||'').trim().toLowerCase();
+    var wantPid=q.get('pfpid')||'', wantSid=q.get('pfsid')||'';
+    if(!code && !wantSid) return;
     var tries=0;
     (function attempt(){
       tries++;
       var found=null;
       if(window.S && Array.isArray(S.projects)){
-        for(var i=0;i<S.projects.length;i++){ var p=S.projects[i];
-          var m=(p.samples||[]).find(function(s){ var c=String(s.code||'').toLowerCase(); return c===code || c.indexOf(code)>=0; });
-          if(m){ found={pid:p.id,sid:m.id}; break; } }
+        for(var i=0;i<S.projects.length && !found;i++){
+          var p=S.projects[i], list=p.samples||[];
+          /* primero por identificador exacto, que es lo que manda la suite */
+          if(wantSid && (!wantPid || p.id===wantPid)){
+            var byId=list.find(function(s){ return s.id===wantSid; });
+            if(byId){ found={pid:p.id,sid:byId.id}; break; }
+          }
+          if(code){
+            var m=list.find(function(s){ var c=String(s.code||'').toLowerCase(); return c===code || c.indexOf(code)>=0; });
+            if(m) found={pid:p.id,sid:m.id};
+          }
+        }
       }
       if(found && typeof openSampleFrom==='function'){ openSampleFrom(found.pid,found.sid); return; }
       if(tries<80) setTimeout(attempt,150);
@@ -1469,7 +1595,7 @@ load();
 /* Ayuda contextual de la app (icono ? en el banner superior) */
 (function(){
   if(window.DPHelp) return;
-  var C={"title": "PrintFlow", "accent": "#FF7A45", "tagline": "Seguimiento de muestras por etapas", "sections": [{"h": "Qué es", "p": "Organiza tus proyectos de laboratorio en etapas (y ramas) y hace seguimiento de cada muestra, validando etapa por etapa."}, {"h": "Primeros pasos", "steps": ["Crea un proyecto con nombre y color.", "Define sus etapas; crea ramas desde una etapa si el flujo se bifurca.", "Añade muestras con su código y descripción.", "Marca cada etapa como validada en la muestra."]}, {"h": "Funciones clave", "defs": [["Etapas y ramas", "Define el flujo de trabajo, con bifurcaciones."], ["Muestras", "Cada una con código, descripción y progreso propio."], ["Búsqueda global", "Barra superior: salta a cualquier muestra de cualquier proyecto."], ["Exportar / importar", "Copia de seguridad de todo en JSON."]]}, {"h": "Atajos", "defs": [["/", "Enfocar el buscador"], ["N", "Nueva muestra o proyecto (según la vista)"]]}, {"h": "Datos", "p": "Se guardan en tu cuenta (Firebase) y se sincronizan entre dispositivos automáticamente."}]};
+  var C={"title":"PrintFlow","accent":"#FF7A45","tagline":"Tus tareas, compras y registros paso a paso","sections":[{"h":"Qué es","p":"Agrupa lo que tienes entre manos en proyectos (compras, tareas de casa, registros…). Cada proyecto define sus pasos, y cada tarea los va verificando uno a uno."},{"h":"Primeros pasos","steps":["Crea un proyecto con nombre y color.","Define sus pasos; añade pasos en paralelo cuando algo pueda hacerse a la vez.","Añade tus tareas con su nombre y una nota.","Pulsa «Verificar» en la tarjeta de la tarea para dar por hecho el paso en curso."]},{"h":"Funciones clave","defs":[["Tareas en primer plano","La página de inicio lista todo lo que está en curso, con su paso actual."],["Verificar desde fuera","No hace falta abrir la tarea: el botón «Verificar» está en su tarjeta y en el panel de notificaciones de 3DProject."],["Panel ampliado","Pulsa una tarea para ver todos sus pasos, cuándo se verificó cada uno y deshacerlos."],["Pasos en paralelo","Para lo que no lleva un orden fijo dentro de la misma fase."],["Buscador global","Barra superior: salta a cualquier tarea de cualquier proyecto."],["Exportar / importar","Copia de seguridad de todo en JSON, y resumen por proyecto en CSV."]]},{"h":"Atajos","defs":[["/","Enfocar el buscador"],["N","Nueva tarea o proyecto (según la vista)"],["T","Cambiar el tema"],["Esc","Cerrar el panel o la ventana abierta"]]},{"h":"Datos","p":"Se guardan en tu cuenta (Firebase) y se sincronizan entre dispositivos automáticamente."}]};
   var CSS=".dph-veil{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,8,15,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}.dph-veil.open{display:flex}.dph-modal{width:min(660px,96vw);max-height:88vh;overflow:auto;background:#12141d;color:#e7eaf2;border:1px solid rgba(255,255,255,.1);border-radius:16px;box-shadow:0 30px 90px rgba(0,0,0,.6);font-family:'Outfit',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.55}[data-theme=light] .dph-modal{background:#fff;color:#1b1e27;border-color:rgba(0,0,0,.1)}.dph-hd{position:sticky;top:0;display:flex;align-items:center;gap:11px;padding:15px 18px;background:inherit;border-bottom:1px solid rgba(255,255,255,.09);border-radius:16px 16px 0 0}[data-theme=light] .dph-hd{border-color:rgba(0,0,0,.09)}.dph-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}.dph-ti{font-weight:700;font-size:16px}.dph-tg{font-size:12px;opacity:.7}.dph-x{margin-left:auto;border:none;background:transparent;color:inherit;opacity:.55;font-size:22px;cursor:pointer;line-height:1;padding:0 4px}.dph-x:hover{opacity:1}.dph-bd{padding:4px 18px 20px}.dph-sec{margin-top:15px}.dph-h{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;opacity:.6;margin-bottom:5px}.dph-p{margin:0 0 3px}.dph-bd ul,.dph-bd ol{margin:4px 0 0;padding-left:20px}.dph-bd li{margin:3px 0}.dph-def{display:flex;gap:10px;margin:5px 0}.dph-def b{flex-shrink:0;min-width:130px}";
   var HDIC="<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9.3\"/><path d=\"M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4\"/><circle cx=\"12\" cy=\"17.3\" r=\".6\" fill=\"currentColor\"/></svg>";
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}

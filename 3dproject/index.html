@@ -660,6 +660,13 @@ body.dp-authed #authGate{display:none}
 .dpn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .dpn-gcount{margin-left:auto;background:var(--glass);border-radius:9px;padding:1px 7px;font-size:10.5px;color:var(--t2);text-transform:none;letter-spacing:0}
 .dpn-item{padding:9px 11px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;gap:3px;border:1px solid transparent}
+.dpn-row{display:flex;align-items:center;gap:9px;margin-top:5px}
+.dpn-row .dpn-m{flex:1;min-width:0}
+.dpn-act{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,122,69,.42);background:rgba(255,122,69,.14);color:#FFB694;border-radius:999px;padding:4px 11px;font:600 11.5px 'Outfit',sans-serif;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.dpn-act:hover{background:rgba(255,122,69,.26);border-color:rgba(255,122,69,.7);color:#fff}
+.dpn-act[disabled]{opacity:.55;cursor:default}
+[data-theme=light] .dpn-act{background:rgba(226,90,32,.1);border-color:rgba(226,90,32,.32);color:#A83D18}
+[data-theme=light] .dpn-act:hover{background:rgba(226,90,32,.18);color:#7A2C12}
 .dpn-item:hover{background:var(--glass);border-color:var(--border)}
 .dpn-t{font-size:13px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:6px}
 .dpn-m{font-size:11.5px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -928,7 +935,7 @@ html.dp-noboot .card{opacity:1!important;animation:none!important}
         </div>
       <div class="card-body">
         <div class="app-name">PrintFlow</div>
-        <p class="app-desc">Proyectos por etapas y seguimiento de muestras.</p>
+        <p class="app-desc">Tareas, compras y registros paso a paso.</p>
       </div>
       <div class="card-line"></div>
     </div>
@@ -1100,7 +1107,17 @@ html.dp-noboot .card{opacity:1!important;animation:none!important}
 /* Centro de notificaciones unificado: agrupa por app y enlaza al elemento exacto */
 (function(){
   var META={
-    printflow:{ label:'PrintFlow', color:'#FF7A45', onItem:function(it){ if(typeof openPrintflowSample==='function') openPrintflowSample(it.code); else if(typeof launchApp==='function') launchApp('flow'); dpnClose(); } },
+    printflow:{ label:'PrintFlow', color:'#FF7A45',
+      onItem:function(it){ if(typeof openPrintflowSample==='function') openPrintflowSample(it.code,it.pid,it.sid); else if(typeof launchApp==='function') launchApp('flow'); dpnClose(); },
+      /* Verificar el paso en curso sin abrir la app: el panel se queda abierto. */
+      onAction:function(it,btn){
+        if(typeof window.pfVerifyNext!=='function') return;
+        btn.disabled=true; btn.textContent='Verificando…';
+        window.pfVerifyNext(it,function(ok){
+          if(ok){ btn.textContent='\u2713 Hecho'; }
+          else{ btn.disabled=false; btn.textContent='\u2713 Verificar'; }
+        });
+      } },
     tracker:{ label:'3DTracker', color:'#34D399', onItem:function(it){ if(typeof openTrackerOrder==='function'&&it.code) openTrackerOrder(it.code); else if(typeof launchApp==='function') launchApp('tracker'); dpnClose(); } },
     stock:{ label:'3DStock', color:'#22D3EE', onItem:function(it){ if(typeof launchApp==='function') launchApp('stock'); dpnClose(); } }
   };
@@ -1110,7 +1127,11 @@ html.dp-noboot .card{opacity:1!important;animation:none!important}
   function total(){ var n=0; ORDER.forEach(function(k){ n+=(store[k]||[]).length; }); return n; }
   function itemHTML(k,it,idx){
     if(k==='printflow'){
-      return '<div class="dpn-item" data-k="printflow" data-i="'+idx+'"><div class="dpn-t">'+esc(it.step||'Etapa')+'</div><div class="dpn-m">'+esc(it.proj||'Proyecto')+' · Muestra '+esc(it.code||'—')+'</div></div>';
+      return '<div class="dpn-item" data-k="printflow" data-i="'+idx+'" title="Abrir la tarea en PrintFlow">'
+        +'<div class="dpn-t">'+esc(it.step||'Paso')+'</div>'
+        +'<div class="dpn-row"><div class="dpn-m">'+esc(it.proj||'Proyecto')+' · '+esc(it.code||'—')+'</div>'
+        +(it.stepId?'<button class="dpn-act" data-act="1" title="Dar por hecho «'+esc(it.step||'')+'»">\u2713 Verificar</button>':'')
+        +'</div></div>';
     }
     if(k==='stock'){
       return '<div class="dpn-item" data-k="stock" data-i="'+idx+'"><div class="dpn-t">'+esc(it.variant||'')+'<span class="dpn-pct" style="color:'+META.stock.color+'">Repuesto</span></div><div class="dpn-m">'+esc(it.product||'')+(it.ts?(' · '+_dpnFmtDate(it.ts)):'')+'</div></div>';
@@ -1136,7 +1157,14 @@ html.dp-noboot .card{opacity:1!important;animation:none!important}
       h+='</div>';
     });
     body.innerHTML=h;
-    [].forEach.call(body.querySelectorAll('.dpn-item'),function(el){ el.addEventListener('click',function(){ var k=el.getAttribute('data-k'), i=+el.getAttribute('data-i'); var it=(store[k]||[])[i]; if(it&&META[k]&&META[k].onItem) META[k].onItem(it); }); });
+    [].forEach.call(body.querySelectorAll('.dpn-item'),function(el){
+      el.addEventListener('click',function(e){
+        var k=el.getAttribute('data-k'), i=+el.getAttribute('data-i'); var it=(store[k]||[])[i]; if(!it||!META[k]) return;
+        var btn=e.target&&e.target.closest?e.target.closest('.dpn-act'):null;
+        if(btn&&el.contains(btn)){ e.stopPropagation(); if(META[k].onAction) META[k].onAction(it,btn); return; }
+        if(META[k].onItem) META[k].onItem(it);
+      });
+    });
   }
   window.DPNotif={ set:function(k,items){ store[k]=Array.isArray(items)?items:[]; render(); } };
   window.dpnToggle=function(ev){ if(ev&&ev.stopPropagation)ev.stopPropagation(); var p=document.getElementById('dpnPanel'); if(p)p.classList.toggle('open'); };
@@ -1174,7 +1202,7 @@ html.dp-noboot .card{opacity:1!important;animation:none!important}
 const APPS = {
   flow: {
     name: 'PrintFlow',
-    desc: 'Seguimiento de muestras y proyectos organizados por etapas. Búsqueda global, ramas de trabajo y exportación/importación de datos en local.',
+    desc: 'Tus tareas, compras y registros agrupados por proyectos, cada uno con sus pasos. Verifica el paso en curso desde la propia tarjeta, busca en todos los proyectos y exporta o importa tus datos.',
     url: 'apps/printflow/printflow.html',
     color: '#FF7A45', bg: 'rgba(255,122,69,.1)', border: 'rgba(255,122,69,.2)',
     cls: 'mb',
@@ -1272,7 +1300,7 @@ const APPS = {
 let currentApp = null;
 /* Versión de despliegue: fuerza recarga sin caché de las subapps tras cada cambio.
    Súbela (bump) cuando cambies el código de una subapp. */
-const APP_VER = '20260731-1600';
+const APP_VER = '20260818-1200';
 
 function launchApp(id) {
   const a = APPS[id];
@@ -1305,7 +1333,8 @@ document.addEventListener('keydown', e => {
 window.dpOnTheme=function(t){var f=document.getElementById('v-frame');if(f&&f.contentWindow){try{f.contentWindow.postMessage({__dp3:true,type:'theme',theme:t},'*');}catch(e){}}};
 window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type==='home'){closeViewer();}});
 function openTrackerOrder(code){ try{ sessionStorage.setItem('dp3-admin-shared', JSON.stringify({orderId:code,orderCode:code})); }catch(e){} var _t=(document.documentElement.getAttribute('data-theme')||'dark'); var frame=document.getElementById('v-frame'); frame.src='apps/3dtracker/admin/order-detail.html?dptheme='+_t+'&v='+APP_VER; document.getElementById('viewer').classList.add('open'); }
-function openPrintflowSample(code){ var a=(typeof APPS!=='undefined')?APPS['flow']:null; var url=a&&a.url?a.url:'apps/printflow/printflow.html'; var _t=(document.documentElement.getAttribute('data-theme')||'dark'); document.getElementById('v-title').textContent='PrintFlow'; document.getElementById('v-dot').style.background=(a&&a.color)||'#FF7A45'; var ext=document.getElementById('v-ext'); if(ext) ext.href=url+'?v='+APP_VER; var frame=document.getElementById('v-frame'); frame.src=url+'?dptheme='+_t+'&v='+APP_VER+'&pffocus='+encodeURIComponent(code||''); document.getElementById('viewer').classList.add('open'); }
+function openPrintflowSample(code,pid,sid){ var a=(typeof APPS!=='undefined')?APPS['flow']:null; var url=a&&a.url?a.url:'apps/printflow/printflow.html'; var _t=(document.documentElement.getAttribute('data-theme')||'dark'); document.getElementById('v-title').textContent='PrintFlow'; document.getElementById('v-dot').style.background=(a&&a.color)||'#FF7A45'; var ext=document.getElementById('v-ext'); if(ext) ext.href=url+'?v='+APP_VER; var frame=document.getElementById('v-frame'); frame.src=url+'?dptheme='+_t+'&v='+APP_VER+'&pffocus='+encodeURIComponent(code||'')
+    +(pid?'&pfpid='+encodeURIComponent(pid):'')+(sid?'&pfsid='+encodeURIComponent(sid):''); document.getElementById('viewer').classList.add('open'); }
 window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type==='openTrackerOrder'&&d.code){openTrackerOrder(d.code);}});
 window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type==='openBilling'){launchApp('billing');}});
 </script>
@@ -1546,13 +1575,12 @@ window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type
 <script>
 /* Widget de etapas pendientes de PrintFlow (lee appState 'printflow' en vivo desde Firebase) */
 (function(){
-  var pending=[];
-  function escH(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  var pending=[], DATA=null;
   function compute(S){
     var out=[]; if(!S||!Array.isArray(S.projects))return out;
     S.projects.forEach(function(p){
       var steps=[]; (p.steps||[]).forEach(function(s){ steps.push({id:s.id,name:s.name}); (s.branches||[]).forEach(function(b){ steps.push({id:b.id,name:b.name}); }); });
-      (p.samples||[]).forEach(function(sm){ var v=sm.validations||{}; for(var _si=0;_si<steps.length;_si++){ var st=steps[_si]; if(!v[st.id]){ out.push({proj:p.name||'Proyecto',code:sm.code||'—',step:st.name||'etapa'}); break; } } });
+      (p.samples||[]).forEach(function(sm){ var v=sm.validations||{}; for(var _si=0;_si<steps.length;_si++){ var st=steps[_si]; if(!v[st.id]){ out.push({pid:p.id,sid:sm.id,stepId:st.id,proj:p.name||'Proyecto',code:sm.code||'—',step:st.name||'paso'}); break; } } });
     });
     return out;
   }
@@ -1560,6 +1588,25 @@ window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type
     window.__pfPendingCount=pending.length;
     if(window.DPNotif) window.DPNotif.set('printflow', pending);
   }
+  /* Da por hecho el paso en curso de una tarea y lo sube a la nube; PrintFlow
+     lo recoge en su propia escucha en vivo. */
+  window.pfVerifyNext=function(it,done){
+    done=done||function(){};
+    if(!DATA||!it||!it.pid||!it.sid||!it.stepId){ done(false); return; }
+    if(!(window.DPCloud&&window.DPCloud.saveState)){ done(false); return; }
+    var p=(DATA.projects||[]).filter(function(x){return x.id===it.pid;})[0];
+    var sm=p&&(p.samples||[]).filter(function(x){return x.id===it.sid;})[0];
+    if(!sm){ done(false); return; }
+    if(!sm.validations||typeof sm.validations!=='object') sm.validations={};
+    if(sm.validations[it.stepId]){ done(true); return; }
+    sm.validations[it.stepId]=new Date().toISOString();
+    pending=compute(DATA); render();
+    try{
+      window.DPCloud.saveState('printflow',{bioflow6:JSON.stringify(DATA)},Date.now())
+        .then(function(){ done(true); })
+        .catch(function(e){ console.warn('[printflow] no se pudo verificar el paso:',e&&(e.message||e)); done(false); });
+    }catch(e){ done(false); }
+  };
   function start(){
     try{ window.DPCloud.onAuth(function(u){
       if(!u||!u.email)return;
@@ -1567,7 +1614,7 @@ window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type
       if(!window.DPCloud.watchState)return;
       window.DPCloud.watchState('printflow', function(d){
         var S=null; try{ if(d&&d.data&&d.data.bioflow6) S=JSON.parse(d.data.bioflow6); }catch(e){}
-        pending=compute(S); render();
+        DATA=S; pending=compute(S); render();
         if(typeof window.pfOnPending==='function'){ try{ window.pfOnPending(pending); }catch(e){} }
       });
     }); }catch(e){}
@@ -1664,13 +1711,24 @@ window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type
     if(PREF.sortMode==='alpha'){ arr.sort(function(a,b){ return nameOf(a).localeCompare(nameOf(b),'es',{numeric:true}); }); }
     else if(PREF.sortMode==='opens'){ arr.sort(function(a,b){ return (opensOf(b)-opensOf(a)) || nameOf(a).localeCompare(nameOf(b),'es',{numeric:true}); }); }
     else if(PREF.order&&PREF.order.length){ arr.sort(function(a,b){ var ia=PREF.order.indexOf(a.getAttribute('data-app')), ib=PREF.order.indexOf(b.getAttribute('data-app')); if(ia<0)ia=1e9; if(ib<0)ib=1e9; return ia-ib; }); }
-    arr.forEach(function(c){ grid.appendChild(c); });
+    /* ¿el orden pedido ya es el que hay? entonces no se toca el DOM. Reinsertar
+       una tarjeta reinicia su animación de entrada, y al llegar los ajustes de
+       la nube eso hacía que la pantalla pareciera recargarse. */
+    var cur=[].slice.call(grid.children).filter(function(c){ return c.classList.contains('card'); });
+    var igual=(cur.length===arr.length);
+    if(igual) for(var i=0;i<arr.length;i++){ if(cur[i]!==arr[i]){ igual=false; break; } }
+    if(!igual){
+      /* si el arranque ya pasó, la reinserción no debe volver a animar nada */
+      var yaMostrado=document.body.classList.contains('dp-ready');
+      arr.forEach(function(c){ grid.appendChild(c); });
+      if(yaMostrado) arr.forEach(function(c){ c.style.animation='none'; c.style.opacity='1'; });
+    }
     var cust=(PREF.sortMode==='custom');
     grid.classList.toggle('sortable',cust);
     cards.forEach(function(c){ c.draggable=cust; });
     var pill=document.getElementById('sortPill'); if(pill){ pill.textContent='Orden: '+LABEL[PREF.sortMode]; pill.title=cust?'Arrastra las tarjetas para ordenarlas · pulsa para cambiar de modo':'Pulsa para cambiar el orden de las apps'; }
   }
-  function reveal(){ var cs=[].slice.call(grid.querySelectorAll('.card')); cs.forEach(function(c,idx){ c.style.animation='none'; void c.offsetWidth; c.style.animation='dpReveal .6s cubic-bezier(.22,.9,.32,1) both'; c.style.animationDelay=(0.05+idx*0.06)+'s'; }); }
+  function reveal(){ var cs=[].slice.call(grid.querySelectorAll('.card')); cs.forEach(function(c,idx){ c.style.opacity=''; c.style.animation='none'; void c.offsetWidth; c.style.animation='dpReveal .6s cubic-bezier(.22,.9,.32,1) both'; c.style.animationDelay=(0.05+idx*0.06)+'s'; }); }
   window.dpRevealApps=reveal;
   function cycle(){ var i=MODES.indexOf(PREF.sortMode); PREF.sortMode=MODES[(i+1)%MODES.length]; apply(); reveal(); persist(); }
   var orig=window.launchApp;
@@ -1689,7 +1747,8 @@ window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type
       if(!u||!u.email) return; if(window.__lnSub) return; window.__lnSub=true; cloudReady=true;
       if(!window.DPCloud.watchState) return;
       window.DPCloud.watchState('launcher', function(d){
-        var data=d&&d.data?d.data:null; if(!data){ saveCloud(); return; }
+        var data=d&&d.data?d.data:null;
+        if(!data){ if(!window.__lnSeeded){ window.__lnSeeded=true; saveCloud(); } return; }
         if(MODES.indexOf(data.sortMode)>=0) PREF.sortMode=data.sortMode;
         if(Array.isArray(data.order)) PREF.order=data.order;
         PREF.opens=mergeOpens(data.opens);

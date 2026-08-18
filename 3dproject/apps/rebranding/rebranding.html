@@ -395,10 +395,12 @@ main{max-width:none;margin:52px 0 0 var(--sidebar-w);padding:22px 28px 60px}
       <div class="chipstrip" id="refbar"></div>
     </div>
 
-    <h2 class="sec">Imágenes de resultado <span class="hint">se muestran alrededor de la imagen en edición</span></h2>
+    <h2 class="sec">Imágenes de resultado <span class="hint">se muestran alrededor de la imagen en edición</span><span class="hint" id="resimguse"></span></h2>
     <div class="cfgcard">
       <p>Añade aquí las imágenes que quieras tener a la vista como referencia visual mientras editas
-      (por ejemplo, publicaciones ya publicadas). Se guardan en este navegador, reducidas para no ocupar espacio.</p>
+      (por ejemplo, publicaciones ya publicadas). Al importarlas se convierten automáticamente al
+      formato más ligero que admita el navegador y al tamaño mínimo que conserva el color y la
+      luminosidad originales, para que ocupen lo menos posible.</p>
       <div class="dz compact" id="dropResImg" tabindex="0" role="button">
         Añadir imágenes de resultado — <em>.jpg / .png / .webp</em>
         <input type="file" id="fileResImg" accept="image/*" multiple hidden>
@@ -1091,31 +1093,126 @@ function buildRefbar(){
 }
 
 /* --- imágenes de resultado --- */
-/* Añadidas a mano desde Configuración (se guardan en este navegador, reducidas). */
+/* Añadidas a mano desde Configuración. Se guardan en este navegador convertidas al
+   formato más compacto que admita (WebP y, si no, JPEG) y al tamaño mínimo que
+   conserva fielmente el color y la luminosidad: son referencias visuales, no
+   originales, así que basta con el lado mayor a 760 px. La calidad se busca
+   automáticamente para que cada imagen quepa en el presupuesto de espacio. */
 const RESIMG_KEY='rb-resimgs';
+const RESIMG_MAXDIM=760;              /* lado mayor en píxeles */
+const RESIMG_TARGET=90*1024;          /* objetivo de peso por imagen */
+const RESIMG_MIN_Q=0.5;               /* calidad mínima admisible */
+const RESIMG_MAX_Q=0.92;              /* calidad de partida */
+
+/* WebP pesa la mitad que JPEG con el mismo color y luminosidad; si el navegador
+   no sabe generarlo, se usa JPEG. */
+const RESIMG_FMT=(function(){
+  try{ const c=document.createElement('canvas'); c.width=c.height=1;
+    return c.toDataURL('image/webp').indexOf('data:image/webp')===0?'image/webp':'image/jpeg';
+  }catch(e){ return 'image/jpeg'; }
+})();
+
 let resImgs=[];
 try{ resImgs=JSON.parse(localStorage.getItem(RESIMG_KEY)||'[]')||[]; }catch(e){ resImgs=[]; }
-function saveResImgs(){ try{ localStorage.setItem(RESIMG_KEY,JSON.stringify(resImgs)); }catch(e){ alert('No se pudieron guardar las imágenes: el almacenamiento del navegador está lleno. Elimina alguna.'); } }
-function shrinkImage(file,max){ return new Promise(function(res,rej){
-  const fr=new FileReader();
-  fr.onload=function(){ const im=new Image();
-    im.onload=function(){ const s=Math.min(1,max/Math.max(im.width,im.height));
-      const c=document.createElement('canvas'); c.width=Math.round(im.width*s); c.height=Math.round(im.height*s);
-      c.getContext('2d').drawImage(im,0,0,c.width,c.height);
-      try{ res(c.toDataURL('image/jpeg',0.82)); }catch(e){ rej(e); } };
-    im.onerror=rej; im.src=fr.result; };
-  fr.onerror=rej; fr.readAsDataURL(file); }); }
+
+function saveResImgs(){ try{ localStorage.setItem(RESIMG_KEY,JSON.stringify(resImgs)); return true; }catch(e){ return false; } }
+function dataURLBytes(u){ const i=(u||'').indexOf(','); return i<0?0:Math.round((u.length-i-1)*0.75); }
+function resImgsBytes(){ let n=0; resImgs.forEach(r=>{ n+=dataURLBytes(r.url)+(r.name||'').length+40; }); return n; }
+function fmtBytes(n){ return n<1024?n+' B':n<1048576?(n/1024).toFixed(0)+' KB':(n/1048576).toFixed(2)+' MB'; }
+
+/* Decodifica respetando la orientación EXIF (así no se giran las referencias). */
+function decodeImageSource(src){
+  if(window.createImageBitmap && (src instanceof Blob)){
+    try{ return createImageBitmap(src,{imageOrientation:'from-image'}).catch(()=>decodeViaObjectURL(src)); }catch(e){}
+  }
+  return decodeViaObjectURL(src);
+}
+function decodeViaObjectURL(src){
+  return new Promise((res,rej)=>{
+    const url=(src instanceof Blob)?URL.createObjectURL(src):src;
+    const im=new Image();
+    im.onload=()=>{ if(src instanceof Blob)URL.revokeObjectURL(url); res(im); };
+    im.onerror=e=>{ if(src instanceof Blob)URL.revokeObjectURL(url); rej(e); };
+    im.src=url;
+  });
+}
+/* Redibuja a la dimensión pedida y codifica con la calidad indicada. */
+function encodeResImg(img,dim,q,fmt){
+  const sc=Math.min(1,dim/Math.max(img.width,img.height));
+  const w=Math.max(1,Math.round(img.width*sc)), h=Math.max(1,Math.round(img.height*sc));
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const ctx=c.getContext('2d',{alpha:false});
+  ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+  ctx.drawImage(img,0,0,w,h);
+  return c.toDataURL(fmt,q);
+}
+/* Busca la mayor calidad (y, si hace falta, la mayor dimensión) que quepa en el
+   presupuesto: primero baja la calidad, y solo si aun así no cabe reduce el tamaño. */
+async function shrinkImage(src,maxDim,target){
+  maxDim=maxDim||RESIMG_MAXDIM; target=target||RESIMG_TARGET;
+  const img=await decodeImageSource(src);
+  const fmt=RESIMG_FMT;
+  const dims=[maxDim,Math.round(maxDim*0.8),Math.round(maxDim*0.62),Math.round(maxDim*0.48)];
+  let best=null;
+  try{
+    for(const dim of dims){
+      let lo=RESIMG_MIN_Q, hi=RESIMG_MAX_Q;
+      const top=encodeResImg(img,dim,hi,fmt);
+      if(dataURLBytes(top)<=target){ best=top; break; }
+      let fit=null, ligera=null, ligeraB=Infinity;
+      for(let i=0;i<6;i++){
+        const mid=(lo+hi)/2, u=encodeResImg(img,dim,mid,fmt), b=dataURLBytes(u);
+        if(b<=target){ fit=u; lo=mid; }
+        else { hi=mid; if(b<ligeraB){ ligera=u; ligeraB=b; } }
+      }
+      if(fit){ best=fit; break; }
+      best=ligera;   /* la más ligera que se ha llegado a probar en esta dimensión */
+    }
+  } finally { try{ img.close&&img.close(); }catch(e){} }
+  return best;
+}
+/* Vuelve a comprimir lo ya guardado cuando el navegador se queda sin espacio. */
+async function recompressResImgs(target){
+  for(const r of resImgs){
+    try{
+      const blob=await (await fetch(r.url)).blob();
+      const u=await shrinkImage(blob,RESIMG_MAXDIM,target);
+      if(u && u.length<r.url.length) r.url=u;
+    }catch(e){ console.warn('No se pudo recomprimir',r.name,e); }
+  }
+}
+
 async function addResImgs(list){
   const files=Array.from(list||[]).filter(f=>/^image\//.test(f.type));
+  if(!files.length) return;
+  const use=$('#resimguse'); if(use) use.textContent='· convirtiendo…';
+  const start=resImgs.length;
   for(const f of files){
-    try{ const url=await shrinkImage(f,640); resImgs.push({id:'ri'+Date.now()+Math.random().toString(36).slice(2,7),name:f.name.replace(/\.[^.]+$/,''),url:url}); }
+    try{
+      const url=await shrinkImage(f,RESIMG_MAXDIM,RESIMG_TARGET);
+      if(url) resImgs.push({id:'ri'+Date.now()+Math.random().toString(36).slice(2,7),name:f.name.replace(/\.[^.]+$/,''),url:url});
+    }
     catch(e){ console.warn('No se pudo procesar',f.name,e); }
   }
-  saveResImgs(); buildResImgBar(); buildResbar();
+  if(!saveResImgs()){
+    /* sin espacio: apretar la compresión de todo y reintentar antes de rendirse */
+    await recompressResImgs(Math.round(RESIMG_TARGET*0.55));
+    if(!saveResImgs()){
+      await recompressResImgs(Math.round(RESIMG_TARGET*0.30));
+      if(!saveResImgs()){
+        resImgs.splice(start);
+        saveResImgs();
+        alert('No caben más imágenes en el almacenamiento de este navegador.\nElimina alguna de las ya añadidas e inténtalo de nuevo.');
+      }
+    }
+  }
+  buildResImgBar(); buildResbar();
 }
 function delResImg(id){ resImgs=resImgs.filter(x=>x.id!==id); saveResImgs(); buildResImgBar(); buildResbar(); }
 function buildResImgBar(){
   const bar=$('#resimgbar'); if(!bar)return; bar.innerHTML='';
+  const use=$('#resimguse');
+  if(use) use.textContent=resImgs.length?('· '+resImgs.length+' img · '+fmtBytes(resImgsBytes())+' · '+(RESIMG_FMT==='image/webp'?'WebP':'JPEG')):'';
   if(!resImgs.length){ bar.innerHTML='<div class="emptybox" style="width:100%">sin imágenes añadidas</div>'; return; }
   resImgs.forEach(r=>{ const el=document.createElement('div'); el.className='fchip';
     el.innerHTML='<img src="'+r.url+'"><span>'+(r.name.length>18?r.name.slice(0,16)+'…':r.name)+'</span><span class="rb" title="Quitar" style="cursor:pointer">✕</span>';
