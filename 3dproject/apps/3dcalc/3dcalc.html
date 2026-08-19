@@ -510,6 +510,39 @@ option{background-color:#161922;color:#E8EBF4}
 .prod-auto span{color:var(--t2)}.prod-auto em{color:var(--t3);font-style:normal;font-size:11px}
 .prod-auto b{color:var(--t1);white-space:nowrap}
 .pdot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:3px;vertical-align:middle}
+/* simulación de calendario dentro del formulario de producción */
+.simcal{margin-top:14px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.02);padding:12px 13px}
+.simcal-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:9px}
+.simcal-t{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--t2)}
+.simcal-tabs{display:flex;gap:3px;padding:3px;border:1px solid var(--border);border-radius:9px;background:var(--sel)}
+.simcal-tabs button{border:0;background:transparent;color:var(--t2);font:600 11.5px 'Outfit',sans-serif;padding:5px 11px;border-radius:7px;cursor:pointer}
+.simcal-tabs button:hover{color:var(--t1)}
+.simcal-tabs button.on{background:rgba(0,221,184,.14);color:var(--ac)}
+.simcal-tabs button.on.sc-urg{background:rgba(244,183,64,.16);color:#F4B740}
+.simcal-note{font-size:11px;color:var(--t3);line-height:1.45;margin-bottom:10px}
+.simcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.simcal-wd{font:700 9.5px 'Outfit',sans-serif;text-transform:uppercase;letter-spacing:.4px;color:var(--t3);text-align:center;padding:1px 0}
+.simcal-wd.sc-sun{color:#FF6B8A}
+.simcal-cell{min-height:50px;border:1px solid var(--border);border-radius:8px;padding:3px;background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.simcal-cell.sc-sun{background:rgba(255,107,138,.05);border-color:rgba(255,107,138,.12)}
+.simcal-cell.sc-sp{background:rgba(139,124,255,.06);border-color:rgba(139,124,255,.16)}
+.simcal-cell.sc-today{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac) inset}
+.simcal-drow{display:flex;align-items:center;gap:3px;min-height:11px}
+.simcal-dn{font-size:9.5px;font-weight:700;color:var(--t3);margin-left:auto;line-height:1;white-space:nowrap}
+.simcal-fin{font-size:10px;line-height:1}
+.simcal-chip{display:flex;align-items:center;gap:4px;font-size:9px;font-weight:600;color:var(--t2);background:color-mix(in srgb, var(--oc) 12%, transparent);border-left:2px solid var(--oc);border-radius:3px;padding:1px 3px;overflow:hidden;opacity:.6}
+.simcal-chip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.simcal-chip i{width:6px;height:6px;flex-shrink:0}
+.simcal-chip.sc-d i{background:#4D9FFF;border-radius:2px}
+.simcal-chip.sc-t i{background:#F4B740;border-radius:50%}
+.simcal-chip.sc-i i{background:#34D399;transform:rotate(45deg)}
+.simcal-chip.sc-me{opacity:1;color:var(--t1);background:color-mix(in srgb, var(--oc) 26%, transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--oc) 55%, transparent)}
+.simcal-more{font-size:8.5px;color:var(--t3);padding-left:2px}
+.simcal-legend{display:flex;gap:11px;flex-wrap:wrap;font-size:10.5px;color:var(--t3);margin-top:9px}
+.simcal-legend span{display:inline-flex;align-items:center;gap:4px}
+.simcal-legend i.sc-mine{width:9px;height:9px;border-radius:2px;background:var(--ac)}
+.simcal-warn{font-size:11px;line-height:1.45;color:#F4B740;margin-top:9px}
+.simcal-empty{font-size:11.5px;color:var(--t3);line-height:1.45}
 .pd-d{background:#4D9FFF}.pd-t{background:#F4B740}.pd-i{background:#34D399;transform:rotate(45deg)}
 .cal-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px}
 .cal-nav{display:flex;align-items:center;gap:8px}.cal-nav .btn{padding:8px 12px}
@@ -967,7 +1000,7 @@ function loadColorCatalog(force){
     })
     .then(function(list){
       COLOR_CAT=list||[]; COLOR_CAT_LOADING=false;
-      try{ if(view==='calc')renderCalc(); }catch(e){}
+      try{ if(view==='calc'){ if(colorPanelOpen)_rebuildColorField(); else renderCalc(); } }catch(e){}
       return COLOR_CAT;
     });
 }
@@ -976,17 +1009,66 @@ function selectedColors(c){
   if(Array.isArray(v))return v.slice();
   return String(v||'').split(/\s*[·,]\s*/).filter(Boolean);
 }
-function toggleColor(name){
-  var c=S.calc_state, sel=selectedColors(c), i=sel.indexOf(name);
-  if(i>=0)sel.splice(i,1); else sel.push(name);
+/* Marcar o desmarcar un color NO repinta el formulario: se actualizan en el sitio
+   la fila tocada y el resumen del campo, para que el desplegable no dé saltos ni
+   pierda la posición del scroll mientras se eligen varios colores. */
+function toggleColor(name,el){
+  var c=S.calc_state, sel=selectedColors(c), i=sel.indexOf(name), on=(i<0);
+  if(on)sel.push(name); else sel.splice(i,1);
   c.filamento_color=sel.join(' · ');
-  save(); renderCalc();
+  save();
+  var row=(el&&el.closest)?el.closest('.crow'):null;
+  if(row){
+    row.classList.toggle('on',on);
+    var cb=row.querySelector('input'); if(cb)cb.checked=on;
+    _colorFieldSync(row.closest('.cfield'));
+  } else _rebuildColorField();
 }
-/* El panel se mantiene abierto mientras se marcan colores: como cada cambio repinta
-   el formulario, el estado se guarda aquí y se reaplica al volver a dibujarlo. */
+/* Escribir un color a mano sí añade una fila nueva («Añadidos a mano»), así que
+   ahí se redibuja solo el campo de color, conservando panel abierto y scroll. */
+function addManualColor(inp){
+  var v=String((inp&&inp.value)||'').trim(); if(!v)return;
+  var c=S.calc_state, sel=selectedColors(c);
+  if(sel.indexOf(v)<0){ sel.push(v); c.filamento_color=sel.join(' · '); save(); }
+  inp.value='';
+  _rebuildColorField();
+}
+/* Refresca el texto del botón y la cabecera del panel sin tocar la lista. */
+function _colorFieldSync(f){
+  f=f||document.querySelector('.cfield'); if(!f)return;
+  var sel=selectedColors(S.calc_state);
+  var resumen=(sel.length===0?'Sin color seleccionado':(sel.length===1?'1 color seleccionado':sel.length+' colores seleccionados'));
+  var txt=f.querySelector('.cfield-txt');
+  if(txt){ txt.textContent=resumen; txt.classList.toggle('has',sel.length>0); }
+  var panel=f.querySelector('.cpick-panel');
+  if(panel){
+    var top=panel.querySelector('.cpick-top');
+    if(sel.length&&!top){
+      var d=document.createElement('div'); d.className='cpick-top';
+      d.innerHTML='<span>'+resumen+'</span><button type="button" class="cpick-clear" onclick="clearColors()">Desmarcar todos</button>';
+      panel.insertBefore(d,panel.firstChild);
+    }
+    else if(!sel.length&&top){ top.parentNode.removeChild(top); }
+    else if(top){ var sp=top.querySelector('span'); if(sp)sp.textContent=resumen; }
+  }
+  try{ updateResult(); }catch(e){}
+}
+/* Redibuja únicamente el campo de color, no el formulario entero. */
+function _rebuildColorField(){
+  var f=document.querySelector('.cfield'); if(!f){ try{ renderCalc(); }catch(e){} return; }
+  var panel=f.querySelector('.cpick-panel'), sc=panel?panel.scrollTop:0;
+  var tmp=document.createElement('div'); tmp.innerHTML=colorFieldHTML(S.calc_state);
+  var nf=tmp.firstElementChild; if(!nf)return;
+  f.parentNode.replaceChild(nf,f);
+  var np=nf.querySelector('.cpick-panel');
+  if(np){ np.classList.toggle('open',colorPanelOpen); np.scrollTop=sc; }
+  try{ updateResult(); }catch(e){}
+}
+/* El panel se mantiene abierto mientras se marcan colores: el estado vive aquí y
+   se reaplica cuando algo obliga a redibujar el campo. */
 var colorPanelOpen=false;
 /* Deja el campo sin ningún color marcado. */
-function clearColors(){ S.calc_state.filamento_color=''; save(); renderCalc(); }
+function clearColors(){ S.calc_state.filamento_color=''; save(); _rebuildColorField(); }
 function colorPanelToggle(){
   colorPanelOpen=!colorPanelOpen;
   var p=document.getElementById('colorPanel'); if(p)p.classList.toggle('open',colorPanelOpen);
@@ -1032,7 +1114,7 @@ function colorFieldHTML(c){
       return '<div class="cpick-g">'+esc(g)+'</div>'
         +grupos[g].map(function(x){
             var k=x.clave||x.nombre, on=sel.indexOf(k)>=0;
-            return '<label class="crow'+(on?' on':'')+'"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleColor(\''+jsq(k)+'\')">'
+            return '<label class="crow'+(on?' on':'')+'"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleColor(\''+jsq(k)+'\',this)">'
               +'<i style="background:'+esc(x.hex)+'"></i><span>'+esc(x.nombre)+'</span></label>';
           }).join('');
     }).join('');
@@ -1044,7 +1126,7 @@ function colorFieldHTML(c){
     +'<button type="button" class="cfield-btn" onclick="colorPanelToggle()">'
       +'<span class="cfield-txt'+(sel.length?' has':'')+'">'+resumen+'</span><span class="cfield-car">▾</span></button>'
     +'<div class="cpick-panel'+(colorPanelOpen?' open':'')+'" id="colorPanel">'+cabecera+lista
-      +'<div class="cpick-manual"><input class="inp" placeholder="…o escribe un color y pulsa Intro" onkeydown="if(event.key===\'Enter\'){event.preventDefault();var v=this.value.trim();if(v){toggleColor(v);}}"></div>'
+      +'<div class="cpick-manual"><input class="inp" placeholder="…o escribe un color y pulsa Intro" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addManualColor(this);}"></div>'
     +'</div></div>';
 }
 /* ===== calculadora ===== */
@@ -1190,6 +1272,107 @@ function _deliveryText(finProd){ var fin=_entregaDesdeFin(finProd); if(!fin)retu
 function _finFromSched(s){ if(!s)return null; var last=(s.print&&s.print.length)?s.print[s.print.length-1]:s.end; if(!last)return null; var d=_addD(_md(last),1); while(_isSun(d))d=_addD(d,1); return d; }
 function _simFinish(prod,dm,horas,urgLevel){ var _ul=(urgLevel||'Normal'); var pd=prodDays(prod,horas,dm,_ul==='Urgente'); if(!pd||pd.total<=0)return null; var temp={id:'__SIM__',number:'__SIM__',created_at:new Date().toISOString(),archived:false,prod:prod,diseno_modelado:dm,horas:String(horas),urgencia_nivel:_ul,cal_at:8640000000000}; var orig=S.orders; S.orders=(orig||[]).concat([temp]); var sched; try{ sched=scheduleOrders(); }catch(e){ sched={}; } S.orders=orig; return _finFromSched(sched['__SIM__']); }
 function _simStartDay(prod,dm,horas,urgLevel){ var _ul=(urgLevel||'Normal'); var pd=prodDays(prod,horas,dm,_ul==='Urgente'); if(!pd||pd.total<=0)return null; var temp={id:'__SIM__',number:'__SIM__',created_at:new Date().toISOString(),archived:false,prod:prod,diseno_modelado:dm,horas:String(horas),urgencia_nivel:_ul,cal_at:8640000000000}; var orig=S.orders; S.orders=(orig||[]).concat([temp]); var sched; try{ sched=scheduleOrders(); }catch(e){ sched={}; } S.orders=orig; var _e=sched['__SIM__']; return _e?_e.start:null; }
+
+/* ===== simulación del calendario (antes de aceptar el pedido) ================
+   Programa una copia temporal del pedido junto a los ya guardados y devuelve la
+   planificación resultante. Nunca toca S.orders, SCHED_INFO ni el calendario
+   real: es solo una previsualización de «cómo quedaría si lo guardase ahora». */
+var SIM_ID='__SIM__';
+function _simSchedule(prod,dm,horas,urgLevel){
+  if(!prod)return null;
+  var _ul=(urgLevel==='Urgente'?'Urgente':'Normal');
+  var pd=prodDays(prod,horas,dm,_ul==='Urgente');
+  if(!pd||pd.total<=0)return null;
+  var temp={id:SIM_ID,number:SIM_ID,cliente:((S.calc_state&&S.calc_state.cliente)||'Este pedido'),created_at:new Date().toISOString(),archived:false,prod:prod,diseno_modelado:dm,horas:String(horas),urgencia_nivel:_ul,cal_at:8640000000000};
+  var orig=S.orders, infoPrev=SCHED_INFO, sched, info;
+  S.orders=(orig||[]).concat([temp]);
+  try{ sched=scheduleOrders(); info=SCHED_INFO; }catch(e){ sched={}; info=null; }
+  S.orders=orig; SCHED_INFO=infoPrev;
+  if(!sched||!sched[SIM_ID])return null;
+  return {sched:sched,list:(orig||[]).concat([temp]),sim:sched[SIM_ID],info:info,pd:pd,lvl:_ul};
+}
+/* Cuántos pedidos ya programados se irían a una fecha peor por colar este. */
+function _simImpact(res){
+  var base, infoPrev=SCHED_INFO;
+  try{ base=scheduleOrders(); }catch(e){ base={}; }
+  SCHED_INFO=infoPrev;
+  var n=0, worst=0;
+  (S.orders||[]).forEach(function(o){
+    var b=base[o.id], a=res.sched[o.id]; if(!b||!a)return;
+    var fb=_finFromSched(b), fa=_finFromSched(a); if(!fb||!fa)return;
+    var dd=Math.round((fa-fb)/86400000);
+    if(dd>0){ n++; if(dd>worst)worst=dd; }
+  });
+  return {count:n,worst:worst};
+}
+/* Contexto del formulario que se está simulando (lo fija _prodInner). */
+var _simCtx=null, prodSimLvl='auto';
+function setProdSimLvl(v){
+  prodSimLvl=v;
+  var el=document.getElementById('prodSimCal'); if(el)el.innerHTML=prodSimCalHTML();
+}
+function _simLvlActive(){
+  if(prodSimLvl==='std'||prodSimLvl==='urg')return prodSimLvl;
+  return (_simCtx&&_simCtx.urg)?'urg':'std';
+}
+function prodSimCalHTML(){
+  var cx=_simCtx; if(!cx||!cx.p)return '';
+  var lvl=_simLvlActive();
+  var head='<div class="simcal-h"><span class="simcal-t">Simulación del calendario</span>'
+    +'<div class="simcal-tabs">'
+      +'<button type="button" class="'+(lvl==='std'?'on':'')+'" onclick="setProdSimLvl(\'std\')">Estándar</button>'
+      +'<button type="button" class="'+(lvl==='urg'?'on sc-urg':'')+'" onclick="setProdSimLvl(\'urg\')">⚡ Urgente</button>'
+    +'</div></div>';
+  var res=_simSchedule(cx.p,cx.dm,cx.hrs,lvl==='urg'?'Urgente':'Normal');
+  if(!res)return '<div class="simcal">'+head+'<div class="simcal-empty">Indica el tiempo de impresión, el diseño o algún test para poder simular la programación.</div></div>';
+  return '<div class="simcal">'+head
+    +'<div class="simcal-note">Así quedaría el calendario si guardases el pedido ahora con la tarifa '+(lvl==='urg'?'urgente':'estándar')+'. Es solo una previsualización: el calendario real no cambia hasta que lo guardes.</div>'
+    +_simCalGridHTML(res)+_simCalFootHTML(res)+'</div>';
+}
+function _simCalGridHTML(res){
+  var sched=res.sched, dayMap={};
+  (res.list||[]).forEach(function(o){
+    var sc=sched[o.id]; if(!sc)return;
+    sc.design.forEach(function(k){ (dayMap[k]=dayMap[k]||[]).push({o:o,ph:'d'}); });
+    sc.test.forEach(function(k){ (dayMap[k]=dayMap[k]||[]).push({o:o,ph:'t'}); });
+    sc.print.forEach(function(k){ (dayMap[k]=dayMap[k]||[]).push({o:o,ph:'i'}); });
+  });
+  var st=_md(res.sim.start), fin=_finFromSched(res.sim)||_md(res.sim.end);
+  var from=_addD(st,-((st.getDay()+6)%7));      /* lunes de la semana de inicio  */
+  var to=_addD(fin,6-((fin.getDay()+6)%7));     /* domingo de la semana de entrega */
+  if((to-from)/86400000>76)to=_addD(from,76);   /* como mucho 11 semanas */
+  var todayK=_dk(new Date()), finK=_dk(fin);
+  var MON=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  var h='<div class="simcal-grid"><div class="simcal-wd">Lun</div><div class="simcal-wd">Mar</div><div class="simcal-wd">Mié</div><div class="simcal-wd">Jue</div><div class="simcal-wd">Vie</div><div class="simcal-wd">Sáb</div><div class="simcal-wd sc-sun">Dom</div>';
+  for(var d=_md(from); d<=to; d=_addD(d,1)){
+    var k=_dk(d), sp=_daySpecial(k), sun=_isSun(d), items=dayMap[k]||[];
+    /* el pedido simulado va siempre el primero de la celda */
+    items=items.slice().sort(function(a,b){ return (a.o.id===SIM_ID?0:1)-(b.o.id===SIM_ID?0:1); });
+    var vis=items.slice(0,3), rest=items.length-vis.length;
+    var chips=vis.map(function(x){
+      var mine=(x.o.id===SIM_ID);
+      var lbl=(x.ph==='d'?'Diseño':(x.ph==='t'?'Testado':'Impresión'));
+      var nm=mine?'Este pedido':(x.o.cliente||x.o.number||'Pedido');
+      return '<div class="simcal-chip sc-'+x.ph+(mine?' sc-me':'')+'" style="--oc:'+(mine?'var(--ac)':orderColor(x.o))+'" title="'+esc(nm+' — '+lbl)+'"><i></i><span>'+esc(mine?lbl:nm)+'</span></div>';
+    }).join('');
+    if(rest>0)chips+='<div class="simcal-more">+'+rest+' más</div>';
+    var mark=(d.getDate()===1||_dk(d)===_dk(from));
+    h+='<div class="simcal-cell'+(sun?' sc-sun':'')+(sp.length?' sc-sp':'')+(k===todayK?' sc-today':'')+'" title="'+_fmtFin(d)+(sp.length?(' · '+sp.map(function(t){return CDLBL[t];}).join(', ')):'')+'">'
+      +'<div class="simcal-drow">'+(k===finK?'<span class="simcal-fin" title="Entrega estimada">🏁</span>':'')
+      +'<span class="simcal-dn">'+d.getDate()+(mark?(' '+MON[d.getMonth()]):'')+'</span></div>'+chips+'</div>';
+  }
+  return h+'</div>';
+}
+function _simCalFootHTML(res){
+  var fin=_finFromSched(res.sim);
+  var h='<div class="simcal-legend">'
+    +'<span><i class="sc-mine"></i>Este pedido</span>'
+    +'<span><i class="pdot pd-d"></i>Diseño</span><span><i class="pdot pd-t"></i>Testado</span><span><i class="pdot pd-i"></i>Impresión</span>'
+    +'<span>🏁 Entrega'+(fin?(' · '+_fmtFin(fin)):'')+'</span></div>';
+  var im=_simImpact(res);
+  if(im.count>0)h+='<div class="simcal-warn">Al colarlo en la cola, '+im.count+' pedido'+(im.count===1?'':'s')+' ya programado'+(im.count===1?'':'s')+' se entregaría'+(im.count===1?'':'n')+' hasta '+im.worst+' día'+(im.worst===1?'':'s')+' más tarde.</div>';
+  return h;
+}
 function _prodSumHTML(pd,finDate,sim,finUrg,startDk){
   function seg(d,cls){ return d>0?('<i style="flex:'+d+'" class="'+cls+'"></i>'):''; }
   var _stTxt='';
@@ -1232,6 +1415,8 @@ function _prodInner(p,on,dm,hrs,finDate,sim,urg,finUrg){
   var _autoSt=_simStartDay(p,dm,hrs,urg?'Urgente':'Normal'); var _stVal=(p.startDay||_autoSt||'');
   h+='<div class="fg prod-st"><label class="lbl">Primer día de inicio <em class="prod-src">'+(p.startDay?(p.startDay<_dk(_md(Date.now()))?'fijado manualmente · anterior a hoy':'fijado manualmente'):'primer día disponible (auto) · puedes adelantarlo')+'</em></label><div class="date-row"><input class="inp" type="date" value="'+esc(_stVal)+'" onchange="EPSET(\'startDay\',this.value)"><button type="button" class="btn ghost date-hoy'+((p.startDay===_dk(_md(Date.now())))?' date-hoy-on':'')+'" title="Empezar la producción hoy" onclick="EPSET(\'startDay\',_dk(_md(Date.now())))">Hoy</button></div></div>';
   h+='<div class="prod-sum-box">'+_prodSumHTML(prodDays(p,hrs,dm,urg),finDate,sim,finUrg,(p.startDay||_autoSt||null))+'</div>';
+  /* Solo en la calculadora (sim): previsualización del calendario sin aceptar el pedido. */
+  if(sim){ _simCtx={p:p,dm:dm,hrs:hrs,urg:!!urg}; h+='<div id="prodSimCal">'+prodSimCalHTML()+'</div>'; }
   return h;
 }
 function prodFormHTML(c){
@@ -1252,6 +1437,7 @@ function refreshProdCard(){
   var im=card.querySelector('.prod-im .inp'); if(im)im.value=decToHM(hh);
   var imu=card.querySelector('.prod-im .u'); if(imu)imu.textContent=iDays+' d';
   var box=card.querySelector('.prod-sum-box'); if(box)box.innerHTML=_prodSumHTML(prodDays(p,hrs,dm,_urgn),_simFinish(p,dm,hrs,_urgn?'Urgente':'Normal'),true,_urgAmb?_simFinish(p,dm,hrs,'Urgente'):null,(p.startDay||_simStartDay(p,dm,hrs,_urgn?'Urgente':'Normal')||null));
+  var sim=card.querySelector('#prodSimCal'); if(sim){ _simCtx={p:p,dm:dm,hrs:hrs,urg:_urgn}; sim.innerHTML=prodSimCalHTML(); }
 }
 function _md(d){ var x=new Date(d); if(isNaN(x))x=new Date(); x.setHours(0,0,0,0); return x; }
 function _isSun(d){ return d.getDay()===0; }
@@ -2284,23 +2470,75 @@ function ticketLines(o,kind){
     '          Err='+(o.probabilidad_error||'-')+' | Urg='+(o.urgencia_nivel||'-'));
   return lines;
 }
+/* Alto disponible antes del pie del A4. */
+var PDF_BOTTOM=282, PDF_TOP=20;
+/* Mide la tarjeta de datos: cada valor se reparte en tantas líneas como necesite
+   (una lista larga de colores, una descripción larga…) y la fila crece con él,
+   de modo que nada se recorta ni se solapa con la fila siguiente. */
+function _dataCardPrep(doc,w,rows){
+  var pad=7, colW=w/2-pad-7, labH=5, lineH=4.6, gap=4.2, MAXL=14;
+  var prep=(rows||[]).map(function(rw){
+    var cells=[], maxL=1;
+    for(var ci=0;ci<2;ci++){
+      var lab=rw[ci*2], val=rw[ci*2+1];
+      if(lab==null){ cells.push(null); continue; }
+      var isLink=!!(val&&typeof val==='object'&&val.url);
+      var vs=String(isLink?(val.v||''):(val==null?'':val));
+      doc.setFont('helvetica','bold'); doc.setFontSize(10.5);
+      var lines=doc.splitTextToSize(vs,colW);
+      if(!lines.length)lines=[''];
+      if(lines.length>MAXL){ lines=lines.slice(0,MAXL); lines[MAXL-1]=lines[MAXL-1]+'…'; }
+      if(lines.length>maxL)maxL=lines.length;
+      cells.push({lab:lab,lines:lines,url:isLink?val.url:null});
+    }
+    return {cells:cells,h:labH+maxL*lineH+gap};
+  });
+  var total=pad+pad-3;
+  prep.forEach(function(r){ total+=r.h; });
+  return {prep:prep,h:total,pad:pad,labH:labH,lineH:lineH};
+}
 function _dataCard(doc,x,y,w,rows){
-  var pad=7, lh=13.5, n=rows.length; var h=pad+n*lh+pad-3;
+  var m=_dataCardPrep(doc,w,rows), pad=m.pad, h=m.h;
   doc.setDrawColor(225,228,234); doc.setLineWidth(0.3); doc.setFillColor(250,251,252);
   doc.roundedRect(x,y,w,h,2.5,2.5,'FD');
-  var colx=[x+pad+1, x+w/2+3]; var ry=y+pad+3;
-  rows.forEach(function(rw){
-    for(var ci=0;ci<2;ci++){ var lab=rw[ci*2], val=rw[ci*2+1]; if(lab==null)continue; var cx=colx[ci];
-      doc.setFont('helvetica','bold'); doc.setFontSize(7.3); doc.setTextColor(140,144,154); doc.text(String(lab).toUpperCase(),cx,ry);
+  var colx=[x+pad+1, x+w/2+3], ry=y+pad+3;
+  m.prep.forEach(function(rw){
+    rw.cells.forEach(function(cell,ci){
+      if(!cell)return;
+      var cx=colx[ci];
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.3); doc.setTextColor(140,144,154);
+      doc.text(String(cell.lab).toUpperCase(),cx,ry);
       doc.setFont('helvetica','bold'); doc.setFontSize(10.5);
-      var _isLink=(val&&typeof val==='object'&&val.url);
-      var _vs=String(_isLink?(val.v||''):(val==null?'':val));
-      var vv=doc.splitTextToSize(_vs, w/2-pad-7); var _ln=vv[0]||'';
-      if(_isLink){ doc.setTextColor(22,127,111); try{ doc.textWithLink(_ln,cx,ry+5,{url:val.url}); }catch(_e){ doc.text(_ln,cx,ry+5); } var _tw=doc.getTextWidth(_ln); doc.setDrawColor(22,127,111); doc.setLineWidth(0.3); doc.line(cx,ry+6.2,cx+_tw,ry+6.2); }
-      else { doc.setTextColor(28,30,38); doc.text(_ln,cx,ry+5); }
-    } ry+=lh;
+      cell.lines.forEach(function(ln,li){
+        var ly=ry+m.labH+li*m.lineH;
+        if(cell.url){
+          doc.setTextColor(22,127,111);
+          try{ doc.textWithLink(ln,cx,ly,{url:cell.url}); }catch(_e){ doc.text(ln,cx,ly); }
+          var tw=doc.getTextWidth(ln); doc.setDrawColor(22,127,111); doc.setLineWidth(0.3); doc.line(cx,ly+1.2,cx+tw,ly+1.2);
+        } else { doc.setTextColor(28,30,38); doc.text(ln,cx,ly); }
+      });
+    });
+    ry+=rw.h;
   });
   return y+h;
+}
+/* Título + tarjeta como un bloque: si no cabe entero, salta de página junto con
+   su título en vez de dejarlo huérfano al final de la hoja. */
+function _pdfSection(doc,M,W,y,title,ac,rows){
+  var w=W-2*M, m=_dataCardPrep(doc,w,rows);
+  if(y+5+m.h>PDF_BOTTOM){ doc.addPage(); y=PDF_TOP; }
+  doc.setTextColor(ac[0],ac[1],ac[2]); doc.setFont('helvetica','bold'); doc.setFontSize(12);
+  doc.text(title,M,y); y+=3;
+  return _dataCard(doc,M,y+2,w,rows);
+}
+/* Alto aproximado de un párrafo de _pdfRich, para decidir el salto de página.
+   Se mide en redonda y se añade una línea de margen porque las palabras en
+   negrita son algo más anchas. */
+function _pdfRichH(doc,tx,maxW,lineH){
+  doc.setFont('helvetica','normal');
+  var plain=String(tx==null?'':tx).replace(/\*\*/g,'');
+  var n=doc.splitTextToSize(plain,maxW).length||1;
+  return (n+1)*lineH;
 }
 function _pdfRich(doc,tx,x,y,maxW,lineH){
   var segs=[]; var re=/\*\*([^*]+)\*\*/g; var last=0,mm;
@@ -2323,7 +2561,9 @@ function renderTicketPage(doc,o,kind){
   var br=pdfBrand(); var M=16, W=210;
   var cliente=o.cliente||'—', desc=o.descripcion||'—', fecha=_fmtDMY(o.fecha||(o.created_at?String(o.created_at).slice(0,10):''));
   var r=null; try{ r=compute(orderToCalcState(o)); }catch(e){}
-  var _ordLvl=(o.urgencia_nivel==='Urgente'?'Urgente':'Normal'); var _finD=null; try{ if(o.id&&o.prod&&o.urgencia_nivel!=='Ambos'){ _finD=_finFromSched(scheduleOrders()[o.id]); } else if(o.prod){ _finD=_simFinish(o.prod,o.diseno_modelado,o.horas,_ordLvl); } }catch(e){} var _dvBox=(o.urgencia_nivel==='Ambos')?!!(_delivStd||_delivUrg):!!((o.urgencia_nivel==='Urgente')?(_delivUrg||_deliv):(_delivStd||_deliv));
+  var _ordLvl=(o.urgencia_nivel==='Urgente'?'Urgente':'Normal'); var _finD=null; try{ if(o.id&&o.prod&&o.urgencia_nivel!=='Ambos'){ _finD=_finFromSched(scheduleOrders()[o.id]); } else if(o.prod){ _finD=_simFinish(o.prod,o.diseno_modelado,o.horas,_ordLvl); } }catch(e){}
+  /* El precio final se necesita ya aquí para calcular el recargo de urgencia. */
+  var precio=(Number(o.precio_final)||(r?r.precio:0));
   var _stdPrice=(r?roundMoney(r.precio):0);
   var _urgExtra=(o.urgencia_nivel==='Urgente')?roundMoney(Math.max(0,precio-_stdPrice)):0;
   var _urgD=(o.urg_days!=null?num(o.urg_days):null);
@@ -2333,7 +2573,6 @@ function renderTicketPage(doc,o,kind){
   var tiempo=decToHM(o.horas)+' h';
   var pendingColor=(o.filamento_color==='Pendiente de configurar');
   var material=((r&&r.filName)||o.filamento||'—')+((o.filamento_color&&!pendingColor&&!(r&&r.filColor==='Multicolor'))?' ('+o.filamento_color+')':'');
-  var precio=(Number(o.precio_final)||(r?r.precio:0));
   var TPL=pdfTpl(), TOK=pdfTokens(o,r,null,_deliv), CS=internal?TPL.internal:TPL.client; function TT(s){return applyTokens(s,TOK);}
   // ===== cabecera compartida =====
   try{ doc.addImage(br.logo,'JPEG',M,11,22,22); }catch(e){}
@@ -2345,40 +2584,53 @@ function renderTicketPage(doc,o,kind){
   doc.setDrawColor(ac[0],ac[1],ac[2]); doc.setLineWidth(0.8); doc.line(M,39,W-M,39);
   var y=49;
   // ===== Datos del Proyecto (compartido) =====
-  doc.setTextColor(ac[0],ac[1],ac[2]); doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.text(TT(CS.t_datos),M,y); y+=3;
   var _datos=[
     ['Cliente',cliente,'Descripción',desc],
     ['Material',material,'Peso estimado',(o.peso_g||0)+' g'],
     ['Tiempo de impresora',tiempo,'Unidades',((o.cantidad||1)+' ud.')]
   ];
   if(pendingColor)_datos.push(['Color',{v:'Pendiente de configurar',url:CONFIG_URL},null,null]);
-  y=_dataCard(doc,M,y+2,W-2*M,_datos);
+  y=_pdfSection(doc,M,W,y,TT(CS.t_datos),ac,_datos);
   // ===== caja PRECIO FINAL (compartido) =====
   var _amb=(o.urgencia_nivel==='Ambos');
   if(_amb){
-    var _dd=orderDual(o); var _hasDeliv=!!(_delivStd||_delivUrg); var py=y+9, gap2=6, bw2=(W-2*M-gap2)/2, bh=(_hasDeliv?31:22);
-    var _pbox=function(bx,lbl,val,urg,deliv){ var c1=urg?[255,250,238]:[245,247,250], c2=urg?[244,183,64]:ac;
+    var _dd=orderDual(o); var gap2=6, bw2=(W-2*M-gap2)/2;
+    /* La caja se mide antes de dibujarla: si el plazo ocupa varias líneas, crece
+       en lugar de que el texto se salga por debajo del recuadro. */
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    var _lnS=_delivStd?doc.splitTextToSize('Entrega: '+_delivStd,bw2-13):[];
+    var _lnU=_delivUrg?doc.splitTextToSize('Entrega: '+_delivUrg,bw2-13):[];
+    var _nl=Math.max(_lnS.length,_lnU.length), bh=22+(_nl?(_nl*3.9+2.6):0);
+    if(y+9+bh+11>PDF_BOTTOM){ doc.addPage(); y=PDF_TOP; }
+    var py=y+9;
+    var _pbox=function(bx,lbl,val,urg,lines){ var c1=urg?[255,250,238]:[245,247,250], c2=urg?[244,183,64]:ac;
       doc.setFillColor(c1[0],c1[1],c1[2]); doc.rect(bx,py,bw2,bh,'F'); doc.setFillColor(c2[0],c2[1],c2[2]); doc.rect(bx,py,2.6,bh,'F');
       doc.setTextColor(120,124,134); doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.text(lbl,bx+9,py+8.5);
       doc.setTextColor(20,22,28); doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.text(val.toFixed(2)+' €',bx+9,py+18);
-      if(deliv){ doc.setTextColor(112,116,126); doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.text('Entrega: '+deliv,bx+9,py+26.5,{maxWidth:bw2-13}); } };
-    _pbox(M, 'Tarifa estándar', _dd.normal, false, _delivStd);
-    _pbox(M+bw2+gap2, 'Tarifa urgente', _dd.urgente, true, _delivUrg);
+      if(lines&&lines.length){ doc.setTextColor(112,116,126); doc.setFont('helvetica','normal'); doc.setFontSize(8);
+        lines.forEach(function(ln,i){ doc.text(ln,bx+9,py+25.2+i*3.9); }); } };
+    _pbox(M, 'Tarifa estándar', _dd.normal, false, _lnS);
+    _pbox(M+bw2+gap2, 'Tarifa urgente', _dd.urgente, true, _lnU);
     y=py+bh+11;
   } else {
   var _dv1=(o.urgencia_nivel==='Urgente')?(_delivUrg||_deliv):(_delivStd||_deliv);
-  var py=y+9, bw=W-2*M, bh=(_dv1?30:22);
+  var bw=W-2*M;
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+  var _ln1=_dv1?doc.splitTextToSize('Entrega: '+_dv1,bw-18):[];
+  var bh=22+(_ln1.length?(_ln1.length*4.1+2):0);
+  if(y+9+bh+11>PDF_BOTTOM){ doc.addPage(); y=PDF_TOP; }
+  var py=y+9;
   doc.setFillColor(245,247,250); doc.rect(M,py,bw,bh,'F'); doc.setFillColor(ac[0],ac[1],ac[2]); doc.rect(M,py,2.6,bh,'F');
   doc.setTextColor(120,124,134); doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.text(TT(CS.t_precio)+((o.urgencia_nivel==='Urgente')?'  ·  TARIFA URGENTE':''),M+9,py+8);
   doc.setTextColor(20,22,28); doc.setFont('helvetica','bold'); doc.setFontSize(23); doc.text(precio.toFixed(2)+' €',M+9,py+18);
   if(r&&r.cant>1){ doc.setTextColor(120,124,134); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text(r.precioUnit.toFixed(2)+' € / ud  ·  '+r.cant+' uds',W-M-4,py+18,{align:'right'}); }
-  if(_dv1){ doc.setTextColor(112,116,126); doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.text('Entrega: '+_dv1,M+9,py+26); }
+  if(_ln1.length){ doc.setTextColor(112,116,126); doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+    _ln1.forEach(function(ln,i){ doc.text(ln,M+9,py+25.6+i*4.1); }); }
   y=py+bh+11;
   }
   if(internal){
     // ===== Parámetros del presupuesto =====
-    doc.setTextColor(ac[0],ac[1],ac[2]); doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.text(TT(TPL.internal.t_params),M,y); y+=3;
-    y=_dataCard(doc,M,y+2,W-2*M,[
+    y=_pdfSection(doc,M,W,y,TT(TPL.internal.t_params),ac,[
       ['Impresora',(r&&r.printer&&r.printer.name)||o.impresora||'—','Precio material',(r?r.pricekg.toFixed(2):'0.00')+' €/kg'],
       ['Diseño / modelado',o.diseno_modelado||'—','Búsqueda modelos',o.busqueda_modelos||'—'],
       ['Elim. soportes',o.eliminacion_soportes||'—','Postprocesado',o.postprocesado||'—'],
@@ -2428,25 +2680,59 @@ function renderTicketPage(doc,o,kind){
       foot:[[{content:'PVP FINAL',styles:{fontStyle:'bold',textColor:[20,22,28]}},{content:(o.urgencia_nivel==='Ambos'?(r?r.precio:0):precio).toFixed(2)+' €',styles:{fontStyle:'bold',halign:'right',textColor:ac}}]],
       footStyles:{fillColor:[238,243,242]} });
   } else {
-    if(o.urgencia_nivel==='Ambos'){
-      var _dd2=orderDual(o); var colGap=8, colW=(W-2*M-colGap)/2;
-      var _condCol=function(x0,cw2,price,allow,heading,acc,plazoTxt){
-        var tokC=pdfTokens(o,r,price,plazoTxt||_deliv);
-        doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(acc[0],acc[1],acc[2]); doc.text(heading,x0,y);
-        var yy=y+7; doc.setFontSize(9.5);
-        (TPL.client.conds||[]).forEach(function(c){ if(c.on===false)return; var uu=c.u||'b'; if(allow.indexOf(uu)<0)return; var tx=applyTokens(c.t||'',tokC); if(!String(tx).trim())return; doc.setFont('helvetica','bold'); doc.setTextColor(acc[0],acc[1],acc[2]); doc.text('•',x0,yy); doc.setTextColor(70,72,82); yy=_pdfRich(doc,tx,x0+4,yy,cw2-4,4.8)+5.4; });
-        return yy;
-      };
-      var _yA=_condCol(M, colW, _dd2.normal, ['n','b'], 'Tarifa estándar', ac, _delivStd);
-      var _yB=_condCol(M+colW+colGap, colW, _dd2.urgente, ['u','b'], 'Tarifa urgente', [244,183,64], _delivUrg);
-      var _yG=Math.max(_yA,_yB)+3, _tokG=pdfTokens(o,r,null,_deliv);
+    /* Textos de las condiciones que tocan a una tarifa concreta. */
+    var _condTexts=function(allow,tok){
+      var out=[];
+      (TPL.client.conds||[]).forEach(function(c){ if(c.on===false)return; if(allow.indexOf(c.u||'b')<0)return;
+        var tx=applyTokens(c.t||'',tok); if(String(tx).trim())out.push(tx); });
+      return out;
+    };
+    /* Pinta una lista de viñetas. Con brk, ninguna viñeta se parte por el pie de
+       página: la que no cabe entera arranca en una hoja nueva. */
+    var _condList=function(x0,cwv,texts,acc,yy,lineH,brk){
       doc.setFontSize(9.5);
-      (TPL.client.conds||[]).forEach(function(c){ if(c.on===false)return; if((c.u||'b')!=='g')return; var tx=applyTokens(c.t||'',_tokG); if(!String(tx).trim())return; doc.setFont('helvetica','bold'); doc.setTextColor(ac[0],ac[1],ac[2]); doc.text('•',M,_yG); doc.setTextColor(70,72,82); _yG=_pdfRich(doc,tx,M+4,_yG,(W-2*M)-4,5.0)+6.0; });
+      texts.forEach(function(tx){
+        if(brk&&yy+_pdfRichH(doc,tx,cwv,lineH)>PDF_BOTTOM){ doc.addPage(); yy=PDF_TOP+2; }
+        doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(acc[0],acc[1],acc[2]); doc.text('•',x0,yy);
+        doc.setTextColor(70,72,82);
+        yy=_pdfRich(doc,tx,x0+4,yy,cwv,lineH)+lineH+1.4;
+      });
+      return yy;
+    };
+    var _condH=function(texts,cwv,lineH){ var t=0; doc.setFontSize(9.5); texts.forEach(function(tx){ t+=_pdfRichH(doc,tx,cwv,lineH)+lineH+1.4; }); return t; };
+    if(o.urgencia_nivel==='Ambos'){
+      var _dd2=orderDual(o), colGap=8, colW=(W-2*M-colGap)/2, _cw2=colW-4;
+      var _txA=_condTexts(['n','b'],pdfTokens(o,r,_dd2.normal,_delivStd||_deliv));
+      var _txB=_condTexts(['u','b'],pdfTokens(o,r,_dd2.urgente,_delivUrg||_deliv));
+      var _hA=_condH(_txA,_cw2,4.8), _hB=_condH(_txB,_cw2,4.8), _hMax=7+Math.max(_hA,_hB);
+      var _yG;
+      if(_hMax<=PDF_BOTTOM-PDF_TOP){
+        /* Las dos columnas se mantienen alineadas: o caben aquí, o van juntas a
+           la hoja siguiente. Nunca se parten por la mitad. */
+        if(y+_hMax>PDF_BOTTOM){ doc.addPage(); y=PDF_TOP; }
+        doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(ac[0],ac[1],ac[2]); doc.text('Tarifa estándar',M,y);
+        doc.setTextColor(244,183,64); doc.text('Tarifa urgente',M+colW+colGap,y);
+        var _yA=_condList(M,_cw2,_txA,ac,y+7,4.8,false);
+        var _yB=_condList(M+colW+colGap,_cw2,_txB,[244,183,64],y+7,4.8,false);
+        _yG=Math.max(_yA,_yB)+3;
+      } else {
+        /* Demasiado texto para dos columnas: se apilan a ancho completo, cada una
+           con sus propios saltos de página. */
+        var _fw=(W-2*M)-4;
+        if(y+16>PDF_BOTTOM){ doc.addPage(); y=PDF_TOP; }
+        doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(ac[0],ac[1],ac[2]); doc.text('Tarifa estándar',M,y);
+        _yG=_condList(M,_fw,_txA,ac,y+7,5.0,true)+4;
+        if(_yG+16>PDF_BOTTOM){ doc.addPage(); _yG=PDF_TOP; }
+        doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(244,183,64); doc.text('Tarifa urgente',M,_yG);
+        _yG=_condList(M,_fw,_txB,[244,183,64],_yG+7,5.0,true)+4;
+      }
+      _yG=_condList(M,(W-2*M)-4,_condTexts(['g'],pdfTokens(o,r,null,_deliv)),ac,_yG,5.0,true);
     } else {
+    var _al=(o.urgencia_nivel==='Urgente')?['u','b','g']:['n','b','g'];
+    var conds=_condTexts(_al,TOK);
+    if(y+18>PDF_BOTTOM){ doc.addPage(); y=PDF_TOP; }
     doc.setTextColor(ac[0],ac[1],ac[2]); doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.text(TT(TPL.client.t_cond),M,y);
-    var _al=(o.urgencia_nivel==='Urgente')?['u','b','g']:['n','b','g']; var conds=(TPL.client.conds||[]).filter(function(c){return c.on!==false && _al.indexOf(c.u||'b')>=0;}).map(function(c){return TT(c.t||'');});
-    doc.setFontSize(9.5); var cy=y+9; var bx=M, tx0=M+5, cw=W-M-tx0;
-    conds.forEach(function(tx){ if(!String(tx).trim())return; doc.setFont('helvetica','bold'); doc.setTextColor(ac[0],ac[1],ac[2]); doc.text('•',bx,cy); doc.setTextColor(70,72,82); cy=_pdfRich(doc,tx,tx0,cy,cw,5.2)+6.6; });
+    _condList(M,W-M-(M+5),conds,ac,y+9,5.2,true);
     }
   }
   doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(165,168,176);

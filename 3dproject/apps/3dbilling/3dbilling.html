@@ -505,11 +505,15 @@ function toggleOpenDock(){ if(window.innerWidth<=980) document.body.classList.ad
    el propio documento (.sheet) como imagen y se coloca en un PDF A4, en lugar
    de redibujarlo a mano. Antes de capturar se clona y se convierten los campos
    editables (textarea/input) en texto plano y se ocultan los controles. */
-function _docPdfName(r){
-  var tipo=(r.docType==='Presupuesto')?'Presupuesto':'Recibo';
-  var partes=[String(r.date||'').replace(/-/g,''),tipo,(r.number||''),(r.title||''),((r.client&&r.client.name)||'')];
-  return partes.filter(Boolean).join('_').replace(/[\\/:*?"<>|\r\n\t]+/g,' ').replace(/\s+/g,' ').trim()+'.pdf';
+/* Nombre por defecto del PDF: fecha(aaaammdd)_cliente_nº del recibo/presupuesto. */
+function _docPdfBase(r){
+  var f=String((r&&r.date)||'').slice(0,10).replace(/-/g,'');
+  if(!/^[0-9]{8}$/.test(f))f=todayISO().replace(/-/g,'');
+  var partes=[f,((r&&r.client&&r.client.name)||''),((r&&r.number)||'')];
+  var n=partes.filter(Boolean).join('_').replace(/[\\/:*?"<>|\r\n\t]+/g,' ').replace(/\s+/g,' ').trim();
+  return n||f;
 }
+function _docPdfName(r){ return _docPdfBase(r)+'.pdf'; }
 function _staticFromField(el){
   var d=document.createElement('div');
   d.className=el.className;
@@ -607,6 +611,7 @@ function printPDF(){
         first=false; y+=h;
       }
     }
+    try{ doc.setProperties({title:_docPdfBase(r)}); }catch(e){}
     try{
       var b=doc.output('blob'), u=URL.createObjectURL(b);
       var w=window.open(u,'_blank'); if(!w) doc.save(_docPdfName(r));
