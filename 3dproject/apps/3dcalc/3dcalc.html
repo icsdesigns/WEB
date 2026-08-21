@@ -808,10 +808,12 @@ function compute(c){
   /* Beneficio total: complementos + margen − coste bruto. Ni los accesorios, ni
      la tasa de ahorro, ni el ajuste a la tarifa mínima entran aquí: van a «Otros». */
   var beneficioTotal=roundMoney(subtotalMargen+resto-bruto);
+  /* «Otros»: accesorios, tasa de ahorro y ajuste a la tarifa mínima. */
+  var subtotalOtros=roundMoney(accesorios+cajonTasa+minAjuste);
   return {printer:printer,pricekg:pricekg,peso:peso,horas:horas,filName:filName,filColor:filColor,
     filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,
     bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,
-    markupVal:markupVal,errorVal:errorVal,subtotalMargen:subtotalMargen,beneficioTotal:beneficioTotal,
+    markupVal:markupVal,errorVal:errorVal,subtotalMargen:subtotalMargen,subtotalOtros:subtotalOtros,beneficioTotal:beneficioTotal,
     bloqueA:roundMoney(bloqueA),bloqueC:roundMoney(bloqueC),
     precioPrevio:precioPrevio,cajonTipo:cajonTipo,cajonPct:cajonPct,cajonTasa:cajonTasa,
     precio:precio,precioUnit:roundMoney(precio/cant),cant:cant,precioMin:precioMin,minAplicado:minAplicado,minAjuste:minAjuste,accesorios:accesorios};
@@ -1256,7 +1258,8 @@ function resultHTML(){
   if(r.accesorios>0)_otros+='<div class="r"><span>Accesorios</span><b>+'+fmt(r.accesorios)+'</b></div>';
   if(r.cajonTasa>0)_otros+='<div class="r"><span>Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+esc(r.cajonTipo)+')</span><b>+'+fmt(r.cajonTasa)+'</b></div>';
   if(r.minAjuste>0)_otros+='<div class="r"><span>Ajuste hasta la tarifa mínima ('+fmt(r.precioMin)+')</span><b>+'+fmt(r.minAjuste)+'</b></div>';
-  if(_otros)html+='<div class="grp">Otros</div>'+_otros;
+  if(_otros)html+='<div class="grp">Otros</div>'+_otros
+    +'<div class="r sub"><span>Subtotal otros</span><b>'+fmt(r.subtotalOtros)+'</b></div>';
   html+='<div class="grp">Beneficio total</div>'
     +'<div class="r ben"><span>Complementos + margen − bruto</span><b>'+fmt(r.beneficioTotal)+'</b></div>';
   html+='<div class="sep"></div>'
@@ -2410,7 +2413,7 @@ function _odBrk(r){
   if(r.accesorios>0)otros+=row('Accesorios',r.accesorios,true);
   if(r.cajonTasa>0)otros+=row('Tasa de ahorro',r.cajonTasa,true);
   if(r.minAjuste>0)otros+=row('Ajuste hasta la tarifa mínima ('+eur(r.precioMin)+')',r.minAjuste,true);
-  if(otros)h+=grp('Otros')+otros;
+  if(otros)h+=grp('Otros')+otros+sub('Subtotal otros',r.subtotalOtros);
   h+=grp('Beneficio total')+sub('Complementos + margen − bruto',r.beneficioTotal);
   return h;
 }
@@ -2535,7 +2538,8 @@ function computeOrder(o){
   var totalCalc=bloqueA+recargo+cajonTasa+bloqueC;
   var minAplicado=(totalCalc<precioMin);
   var minAjuste=roundMoney(Math.max(0,roundUpToNickel(Math.max(totalCalc,precioMin))-roundUpToNickel(totalCalc)));
-  return {minAjuste:minAjuste,subtotalMargen:subtotalMargen,beneficioTotal:beneficioTotal,filName:filName,filColor:filColor,peso:peso,horas:horas,filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,markupVal:markupVal,errorVal:errorVal,cant:cant,precioMin:precioMin,minAplicado:minAplicado,
+  var subtotalOtros=roundMoney(bloqueC+cajonTasa+minAjuste);
+  return {minAjuste:minAjuste,subtotalMargen:subtotalMargen,subtotalOtros:subtotalOtros,beneficioTotal:beneficioTotal,filName:filName,filColor:filColor,peso:peso,horas:horas,filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,markupVal:markupVal,errorVal:errorVal,cant:cant,precioMin:precioMin,minAplicado:minAplicado,
     bloqueA:roundMoney(bloqueA),bloqueC:roundMoney(bloqueC),accesorios:roundMoney(bloqueC),
     cajonTipo:cajonTipo,cajonTasa:cajonTasa,cajonPct:cajonPct};
 }
@@ -2573,6 +2577,7 @@ function ticketLines(o,kind){
   lines.push(SUB,L('SUBTOTAL MARGEN',r.subtotalMargen.toFixed(2)+' '+u));
   if(r.minAplicado)lines.push('  * Tarifa minima aplicada: '+r.precioMin.toFixed(2)+' '+u);
   if(r.cajonTasa>0)lines.push('','-- CAJON DE AHORRO --',L('Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+(r.cajonTipo||'')+')','+'+r.cajonTasa.toFixed(2)+' '+u));
+  if(r.subtotalOtros>0)lines.push(SUB,L('SUBTOTAL OTROS',r.subtotalOtros.toFixed(2)+' '+u));
   lines.push('',SUB,L('BENEFICIO TOTAL',r.beneficioTotal.toFixed(2)+' '+u),
     '  (complementos + margen - bruto)');
   lines.push(SEP,L('PRECIO UNITARIO',(total/cant).toFixed(2)+' '+u),L('CANTIDAD',cant+' ud.'),SUB,L('PVP FINAL',total.toFixed(2)+' '+u),SEP,
@@ -2758,7 +2763,9 @@ function renderTicketPage(doc,o,kind){
     _sbox(M,'PARÁM. BÁSICOS',_rBas);
     _sbox(M+_bw3+_bg,'PARÁM. COMPLEMENTARIOS',_rComp);
     _sbox(M+2*(_bw3+_bg),'UTILITARIOS',_rUtil);
-    var _trows=[['Subtotal bruto + complementos',_rBas+_rComp],['Subtotal margen',(r?r.subtotalMargen:0)],['Beneficio total',(r?r.beneficioTotal:0)]];
+    var _trows=[['Subtotal bruto + complementos',_rBas+_rComp],['Subtotal margen',(r?r.subtotalMargen:0)]];
+    if(r&&r.subtotalOtros>0)_trows.push(['Subtotal otros',r.subtotalOtros]);
+    _trows.push(['Beneficio total',(r?r.beneficioTotal:0)]);
     if(_urgExtra>0)_trows.push(['Recargo urgencia'+((_urgD!=null)?(' ('+_urgD+' día'+(_urgD===1?'':'s')+' · +'+_urgPct+'%)'):''),_urgExtra]);
     var _pw=W-2*M, _py=_by+_bh3+8, _rowh=9, _pnlH=_rowh*_trows.length+5;
     doc.setFillColor(248,249,251); doc.roundedRect(M,_py,_pw,_pnlH,2,2,'F');
