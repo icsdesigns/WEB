@@ -141,6 +141,10 @@ table.t .sw{display:inline-block;width:14px;height:14px;border-radius:4px;border
 .brk .grp{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--t3);margin-top:10px}
 .brk .r.sub b{color:var(--t1);font-weight:700}
 .brk .r.sub span{color:var(--t1)}
+.brk .r.ben{font-size:14px;margin-top:2px}
+.brk .r.ben span{color:var(--t1);font-weight:600}
+.brk .r.ben b{color:var(--ac);font-weight:800}
+.brk .r-form{font-size:10.5px;color:var(--t3);line-height:1.4;margin-top:-4px}
 
 .k-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .k-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700}
@@ -599,6 +603,22 @@ option{background-color:#161922;color:#E8EBF4}
 .cd-tag.cd-vac{background:#FF6B8A}.cd-tag.cd-noart{background:#B87CFF}.cd-tag.cd-notec{background:#4D9FFF}
 .cd-range{font-size:12px;color:var(--t2)}
 .cd-item .del{margin-left:auto}
+/* detalle de un día del calendario */
+.cd-tag.cd-dom{background:#FF6B8A}
+.di-h{font-size:10.5px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--t2);margin:16px 0 8px}
+.di-h:first-of-type{margin-top:14px}
+.di-list{display:flex;flex-direction:column;gap:6px}
+.di-cond{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border:1px solid var(--border);border-radius:10px}
+.di-cond .cd-tag{flex:0 0 auto;margin-top:1px}
+.di-cond-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.di-cond-t{font-size:12px;color:var(--t2);line-height:1.4}
+.di-cond-r{font-size:10.5px;color:var(--t3)}
+.di-cond .del{flex:0 0 auto;margin-left:0}
+.di-ph{display:inline-flex;align-items:center;gap:4px;margin-right:8px}
+.di-mile{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid var(--border);border-radius:10px;font-size:12.5px;color:var(--t2)}
+.di-mile b{color:var(--t1)}
+.di-mile-i{font-size:15px;line-height:1;flex:0 0 auto}
+.di-empty{font-size:12px;color:var(--t3);line-height:1.45}
 @media(max-width:760px){.cal-cell{min-height:60px}.cal-chip{font-size:9px;gap:3px}.cal-chip i{width:6px;height:6px}.co-sub{display:none}.cal-title{min-width:110px;font-size:14px}.cd-add .inp,.cd-add .selx{flex:1 1 40%}}
 </style>
 <link rel="stylesheet" href="../../css/light-theme.css?v=20260731">
@@ -784,11 +804,16 @@ function compute(c){
   var cant=Math.max(1,Math.floor(num(c.cantidad)||1));
   var markupVal=Math.max(0,bruto*(markup-1));
   var errorVal=Math.max(0,bruto*errorRate);
-  var beneficioNeto=markupVal+errorVal+recargo;
+  /* Subtotal margen: lo que se añade sobre el coste (markup, fondo de error y
+     plus de urgencia). Antes esto se llamaba «beneficio neto». */
+  var subtotalMargen=markupVal+errorVal+recargo;
+  /* Beneficio neto real: al margen se le suman los complementos cobrados y la
+     tasa de ahorro, y se le descuenta el coste bruto de producir la pieza. */
+  var beneficioNeto=roundMoney(subtotalMargen+resto+cajonTasa-bruto);
   return {printer:printer,pricekg:pricekg,peso:peso,horas:horas,filName:filName,filColor:filColor,
     filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,
     bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,
-    markupVal:markupVal,errorVal:errorVal,beneficioNeto:beneficioNeto,
+    markupVal:markupVal,errorVal:errorVal,subtotalMargen:roundMoney(subtotalMargen),beneficioNeto:beneficioNeto,
     bloqueA:roundMoney(bloqueA),bloqueC:roundMoney(bloqueC),
     precioPrevio:precioPrevio,cajonTipo:cajonTipo,cajonPct:cajonPct,cajonTasa:cajonTasa,
     precio:precio,precioUnit:roundMoney(precio/cant),cant:cant,precioMin:precioMin,minAplicado:minAplicado,minAjuste:minAjuste,accesorios:accesorios};
@@ -1227,10 +1252,13 @@ function resultHTML(){
   if(r.errorVal>0)html+='<div class="r"><span>Fondo error ('+esc(S.calc_state.probabilidad_error)+')</span><b>+'+fmt(r.errorVal)+'</b></div>';
   if(r.recargo>0)html+='<div class="r"><span>Plus urgencia</span><b>+'+fmt(r.recargo)+'</b></div>';
   if(r.gastoMisc>0)html+='<div class="r"><span>Extras / misc.</span><b>+'+fmt(r.gastoMisc)+'</b></div>';
-  html+='<div class="r sub"><span>Beneficio neto</span><b>'+fmt(r.beneficioNeto)+'</b></div>';
+  html+='<div class="r sub"><span>Subtotal margen</span><b>'+fmt(r.subtotalMargen)+'</b></div>';
   if(r.accesorios>0)html+='<div class="grp">Utilitarios</div><div class="r"><span>Accesorios</span><b>+'+fmt(r.accesorios)+'</b></div>';
   if(r.cajonTasa>0)html+='<div class="grp">Cajón de ahorro</div><div class="r"><span>Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+esc(r.cajonTipo)+')</span><b>+'+fmt(r.cajonTasa)+'</b></div>';
   if(r.minAjuste>0)html+='<div class="grp">Tarifa mínima</div><div class="r"><span>Ajuste hasta el mínimo</span><b>+'+fmt(r.minAjuste)+'</b></div>';
+  html+='<div class="grp">Beneficio</div>'
+    +'<div class="r ben"><span>Beneficio neto</span><b>'+fmt(r.beneficioNeto)+'</b></div>'
+    +'<div class="r-form">Subtotal margen + Subtotal complementos + Tasa de ahorro − Subtotal bruto</div>';
   html+='<div class="sep"></div>'
     +'<div class="r big"><span>PVP final</span><b>'+fmt(r.precio)+'</b></div>'
     +'</div>';
@@ -1572,7 +1600,76 @@ var _calDrag=null;
 function calDragStart(ev,k){ if(ev&&ev.button&&ev.button!==0)return; _calDrag={a:k,b:k,on:true}; if(ev&&ev.preventDefault)ev.preventDefault(); _calPaint(); }
 function calDragOver(k){ if(_calDrag&&_calDrag.on){ _calDrag.b=k; _calPaint(); } }
 function _calPaint(){ if(!_calDrag)return; var lo=_calDrag.a<_calDrag.b?_calDrag.a:_calDrag.b, hi=_calDrag.a<_calDrag.b?_calDrag.b:_calDrag.a; var cs=document.querySelectorAll('.cal-cell[data-dk]'); Array.prototype.forEach.call(cs,function(c){ var kk=c.getAttribute('data-dk'); if(kk>=lo&&kk<=hi)c.classList.add('cal-sel'); else c.classList.remove('cal-sel'); }); }
-function calDragEnd(){ if(!_calDrag||!_calDrag.on)return; _calDrag.on=false; var lo=_calDrag.a<_calDrag.b?_calDrag.a:_calDrag.b, hi=_calDrag.a<_calDrag.b?_calDrag.b:_calDrag.a; _calPickType(lo,hi); }
+function calDragEnd(){ if(!_calDrag||!_calDrag.on)return; _calDrag.on=false; var lo=_calDrag.a<_calDrag.b?_calDrag.a:_calDrag.b, hi=_calDrag.a<_calDrag.b?_calDrag.b:_calDrag.a;
+  /* Un clic sobre un solo día muestra qué pasa ese día; arrastrar sobre varios
+     sigue abriendo el selector de periodo especial. */
+  if(lo===hi)calDayInfo(lo); else _calPickType(lo,hi); }
+function _fromDk(k){ var p=String(k).split('-'); return _md(new Date(+p[0],(+p[1]||1)-1,(+p[2]||1))); }
+/* Qué bloquea realmente cada tipo de día especial (ver _forbidden). */
+var CD_EXPL={
+  vac:'No se asigna ningún trabajo: ni diseño, ni testado, ni impresión.',
+  noart:'Sin diseño ni testado de pedidos artísticos; la impresión sí puede continuar.',
+  notec:'Sin diseño ni testado de pedidos técnicos; la impresión sí puede continuar.',
+  noimp:'Sin días de impresión; el diseño y el testado sí pueden continuar.'
+};
+/* Detalle de un día del calendario: condiciones que lo afectan, pedidos
+   programados en él y los hitos (fin de producción y entrega) que caen ese día. */
+function calDayInfo(dk){
+  try{ Array.prototype.forEach.call(document.querySelectorAll('.cal-cell.cal-sel'),function(c){ c.classList.remove('cal-sel'); }); }catch(e){}
+  var d=_fromDk(dk), sun=_isSun(d), sched=scheduleOrders();
+  var FASE={d:'Diseño',t:'Testado',i:'Impresión'};
+  var items=[], finProd=[], entregas=[];
+  (S.orders||[]).forEach(function(o){
+    var sc=sched[o.id]; if(!sc)return;
+    var ph=[];
+    if(sc.design.indexOf(dk)>=0)ph.push('d');
+    if(sc.test.indexOf(dk)>=0)ph.push('t');
+    if(sc.print.indexOf(dk)>=0)ph.push('i');
+    if(ph.length)items.push({o:o,ph:ph,sc:sc});
+    var f=_finFromSched(sc); if(!f)return;
+    if(_dk(f)===dk)finProd.push(o);
+    var e=_entregaDesdeFin(f); if(e&&_dk(e)===dk)entregas.push(o);
+  });
+  var cds=(S.calDays||[]).filter(function(x){ return x&&x.start&&x.end&&dk>=x.start&&dk<=x.end; });
+  var tit=_fmtFin(d); tit=tit.charAt(0).toUpperCase()+tit.slice(1);
+  var h='<div class="mtit">'+tit+'</div>'
+    +'<div class="h-sub" style="margin-top:-4px">'+(dk===_dk(new Date())?'Hoy':_fmtDMY(dk))+'</div>';
+
+  h+='<div class="di-h">Condiciones del día</div>';
+  var conds=[];
+  if(sun)conds.push('<div class="di-cond"><span class="cd-tag cd-dom">Domingo</span><div class="di-cond-b"><span class="di-cond-t">Solo se trabaja en pedidos con <b>tarifa urgente</b> (diseño, testado e impresión). No se hacen entregas.</span></div></div>');
+  cds.forEach(function(cd){
+    conds.push('<div class="di-cond"><span class="cd-tag cd-'+cd.type+'">'+CDLBL[cd.type]+'</span>'
+      +'<div class="di-cond-b"><span class="di-cond-t">'+CD_EXPL[cd.type]+'</span>'
+      +'<span class="di-cond-r">Periodo: '+_fmtDk(cd.start)+(cd.end!==cd.start?(' → '+_fmtDk(cd.end)):'')+'</span></div>'
+      +'<button class="del" title="Quitar el periodo" onclick="delCalDay(\''+cd.id+'\');closeModal()">✕</button></div>');
+  });
+  h+=conds.length?('<div class="di-list">'+conds.join('')+'</div>')
+                 :'<div class="di-empty">Día laborable sin restricciones: admite diseño, testado e impresión de cualquier modalidad.</div>';
+
+  h+='<div class="di-h">Pedidos activos'+(items.length?(' ('+items.length+')'):'')+'</div>';
+  if(items.length){
+    h+='<div class="di-list">'+items.map(function(x){
+      var fases=x.ph.map(function(p){ return '<span class="di-ph"><i class="pdot pd-'+p+'"></i>'+FASE[p]+'</span>'; }).join('');
+      var nom=(x.o.cliente||x.o.number||'Pedido')+(x.o.urgencia_nivel==='Urgente'?' \u26A1':'');
+      return '<div class="cal-ord" onclick="closeModal();openOrder(\''+x.o.id+'\')"><i style="background:'+orderColor(x.o)+'"></i>'
+        +'<span class="co-name">'+esc(nom)+'</span>'
+        +'<span class="co-sub">'+fases+' · '+(x.sc.tipo==='tec'?'Técnico':'Artístico')+'</span></div>';
+    }).join('')+'</div>';
+  } else h+='<div class="di-empty">Ningún pedido programado este día.</div>';
+
+  if(finProd.length||entregas.length){
+    h+='<div class="di-h">Hitos</div><div class="di-list">';
+    finProd.forEach(function(o){ h+='<div class="di-mile"><span class="di-mile-i">🏁</span><span>Fin de producción de <b>'+esc(o.cliente||o.number||'Pedido')+'</b></span></div>'; });
+    entregas.forEach(function(o){ h+='<div class="di-mile"><span class="di-mile-i">📦</span><span>Entrega al cliente de <b>'+esc(o.cliente||o.number||'Pedido')+'</b></span></div>'; });
+    h+='</div>';
+  }
+
+  h+='<div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:16px">'
+    +'<button class="btn ghost" onclick="_calPickType(\''+dk+'\',\''+dk+'\')">Marcar como día especial</button>'
+    +'<button class="btn" onclick="closeModal();renderCalendar()">Cerrar</button></div>';
+  openModal(h);
+}
 function _calPickType(lo,hi){ var rng=(lo===hi?_fmtDk(lo):(_fmtDk(lo)+' → '+_fmtDk(hi))); function b(ty,lbl){ return '<button class="btn ghost cd-pickbtn cd-'+ty+'" onclick="calAddRange(\''+lo+'\',\''+hi+'\',\''+ty+'\')">'+lbl+'</button>'; } openModal('<div class="mtit">Nuevo periodo especial</div><div class="h-sub" style="margin-top:-4px">'+rng+'</div><div class="cd-pickgrid">'+b('vac','Vacaciones')+b('notec','Sin técnico')+b('noart','Sin artístico')+b('noimp','Sin impresión')+'</div><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn ghost" onclick="closeModal();renderCalendar()">Cancelar</button></div>'); }
 function calAddRange(lo,hi,ty){ S.calDays=S.calDays||[]; S.calDays.push({id:uid(),type:ty,start:lo,end:hi}); save(); closeModal(); renderCalendar(); toast3('Periodo añadido','#34D399'); }
 function delCalDay(id){ S.calDays=(S.calDays||[]).filter(function(x){return x.id!==id;}); save(); renderCalendar(); }
@@ -1640,7 +1737,7 @@ function renderCalendar(){
     var badges=spd.map(function(ty){return '<span class="cd-mini cd-'+ty+'" title="'+CDLBL[ty]+'">'+({vac:'V',noart:'A',notec:'T',noimp:'I'}[ty])+'</span>';}).join('');
     var chips=(dayMap[k]||[]).map(function(x){ var col=orderColor(x.o), lbl=(x.ph==='d'?'Diseño':(x.ph==='t'?'Testado':'Impresión')); var _s=sched[x.o.id]||{}; var _mk=(x.o.urgencia_nivel==='Urgente'?' ch-urg':'')+(_s.compressed?' ch-cmp':'')+((SCHED_INFO&&SCHED_INFO.delayed&&SCHED_INFO.delayed[x.o.id])?' ch-del':'');
       return '<div class="cal-chip cph-'+x.ph+_mk+'" style="--oc:'+col+'" title="'+esc((x.o.cliente||x.o.number||'Pedido'))+' — '+lbl+(x.o.urgencia_nivel==='Urgente'?' · URGENTE':'')+(_s.compressed?' · tiempos optimizados':'')+((SCHED_INFO&&SCHED_INFO.delayed&&SCHED_INFO.delayed[x.o.id])?(' · +'+SCHED_INFO.delayed[x.o.id]+' d sobre lo comprometido'):'')+'" onmousedown="event.stopPropagation()" onclick="openOrder(\''+x.o.id+'\')"><i></i><span>'+esc(x.o.cliente||x.o.number||'Pedido')+'</span></div>'; }).join('');
-    h+='<div class="cal-cell'+(sun?' cal-sun':'')+(spd.length?' cal-hassp':'')+(k===todayK?' cal-today':'')+'" data-dk="'+k+'" onmousedown="calDragStart(event,\''+k+'\')" onmouseenter="calDragOver(\''+k+'\')"><div class="cal-drow"><span class="cal-dn">'+day+'</span>'+badges+'</div>'+chips+'</div>';
+    h+='<div class="cal-cell'+(sun?' cal-sun':'')+(spd.length?' cal-hassp':'')+(k===todayK?' cal-today':'')+'" data-dk="'+k+'" title="Ver las condiciones y los pedidos de este día" onmousedown="calDragStart(event,\''+k+'\')" onmouseenter="calDragOver(\''+k+'\')"><div class="cal-drow"><span class="cal-dn">'+day+'</span>'+badges+'</div>'+chips+'</div>';
   }
   h+='</div>';
   var ids={}, ol=[]; (S.orders||[]).forEach(function(o){ if(sched[o.id]&&!ids[o.id]){ids[o.id]=1;ol.push(o);} });
@@ -1650,7 +1747,7 @@ function renderCalendar(){
   else h+='<div class="card" style="margin-top:14px"><div class="empty" style="padding:26px;text-align:center;color:var(--t2)">Aún no hay pedidos programados. Activa «Tiempo de producción» en la Calculadora y guarda un pedido, o abre un pedido › «Producción / calendario».</div></div>';
   var td=_dk(new Date());
   h+='<div class="cal-special"><div class="card-h" style="margin-bottom:8px">Días especiales</div>'
-    +'<div class="note" style="margin:2px 0 8px;font-size:11.5px">Arrastra sobre el calendario para marcar un periodo, o usa los campos:</div><div class="cd-add"><select class="selx" id="cd-type"><option value="vac">Vacaciones</option><option value="noart">Sin artístico</option><option value="notec">Sin técnico</option><option value="noimp">Sin impresión</option></select>'
+    +'<div class="note" style="margin:2px 0 8px;font-size:11.5px">Pulsa un día para ver sus condiciones y los pedidos activos en él. Arrastra sobre varios días para marcar un periodo, o usa los campos:</div><div class="cd-add"><select class="selx" id="cd-type"><option value="vac">Vacaciones</option><option value="noart">Sin artístico</option><option value="notec">Sin técnico</option><option value="noimp">Sin impresión</option></select>'
     +'<input class="inp" type="date" id="cd-start" value="'+td+'"><span class="cd-to">→</span><input class="inp" type="date" id="cd-end" value="'+td+'"><button class="btn" onclick="addCalDay()">Añadir</button></div>';
   var cds=(S.calDays||[]).slice().sort(function(a,b){return a.start<b.start?-1:(a.start>b.start?1:0);});
   if(cds.length){ h+='<div class="cd-list">'; cds.forEach(function(cd){ h+='<div class="cd-item"><span class="cd-tag cd-'+cd.type+'">'+CDLBL[cd.type]+'</span><span class="cd-range">'+_fmtDk(cd.start)+(cd.end!==cd.start?(' → '+_fmtDk(cd.end)):'')+'</span><button class="del" onclick="delCalDay(\''+cd.id+'\')">✕</button></div>'; }); h+='</div>'; }
@@ -2310,8 +2407,10 @@ function _odBrk(r){
   if(r.errorVal>0)h+=row('Fondo de error',r.errorVal,true);
   if(r.recargo>0)h+=row('Plus urgencia',r.recargo,true);
   if(r.gastoMisc>0)h+=row('Extras / misc.',r.gastoMisc,true);
-  h+=sub('Beneficio neto',r.beneficioNeto);
+  h+=sub('Subtotal margen',r.subtotalMargen);
   if(r.accesorios>0)h+=grp('Utilitarios')+row('Accesorios',r.accesorios);
+  if(r.cajonTasa>0)h+=grp('Cajón de ahorro')+row('Tasa de ahorro',r.cajonTasa,true);
+  h+=grp('Beneficio')+sub('Beneficio neto',r.beneficioNeto);
   return h;
 }
 function orderModalHTML(o){
@@ -2430,10 +2529,12 @@ function computeOrder(o){
   var cajonTasa=cajonBase?cajonFee(cajonTipo,cajonBase,o.diseno_modelado):0;
   var cajonPct=cajonBase?cajonRate(cajonTipo,cajonBase,o.diseno_modelado):0;
   var bloqueC=accessoriesTotal(o);
+  var subtotalMargen=markupVal+errorVal+recargo;
+  var beneficioNeto=roundMoney(subtotalMargen+resto+cajonTasa-bruto);
   var totalCalc=bloqueA+recargo+cajonTasa+bloqueC;
   var minAplicado=(totalCalc<precioMin);
   var minAjuste=roundMoney(Math.max(0,roundUpToNickel(Math.max(totalCalc,precioMin))-roundUpToNickel(totalCalc)));
-  return {minAjuste:minAjuste,filName:filName,filColor:filColor,peso:peso,horas:horas,filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,markupVal:markupVal,errorVal:errorVal,cant:cant,precioMin:precioMin,minAplicado:minAplicado,
+  return {minAjuste:minAjuste,subtotalMargen:roundMoney(subtotalMargen),beneficioNeto:beneficioNeto,filName:filName,filColor:filColor,peso:peso,horas:horas,filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,markupVal:markupVal,errorVal:errorVal,cant:cant,precioMin:precioMin,minAplicado:minAplicado,
     bloqueA:roundMoney(bloqueA),bloqueC:roundMoney(bloqueC),accesorios:roundMoney(bloqueC),
     cajonTipo:cajonTipo,cajonTasa:cajonTasa,cajonPct:cajonPct};
 }
@@ -2468,10 +2569,11 @@ function ticketLines(o,kind){
   lines.push('','-- MARGENES Y BENEFICIO --',L('Markup (x'+r.markup.toFixed(1)+')','+'+r.markupVal.toFixed(2)+' '+u));
   if(r.errorVal>0)lines.push(L('Fondo error','+'+r.errorVal.toFixed(2)+' '+u));
   if(r.recargo>0)lines.push(L('Plus urgencia','+'+r.recargo.toFixed(2)+' '+u));
-  var beneficio=r.markupVal+r.errorVal+r.recargo;
-  lines.push(SUB,L('BENEFICIO NETO',beneficio.toFixed(2)+' '+u));
+  lines.push(SUB,L('SUBTOTAL MARGEN',r.subtotalMargen.toFixed(2)+' '+u));
   if(r.minAplicado)lines.push('  * Tarifa minima aplicada: '+r.precioMin.toFixed(2)+' '+u);
   if(r.cajonTasa>0)lines.push('','-- CAJON DE AHORRO --',L('Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+(r.cajonTipo||'')+')','+'+r.cajonTasa.toFixed(2)+' '+u));
+  lines.push('',SUB,L('BENEFICIO NETO',r.beneficioNeto.toFixed(2)+' '+u),
+    '  (margen + complementos + tasa - bruto)');
   lines.push(SEP,L('PRECIO UNITARIO',(total/cant).toFixed(2)+' '+u),L('CANTIDAD',cant+' ud.'),SUB,L('PVP FINAL',total.toFixed(2)+' '+u),SEP,
     '','Opciones: Dis='+(o.diseno_modelado||'-')+' | Busq='+(o.busqueda_modelos||'-'),
     '          Sop='+(o.eliminacion_soportes||'-')+' | Post='+(o.postprocesado||'-'),
@@ -2655,7 +2757,7 @@ function renderTicketPage(doc,o,kind){
     _sbox(M,'PARÁM. BÁSICOS',_rBas);
     _sbox(M+_bw3+_bg,'PARÁM. COMPLEMENTARIOS',_rComp);
     _sbox(M+2*(_bw3+_bg),'UTILITARIOS',_rUtil);
-    var _trows=[['Subtotal bruto + complementos',_rBas+_rComp],['Beneficio neto',(r?r.beneficioNeto:0)]];
+    var _trows=[['Subtotal bruto + complementos',_rBas+_rComp],['Subtotal margen',(r?r.subtotalMargen:0)],['Beneficio neto',(r?r.beneficioNeto:0)]];
     if(_urgExtra>0)_trows.push(['Recargo urgencia'+((_urgD!=null)?(' ('+_urgD+' día'+(_urgD===1?'':'s')+' · +'+_urgPct+'%)'):''),_urgExtra]);
     var _pw=W-2*M, _py=_by+_bh3+8, _rowh=9, _pnlH=_rowh*_trows.length+5;
     doc.setFillColor(248,249,251); doc.roundedRect(M,_py,_pw,_pnlH,2,2,'F');
