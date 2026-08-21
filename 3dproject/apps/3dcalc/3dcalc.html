@@ -144,7 +144,6 @@ table.t .sw{display:inline-block;width:14px;height:14px;border-radius:4px;border
 .brk .r.ben{font-size:14px;margin-top:2px}
 .brk .r.ben span{color:var(--t1);font-weight:600}
 .brk .r.ben b{color:var(--ac);font-weight:800}
-.brk .r-form{font-size:10.5px;color:var(--t3);line-height:1.4;margin-top:-4px}
 
 .k-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .k-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700}
@@ -804,16 +803,15 @@ function compute(c){
   var cant=Math.max(1,Math.floor(num(c.cantidad)||1));
   var markupVal=Math.max(0,bruto*(markup-1));
   var errorVal=Math.max(0,bruto*errorRate);
-  /* Subtotal margen: lo que se añade sobre el coste (markup, fondo de error y
-     plus de urgencia). Antes esto se llamaba «beneficio neto». */
-  var subtotalMargen=markupVal+errorVal+recargo;
-  /* Beneficio neto real: al margen se le suman los complementos cobrados y la
-     tasa de ahorro, y se le descuenta el coste bruto de producir la pieza. */
-  var beneficioNeto=roundMoney(subtotalMargen+resto+cajonTasa-bruto);
+  /* Subtotal margen: markup + fondo de error (y el plus de urgencia si lo hay). */
+  var subtotalMargen=roundMoney(markupVal+errorVal+recargo);
+  /* Beneficio total: complementos + margen − coste bruto. Ni los accesorios, ni
+     la tasa de ahorro, ni el ajuste a la tarifa mínima entran aquí: van a «Otros». */
+  var beneficioTotal=roundMoney(subtotalMargen+resto-bruto);
   return {printer:printer,pricekg:pricekg,peso:peso,horas:horas,filName:filName,filColor:filColor,
     filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,
     bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,
-    markupVal:markupVal,errorVal:errorVal,subtotalMargen:roundMoney(subtotalMargen),beneficioNeto:beneficioNeto,
+    markupVal:markupVal,errorVal:errorVal,subtotalMargen:subtotalMargen,beneficioTotal:beneficioTotal,
     bloqueA:roundMoney(bloqueA),bloqueC:roundMoney(bloqueC),
     precioPrevio:precioPrevio,cajonTipo:cajonTipo,cajonPct:cajonPct,cajonTasa:cajonTasa,
     precio:precio,precioUnit:roundMoney(precio/cant),cant:cant,precioMin:precioMin,minAplicado:minAplicado,minAjuste:minAjuste,accesorios:accesorios};
@@ -1245,24 +1243,25 @@ function resultHTML(){
   if(r.resto>0){
     html+='<div class="grp">Parámetros complementarios</div>'
       +row('Diseño &amp; modelado',r.diseno)+row('Búsqueda modelos',r.busqueda)+row('Elim. soportes',r.soportes)+row('Postprocesado',r.postproc)
+      +(r.gastoMisc>0?row('Extras / misc.',r.gastoMisc):'')
       +'<div class="r sub"><span>Subtotal complementos</span><b>'+fmt(r.resto)+'</b></div>';
   }
-  html+='<div class="grp">Márgenes y beneficio</div>'
+  html+='<div class="grp">Márgenes</div>'
     +'<div class="r"><span>Markup (×'+r.markup.toFixed(1)+')</span><b>+'+fmt(r.markupVal)+'</b></div>';
   if(r.errorVal>0)html+='<div class="r"><span>Fondo error ('+esc(S.calc_state.probabilidad_error)+')</span><b>+'+fmt(r.errorVal)+'</b></div>';
   if(r.recargo>0)html+='<div class="r"><span>Plus urgencia</span><b>+'+fmt(r.recargo)+'</b></div>';
-  if(r.gastoMisc>0)html+='<div class="r"><span>Extras / misc.</span><b>+'+fmt(r.gastoMisc)+'</b></div>';
   html+='<div class="r sub"><span>Subtotal margen</span><b>'+fmt(r.subtotalMargen)+'</b></div>';
-  if(r.accesorios>0)html+='<div class="grp">Utilitarios</div><div class="r"><span>Accesorios</span><b>+'+fmt(r.accesorios)+'</b></div>';
-  if(r.cajonTasa>0)html+='<div class="grp">Cajón de ahorro</div><div class="r"><span>Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+esc(r.cajonTipo)+')</span><b>+'+fmt(r.cajonTasa)+'</b></div>';
-  if(r.minAjuste>0)html+='<div class="grp">Tarifa mínima</div><div class="r"><span>Ajuste hasta el mínimo</span><b>+'+fmt(r.minAjuste)+'</b></div>';
-  html+='<div class="grp">Beneficio</div>'
-    +'<div class="r ben"><span>Beneficio neto</span><b>'+fmt(r.beneficioNeto)+'</b></div>'
-    +'<div class="r-form">Subtotal margen + Subtotal complementos + Tasa de ahorro − Subtotal bruto</div>';
+  /* «Otros»: lo que se suma al PVP sin formar parte del beneficio. */
+  var _otros='';
+  if(r.accesorios>0)_otros+='<div class="r"><span>Accesorios</span><b>+'+fmt(r.accesorios)+'</b></div>';
+  if(r.cajonTasa>0)_otros+='<div class="r"><span>Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+esc(r.cajonTipo)+')</span><b>+'+fmt(r.cajonTasa)+'</b></div>';
+  if(r.minAjuste>0)_otros+='<div class="r"><span>Ajuste hasta la tarifa mínima ('+fmt(r.precioMin)+')</span><b>+'+fmt(r.minAjuste)+'</b></div>';
+  if(_otros)html+='<div class="grp">Otros</div>'+_otros;
+  html+='<div class="grp">Beneficio total</div>'
+    +'<div class="r ben"><span>Complementos + margen − bruto</span><b>'+fmt(r.beneficioTotal)+'</b></div>';
   html+='<div class="sep"></div>'
     +'<div class="r big"><span>PVP final</span><b>'+fmt(r.precio)+'</b></div>'
     +'</div>';
-  if(r.minAplicado)html+='<span class="pill">Tarifa mínima aplicada ('+fmt(r.precioMin)+')</span>';
   html+='<button class="btn" style="width:100%;margin-top:16px" onclick="saveAsOrder()">Guardar como pedido</button>';
   html+='<div class="pdf-actions">'+'<div class="pdf-card"><div class="pdf-card-t">PDF cliente</div><div class="pdf-card-b"><button onclick="calcViewPDF(\'cliente\')" title="Ver en el navegador"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>Ver</button><button onclick="calcPDF(\'cliente\')" title="Descargar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Descargar</button></div></div>'+'<div class="pdf-card"><div class="pdf-card-t">PDF interno</div><div class="pdf-card-b"><button onclick="calcViewPDF(\'empresa\')" title="Ver en el navegador"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>Ver</button><button onclick="calcPDF(\'empresa\')" title="Descargar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Descargar</button></div></div>'+'</div>';
   html+='<button class="btn ghost pdf-both" onclick="calcBothPdf()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar ambos PDF</button>';
@@ -1801,13 +1800,13 @@ function saveAsOrder(){ var c=S.calc_state; var dup=_findDupOrder(c.cliente,c.de
     +'<button class="btn ghost" onclick="closeModal()">Cancelar</button></div>'); return; }
   _doSaveOrder();
 }
-function _doSaveOrder(descOverride){ var r=compute(),c=S.calc_state; var desc=(descOverride!=null?descOverride:c.descripcion); S.oseq=(S.oseq||0)+1; S.orders.unshift({id:uid(),number:randomOrderNo(),created_at:new Date().toISOString(),fecha:(c.fecha||todayISO()),empresa:c.empresa,cliente:c.cliente,cliente_email:c.cliente_email||'',tipo_proyecto:(c.tipo_proyecto||'Técnico'),precio_base_cajon:roundMoney(r.bloqueA||0),descripcion:desc,impresora:(r.printer.name||''),filamento:r.filName,filamento_color:r.filColor,peso_g:String(r.peso),horas:String(r.horas),cantidad:r.cant,precio_final:((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:r.precio),precio_normal:(c.urgencia_nivel==='Ambos'?r.precio:null),precio_urgente:(c.urgencia_nivel==='Ambos'?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:null),urg_days:((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?(calcDaysGained()||0):null),coste_bruto:roundMoney(r.bruto),beneficio_neto:roundMoney(r.beneficioNeto),importe_pagado:0,estado:'Pendiente',status_updated_at:Date.now(),notif_snooze_until:0,diseno_modelado:c.diseno_modelado,diseno_opt:!!c.diseno_opt,busqueda_modelos:c.busqueda_modelos,eliminacion_soportes:c.eliminacion_soportes,postprocesado:c.postprocesado,probabilidad_error:c.probabilidad_error,markup:c.markup,urgencia_nivel:c.urgencia_nivel,gasto_misc:num(c.gasto_misc),is_multimaterial:!!c.is_multimaterial,material_breakdown:JSON.parse(JSON.stringify(c.material_breakdown||[])),util:JSON.parse(JSON.stringify(c.util||{})),payment_history:[],material_contabilizado:false,archived:false,repeticiones_error:0,imagen:'',is_shared:!!c.is_shared,prod:(c.prod_on&&c.prod?JSON.parse(JSON.stringify(c.prod)):null),cal_at:(c.prod_on&&c.prod?Date.now():null),promised:null,shared_split:c.is_shared?{'3DCC':num(c.shared_percent_3dcc),'SILAB3D':num(c.shared_percent_silab3d)}:null}); ensureClient(S.orders[0]); var _new=S.orders[0]; var _wasUrg=(_new.urgencia_nivel==='Urgente'&&_new.prod&&!_new.cal_off);
+function _doSaveOrder(descOverride){ var r=compute(),c=S.calc_state; var desc=(descOverride!=null?descOverride:c.descripcion); S.oseq=(S.oseq||0)+1; S.orders.unshift({id:uid(),number:randomOrderNo(),created_at:new Date().toISOString(),fecha:(c.fecha||todayISO()),empresa:c.empresa,cliente:c.cliente,cliente_email:c.cliente_email||'',tipo_proyecto:(c.tipo_proyecto||'Técnico'),precio_base_cajon:roundMoney(r.bloqueA||0),descripcion:desc,impresora:(r.printer.name||''),filamento:r.filName,filamento_color:r.filColor,peso_g:String(r.peso),horas:String(r.horas),cantidad:r.cant,precio_final:((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:r.precio),precio_normal:(c.urgencia_nivel==='Ambos'?r.precio:null),precio_urgente:(c.urgencia_nivel==='Ambos'?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:null),urg_days:((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?(calcDaysGained()||0):null),coste_bruto:roundMoney(r.bruto),beneficio_neto:roundMoney(r.beneficioTotal),importe_pagado:0,estado:'Pendiente',status_updated_at:Date.now(),notif_snooze_until:0,diseno_modelado:c.diseno_modelado,diseno_opt:!!c.diseno_opt,busqueda_modelos:c.busqueda_modelos,eliminacion_soportes:c.eliminacion_soportes,postprocesado:c.postprocesado,probabilidad_error:c.probabilidad_error,markup:c.markup,urgencia_nivel:c.urgencia_nivel,gasto_misc:num(c.gasto_misc),is_multimaterial:!!c.is_multimaterial,material_breakdown:JSON.parse(JSON.stringify(c.material_breakdown||[])),util:JSON.parse(JSON.stringify(c.util||{})),payment_history:[],material_contabilizado:false,archived:false,repeticiones_error:0,imagen:'',is_shared:!!c.is_shared,prod:(c.prod_on&&c.prod?JSON.parse(JSON.stringify(c.prod)):null),cal_at:(c.prod_on&&c.prod?Date.now():null),promised:null,shared_split:c.is_shared?{'3DCC':num(c.shared_percent_3dcc),'SILAB3D':num(c.shared_percent_silab3d)}:null}); ensureClient(S.orders[0]); var _new=S.orders[0]; var _wasUrg=(_new.urgencia_nivel==='Urgente'&&_new.prod&&!_new.cal_off);
   var _before=null; if(_wasUrg){ try{ var _tmp=S.orders; S.orders=_tmp.filter(function(x){return x.id!==_new.id;}); _before=_schedSnapshot(); S.orders=_tmp; }catch(e){} }
   save(); try{ _ensurePromised(); }catch(e){}
   if(_wasUrg&&_before){ try{ var _after=_schedSnapshot(); closeModal(); go('ord'); openModal(urgentImpactHTML(_before,_after,_new.id)); toast3('Pedido urgente guardado','#F4B740'); return; }catch(e){} }
   closeModal(); go('ord'); toast3('Pedido guardado','#34D399'); }
 function _saveOrderNewName(){ var c=S.calc_state; var base=String(c.descripcion||''); var nd=prompt('Nueva descripción para diferenciar este pedido:', base?(base+' (2)'):''); if(nd==null)return; nd=nd.trim(); if(!nd){ toast3('La descripción no puede estar vacía','#FF6B8A'); return; } _doSaveOrder(nd); }
-function _overwriteOrder(id){ var o=getOrder(id); if(!o){ closeModal(); return; } var r=compute(),c=S.calc_state; o.fecha=(c.fecha||o.fecha||todayISO()); o.empresa=c.empresa; o.cliente=c.cliente; o.cliente_email=c.cliente_email||''; o.descripcion=c.descripcion; o.impresora=(r.printer.name||''); o.filamento=r.filName; o.filamento_color=r.filColor; o.peso_g=String(r.peso); o.horas=String(r.horas); o.cantidad=r.cant; o.precio_final=((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:r.precio); o.precio_normal=(c.urgencia_nivel==='Ambos'?r.precio:null); o.precio_urgente=(c.urgencia_nivel==='Ambos'?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:null); o.urg_days=((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?(calcDaysGained()||0):null); o.coste_bruto=roundMoney(r.bruto); o.beneficio_neto=roundMoney(r.beneficioNeto); o.diseno_modelado=c.diseno_modelado; o.diseno_opt=!!c.diseno_opt; o.busqueda_modelos=c.busqueda_modelos; o.eliminacion_soportes=c.eliminacion_soportes; o.postprocesado=c.postprocesado; o.probabilidad_error=c.probabilidad_error; o.markup=c.markup; o.urgencia_nivel=c.urgencia_nivel; o.gasto_misc=num(c.gasto_misc); o.is_multimaterial=!!c.is_multimaterial; o.material_breakdown=JSON.parse(JSON.stringify(c.material_breakdown||[])); o.util=JSON.parse(JSON.stringify(c.util||{})); o.is_shared=!!c.is_shared; o.shared_split=c.is_shared?{'3DCC':num(c.shared_percent_3dcc),'SILAB3D':num(c.shared_percent_silab3d)}:null; o.status_updated_at=Date.now(); o.material_contabilizado=false; ensureClient(o); save(); closeModal(); go('ord'); toast3('Pedido sobrescrito','#34D399'); }
+function _overwriteOrder(id){ var o=getOrder(id); if(!o){ closeModal(); return; } var r=compute(),c=S.calc_state; o.fecha=(c.fecha||o.fecha||todayISO()); o.empresa=c.empresa; o.cliente=c.cliente; o.cliente_email=c.cliente_email||''; o.descripcion=c.descripcion; o.impresora=(r.printer.name||''); o.filamento=r.filName; o.filamento_color=r.filColor; o.peso_g=String(r.peso); o.horas=String(r.horas); o.cantidad=r.cant; o.precio_final=((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:r.precio); o.precio_normal=(c.urgencia_nivel==='Ambos'?r.precio:null); o.precio_urgente=(c.urgencia_nivel==='Ambos'?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:null); o.urg_days=((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?(calcDaysGained()||0):null); o.coste_bruto=roundMoney(r.bruto); o.beneficio_neto=roundMoney(r.beneficioTotal); o.diseno_modelado=c.diseno_modelado; o.diseno_opt=!!c.diseno_opt; o.busqueda_modelos=c.busqueda_modelos; o.eliminacion_soportes=c.eliminacion_soportes; o.postprocesado=c.postprocesado; o.probabilidad_error=c.probabilidad_error; o.markup=c.markup; o.urgencia_nivel=c.urgencia_nivel; o.gasto_misc=num(c.gasto_misc); o.is_multimaterial=!!c.is_multimaterial; o.material_breakdown=JSON.parse(JSON.stringify(c.material_breakdown||[])); o.util=JSON.parse(JSON.stringify(c.util||{})); o.is_shared=!!c.is_shared; o.shared_split=c.is_shared?{'3DCC':num(c.shared_percent_3dcc),'SILAB3D':num(c.shared_percent_silab3d)}:null; o.status_updated_at=Date.now(); o.material_contabilizado=false; ensureClient(o); save(); closeModal(); go('ord'); toast3('Pedido sobrescrito','#34D399'); }
 function newOrder(){ S.oseq=(S.oseq||0)+1; S.orders.unshift({id:uid(),number:randomOrderNo(),created_at:new Date().toISOString(),fecha:todayISO(),empresa:'3DCC',cliente:'',descripcion:'',precio_final:0,importe_pagado:0,estado:'Pendiente',status_updated_at:Date.now(),notif_snooze_until:0,payment_history:[],material_contabilizado:false,archived:false,repeticiones_error:0,imagen:''}); save(); renderOrders(); }
 function setOrd(id,f,v){ var o=S.orders.filter(function(x){return x.id===id;})[0]; if(!o)return; if(f==='precio_final'||f==='importe_pagado')v=num(v); o[f]=v; if(f==='cliente'||f==='cliente_email')ensureClient(o); if(f==='importe_pagado'||f==='precio_final')autoArchive(o); save(); updateOrdBadge(); var pe=document.getElementById('pend-'+id); if(pe){var p=num(o.precio_final)-num(o.importe_pagado); pe.innerHTML=p>0.005?'<span class="pend">'+eur(p)+'</span>':'<span class="paid">Pagado</span>';} }
 function delOrder(id){ if(!confirm('¿Eliminar este pedido?'))return; cajonDropOrder(id,true); S.orders=S.orders.filter(function(x){return x.id!==id;}); save(); renderOrders(); }
@@ -2394,7 +2393,7 @@ function activateInTracker(id){ var o=getOrder(id); if(!o)return; if(!(window.DP
   if(window.DPCloud.getOrderByCode){ window.DPCloud.getOrderByCode(code).then(function(ex){ if(ex) markAndGo(); else create(); }).catch(create); } else create(); }
 function openOrder(id){ var o=getOrder(id); if(o) openModal(orderModalHTML(o)); }
 function reopenOrder(id){ var o=getOrder(id); if(o) openModal(orderModalHTML(o)); renderOrders(); }
-function setOrdParam(id,f,v){ var o=getOrder(id); if(!o)return; if(['peso_g','horas','cantidad','gasto_misc'].indexOf(f)>=0)v=num(v); o[f]=v; if(f==='filamento')o.is_multimaterial=false; try{ var r=compute(orderToCalcState(o)); var _dd3=orderDual(o); o.precio_final=(o.urgencia_nivel==='Urgente'?_dd3.urgente:(o.urgencia_nivel==='Ambos'?_dd3.urgente:r.precio)); o.precio_normal=(o.urgencia_nivel==='Ambos'?_dd3.normal:null); o.precio_urgente=(o.urgencia_nivel==='Ambos'?_dd3.urgente:null); o.coste_bruto=roundMoney(r.bruto); o.beneficio_neto=roundMoney(r.beneficioNeto); }catch(e){} save(); reopenOrder(id); }
+function setOrdParam(id,f,v){ var o=getOrder(id); if(!o)return; if(['peso_g','horas','cantidad','gasto_misc'].indexOf(f)>=0)v=num(v); o[f]=v; if(f==='filamento')o.is_multimaterial=false; try{ var r=compute(orderToCalcState(o)); var _dd3=orderDual(o); o.precio_final=(o.urgencia_nivel==='Urgente'?_dd3.urgente:(o.urgencia_nivel==='Ambos'?_dd3.urgente:r.precio)); o.precio_normal=(o.urgencia_nivel==='Ambos'?_dd3.normal:null); o.precio_urgente=(o.urgencia_nivel==='Ambos'?_dd3.urgente:null); o.coste_bruto=roundMoney(r.bruto); o.beneficio_neto=roundMoney(r.beneficioTotal); }catch(e){} save(); reopenOrder(id); }
 function setOrdParamTime(id,el){ var d=hmToDec(el.value); setOrdParam(id,'horas',String(d)); }
 function setOrdMeta(id,f,v){ var o=getOrder(id); if(!o)return; o[f]=v; if(f==='cliente'||f==='cliente_email')ensureClient(o); save(); }
 function _odBrk(r){
@@ -2402,15 +2401,17 @@ function _odBrk(r){
   function grp(l){return '<div class="odb-grp">'+l+'</div>';}
   function sub(l,v){return '<div class="odb-r odb-sub"><span>'+l+'</span><b>'+eur(v)+'</b></div>';}
   var h=grp('Parámetros básicos')+row('Filamento',r.filamento)+row('Electricidad',r.electricidad)+row('Deterioro impresora',r.deterioro)+sub('Subtotal básico',r.bruto);
-  if(r.resto>0){ h+=grp('Parámetros complementarios')+row('Diseño y modelado',r.diseno)+row('Búsqueda de modelos',r.busqueda)+row('Eliminación de soportes',r.soportes)+row('Post-procesado',r.postproc)+sub('Subtotal complementarios',r.resto); }
-  h+=grp('Márgenes y beneficio')+row('Markup (×'+r.markup.toFixed(1)+')',r.markupVal,true);
+  if(r.resto>0){ h+=grp('Parámetros complementarios')+row('Diseño y modelado',r.diseno)+row('Búsqueda de modelos',r.busqueda)+row('Eliminación de soportes',r.soportes)+row('Post-procesado',r.postproc)+(r.gastoMisc>0?row('Extras / misc.',r.gastoMisc):'')+sub('Subtotal complementarios',r.resto); }
+  h+=grp('Márgenes')+row('Markup (×'+r.markup.toFixed(1)+')',r.markupVal,true);
   if(r.errorVal>0)h+=row('Fondo de error',r.errorVal,true);
   if(r.recargo>0)h+=row('Plus urgencia',r.recargo,true);
-  if(r.gastoMisc>0)h+=row('Extras / misc.',r.gastoMisc,true);
   h+=sub('Subtotal margen',r.subtotalMargen);
-  if(r.accesorios>0)h+=grp('Utilitarios')+row('Accesorios',r.accesorios);
-  if(r.cajonTasa>0)h+=grp('Cajón de ahorro')+row('Tasa de ahorro',r.cajonTasa,true);
-  h+=grp('Beneficio')+sub('Beneficio neto',r.beneficioNeto);
+  var otros='';
+  if(r.accesorios>0)otros+=row('Accesorios',r.accesorios,true);
+  if(r.cajonTasa>0)otros+=row('Tasa de ahorro',r.cajonTasa,true);
+  if(r.minAjuste>0)otros+=row('Ajuste hasta la tarifa mínima ('+eur(r.precioMin)+')',r.minAjuste,true);
+  if(otros)h+=grp('Otros')+otros;
+  h+=grp('Beneficio total')+sub('Complementos + margen − bruto',r.beneficioTotal);
   return h;
 }
 function orderModalHTML(o){
@@ -2529,12 +2530,12 @@ function computeOrder(o){
   var cajonTasa=cajonBase?cajonFee(cajonTipo,cajonBase,o.diseno_modelado):0;
   var cajonPct=cajonBase?cajonRate(cajonTipo,cajonBase,o.diseno_modelado):0;
   var bloqueC=accessoriesTotal(o);
-  var subtotalMargen=markupVal+errorVal+recargo;
-  var beneficioNeto=roundMoney(subtotalMargen+resto+cajonTasa-bruto);
+  var subtotalMargen=roundMoney(markupVal+errorVal+recargo);
+  var beneficioTotal=roundMoney(subtotalMargen+resto-bruto);
   var totalCalc=bloqueA+recargo+cajonTasa+bloqueC;
   var minAplicado=(totalCalc<precioMin);
   var minAjuste=roundMoney(Math.max(0,roundUpToNickel(Math.max(totalCalc,precioMin))-roundUpToNickel(totalCalc)));
-  return {minAjuste:minAjuste,subtotalMargen:roundMoney(subtotalMargen),beneficioNeto:beneficioNeto,filName:filName,filColor:filColor,peso:peso,horas:horas,filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,markupVal:markupVal,errorVal:errorVal,cant:cant,precioMin:precioMin,minAplicado:minAplicado,
+  return {minAjuste:minAjuste,subtotalMargen:subtotalMargen,beneficioTotal:beneficioTotal,filName:filName,filColor:filColor,peso:peso,horas:horas,filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,markupVal:markupVal,errorVal:errorVal,cant:cant,precioMin:precioMin,minAplicado:minAplicado,
     bloqueA:roundMoney(bloqueA),bloqueC:roundMoney(bloqueC),accesorios:roundMoney(bloqueC),
     cajonTipo:cajonTipo,cajonTasa:cajonTasa,cajonPct:cajonPct};
 }
@@ -2572,8 +2573,8 @@ function ticketLines(o,kind){
   lines.push(SUB,L('SUBTOTAL MARGEN',r.subtotalMargen.toFixed(2)+' '+u));
   if(r.minAplicado)lines.push('  * Tarifa minima aplicada: '+r.precioMin.toFixed(2)+' '+u);
   if(r.cajonTasa>0)lines.push('','-- CAJON DE AHORRO --',L('Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+(r.cajonTipo||'')+')','+'+r.cajonTasa.toFixed(2)+' '+u));
-  lines.push('',SUB,L('BENEFICIO NETO',r.beneficioNeto.toFixed(2)+' '+u),
-    '  (margen + complementos + tasa - bruto)');
+  lines.push('',SUB,L('BENEFICIO TOTAL',r.beneficioTotal.toFixed(2)+' '+u),
+    '  (complementos + margen - bruto)');
   lines.push(SEP,L('PRECIO UNITARIO',(total/cant).toFixed(2)+' '+u),L('CANTIDAD',cant+' ud.'),SUB,L('PVP FINAL',total.toFixed(2)+' '+u),SEP,
     '','Opciones: Dis='+(o.diseno_modelado||'-')+' | Busq='+(o.busqueda_modelos||'-'),
     '          Sop='+(o.eliminacion_soportes||'-')+' | Post='+(o.postprocesado||'-'),
@@ -2757,7 +2758,7 @@ function renderTicketPage(doc,o,kind){
     _sbox(M,'PARÁM. BÁSICOS',_rBas);
     _sbox(M+_bw3+_bg,'PARÁM. COMPLEMENTARIOS',_rComp);
     _sbox(M+2*(_bw3+_bg),'UTILITARIOS',_rUtil);
-    var _trows=[['Subtotal bruto + complementos',_rBas+_rComp],['Subtotal margen',(r?r.subtotalMargen:0)],['Beneficio neto',(r?r.beneficioNeto:0)]];
+    var _trows=[['Subtotal bruto + complementos',_rBas+_rComp],['Subtotal margen',(r?r.subtotalMargen:0)],['Beneficio total',(r?r.beneficioTotal:0)]];
     if(_urgExtra>0)_trows.push(['Recargo urgencia'+((_urgD!=null)?(' ('+_urgD+' día'+(_urgD===1?'':'s')+' · +'+_urgPct+'%)'):''),_urgExtra]);
     var _pw=W-2*M, _py=_by+_bh3+8, _rowh=9, _pnlH=_rowh*_trows.length+5;
     doc.setFillColor(248,249,251); doc.roundedRect(M,_py,_pw,_pnlH,2,2,'F');
