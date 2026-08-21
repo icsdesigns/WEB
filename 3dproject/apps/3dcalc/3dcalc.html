@@ -758,24 +758,29 @@ function compute(c){
   var postproc=round4(((POSTPROCESADO[c.postprocesado]||0)/60)*labor);
   var gastoMisc=round4(Math.max(0,num(c.gasto_misc)));
   /* ── MODELO DE BLOQUES ──────────────────────────────────────────────────────
-     A = básicos + complementarios + fondo de error + markup  (nunca < mínimo)
+     A = básicos + complementarios + fondo de error + markup
      B = multiplicadores sobre A: recargo de urgencia y tasa de ahorro
      C = accesorios, que se suman a A sin multiplicadores
-     PVP = A + A×urgencia + A×tasa + C                                        */
+     PVP = máx(A + A×urgencia + A×tasa + C, tarifa mínima)
+     La tarifa mínima es un suelo del TOTAL, no del bloque A: los accesorios y la
+     tasa de ahorro cuentan PARA llegar al mínimo, nunca se suman por encima de
+     él (3 € de coste + 1 € de accesorios + 0,50 € de tasa = mínimo, no 6,50 €). */
   var bruto=filamento+electricidad+deterioro;
   var resto=diseno+busqueda+soportes+postproc+gastoMisc;
   var precioMin=num(g.precio_minimo);
-  var bloqueA=Math.max(bruto*markup+bruto*errorRate+resto, precioMin);
-  var minAplicado=(bruto*markup+bruto*errorRate+resto)<precioMin;
+  var bloqueA=bruto*markup+bruto*errorRate+resto;
   var accesorios=accessoriesTotal(c);         // bloque C
   var bloqueC=accesorios;
   var recargo=bloqueA*urg;                    // bloque B · urgencia
   var cajonTipo=(c.tipo_proyecto||(c.prod&&c.prod.tipo)||'Técnico');
   var cajonPct=cajonRate(cajonTipo,bloqueA,c.diseno_modelado);  // bloque B · tasa de ahorro
   var cajonTasa=roundMoney(bloqueA*cajonPct);
-  var precioPrevio=roundUpToNickel(bloqueA+recargo+bloqueC);   // total antes de la tasa
-  var precio=roundUpToNickel(bloqueA+recargo+cajonTasa+bloqueC);
-  var precioSinMisc=roundUpToNickel(bloqueA);
+  var totalCalc=bloqueA+recargo+cajonTasa+bloqueC;
+  var minAplicado=(totalCalc<precioMin);
+  var precio=roundUpToNickel(Math.max(totalCalc,precioMin));
+  /* Lo que se ha subido el precio para llegar al mínimo (0 si no hizo falta). */
+  var minAjuste=roundMoney(Math.max(0,precio-roundUpToNickel(totalCalc)));
+  var precioPrevio=roundUpToNickel(Math.max(bloqueA+recargo+bloqueC,precioMin));   // total antes de la tasa
   var cant=Math.max(1,Math.floor(num(c.cantidad)||1));
   var markupVal=Math.max(0,bruto*(markup-1));
   var errorVal=Math.max(0,bruto*errorRate);
@@ -786,7 +791,7 @@ function compute(c){
     markupVal:markupVal,errorVal:errorVal,beneficioNeto:beneficioNeto,
     bloqueA:roundMoney(bloqueA),bloqueC:roundMoney(bloqueC),
     precioPrevio:precioPrevio,cajonTipo:cajonTipo,cajonPct:cajonPct,cajonTasa:cajonTasa,
-    precio:precio,precioUnit:roundMoney(precio/cant),cant:cant,precioMin:precioMin,minAplicado:minAplicado,accesorios:accesorios};
+    precio:precio,precioUnit:roundMoney(precio/cant),cant:cant,precioMin:precioMin,minAplicado:minAplicado,minAjuste:minAjuste,accesorios:accesorios};
 }
 
 /* ===== extras de la calculadora (colores, compartido, asistente de error) ===== */
@@ -1225,6 +1230,7 @@ function resultHTML(){
   html+='<div class="r sub"><span>Beneficio neto</span><b>'+fmt(r.beneficioNeto)+'</b></div>';
   if(r.accesorios>0)html+='<div class="grp">Utilitarios</div><div class="r"><span>Accesorios</span><b>+'+fmt(r.accesorios)+'</b></div>';
   if(r.cajonTasa>0)html+='<div class="grp">Cajón de ahorro</div><div class="r"><span>Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+esc(r.cajonTipo)+')</span><b>+'+fmt(r.cajonTasa)+'</b></div>';
+  if(r.minAjuste>0)html+='<div class="grp">Tarifa mínima</div><div class="r"><span>Ajuste hasta el mínimo</span><b>+'+fmt(r.minAjuste)+'</b></div>';
   html+='<div class="sep"></div>'
     +'<div class="r big"><span>PVP final</span><b>'+fmt(r.precio)+'</b></div>'
     +'</div>';
@@ -1479,7 +1485,7 @@ function _placeOrder(C,o,urg,useUrgDur,startOverride){
   }
   return null;
 }
-function _finDate(res){ if(!res||!res.placed.length)return null; var last=res.placed[res.placed.length-1].dk; return _addD(_md(last),1); }
+function _finDate(res){ if(!res||!res.placed.length)return null; var last=res.placed[res.placed.length-1].dk; var d=_addD(_md(last),1); while(_isSun(d))d=_addD(d,1); return d; }
 function _overDays(o,res){ if(!o.promised||!res)return 0; var b=_md(o.promised), f=_finDate(res); if(!f||isNaN(b.getTime()))return 0; return Math.round((f-b)/86400000); }
 function _commitSched(sched,o,res,compressed){
   var des=[],tst=[],prt=[];
@@ -1584,7 +1590,7 @@ function calInfo(){
       +'<div class="note" style="font-size:11.5px;line-height:1.7"><b>Diseño</b>: No necesario 0 · Chorrada/Fácil 1 · Medio 2 · Avanzado 3 días.<br><b>Testado</b>: Sencillo 1 día · Complicado 2 días (por test).<br><b>Impresión</b>: 1 día por cada 12 h.</div></div>'
     +'<div class="card" style="margin:0;border-color:rgba(244,183,64,.4)"><div class="card-h" style="color:#F4B740">Tarifa urgente</div>'
       +'<div class="note" style="font-size:11.5px;line-height:1.7"><b>Diseño</b>: No necesario 0 · Chorrada/Fácil/Medio 1 · Avanzado 2 días.<br><b>Testado</b>: simples agrupados 2 por día · complicados 1 día c/u.<br><b>Impresión</b>: 1 día por cada 12 h.</div></div></div>';
-  var gen='<div class="note" style="margin-top:12px;font-size:11.5px">Los bloques van siempre en orden <b>diseño → testado → impresión</b> sin huecos y la impresión de un pedido nunca comparte día con sus propias fases de diseño o testado; se saltan domingos y días especiales (vacaciones, sin técnico/artístico/impresión); nunca se programan fechas anteriores a hoy; y la prioridad sigue el <b>orden de activación</b> del calendario.</div>';
+  var gen='<div class="note" style="margin-top:12px;font-size:11.5px">Los bloques van siempre en orden <b>diseño → testado → impresión</b> sin huecos y la impresión de un pedido nunca comparte día con sus propias fases de diseño o testado; se saltan los domingos y los días especiales (vacaciones, sin técnico/artístico/impresión), <b>salvo en tarifa urgente</b>, que sí trabaja en domingo (diseño, testado e impresión); las <b>entregas nunca caen en domingo</b>, pasan al siguiente día hábil; nunca se programan fechas anteriores a hoy; y la prioridad sigue el <b>orden de activación</b> del calendario.</div>';
   var _pcell=function(ok){ return '<td style="text-align:center;padding:7px 6px;background:'+(ok?SI:NO)+';color:#fff;font-weight:700;font-size:12px;border-radius:6px">'+(ok?'✓':'✗')+'</td>'; };
   var per='<table style="width:100%;border-collapse:separate;border-spacing:4px;margin-top:6px"><tr><th style="font-size:11px;color:var(--t2);text-align:left;padding-right:6px">Periodo</th><th style="font-size:10.5px;color:var(--t2)">Dis./test. téc.</th><th style="font-size:10.5px;color:var(--t2)">Dis./test. art.</th><th style="font-size:10.5px;color:var(--t2)">Impresión</th></tr>'
     +'<tr><th style="font-size:11px;color:#FF6B8A;text-align:left;padding-right:6px">Vacaciones</th>'+_pcell(false)+_pcell(false)+_pcell(false)+'</tr>'
@@ -1622,7 +1628,7 @@ function renderCalendar(){
   var MON=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   var y=calMonth.y, m=calMonth.m, first=new Date(y,m,1), startW=(first.getDay()+6)%7, dim=new Date(y,m+1,0).getDate(), todayK=_dk(new Date());
   var nSched=Object.keys(sched).length;
-  var h='<div class="h1" style="display:flex;align-items:center;gap:10px">Calendario de producción<button class="cal-info-btn" title="Reglas de tiempos de producción" onclick="calInfo()">i</button></div><div class="h-sub">Programación automática de tus pedidos: días de diseño, testado e impresión (se saltan domingos y días especiales).</div>';
+  var h='<div class="h1" style="display:flex;align-items:center;gap:10px">Calendario de producción<button class="cal-info-btn" title="Reglas de tiempos de producción" onclick="calInfo()">i</button></div><div class="h-sub">Programación automática de tus pedidos: días de diseño, testado e impresión. Se saltan domingos y días especiales, salvo en tarifa urgente, que sí trabaja en domingo; las entregas nunca caen en domingo.</div>';
   h+='<div class="cal-top"><div class="cal-nav"><button class="btn ghost" onclick="calShift(-1)">‹</button>'
     +'<div class="cal-title">'+MON[m].charAt(0).toUpperCase()+MON[m].slice(1)+' '+y+'</div>'
     +'<button class="btn ghost" onclick="calShift(1)">›</button><button class="btn ghost" onclick="calToday()">Hoy</button></div>'
@@ -2413,10 +2419,9 @@ function computeOrder(o){
   var gastoMisc=round4(Math.max(0,num(o.gasto_misc)));
   var bruto=filamento+electricidad+deterioro, resto=diseno+busqueda+soportes+postproc+gastoMisc;
   var precioMin=num(g.precio_minimo);
-  var bloqueA=Math.max(bruto*markup+bruto*errorRate+resto, precioMin);
-  var minAplicado=(bruto*markup+bruto*errorRate+resto)<precioMin;
+  /* La tarifa mínima es suelo del total, no del bloque A (ver compute()). */
+  var bloqueA=bruto*markup+bruto*errorRate+resto;
   var recargo=bloqueA*urg;
-  var precioSinMisc=roundUpToNickel(bloqueA);
   var cant=Math.max(1,Math.floor(num(o.cantidad)||1));
   var markupVal=Math.max(0,bruto*(markup-1)), errorVal=Math.max(0,bruto*errorRate);
   /* Tasa del cajón: se guardó con el pedido, así que se refleja tal cual se cobró. */
@@ -2425,7 +2430,10 @@ function computeOrder(o){
   var cajonTasa=cajonBase?cajonFee(cajonTipo,cajonBase,o.diseno_modelado):0;
   var cajonPct=cajonBase?cajonRate(cajonTipo,cajonBase,o.diseno_modelado):0;
   var bloqueC=accessoriesTotal(o);
-  return {filName:filName,filColor:filColor,peso:peso,horas:horas,filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,markupVal:markupVal,errorVal:errorVal,cant:cant,precioMin:precioMin,minAplicado:minAplicado,
+  var totalCalc=bloqueA+recargo+cajonTasa+bloqueC;
+  var minAplicado=(totalCalc<precioMin);
+  var minAjuste=roundMoney(Math.max(0,roundUpToNickel(Math.max(totalCalc,precioMin))-roundUpToNickel(totalCalc)));
+  return {minAjuste:minAjuste,filName:filName,filColor:filColor,peso:peso,horas:horas,filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,markupVal:markupVal,errorVal:errorVal,cant:cant,precioMin:precioMin,minAplicado:minAplicado,
     bloqueA:roundMoney(bloqueA),bloqueC:roundMoney(bloqueC),accesorios:roundMoney(bloqueC),
     cajonTipo:cajonTipo,cajonTasa:cajonTasa,cajonPct:cajonPct};
 }
@@ -2673,6 +2681,7 @@ function renderTicketPage(doc,o,kind){
       if(r.gastoMisc>0) push('Extras / misc.',r.gastoMisc);
       if(r.cajonTasa>0) push('Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+(r.cajonTipo||'')+')',r.cajonTasa);
       if(r.accesorios>0) push('Utilitarios (accesorios)',r.accesorios);
+      if(r.minAjuste>0) push('Ajuste a tarifa mínima ('+(r.precioMin||0).toFixed(2)+' €)',r.minAjuste);
     }
     doc.autoTable({ startY:_ty+_tbh+16, head:[['Concepto','Importe']], body:body, theme:'grid',
       headStyles:{fillColor:ac,textColor:255,fontStyle:'bold'}, columnStyles:{1:{halign:'right'}},
