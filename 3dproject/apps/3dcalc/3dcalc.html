@@ -805,11 +805,12 @@ function compute(c){
   var errorVal=Math.max(0,bruto*errorRate);
   /* Subtotal margen: markup + fondo de error (y el plus de urgencia si lo hay). */
   var subtotalMargen=roundMoney(markupVal+errorVal+recargo);
-  /* Beneficio total: complementos + margen − coste bruto. Ni los accesorios, ni
-     la tasa de ahorro, ni el ajuste a la tarifa mínima entran aquí: van a «Otros». */
-  var beneficioTotal=roundMoney(subtotalMargen+resto-bruto);
   /* «Otros»: accesorios, tasa de ahorro y ajuste a la tarifa mínima. */
   var subtotalOtros=roundMoney(accesorios+cajonTasa+minAjuste);
+  /* Beneficio total: complementos + margen − coste bruto, más lo que se haya
+     subido el precio para llegar a la tarifa mínima (eso también queda). Los
+     accesorios y la tasa de ahorro no cuentan: son un coste que se repercute. */
+  var beneficioTotal=roundMoney(subtotalMargen+resto+minAjuste-bruto);
   return {printer:printer,pricekg:pricekg,peso:peso,horas:horas,filName:filName,filColor:filColor,
     filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,
     bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,
@@ -1261,7 +1262,7 @@ function resultHTML(){
   if(_otros)html+='<div class="grp">Otros</div>'+_otros
     +'<div class="r sub"><span>Subtotal otros</span><b>'+fmt(r.subtotalOtros)+'</b></div>';
   html+='<div class="grp">Beneficio total</div>'
-    +'<div class="r ben"><span>Complementos + margen − bruto</span><b>'+fmt(r.beneficioTotal)+'</b></div>';
+    +'<div class="r ben"><span>Complementos + margen'+(r.minAjuste>0?' + ajuste mínimo':'')+' − bruto</span><b>'+fmt(r.beneficioTotal)+'</b></div>';
   html+='<div class="sep"></div>'
     +'<div class="r big"><span>PVP final</span><b>'+fmt(r.precio)+'</b></div>'
     +'</div>';
@@ -2414,7 +2415,7 @@ function _odBrk(r){
   if(r.cajonTasa>0)otros+=row('Tasa de ahorro',r.cajonTasa,true);
   if(r.minAjuste>0)otros+=row('Ajuste hasta la tarifa mínima ('+eur(r.precioMin)+')',r.minAjuste,true);
   if(otros)h+=grp('Otros')+otros+sub('Subtotal otros',r.subtotalOtros);
-  h+=grp('Beneficio total')+sub('Complementos + margen − bruto',r.beneficioTotal);
+  h+=grp('Beneficio total')+sub('Complementos + margen'+(r.minAjuste>0?' + ajuste mínimo':'')+' − bruto',r.beneficioTotal);
   return h;
 }
 function orderModalHTML(o){
@@ -2534,11 +2535,11 @@ function computeOrder(o){
   var cajonPct=cajonBase?cajonRate(cajonTipo,cajonBase,o.diseno_modelado):0;
   var bloqueC=accessoriesTotal(o);
   var subtotalMargen=roundMoney(markupVal+errorVal+recargo);
-  var beneficioTotal=roundMoney(subtotalMargen+resto-bruto);
   var totalCalc=bloqueA+recargo+cajonTasa+bloqueC;
   var minAplicado=(totalCalc<precioMin);
   var minAjuste=roundMoney(Math.max(0,roundUpToNickel(Math.max(totalCalc,precioMin))-roundUpToNickel(totalCalc)));
   var subtotalOtros=roundMoney(bloqueC+cajonTasa+minAjuste);
+  var beneficioTotal=roundMoney(subtotalMargen+resto+minAjuste-bruto);
   return {minAjuste:minAjuste,subtotalMargen:subtotalMargen,subtotalOtros:subtotalOtros,beneficioTotal:beneficioTotal,filName:filName,filColor:filColor,peso:peso,horas:horas,filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,markupVal:markupVal,errorVal:errorVal,cant:cant,precioMin:precioMin,minAplicado:minAplicado,
     bloqueA:roundMoney(bloqueA),bloqueC:roundMoney(bloqueC),accesorios:roundMoney(bloqueC),
     cajonTipo:cajonTipo,cajonTasa:cajonTasa,cajonPct:cajonPct};
@@ -2579,7 +2580,7 @@ function ticketLines(o,kind){
   if(r.cajonTasa>0)lines.push('','-- CAJON DE AHORRO --',L('Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+(r.cajonTipo||'')+')','+'+r.cajonTasa.toFixed(2)+' '+u));
   if(r.subtotalOtros>0)lines.push(SUB,L('SUBTOTAL OTROS',r.subtotalOtros.toFixed(2)+' '+u));
   lines.push('',SUB,L('BENEFICIO TOTAL',r.beneficioTotal.toFixed(2)+' '+u),
-    '  (complementos + margen - bruto)');
+    '  (complementos + margen'+(r.minAjuste>0?' + ajuste minimo':'')+' - bruto)');
   lines.push(SEP,L('PRECIO UNITARIO',(total/cant).toFixed(2)+' '+u),L('CANTIDAD',cant+' ud.'),SUB,L('PVP FINAL',total.toFixed(2)+' '+u),SEP,
     '','Opciones: Dis='+(o.diseno_modelado||'-')+' | Busq='+(o.busqueda_modelos||'-'),
     '          Sop='+(o.eliminacion_soportes||'-')+' | Post='+(o.postprocesado||'-'),
@@ -2858,16 +2859,21 @@ function renderTicketPage(doc,o,kind){
   doc.text(TT(CS.footer),M,289);
 }
 function calcStateToOrder(){ var c=S.calc_state, r=compute(); return {number:'PRESUPUESTO',fecha:(c.fecha||todayISO()),cliente:c.cliente,cliente_email:c.cliente_email,tipo_proyecto:(c.tipo_proyecto||'Técnico'),precio_base_cajon:roundMoney(r.bloqueA||0),descripcion:c.descripcion,impresora:(r.printer.name||''),filamento:r.filName,filamento_color:r.filColor,peso_g:String(r.peso),horas:String(r.horas),cantidad:r.cant,precio_final:r.precio,diseno_modelado:c.diseno_modelado,diseno_opt:!!c.diseno_opt,busqueda_modelos:c.busqueda_modelos,eliminacion_soportes:c.eliminacion_soportes,postprocesado:c.postprocesado,probabilidad_error:c.probabilidad_error,markup:c.markup,urgencia_nivel:c.urgencia_nivel,gasto_misc:num(c.gasto_misc),is_multimaterial:!!c.is_multimaterial,material_breakdown:JSON.parse(JSON.stringify(c.material_breakdown||[])),prod:(c.prod_on&&c.prod?c.prod:null),util:JSON.parse(JSON.stringify(c.util||{}))}; }
-function pdfFileName(o,kind){
-  var f=String((o&&o.fecha)||todayISO()).slice(0,10).replace(/-/g,''); if(!/^[0-9]{8}$/.test(f))f=todayISO().replace(/-/g,'');
-  var tipo=(kind==='empresa')?'Presupuesto interno':(kind==='ambos'?'Presupuesto cliente e interno':'Presupuesto cliente');
+/* Nombre del PDF: fecha(aaaammdd)_Cliente|Interno_Nombre cliente_Descripción.
+   La fecha va en orden año-mes-día sin separadores porque «/» no es un carácter
+   válido en un nombre de archivo. */
+function pdfFileBase(o,kind){
+  var f=String((o&&o.fecha)||todayISO()).slice(0,10).replace(/-/g,'');
+  if(!/^[0-9]{8}$/.test(f))f=todayISO().replace(/-/g,'');
+  var tipo=(kind==='empresa')?'Interno':(kind==='ambos'?'Cliente e Interno':'Cliente');
   var cli=String((o&&o.cliente)||'').trim(), desc=String((o&&o.descripcion)||'').trim();
   var parts=[f,tipo]; if(cli)parts.push(cli); if(desc)parts.push(desc);
   var name=parts.join('_').replace(/[\\\/:*?"<>|\r\n\t]+/g,' ').replace(/\s+/g,' ').trim();
-  return name+'.pdf';
+  return name||f;
 }
+function pdfFileName(o,kind){ return pdfFileBase(o,kind)+'.pdf'; }
 function _pdfOk(){ if(!(window.jspdf&&window.jspdf.jsPDF)){ toast3('No se pudo cargar el generador de PDF','#FF6B8A'); return false; } return true; }
-function _pdfDoc(o,kind){ var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}); renderTicketPage(doc,o,kind==='empresa'?'empresa':'cliente'); return doc; }
+function _pdfDoc(o,kind){ var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}); var k=(kind==='empresa'?'empresa':'cliente'); renderTicketPage(doc,o,k); try{ doc.setProperties({title:pdfFileBase(o,k)}); }catch(e){} return doc; }
 function _pdfTriggerDL(blob,name){ var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(e){} },60000); }
 function _pdfDonePopup(files){ var btns=files.map(function(f){ var u=URL.createObjectURL(f.blob); return '<button class="btn ghost" onclick="window.open(\''+u+'\',\'_blank\')">Abrir '+esc(f.label||'PDF')+'</button>'; }).join(''); var html='<div class="mtit">Descarga completada</div><div class="h-sub" style="margin-top:-4px">'+(files.length>1?'Se han guardado los 2 PDF.':'PDF guardado.')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">'+btns+'<button class="btn" onclick="closeModal()">Cerrar</button></div>'; openModal(html); }
 function _pdfBothFallback(files){ files.forEach(function(f){ _pdfTriggerDL(f.blob,f.name); }); toast3('2 PDF descargados','#34D399'); }
