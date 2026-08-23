@@ -390,12 +390,22 @@ option{background-color:#161922;color:#E8EBF4}
 .od-flag{font-size:12px;color:#34D399;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:8px;padding:6px 10px;margin-top:4px}
 .od-payform{display:flex;gap:8px;flex-wrap:wrap}
 .od-payform .inp{flex:1;min-width:110px}
-.od-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;margin-top:14px}
+.od-actions{display:flex;flex-direction:column;gap:10px;margin-top:16px}
 .od-actions>*{margin:0!important}
-.od-actions .btn{padding:9px 14px;font-size:12.5px;line-height:1.2;white-space:nowrap;flex:0 1 auto}
 .od-actions .pdf-actions{margin:0!important;gap:10px}
 .od-actions .pdf-both{margin:0!important}
-@media(max-width:560px){ .od-actions{gap:8px} .od-actions .btn{flex:1 1 46%;justify-content:center;text-align:center} }
+/* Herramientas del pedido: rejilla 2×2 para que no quede ningún botón huérfano. */
+.od-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.od-tools .btn{width:100%;justify-content:flex-start;gap:9px;padding:10px 13px;font-size:12.5px;line-height:1.2;text-align:left}
+.od-tools .btn svg{opacity:.6;flex:0 0 auto;transition:opacity .13s}
+.od-tools .btn:hover{border-color:var(--ac)}
+.od-tools .btn:hover svg{opacity:1}
+/* Pie: separado del resto y con la acción destructiva en tono discreto. */
+.od-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+.btn.danger{background:transparent;border:1px solid rgba(255,107,138,.32);color:#FF6B8A;font-weight:600}
+.btn.danger:hover{background:rgba(255,107,138,.1);border-color:rgba(255,107,138,.6)}
+.btn.danger svg{opacity:.75}
+@media(max-width:560px){ .od-tools{grid-template-columns:1fr} }
 .od-err{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--t2);margin-left:auto}
 .od-step{width:24px;height:24px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--t1);font-size:14px;cursor:pointer}
 .od-img{max-width:100%;border-radius:10px;margin-top:12px;border:1px solid var(--border)}
@@ -813,8 +823,11 @@ function compute(c){
   var bloqueC=accesorios;
   var recargo=bloqueA*urg;                    // bloque B · urgencia
   var cajonTipo=(c.tipo_proyecto||(c.prod&&c.prod.tipo)||'Técnico');
-  var cajonPct=cajonRate(cajonTipo,bloqueA,c.diseno_modelado);  // bloque B · tasa de ahorro
-  var cajonTasa=roundMoney(bloqueA*cajonPct);
+  /* Los gastos extra / misceláneos se repercuten tal cual: no generan tasa de
+     ahorro, así que salen de la base del cajón (y del tramo que fija el %). */
+  var cajonBase=Math.max(0,bloqueA-gastoMisc);
+  var cajonPct=cajonRate(cajonTipo,cajonBase,c.diseno_modelado);  // bloque B · tasa de ahorro
+  var cajonTasa=roundMoney(cajonBase*cajonPct);
   var totalCalc=bloqueA+recargo+cajonTasa+bloqueC;
   var minAplicado=(totalCalc<precioMin);
   var precio=roundUpToNickel(Math.max(totalCalc,precioMin));
@@ -837,7 +850,7 @@ function compute(c){
     bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,
     markupVal:markupVal,errorVal:errorVal,subtotalMargen:subtotalMargen,subtotalOtros:subtotalOtros,beneficioTotal:beneficioTotal,
     bloqueA:roundMoney(bloqueA),bloqueC:roundMoney(bloqueC),
-    precioPrevio:precioPrevio,cajonTipo:cajonTipo,cajonPct:cajonPct,cajonTasa:cajonTasa,
+    precioPrevio:precioPrevio,cajonTipo:cajonTipo,cajonPct:cajonPct,cajonTasa:cajonTasa,cajonBase:roundMoney(cajonBase),
     precio:precio,precioUnit:roundMoney(precio/cant),cant:cant,precioMin:precioMin,minAplicado:minAplicado,minAjuste:minAjuste,accesorios:accesorios};
 }
 
@@ -1825,13 +1838,13 @@ function saveAsOrder(){ var c=S.calc_state; var dup=_findDupOrder(c.cliente,c.de
     +'<button class="btn ghost" onclick="closeModal()">Cancelar</button></div>'); return; }
   _doSaveOrder();
 }
-function _doSaveOrder(descOverride){ var r=compute(),c=S.calc_state; var desc=(descOverride!=null?descOverride:c.descripcion); S.oseq=(S.oseq||0)+1; S.orders.unshift({id:uid(),number:randomOrderNo(),created_at:new Date().toISOString(),fecha:(c.fecha||todayISO()),empresa:c.empresa,cliente:c.cliente,cliente_email:c.cliente_email||'',tipo_proyecto:(c.tipo_proyecto||'Técnico'),precio_base_cajon:roundMoney(r.bloqueA||0),descripcion:desc,impresora:(r.printer.name||''),filamento:r.filName,filamento_color:r.filColor,peso_g:String(r.peso),horas:String(r.horas),cantidad:r.cant,precio_final:((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:r.precio),precio_normal:(c.urgencia_nivel==='Ambos'?r.precio:null),precio_urgente:(c.urgencia_nivel==='Ambos'?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:null),urg_days:((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?(calcDaysGained()||0):null),coste_bruto:roundMoney(r.bruto),beneficio_neto:roundMoney(r.beneficioTotal),importe_pagado:0,estado:'Pendiente',status_updated_at:Date.now(),notif_snooze_until:0,diseno_modelado:c.diseno_modelado,diseno_opt:!!c.diseno_opt,busqueda_modelos:c.busqueda_modelos,eliminacion_soportes:c.eliminacion_soportes,postprocesado:c.postprocesado,probabilidad_error:c.probabilidad_error,markup:c.markup,urgencia_nivel:c.urgencia_nivel,gasto_misc:num(c.gasto_misc),is_multimaterial:!!c.is_multimaterial,material_breakdown:JSON.parse(JSON.stringify(c.material_breakdown||[])),util:JSON.parse(JSON.stringify(c.util||{})),payment_history:[],material_contabilizado:false,archived:false,repeticiones_error:0,imagen:'',is_shared:!!c.is_shared,prod:(c.prod_on&&c.prod?JSON.parse(JSON.stringify(c.prod)):null),cal_at:(c.prod_on&&c.prod?Date.now():null),promised:null,shared_split:c.is_shared?{'3DCC':num(c.shared_percent_3dcc),'SILAB3D':num(c.shared_percent_silab3d)}:null}); ensureClient(S.orders[0]); var _new=S.orders[0]; var _wasUrg=(_new.urgencia_nivel==='Urgente'&&_new.prod&&!_new.cal_off);
+function _doSaveOrder(descOverride){ var r=compute(),c=S.calc_state; var desc=(descOverride!=null?descOverride:c.descripcion); S.oseq=(S.oseq||0)+1; S.orders.unshift({id:uid(),number:randomOrderNo(),created_at:new Date().toISOString(),fecha:(c.fecha||todayISO()),empresa:c.empresa,cliente:c.cliente,cliente_email:c.cliente_email||'',tipo_proyecto:(c.tipo_proyecto||'Técnico'),precio_base_cajon:roundMoney(r.cajonBase||0),descripcion:desc,impresora:(r.printer.name||''),filamento:r.filName,filamento_color:r.filColor,peso_g:String(r.peso),horas:String(r.horas),cantidad:r.cant,precio_final:((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:r.precio),precio_normal:(c.urgencia_nivel==='Ambos'?r.precio:null),precio_urgente:(c.urgencia_nivel==='Ambos'?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:null),urg_days:((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?(calcDaysGained()||0):null),coste_bruto:roundMoney(r.bruto),beneficio_neto:roundMoney(r.beneficioTotal),importe_pagado:0,estado:'Pendiente',status_updated_at:Date.now(),notif_snooze_until:0,diseno_modelado:c.diseno_modelado,diseno_opt:!!c.diseno_opt,busqueda_modelos:c.busqueda_modelos,eliminacion_soportes:c.eliminacion_soportes,postprocesado:c.postprocesado,probabilidad_error:c.probabilidad_error,markup:c.markup,urgencia_nivel:c.urgencia_nivel,gasto_misc:num(c.gasto_misc),is_multimaterial:!!c.is_multimaterial,material_breakdown:JSON.parse(JSON.stringify(c.material_breakdown||[])),util:JSON.parse(JSON.stringify(c.util||{})),payment_history:[],material_contabilizado:false,archived:false,repeticiones_error:0,imagen:'',is_shared:!!c.is_shared,prod:(c.prod_on&&c.prod?JSON.parse(JSON.stringify(c.prod)):null),cal_at:(c.prod_on&&c.prod?Date.now():null),promised:null,shared_split:c.is_shared?{'3DCC':num(c.shared_percent_3dcc),'SILAB3D':num(c.shared_percent_silab3d)}:null}); ensureClient(S.orders[0]); var _new=S.orders[0]; var _wasUrg=(_new.urgencia_nivel==='Urgente'&&_new.prod&&!_new.cal_off);
   var _before=null; if(_wasUrg){ try{ var _tmp=S.orders; S.orders=_tmp.filter(function(x){return x.id!==_new.id;}); _before=_schedSnapshot(); S.orders=_tmp; }catch(e){} }
   save(); try{ _ensurePromised(); }catch(e){}
   if(_wasUrg&&_before){ try{ var _after=_schedSnapshot(); closeModal(); go('ord'); openModal(urgentImpactHTML(_before,_after,_new.id)); toast3('Pedido urgente guardado','#F4B740'); return; }catch(e){} }
   closeModal(); go('ord'); toast3('Pedido guardado','#34D399'); }
 function _saveOrderNewName(){ var c=S.calc_state; var base=String(c.descripcion||''); var nd=prompt('Nueva descripción para diferenciar este pedido:', base?(base+' (2)'):''); if(nd==null)return; nd=nd.trim(); if(!nd){ toast3('La descripción no puede estar vacía','#FF6B8A'); return; } _doSaveOrder(nd); }
-function _overwriteOrder(id){ var o=getOrder(id); if(!o){ closeModal(); return; } var r=compute(),c=S.calc_state; o.fecha=(c.fecha||o.fecha||todayISO()); o.empresa=c.empresa; o.cliente=c.cliente; o.cliente_email=c.cliente_email||''; o.descripcion=c.descripcion; o.impresora=(r.printer.name||''); o.filamento=r.filName; o.filamento_color=r.filColor; o.peso_g=String(r.peso); o.horas=String(r.horas); o.cantidad=r.cant; o.precio_final=((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:r.precio); o.precio_normal=(c.urgencia_nivel==='Ambos'?r.precio:null); o.precio_urgente=(c.urgencia_nivel==='Ambos'?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:null); o.urg_days=((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?(calcDaysGained()||0):null); o.coste_bruto=roundMoney(r.bruto); o.beneficio_neto=roundMoney(r.beneficioTotal); o.diseno_modelado=c.diseno_modelado; o.diseno_opt=!!c.diseno_opt; o.busqueda_modelos=c.busqueda_modelos; o.eliminacion_soportes=c.eliminacion_soportes; o.postprocesado=c.postprocesado; o.probabilidad_error=c.probabilidad_error; o.markup=c.markup; o.urgencia_nivel=c.urgencia_nivel; o.gasto_misc=num(c.gasto_misc); o.is_multimaterial=!!c.is_multimaterial; o.material_breakdown=JSON.parse(JSON.stringify(c.material_breakdown||[])); o.util=JSON.parse(JSON.stringify(c.util||{})); o.is_shared=!!c.is_shared; o.shared_split=c.is_shared?{'3DCC':num(c.shared_percent_3dcc),'SILAB3D':num(c.shared_percent_silab3d)}:null; o.status_updated_at=Date.now(); o.material_contabilizado=false; ensureClient(o); save(); closeModal(); go('ord'); toast3('Pedido sobrescrito','#34D399'); }
+function _overwriteOrder(id){ var o=getOrder(id); if(!o){ closeModal(); return; } var r=compute(),c=S.calc_state; o.fecha=(c.fecha||o.fecha||todayISO()); o.empresa=c.empresa; o.cliente=c.cliente; o.cliente_email=c.cliente_email||''; o.descripcion=c.descripcion; o.impresora=(r.printer.name||''); o.filamento=r.filName; o.filamento_color=r.filColor; o.peso_g=String(r.peso); o.horas=String(r.horas); o.cantidad=r.cant; o.precio_final=((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:r.precio); o.precio_normal=(c.urgencia_nivel==='Ambos'?r.precio:null); o.precio_urgente=(c.urgencia_nivel==='Ambos'?urgSurcharge(r.precio,calcDaysGained()||0,r.bloqueA).total:null); o.urg_days=((c.urgencia_nivel==='Ambos'||c.urgencia_nivel==='Urgente')?(calcDaysGained()||0):null); o.coste_bruto=roundMoney(r.bruto); o.beneficio_neto=roundMoney(r.beneficioTotal); o.precio_base_cajon=roundMoney(r.cajonBase||0); o.diseno_modelado=c.diseno_modelado; o.diseno_opt=!!c.diseno_opt; o.busqueda_modelos=c.busqueda_modelos; o.eliminacion_soportes=c.eliminacion_soportes; o.postprocesado=c.postprocesado; o.probabilidad_error=c.probabilidad_error; o.markup=c.markup; o.urgencia_nivel=c.urgencia_nivel; o.gasto_misc=num(c.gasto_misc); o.is_multimaterial=!!c.is_multimaterial; o.material_breakdown=JSON.parse(JSON.stringify(c.material_breakdown||[])); o.util=JSON.parse(JSON.stringify(c.util||{})); o.is_shared=!!c.is_shared; o.shared_split=c.is_shared?{'3DCC':num(c.shared_percent_3dcc),'SILAB3D':num(c.shared_percent_silab3d)}:null; o.status_updated_at=Date.now(); o.material_contabilizado=false; ensureClient(o); save(); closeModal(); go('ord'); toast3('Pedido sobrescrito','#34D399'); }
 function newOrder(){ S.oseq=(S.oseq||0)+1; S.orders.unshift({id:uid(),number:randomOrderNo(),created_at:new Date().toISOString(),fecha:todayISO(),empresa:'3DCC',cliente:'',descripcion:'',precio_final:0,importe_pagado:0,estado:'Pendiente',status_updated_at:Date.now(),notif_snooze_until:0,payment_history:[],material_contabilizado:false,archived:false,repeticiones_error:0,imagen:''}); save(); renderOrders(); }
 function setOrd(id,f,v){ var o=S.orders.filter(function(x){return x.id===id;})[0]; if(!o)return; if(f==='precio_final'||f==='importe_pagado')v=num(v); o[f]=v; if(f==='cliente'||f==='cliente_email')ensureClient(o); if(f==='importe_pagado'||f==='precio_final')autoArchive(o); save(); updateOrdBadge(); var pe=document.getElementById('pend-'+id); if(pe){var p=num(o.precio_final)-num(o.importe_pagado); pe.innerHTML=p>0.005?'<span class="pend">'+eur(p)+'</span>':'<span class="paid">Pagado</span>';} }
 function delOrder(id){ if(!confirm('¿Eliminar este pedido?'))return; cajonDropOrder(id,true); S.orders=S.orders.filter(function(x){return x.id!==id;}); save(); renderOrders(); }
@@ -2190,7 +2203,7 @@ function formulaCard(){ function fx(k,v){ return '<div class="fx"><span class="f
     +conn('nunca &lt; precio mínimo')+box('BLOQUE A','brute')
     +conn('')
     +'<div class="fxd-bl">Bloque B · multiplicadores sobre A</div>'
-    +'<div class="fxd-inrow">'+boxN('A × Urgencia','% según días ganados','in')+'<span class="fxd-plus">+</span>'+boxN('A × Tasa de ahorro','% según tipo e importe','in')+'</div>'
+    +'<div class="fxd-inrow">'+boxN('A × Urgencia','% según días ganados','in')+'<span class="fxd-plus">+</span>'+boxN('(A − misc.) × Tasa de ahorro','% según tipo e importe','in')+'</div>'
     +conn('')
     +'<div class="fxd-bl">Bloque C · se suma sin multiplicar</div>'
     +box('Accesorios / utilitarios','in')
@@ -2203,7 +2216,7 @@ function formulaCard(){ function fx(k,v){ return '<div class="fx"><span class="f
     +fx('Coste bruto','filamento + electricidad + deterioro')
     +fx('Complementos','diseño + post-procesado (tarifas fijas) + misceláneos')
     +fx('Bloque A','bruto × markup + bruto × prob. error + complementos (nunca por debajo del mínimo)')
-    +fx('Bloque B','recargo de urgencia y tasa de ahorro — cada uno <b>multiplica el bloque A</b>')
+    +fx('Bloque B','recargo de urgencia y tasa de ahorro — cada uno <b>multiplica el bloque A</b>; la tasa deja fuera los gastos misceláneos')
     +fx('Bloque C','utilitarios: uds × precio de accesorio — <b>se suman a A sin multiplicadores</b>')
     +fx('PVP','A + A×urgencia + A×tasa + C')
     +fx('Redondeo','a múltiplos de 0,05 € · nunca por debajo del precio mínimo')
@@ -2417,7 +2430,28 @@ function activateInTracker(id){ var o=getOrder(id); if(!o)return; if(!(window.DP
   function create(){ window.DPCloud.createOrder({order_code:code,customer_name:o.cliente||'',customer_email:o.cliente_email||'',description:o.descripcion||''}).then(markAndGo).catch(function(){ toast3('No se pudo crear el pedido en 3DTracker','#FF6B8A'); }); }
   if(window.DPCloud.getOrderByCode){ window.DPCloud.getOrderByCode(code).then(function(ex){ if(ex) markAndGo(); else create(); }).catch(create); } else create(); }
 function openOrder(id){ var o=getOrder(id); if(o) openModal(orderModalHTML(o)); }
-function reopenOrder(id){ var o=getOrder(id); if(o) openModal(orderModalHTML(o)); renderOrders(); }
+function reopenOrder(id){ var o=getOrder(id); if(!o){ renderOrders(); return; }
+  var m=document.getElementById('modal'), box=m?m.querySelector('.modal'):null;
+  var scr=box?box.scrollTop:0;
+  /* Se anota qué campo estaba enfocado (por su posición) y dónde tenía el cursor,
+     para devolvérselo tras repintar: editar un valor no debe mover la vista. */
+  var act=document.activeElement, idx=null, selA=null, selB=null;
+  if(act&&box&&box.contains(act)){
+    var campos=box.querySelectorAll('input,select,textarea');
+    for(var i=0;i<campos.length;i++){ if(campos[i]===act){ idx=i; break; } }
+    try{ selA=act.selectionStart; selB=act.selectionEnd; }catch(e){}
+  }
+  openModal(orderModalHTML(o));
+  var box2=(document.getElementById('modal')||{}).querySelector?document.getElementById('modal').querySelector('.modal'):null;
+  if(box2){
+    box2.scrollTop=scr;
+    if(idx!=null){
+      var c2=box2.querySelectorAll('input,select,textarea');
+      if(c2[idx]){ try{ c2[idx].focus({preventScroll:true}); }catch(e){ try{ c2[idx].focus(); }catch(e2){} }
+        if(selA!=null){ try{ c2[idx].setSelectionRange(selA,selB); }catch(e){} } }
+    }
+  }
+  renderOrders(); }
 function setOrdParam(id,f,v){ var o=getOrder(id); if(!o)return; if(['peso_g','horas','cantidad','gasto_misc'].indexOf(f)>=0)v=num(v); o[f]=v; if(f==='filamento')o.is_multimaterial=false; try{ recalcOrder(o); }catch(e){} save(); reopenOrder(id); }
 /* Recalcula un pedido guardado de arriba abajo tras tocar un parámetro de cálculo.
    Hay que invalidar precio_normal/precio_urgente antes de llamar a orderDual(),
@@ -2427,7 +2461,7 @@ function recalcOrder(o){
   if(!o)return null;
   o.precio_normal=null; o.precio_urgente=null;
   var r=compute(orderToCalcState(o));
-  o.precio_base_cajon=roundMoney(r.bloqueA||0);
+  o.precio_base_cajon=roundMoney(r.cajonBase||0);
   var amb=(o.urgencia_nivel==='Ambos'), urgente=(o.urgencia_nivel==='Urgente');
   var d=orderDual(o);
   o.precio_final=((amb||urgente)?d.urgente:r.precio);
@@ -2494,13 +2528,15 @@ function orderModalHTML(o){
     +'<div class="od-actions">'
       +'<div class="pdf-actions" style="width:100%;margin-top:0">'+'<div class="pdf-card"><div class="pdf-card-t">PDF cliente</div><div class="pdf-card-b"><button onclick="orderViewPDF(\''+I+'\',\'cliente\')" title="Ver en el navegador"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>Ver</button><button onclick="orderPDF(\''+I+'\',\'cliente\')" title="Descargar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Descargar</button></div></div>'+'<div class="pdf-card"><div class="pdf-card-t">PDF interno</div><div class="pdf-card-b"><button onclick="orderViewPDF(\''+I+'\',\'empresa\')" title="Ver en el navegador"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>Ver</button><button onclick="orderPDF(\''+I+'\',\'empresa\')" title="Descargar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Descargar</button></div></div>'+'</div>'
       +'<button class="btn ghost pdf-both" style="margin-top:0" onclick="exportBothPdf(\''+I+'\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar ambos PDF</button>'
-      +'<button class="btn ghost" onclick="loadOrderToCalc(\''+I+'\')">↺ Abrir en calculadora</button>'
-      +'<button class="btn ghost" onclick="dupOrder(\''+I+'\')">⧉ Duplicar</button>'
-      +'<button class="btn ghost" onclick="editProd(\''+I+'\')">🗓 Producción / calendario</button>'
-      +'<button class="btn ghost" onclick="toggleArchive(\''+I+'\')">'+(o.archived?'♻ Restaurar':'🗄 Archivar')+'</button>'
+      +'<div class="od-tools">'
+        +'<button class="btn ghost" onclick="loadOrderToCalc(\''+I+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Abrir en calculadora</button>'
+        +'<button class="btn ghost" onclick="dupOrder(\''+I+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Duplicar</button>'
+        +'<button class="btn ghost" onclick="editProd(\''+I+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Producción / calendario</button>'
+        +'<button class="btn ghost" onclick="toggleArchive(\''+I+'\')">'+(o.archived?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Restaurar':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>Archivar')+'</button>'
+      +'</div>'
     +'</div>'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">'
-      +'<button class="btn" style="background:rgba(255,107,138,.12);color:#FF6B8A;border:1px solid rgba(255,107,138,.4)" onclick="delOrderM(\''+I+'\')">Eliminar</button>'
+    +'<div class="od-foot">'
+      +'<button class="btn danger" onclick="delOrderM(\''+I+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Eliminar</button>'
       +'<button class="btn ghost" onclick="closeModal()">Cerrar</button></div>';
 }
 
@@ -2897,7 +2933,7 @@ function renderTicketPage(doc,o,kind){
   doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(165,168,176);
   doc.text(TT(CS.footer),M,289);
 }
-function calcStateToOrder(){ var c=S.calc_state, r=compute(); return {number:'PRESUPUESTO',fecha:(c.fecha||todayISO()),cliente:c.cliente,cliente_email:c.cliente_email,tipo_proyecto:(c.tipo_proyecto||'Técnico'),precio_base_cajon:roundMoney(r.bloqueA||0),descripcion:c.descripcion,impresora:(r.printer.name||''),filamento:r.filName,filamento_color:r.filColor,peso_g:String(r.peso),horas:String(r.horas),cantidad:r.cant,precio_final:r.precio,diseno_modelado:c.diseno_modelado,diseno_opt:!!c.diseno_opt,busqueda_modelos:c.busqueda_modelos,eliminacion_soportes:c.eliminacion_soportes,postprocesado:c.postprocesado,probabilidad_error:c.probabilidad_error,markup:c.markup,urgencia_nivel:c.urgencia_nivel,gasto_misc:num(c.gasto_misc),is_multimaterial:!!c.is_multimaterial,material_breakdown:JSON.parse(JSON.stringify(c.material_breakdown||[])),prod:(c.prod_on&&c.prod?c.prod:null),util:JSON.parse(JSON.stringify(c.util||{}))}; }
+function calcStateToOrder(){ var c=S.calc_state, r=compute(); return {number:'PRESUPUESTO',fecha:(c.fecha||todayISO()),cliente:c.cliente,cliente_email:c.cliente_email,tipo_proyecto:(c.tipo_proyecto||'Técnico'),precio_base_cajon:roundMoney(r.cajonBase||0),descripcion:c.descripcion,impresora:(r.printer.name||''),filamento:r.filName,filamento_color:r.filColor,peso_g:String(r.peso),horas:String(r.horas),cantidad:r.cant,precio_final:r.precio,diseno_modelado:c.diseno_modelado,diseno_opt:!!c.diseno_opt,busqueda_modelos:c.busqueda_modelos,eliminacion_soportes:c.eliminacion_soportes,postprocesado:c.postprocesado,probabilidad_error:c.probabilidad_error,markup:c.markup,urgencia_nivel:c.urgencia_nivel,gasto_misc:num(c.gasto_misc),is_multimaterial:!!c.is_multimaterial,material_breakdown:JSON.parse(JSON.stringify(c.material_breakdown||[])),prod:(c.prod_on&&c.prod?c.prod:null),util:JSON.parse(JSON.stringify(c.util||{}))}; }
 /* Nombre del PDF: fecha(aaaammdd)_Cliente|Interno_Nombre cliente_Descripción.
    La fecha va en orden año-mes-día sin separadores porque «/» no es un carácter
    válido en un nombre de archivo. */
