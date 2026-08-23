@@ -673,11 +673,33 @@ function disenoNivel(v){ v=String(v||'No necesario'); return DISENO_LEGACY[v]||v
 function disenoImporte(v,opt){ var p=DISENO_PRECIO[disenoNivel(v)]; if(p==null)p=0; return roundMoney(p*(opt?disenoOptPct():1)); }
 var DISENO_MODELADO={'No necesario':0,'Chorrada - En Slicer':0.15,"Fácil - Fusión 30'":1/3,"Medio - Fusión 60'":2/3,'Avanzado - AI + Remesh':1};
 var BUSQUEDA_MODELOS={'No':0,'Sí':0.25};
-var ELIMINACION_SOPORTES={'No':0,'Simples (no comprometen el producto)':15,'Complejos (comprometen el producto)':30};
-var POSTPROCESADO={'No':0,'Sencillo (Lijado/Ensamblado)':15,'Medio (Lijado + Ensamblado)':40,'Avanzado (Lijado/Ensamblado + Pintura)':75};
+/* «Eliminación de soportes» y «Post-procesado» se fusionan en un único parámetro
+   con tarifas fijas en €. Los pedidos antiguos conservan las tarifas antiguas: si
+   el nivel guardado no está en POSTPROCESADO se valora con las tablas *_LEGACY
+   (minutos × mano de obra), exactamente igual que antes. */
+var POSTPROCESADO={'Limpio (pocos soportes sin lijado)':0,'Sencillo (pocos soportes con lijado)':5,'Medio (lijado + ensamblado / soportes comprometidos)':10,'Avanzado (lijado/ensamblado/soportes comprometidos + pintura)':20};
+var ELIMINACION_SOPORTES_LEGACY={'No':0,'Simples (no comprometen el producto)':15,'Complejos (comprometen el producto)':30};
+var POSTPROCESADO_LEGACY={'No':0,'Sencillo (Lijado/Ensamblado)':15,'Medio (Lijado + Ensamblado)':40,'Avanzado (Lijado/Ensamblado + Pintura)':75};
+function postprocNuevo(v){ return POSTPROCESADO[String(v||'')]!=null; }
+/* Desglose en € {soportes,postproc}: en los niveles nuevos todo va a postproc. */
+function postprocPartes(o,labor){ var v=String((o&&o.postprocesado)||'');
+  if(postprocNuevo(v))return {soportes:0,postproc:roundMoney(POSTPROCESADO[v])};
+  return {soportes:round4(((ELIMINACION_SOPORTES_LEGACY[(o&&o.eliminacion_soportes)]||0)/60)*num(labor)),
+          postproc:round4(((POSTPROCESADO_LEGACY[v]||0)/60)*num(labor))}; }
+/* Opciones del desplegable: si el pedido guarda un nivel antiguo se mantiene en la
+   lista, para no perder su tarifa al abrir la ficha. */
+function postprocOpts(v){ var ks=Object.keys(POSTPROCESADO); if(v&&!postprocNuevo(v))ks=ks.concat([String(v)]); return ks; }
 var _MIG_SOP={'Pocos / Baja dificultad':'Simples (no comprometen el producto)','Muchos / Elevada dificultad':'Complejos (comprometen el producto)'};
 var _MIG_POST={'Sencillo (Lijado ligero)':'Sencillo (Lijado/Ensamblado)','Complejo (Lijado + Pintura)':'Avanzado (Lijado/Ensamblado + Pintura)'};
-function migNames(st){ if(!st||typeof st!=='object')return; function fix(o){ if(!o||typeof o!=='object')return; if(_MIG_SOP[o.eliminacion_soportes])o.eliminacion_soportes=_MIG_SOP[o.eliminacion_soportes]; if(_MIG_POST[o.postprocesado])o.postprocesado=_MIG_POST[o.postprocesado]; } fix(st.calc_state); (st.orders||[]).forEach(fix); }
+/* Equivalencias soportes+postprocesado antiguos → nivel unificado nuevo. */
+var _POST_NUEVO={'No':'Limpio (pocos soportes sin lijado)','Sencillo (Lijado/Ensamblado)':'Sencillo (pocos soportes con lijado)','Medio (Lijado + Ensamblado)':'Medio (lijado + ensamblado / soportes comprometidos)','Avanzado (Lijado/Ensamblado + Pintura)':'Avanzado (lijado/ensamblado/soportes comprometidos + pintura)'};
+function migPostUnificado(c){ if(!c||postprocNuevo(c.postprocesado))return;
+  var n=_POST_NUEVO[String(c.postprocesado||'No')]||'Limpio (pocos soportes sin lijado)';
+  if(n==='Limpio (pocos soportes sin lijado)'&&c.eliminacion_soportes==='Complejos (comprometen el producto)')n='Medio (lijado + ensamblado / soportes comprometidos)';
+  c.postprocesado=n; c.eliminacion_soportes='No'; }
+function migNames(st){ if(!st||typeof st!=='object')return; function fix(o){ if(!o||typeof o!=='object')return; if(_MIG_SOP[o.eliminacion_soportes])o.eliminacion_soportes=_MIG_SOP[o.eliminacion_soportes]; if(_MIG_POST[o.postprocesado])o.postprocesado=_MIG_POST[o.postprocesado]; } fix(st.calc_state); (st.orders||[]).forEach(fix);
+  /* Los pedidos ya guardados NO se migran: conservan sus tarifas antiguas. */
+  migPostUnificado(st.calc_state); }
 var PROBABILIDAD_ERROR={'Exenta (0%)':0,'Mínima (10%)':0.1,'Baja (25%)':0.25,'Media (50%)':0.5,'Alta (100%)':1,'Muy Alta (150%)':1.5,'Crítica (200%)':2};
 var MARKUP={'Normal (230%)':2.3};
 var URGENCIA={'Normal':0,'Urgente':0.5};
@@ -707,7 +729,7 @@ function defData(){return {
   filament_types:[{name:'PLA',price_per_kg:20},{name:'PETG',price_per_kg:18},{name:'PLA SILK/MARBLE',price_per_kg:23},{name:'ASA',price_per_kg:24},{name:'TPU',price_per_kg:21}],
   filament_stock:[{material:'PLA',color:'Negro',remaining_g:1000,buy_threshold_g:150},{material:'PLA',color:'Blanco',remaining_g:1000,buy_threshold_g:150},{material:'PETG',color:'Transparente',remaining_g:1000,buy_threshold_g:150}],
   global_config:{energy_cost_kwh:0.24,labor_cost_h:15,money_unit:'€',precio_minimo:3,optimizacion_pct:30,brand_color:'#3b82f6',util_prices:{simple:0.30,caja_m:1,caja_l:2,bolsa_s:0.15,bolsa_m:0.80,bolsa_l:1.50}},
-  calc_state:{empresa:'3DCC',cliente:'',cliente_email:'',tipo_proyecto:'Técnico',fecha:new Date().toISOString().slice(0,10),descripcion:'',impresora:'Creality K1SE Combo',filamento_tipo:'PLA',filamento_color:'Negro',is_multimaterial:false,material_breakdown:[],peso_g:'50',tiempo_h:'1',diseno_modelado:'No necesario',busqueda_modelos:'No',eliminacion_soportes:'No',postprocesado:'No',probabilidad_error:'Baja (25%)',markup:'Normal (230%)',urgencia_nivel:'Normal',gasto_misc:0,cantidad:1,is_shared:false,shared_percent_3dcc:50,shared_percent_silab3d:50,prod_on:false,prod:null},
+  calc_state:{empresa:'3DCC',cliente:'',cliente_email:'',tipo_proyecto:'Técnico',fecha:new Date().toISOString().slice(0,10),descripcion:'',impresora:'Creality K1SE Combo',filamento_tipo:'PLA',filamento_color:'Negro',is_multimaterial:false,material_breakdown:[],peso_g:'50',tiempo_h:'1',diseno_modelado:'No necesario',busqueda_modelos:'No',eliminacion_soportes:'No',postprocesado:'Limpio (pocos soportes sin lijado)',probabilidad_error:'Baja (25%)',markup:'Normal (230%)',urgencia_nivel:'Normal',gasto_misc:0,cantidad:1,is_shared:false,shared_percent_3dcc:50,shared_percent_silab3d:50,prod_on:false,prod:null},
   orders:[], oseq:0, clients:[], calDays:[], purge:{values:[],active:{},colors:[]},
   cajon:{movs:[]}
 };}
@@ -772,9 +794,8 @@ function compute(c){
   var electricidad=round4(horas*num(printer.energy_consumption_kwh)*num(g.energy_cost_kwh));
   var diseno=round4(disenoImporte(c.diseno_modelado,c.diseno_opt));
   var busqueda=0;   // integrado como un nivel más del propio diseño
-  var soportes=round4(((ELIMINACION_SOPORTES[c.eliminacion_soportes]||0)/60)*labor);
+  var _pp=postprocPartes(c,labor), soportes=_pp.soportes, postproc=_pp.postproc;
   var deterioro=round4(horas*depPerHour(printer));
-  var postproc=round4(((POSTPROCESADO[c.postprocesado]||0)/60)*labor);
   var gastoMisc=round4(Math.max(0,num(c.gasto_misc)));
   /* ── MODELO DE BLOQUES ──────────────────────────────────────────────────────
      A = básicos + complementarios + fondo de error + markup
@@ -803,13 +824,13 @@ function compute(c){
   var cant=Math.max(1,Math.floor(num(c.cantidad)||1));
   var markupVal=Math.max(0,bruto*(markup-1));
   var errorVal=Math.max(0,bruto*errorRate);
-  /* Subtotal margen: markup + fondo de error (y el plus de urgencia si lo hay). */
-  var subtotalMargen=roundMoney(markupVal+errorVal+recargo);
-  /* «Otros»: accesorios, tasa de ahorro y ajuste a la tarifa mínima. */
-  var subtotalOtros=roundMoney(accesorios+cajonTasa+minAjuste);
-  /* Beneficio total: complementos + margen − coste bruto, más lo que se haya
-     subido el precio para llegar a la tarifa mínima (eso también queda). Los
-     accesorios y la tasa de ahorro no cuentan: son un coste que se repercute. */
+  /* Subtotal margen: markup + fondo de error + plus de urgencia + tasa de ahorro. */
+  var subtotalMargen=roundMoney(markupVal+errorVal+recargo+cajonTasa);
+  /* «Otros»: accesorios y ajuste a la tarifa mínima. */
+  var subtotalOtros=roundMoney(accesorios+minAjuste);
+  /* Beneficio total: complementos + margen (tasa de ahorro incluida) − coste
+     bruto, más lo que se haya subido el precio para llegar a la tarifa mínima
+     (eso también queda). Los accesorios no cuentan: son un coste que se repercute. */
   var beneficioTotal=roundMoney(subtotalMargen+resto+minAjuste-bruto);
   return {printer:printer,pricekg:pricekg,peso:peso,horas:horas,filName:filName,filColor:filColor,
     filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,
@@ -1216,8 +1237,8 @@ function renderCalc(){
      +'<div class="fg"><label class="lbl">Diseño / modelado <em class="prod-src">'+eur(disenoImporte(c.diseno_modelado,c.diseno_opt))+(c.diseno_opt?(' · optimización ('+Math.round(disenoOptPct()*100)+'%)'):'')+'</em></label>'
        +'<div class="dz-row"><select class="selx" onchange="setCalc(\'diseno_modelado\',this.value)">'+optList(Object.keys(DISENO_PRECIO),disenoNivel(c.diseno_modelado))+'</select>'
        +'<label class="dz-opt'+(c.diseno_opt?' on':'')+'" title="Pedido de optimización: se cobra el porcentaje indicado en Configuración"><input type="checkbox" '+(c.diseno_opt?'checked':'')+' onchange="toggleDisenoOpt()">Optimización</label></div></div>'
-     +'<div class="fg row"><div><label class="lbl">Eliminación de soportes</label><select class="selx" onchange="setCalc(\'eliminacion_soportes\',this.value)">'+optList(Object.keys(ELIMINACION_SOPORTES),c.eliminacion_soportes)+'</select></div>'
-       +'<div><label class="lbl">Post-procesado</label><select class="selx" onchange="setCalc(\'postprocesado\',this.value)">'+optList(Object.keys(POSTPROCESADO),c.postprocesado)+'</select></div></div>'
+     +'<div class="fg"><label class="lbl">Post-procesado <em class="prod-src">'+eur(postprocPartes(c,num(S.global_config&&S.global_config.labor_cost_h)).postproc)+'</em></label>'
+       +'<select class="selx" onchange="setCalc(\'postprocesado\',this.value)">'+optList(postprocOpts(c.postprocesado),c.postprocesado)+'</select></div>'
      +'<div class="fg row"><div><label class="lbl">Probabilidad de error</label><select class="selx" onchange="setCalc(\'probabilidad_error\',this.value)">'+optList(Object.keys(PROBABILIDAD_ERROR),c.probabilidad_error)+'</select></div>'
        +'<div><label class="lbl">Asistente de riesgo</label><button class="btn ghost" style="width:100%;padding:9px 10px;font-size:12.5px" onclick="openRisk()">⚙ Abrir asistente</button></div></div>'
      +'<div class="fg row"><div><label class="lbl">Urgencia</label><select class="selx" onchange="setCalc(\'urgencia_nivel\',this.value)">'+optList(URG_OPTS,c.urgencia_nivel)+'</select></div>'
@@ -1245,7 +1266,7 @@ function resultHTML(){
     +'<div class="r sub"><span>Subtotal bruto</span><b>'+fmt(r.bruto)+'</b></div>';
   if(r.resto>0){
     html+='<div class="grp">Parámetros complementarios</div>'
-      +row('Diseño &amp; modelado',r.diseno)+row('Búsqueda modelos',r.busqueda)+row('Elim. soportes',r.soportes)+row('Postprocesado',r.postproc)
+      +row('Diseño &amp; modelado',r.diseno)+(r.busqueda>0?row('Búsqueda modelos',r.busqueda):'')+(r.soportes>0?row('Elim. soportes',r.soportes):'')+row('Postprocesado',r.postproc)
       +(r.gastoMisc>0?row('Extras / misc.',r.gastoMisc):'')
       +'<div class="r sub"><span>Subtotal complementos</span><b>'+fmt(r.resto)+'</b></div>';
   }
@@ -1253,11 +1274,11 @@ function resultHTML(){
     +'<div class="r"><span>Markup (×'+r.markup.toFixed(1)+')</span><b>+'+fmt(r.markupVal)+'</b></div>';
   if(r.errorVal>0)html+='<div class="r"><span>Fondo error ('+esc(S.calc_state.probabilidad_error)+')</span><b>+'+fmt(r.errorVal)+'</b></div>';
   if(r.recargo>0)html+='<div class="r"><span>Plus urgencia</span><b>+'+fmt(r.recargo)+'</b></div>';
+  if(r.cajonTasa>0)html+='<div class="r"><span>Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+esc(r.cajonTipo)+')</span><b>+'+fmt(r.cajonTasa)+'</b></div>';
   html+='<div class="r sub"><span>Subtotal margen</span><b>'+fmt(r.subtotalMargen)+'</b></div>';
   /* «Otros»: lo que se suma al PVP sin formar parte del beneficio. */
   var _otros='';
   if(r.accesorios>0)_otros+='<div class="r"><span>Accesorios</span><b>+'+fmt(r.accesorios)+'</b></div>';
-  if(r.cajonTasa>0)_otros+='<div class="r"><span>Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+esc(r.cajonTipo)+')</span><b>+'+fmt(r.cajonTasa)+'</b></div>';
   if(r.minAjuste>0)_otros+='<div class="r"><span>Ajuste hasta la tarifa mínima ('+fmt(r.precioMin)+')</span><b>+'+fmt(r.minAjuste)+'</b></div>';
   if(_otros)html+='<div class="grp">Otros</div>'+_otros
     +'<div class="r sub"><span>Subtotal otros</span><b>'+fmt(r.subtotalOtros)+'</b></div>';
@@ -2153,8 +2174,8 @@ function paramPriceCard(){ var labor=num(S.global_config.labor_cost_h);
       return '<div class="pp-ro"><span class="pp-ro-n">'+esc(k)+'</span>'+(tt?'<span class="pp-ro-t">'+tt+'</span>':'')+'<span class="pp-ro-p'+(free?' free':'')+'">'+(free?'Sin coste':eur(cost))+'</span></div>'; }).join('');
     return '<div class="pp-grp"><div class="pp-grp-h">'+title+'</div>'+rows+'</div>'; }
   return '<div class="card"><div class="card-h">Precios de parámetros complementarios <span class="cfg-ro-tag">solo informativo</span></div>'
-    +'<div class="pp-grid">'+grp('Diseño / modelado',DISENO_PRECIO,'eur')+grp('Eliminación de soportes',ELIMINACION_SOPORTES,'min')+grp('Post-procesado',POSTPROCESADO,'min')+'</div>'
-    +'<div class="note" style="margin-top:14px">El <b>diseño</b> son tarifas fijas (las mismas que ves en la calculadora); en los pedidos de optimización se cobra el <b>'+Math.round(disenoOptPct()*100)+'%</b> de la tarifa, ajustable en Configuración global. Soportes y post-procesado se valoran por tiempo con la mano de obra actual (<b>'+eur(labor)+'/h</b>).</div></div>';
+    +'<div class="pp-grid">'+grp('Diseño / modelado',DISENO_PRECIO,'eur')+grp('Post-procesado (soportes + acabado)',POSTPROCESADO,'eur')+'</div>'
+    +'<div class="note" style="margin-top:14px">El <b>diseño</b> son tarifas fijas (las mismas que ves en la calculadora); en los pedidos de optimización se cobra el <b>'+Math.round(disenoOptPct()*100)+'%</b> de la tarifa, ajustable en Configuración global. El <b>post-procesado</b> (soportes + acabado) es también tarifa fija; los pedidos anteriores a la fusión conservan sus tarifas antiguas, valoradas por tiempo con la mano de obra actual (<b>'+eur(labor)+'/h</b>).</div></div>';
 }
 function formulaCard(){ function fx(k,v){ return '<div class="fx"><span class="fx-k">'+k+'</span><span class="fx-v">'+v+'</span></div>'; }
   function conn(lbl){ return '<div class="fxd-conn"><span class="fxd-line"></span>'+(lbl?'<span class="fxd-lbl">'+lbl+'</span><span class="fxd-line"></span>':'')+'</div>'; }
@@ -2165,7 +2186,7 @@ function formulaCard(){ function fx(k,v){ return '<div class="fx"><span class="f
     +'<div class="fxd-inrow">'+box('Filamento','in')+'<span class="fxd-plus">+</span>'+box('Electricidad','in')+'<span class="fxd-plus">+</span>'+box('Deterioro','in')+'</div>'
     +conn('')+box('Coste bruto','brute')
     +conn('')
-    +'<div class="fxd-inrow">'+box('Bruto × Markup + Fondo de error')+'<span class="fxd-plus">+</span>'+boxN('Complementos','diseño · soportes · post-proc · misc.','in')+'</div>'
+    +'<div class="fxd-inrow">'+box('Bruto × Markup + Fondo de error')+'<span class="fxd-plus">+</span>'+boxN('Complementos','diseño · post-procesado · misc.','in')+'</div>'
     +conn('nunca &lt; precio mínimo')+box('BLOQUE A','brute')
     +conn('')
     +'<div class="fxd-bl">Bloque B · multiplicadores sobre A</div>'
@@ -2180,7 +2201,7 @@ function formulaCard(){ function fx(k,v){ return '<div class="fx"><span class="f
     +fx('Electricidad','horas × consumo (kWh) × €/kWh')
     +fx('Deterioro','horas × (precio + mantenimiento) ÷ amortización')
     +fx('Coste bruto','filamento + electricidad + deterioro')
-    +fx('Complementos','diseño (tarifa fija) + soportes + post-procesado (× €/h) + misceláneos')
+    +fx('Complementos','diseño + post-procesado (tarifas fijas) + misceláneos')
     +fx('Bloque A','bruto × markup + bruto × prob. error + complementos (nunca por debajo del mínimo)')
     +fx('Bloque B','recargo de urgencia y tasa de ahorro — cada uno <b>multiplica el bloque A</b>')
     +fx('Bloque C','utilitarios: uds × precio de accesorio — <b>se suman a A sin multiplicadores</b>')
@@ -2397,7 +2418,26 @@ function activateInTracker(id){ var o=getOrder(id); if(!o)return; if(!(window.DP
   if(window.DPCloud.getOrderByCode){ window.DPCloud.getOrderByCode(code).then(function(ex){ if(ex) markAndGo(); else create(); }).catch(create); } else create(); }
 function openOrder(id){ var o=getOrder(id); if(o) openModal(orderModalHTML(o)); }
 function reopenOrder(id){ var o=getOrder(id); if(o) openModal(orderModalHTML(o)); renderOrders(); }
-function setOrdParam(id,f,v){ var o=getOrder(id); if(!o)return; if(['peso_g','horas','cantidad','gasto_misc'].indexOf(f)>=0)v=num(v); o[f]=v; if(f==='filamento')o.is_multimaterial=false; try{ var r=compute(orderToCalcState(o)); var _dd3=orderDual(o); o.precio_final=(o.urgencia_nivel==='Urgente'?_dd3.urgente:(o.urgencia_nivel==='Ambos'?_dd3.urgente:r.precio)); o.precio_normal=(o.urgencia_nivel==='Ambos'?_dd3.normal:null); o.precio_urgente=(o.urgencia_nivel==='Ambos'?_dd3.urgente:null); o.coste_bruto=roundMoney(r.bruto); o.beneficio_neto=roundMoney(r.beneficioTotal); }catch(e){} save(); reopenOrder(id); }
+function setOrdParam(id,f,v){ var o=getOrder(id); if(!o)return; if(['peso_g','horas','cantidad','gasto_misc'].indexOf(f)>=0)v=num(v); o[f]=v; if(f==='filamento')o.is_multimaterial=false; try{ recalcOrder(o); }catch(e){} save(); reopenOrder(id); }
+/* Recalcula un pedido guardado de arriba abajo tras tocar un parámetro de cálculo.
+   Hay que invalidar precio_normal/precio_urgente antes de llamar a orderDual(),
+   porque si están puestos (pedidos «Ambos») devuelve los precios cacheados; y hay
+   que refrescar precio_base_cajon, que es la base de la tasa de ahorro. */
+function recalcOrder(o){
+  if(!o)return null;
+  o.precio_normal=null; o.precio_urgente=null;
+  var r=compute(orderToCalcState(o));
+  o.precio_base_cajon=roundMoney(r.bloqueA||0);
+  var amb=(o.urgencia_nivel==='Ambos'), urgente=(o.urgencia_nivel==='Urgente');
+  var d=orderDual(o);
+  o.precio_final=((amb||urgente)?d.urgente:r.precio);
+  o.precio_normal=(amb?d.normal:null);
+  o.precio_urgente=(amb?d.urgente:null);
+  o.urg_days=((amb||urgente)?(d.days!=null?d.days:o.urg_days):null);
+  o.coste_bruto=roundMoney(r.bruto);
+  o.beneficio_neto=roundMoney(r.beneficioTotal);
+  return r;
+}
 function setOrdParamTime(id,el){ var d=hmToDec(el.value); setOrdParam(id,'horas',String(d)); }
 function setOrdMeta(id,f,v){ var o=getOrder(id); if(!o)return; o[f]=v; if(f==='cliente'||f==='cliente_email')ensureClient(o); save(); }
 function _odBrk(r){
@@ -2405,14 +2445,14 @@ function _odBrk(r){
   function grp(l){return '<div class="odb-grp">'+l+'</div>';}
   function sub(l,v){return '<div class="odb-r odb-sub"><span>'+l+'</span><b>'+eur(v)+'</b></div>';}
   var h=grp('Parámetros básicos')+row('Filamento',r.filamento)+row('Electricidad',r.electricidad)+row('Deterioro impresora',r.deterioro)+sub('Subtotal básico',r.bruto);
-  if(r.resto>0){ h+=grp('Parámetros complementarios')+row('Diseño y modelado',r.diseno)+row('Búsqueda de modelos',r.busqueda)+row('Eliminación de soportes',r.soportes)+row('Post-procesado',r.postproc)+(r.gastoMisc>0?row('Extras / misc.',r.gastoMisc):'')+sub('Subtotal complementarios',r.resto); }
+  if(r.resto>0){ h+=grp('Parámetros complementarios')+row('Diseño y modelado',r.diseno)+(r.busqueda>0?row('Búsqueda de modelos',r.busqueda):'')+(r.soportes>0?row('Eliminación de soportes',r.soportes):'')+row('Post-procesado',r.postproc)+(r.gastoMisc>0?row('Extras / misc.',r.gastoMisc):'')+sub('Subtotal complementarios',r.resto); }
   h+=grp('Márgenes')+row('Markup (×'+r.markup.toFixed(1)+')',r.markupVal,true);
   if(r.errorVal>0)h+=row('Fondo de error',r.errorVal,true);
   if(r.recargo>0)h+=row('Plus urgencia',r.recargo,true);
+  if(r.cajonTasa>0)h+=row('Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+(r.cajonTipo||'')+')',r.cajonTasa,true);
   h+=sub('Subtotal margen',r.subtotalMargen);
   var otros='';
   if(r.accesorios>0)otros+=row('Accesorios',r.accesorios,true);
-  if(r.cajonTasa>0)otros+=row('Tasa de ahorro',r.cajonTasa,true);
   if(r.minAjuste>0)otros+=row('Ajuste hasta la tarifa mínima ('+eur(r.precioMin)+')',r.minAjuste,true);
   if(otros)h+=grp('Otros')+otros+sub('Subtotal otros',r.subtotalOtros);
   h+=grp('Beneficio total')+sub('Complementos + margen'+(r.minAjuste>0?' + ajuste mínimo':'')+' − bruto',r.beneficioTotal);
@@ -2444,8 +2484,7 @@ function orderModalHTML(o){
     +'<div class="od-sec">Parámetros complementarios</div>'
     +'<div class="od-grid"><div><label class="lbl">Diseño / modelado</label><select class="selx" onchange="setOrdParam(\''+I+'\',\'diseno_modelado\',this.value)">'+optList(Object.keys(DISENO_MODELADO),o.diseno_modelado)+'</select></div>'
       +'<div><label class="lbl">Búsqueda de modelos</label><select class="selx" onchange="setOrdParam(\''+I+'\',\'busqueda_modelos\',this.value)">'+optList(Object.keys(BUSQUEDA_MODELOS),o.busqueda_modelos)+'</select></div></div>'
-    +'<div class="od-grid"><div><label class="lbl">Eliminación de soportes</label><select class="selx" onchange="setOrdParam(\''+I+'\',\'eliminacion_soportes\',this.value)">'+optList(Object.keys(ELIMINACION_SOPORTES),o.eliminacion_soportes)+'</select></div>'
-      +'<div><label class="lbl">Post-procesado</label><select class="selx" onchange="setOrdParam(\''+I+'\',\'postprocesado\',this.value)">'+optList(Object.keys(POSTPROCESADO),o.postprocesado)+'</select></div></div>'
+    +'<div class="od-grid"><div><label class="lbl">Post-procesado</label><select class="selx" onchange="setOrdParam(\''+I+'\',\'postprocesado\',this.value)">'+optList(postprocOpts(o.postprocesado),o.postprocesado)+'</select></div></div>'
     +'<div class="od-grid3"><div><label class="lbl">Probabilidad de error</label><select class="selx" onchange="setOrdParam(\''+I+'\',\'probabilidad_error\',this.value)">'+optList(Object.keys(PROBABILIDAD_ERROR),o.probabilidad_error)+'</select></div>'
       +'<div><label class="lbl">Markup</label><select class="selx" onchange="setOrdParam(\''+I+'\',\'markup\',this.value)">'+optList(Object.keys(MARKUP),o.markup)+'</select></div>'
       +'<div><label class="lbl">Urgencia</label><select class="selx" onchange="setOrdParam(\''+I+'\',\'urgencia_nivel\',this.value)">'+optList(URG_OPTS,o.urgencia_nivel)+'</select></div></div>'
@@ -2491,7 +2530,7 @@ function loadOrderToCalc(id){ var o=getOrder(id); if(!o)return; var c=S.calc_sta
   c.impresora=o.impresora||c.impresora; c.filamento_tipo=o.filamento||c.filamento_tipo; c.filamento_color=o.filamento_color||'Negro';
   c.is_multimaterial=!!o.is_multimaterial; c.material_breakdown=Array.isArray(o.material_breakdown)?JSON.parse(JSON.stringify(o.material_breakdown)):[];
   c.peso_g=String(o.peso_g||0); c.tiempo_h=String(o.horas||0); c.cantidad=num(o.cantidad)||1;
-  c.diseno_modelado=o.diseno_modelado||'No necesario'; c.busqueda_modelos=o.busqueda_modelos||'No'; c.eliminacion_soportes=o.eliminacion_soportes||'No'; c.postprocesado=o.postprocesado||'No';
+  c.diseno_modelado=o.diseno_modelado||'No necesario'; c.busqueda_modelos=o.busqueda_modelos||'No'; c.eliminacion_soportes=o.eliminacion_soportes||'No'; c.postprocesado=o.postprocesado||'Limpio (pocos soportes sin lijado)';
   c.probabilidad_error=o.probabilidad_error||'Baja (25%)'; c.markup=o.markup||'Normal (230%)'; c.urgencia_nivel=o.urgencia_nivel||'Normal'; c.gasto_misc=num(o.gasto_misc);
   c.is_shared=!!o.is_shared; if(o.shared_split){c.shared_percent_3dcc=num(o.shared_split['3DCC']);c.shared_percent_silab3d=num(o.shared_split['SILAB3D']);}
   save(); closeModal(); go('calc'); toast3('Parámetros cargados en la calculadora','#4D9FFF'); }
@@ -2517,9 +2556,8 @@ function computeOrder(o){
   var electricidad=round4(horas*num(printer.energy_consumption_kwh)*num(g.energy_cost_kwh));
   var diseno=round4(disenoImporte(o.diseno_modelado,o.diseno_opt));
   var busqueda=0;   // integrado como un nivel más del propio diseño
-  var soportes=round4(((ELIMINACION_SOPORTES[o.eliminacion_soportes]||0)/60)*labor);
+  var _pp=postprocPartes(o,labor), soportes=_pp.soportes, postproc=_pp.postproc;
   var deterioro=round4(horas*depPerHour(printer));
-  var postproc=round4(((POSTPROCESADO[o.postprocesado]||0)/60)*labor);
   var gastoMisc=round4(Math.max(0,num(o.gasto_misc)));
   var bruto=filamento+electricidad+deterioro, resto=diseno+busqueda+soportes+postproc+gastoMisc;
   var precioMin=num(g.precio_minimo);
@@ -2534,11 +2572,12 @@ function computeOrder(o){
   var cajonTasa=cajonBase?cajonFee(cajonTipo,cajonBase,o.diseno_modelado):0;
   var cajonPct=cajonBase?cajonRate(cajonTipo,cajonBase,o.diseno_modelado):0;
   var bloqueC=accessoriesTotal(o);
-  var subtotalMargen=roundMoney(markupVal+errorVal+recargo);
+  /* La tasa de ahorro cuenta como margen (y por tanto como beneficio). */
+  var subtotalMargen=roundMoney(markupVal+errorVal+recargo+cajonTasa);
   var totalCalc=bloqueA+recargo+cajonTasa+bloqueC;
   var minAplicado=(totalCalc<precioMin);
   var minAjuste=roundMoney(Math.max(0,roundUpToNickel(Math.max(totalCalc,precioMin))-roundUpToNickel(totalCalc)));
-  var subtotalOtros=roundMoney(bloqueC+cajonTasa+minAjuste);
+  var subtotalOtros=roundMoney(bloqueC+minAjuste);
   var beneficioTotal=roundMoney(subtotalMargen+resto+minAjuste-bruto);
   return {minAjuste:minAjuste,subtotalMargen:subtotalMargen,subtotalOtros:subtotalOtros,beneficioTotal:beneficioTotal,filName:filName,filColor:filColor,peso:peso,horas:horas,filamento:filamento,electricidad:electricidad,diseno:diseno,busqueda:busqueda,soportes:soportes,deterioro:deterioro,postproc:postproc,gastoMisc:gastoMisc,bruto:bruto,resto:resto,markup:markup,errorRate:errorRate,urg:urg,recargo:recargo,markupVal:markupVal,errorVal:errorVal,cant:cant,precioMin:precioMin,minAplicado:minAplicado,
     bloqueA:roundMoney(bloqueA),bloqueC:roundMoney(bloqueC),accesorios:roundMoney(bloqueC),
@@ -2575,15 +2614,15 @@ function ticketLines(o,kind){
   lines.push('','-- MARGENES Y BENEFICIO --',L('Markup (x'+r.markup.toFixed(1)+')','+'+r.markupVal.toFixed(2)+' '+u));
   if(r.errorVal>0)lines.push(L('Fondo error','+'+r.errorVal.toFixed(2)+' '+u));
   if(r.recargo>0)lines.push(L('Plus urgencia','+'+r.recargo.toFixed(2)+' '+u));
+  if(r.cajonTasa>0)lines.push(L('Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+(r.cajonTipo||'')+')','+'+r.cajonTasa.toFixed(2)+' '+u));
   lines.push(SUB,L('SUBTOTAL MARGEN',r.subtotalMargen.toFixed(2)+' '+u));
   if(r.minAplicado)lines.push('  * Tarifa minima aplicada: '+r.precioMin.toFixed(2)+' '+u);
-  if(r.cajonTasa>0)lines.push('','-- CAJON DE AHORRO --',L('Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+(r.cajonTipo||'')+')','+'+r.cajonTasa.toFixed(2)+' '+u));
   if(r.subtotalOtros>0)lines.push(SUB,L('SUBTOTAL OTROS',r.subtotalOtros.toFixed(2)+' '+u));
   lines.push('',SUB,L('BENEFICIO TOTAL',r.beneficioTotal.toFixed(2)+' '+u),
     '  (complementos + margen'+(r.minAjuste>0?' + ajuste minimo':'')+' - bruto)');
   lines.push(SEP,L('PRECIO UNITARIO',(total/cant).toFixed(2)+' '+u),L('CANTIDAD',cant+' ud.'),SUB,L('PVP FINAL',total.toFixed(2)+' '+u),SEP,
     '','Opciones: Dis='+(o.diseno_modelado||'-')+' | Busq='+(o.busqueda_modelos||'-'),
-    '          Sop='+(o.eliminacion_soportes||'-')+' | Post='+(o.postprocesado||'-'),
+    '          Post='+(o.postprocesado||'-'),
     '          Err='+(o.probabilidad_error||'-')+' | Urg='+(o.urgencia_nivel||'-'));
   return lines;
 }
@@ -2750,7 +2789,7 @@ function renderTicketPage(doc,o,kind){
     y=_pdfSection(doc,M,W,y,TT(TPL.internal.t_params),ac,[
       ['Impresora',(r&&r.printer&&r.printer.name)||o.impresora||'—','Precio material',(r?r.pricekg.toFixed(2):'0.00')+' €/kg'],
       ['Diseño / modelado',o.diseno_modelado||'—','Búsqueda modelos',o.busqueda_modelos||'—'],
-      ['Elim. soportes',o.eliminacion_soportes||'—','Postprocesado',o.postprocesado||'—'],
+      ['Post-procesado',o.postprocesado||'—','',''],
       ['Probabilidad error',o.probabilidad_error||'—','Markup',(o.markup||'—')+(r?'  (×'+r.markup.toFixed(1)+')':'')],
       ['Urgencia',(o.urgencia_nivel||'Normal')+((_urgD!=null&&o.urgencia_nivel==='Urgente')?('  (+'+_urgPct+'% · '+_urgD+' d)'):''),'Cantidad',(o.cantidad||1)+' ud.'],
       ['Entrega estándar',(_delivStd||'—'),'Entrega urgente',(_delivUrg||'—')]
@@ -2784,13 +2823,13 @@ function renderTicketPage(doc,o,kind){
       var push=function(nm,v){ body.push([nm,(v||0).toFixed(2)+' €']); };
       push('Filamento',r.filamento); push('Electricidad',r.electricidad); push('Deterioro impresora',r.deterioro);
       body.push([bf('Subtotal bruto (básicos)'),bf(r.bruto.toFixed(2)+' €')]);
-      if(r.resto>0){ push('Diseño & modelado',r.diseno); push('Búsqueda modelos',r.busqueda); push('Elim. soportes',r.soportes); push('Postprocesado',r.postproc); body.push([bf('Subtotal complementos'),bf(r.resto.toFixed(2)+' €')]); }
+      if(r.resto>0){ push('Diseño & modelado',r.diseno); if(r.busqueda>0) push('Búsqueda modelos',r.busqueda); if(r.soportes>0) push('Elim. soportes',r.soportes); push('Postprocesado',r.postproc); body.push([bf('Subtotal complementos'),bf(r.resto.toFixed(2)+' €')]); }
       push('Markup (×'+r.markup.toFixed(1)+')',r.markupVal);
       if(r.errorVal>0) push('Fondo error ('+(o.probabilidad_error||'')+')',r.errorVal);
       if(r.recargo>0) push('Plus urgencia',r.recargo);
       if(_urgExtra>0) push('Recargo urgencia'+((_urgD!=null)?(' ('+_urgD+' día'+(_urgD===1?'':'s')+' · +'+_urgPct+'%)'):(' (+'+_urgPct+'%)')),_urgExtra);
-      if(r.gastoMisc>0) push('Extras / misc.',r.gastoMisc);
       if(r.cajonTasa>0) push('Tasa de ahorro ('+(r.cajonPct*100).toFixed((r.cajonPct*100)%1?1:0)+'% · '+(r.cajonTipo||'')+')',r.cajonTasa);
+      if(r.gastoMisc>0) push('Extras / misc.',r.gastoMisc);
       if(r.accesorios>0) push('Utilitarios (accesorios)',r.accesorios);
       if(r.minAjuste>0) push('Ajuste a tarifa mínima ('+(r.precioMin||0).toFixed(2)+' €)',r.minAjuste);
     }
