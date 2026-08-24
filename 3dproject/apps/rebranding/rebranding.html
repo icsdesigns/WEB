@@ -1058,7 +1058,8 @@ document.querySelectorAll('.navitem').forEach(it=>it.addEventListener('click',()
   ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.add('over'); }));
   ['dragleave','dragend','drop'].forEach(ev=>dz.addEventListener(ev,()=>dz.classList.remove('over')));
   dz.addEventListener('drop',e=>{ e.preventDefault(); if(e.dataTransfer&&e.dataTransfer.files) addResImgs(e.dataTransfer.files); });
-  buildResImgBar();
+  /* La barra se pinta en el arranque: aquí resImgs todavía no existe (se declara
+     con let más abajo) y leerla en este punto rompía el resto del guión. */
 })();
 function syncBadges(){
   $('#bFotos').textContent=state.files.length;
@@ -2018,6 +2019,7 @@ function initDefaultThumbs(){
 }
 buildRefbar();
 buildResbar();
+buildResImgBar();
 initDefaultThumbs();
 setStep(1);
 </script>
