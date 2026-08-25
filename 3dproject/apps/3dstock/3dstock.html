@@ -189,7 +189,9 @@ var LIVE=false, liveBusy=false;
 var DATA=null, CH=[];
 var loaded=false, saveT=null, myTs=0;
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function eurF(p){ var n=Number(String(p==null?'':p).replace(',','.')); if(isNaN(n))return ''; return n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+var CURSYM={EUR:'€',USD:'$',GBP:'£'};
+function curSym(){ return CURSYM[(window.DATA&&DATA.currency)||'EUR']||((window.DATA&&DATA.currency)||'€'); }
+function eurF(p){ var n=Number(String(p==null?'':p).replace(',','.')); if(isNaN(n))return ''; return n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' '+curSym(); }
 function normTxt(s){ var x=String(s==null?'':s).toLowerCase(); try{ x=x.normalize('NFD').replace(/[\u0300-\u036f]/g,''); }catch(e){} return x; }
 function kwMatch(q,txt){ var toks=normTxt(q).split(/\s+/).filter(Boolean); if(!toks.length)return true; var h=normTxt(txt); for(var i=0;i<toks.length;i++){ if(h.indexOf(toks[i])<0)return false; } return true; }
 function vHay(v){ return v.vt; }
@@ -465,6 +467,11 @@ function monBodyHTML(){
 }
 
 /* ===== sondeo en vivo (fuentes en paralelo) ===== */
+/* products.json devuelve la moneda base de la tienda (USD); con country=ES
+   Shopify responde con los precios del mercado europeo en euros, que son los
+   que ve el comprador en la ficha del producto. */
+var SUNLU_MARKET='ES', SUNLU_CURRENCY='EUR';
+function sunluURL(page){ return 'https://store.sunlu.com/products.json?limit=250&page='+page+'&country='+SUNLU_MARKET; }
 var SOURCES=[
   {n:'directo', u:function(u){return u;}, p:function(tx){return JSON.parse(tx);}},
   {n:'allorigins/raw', u:function(u){return 'https://api.allorigins.win/raw?url='+encodeURIComponent(u);}, p:function(tx){return JSON.parse(tx);}},
@@ -484,10 +491,10 @@ function raceSources(url,ms){ return new Promise(function(res,rej){ var pend=SOU
   SOURCES.forEach(function(src){ trySource(src,url,ms).then(function(r){ if(!won){won=true;res(r);} },function(){ pend--; if(pend===0&&!won)rej(new Error('ninguna fuente respondió')); }); });
 }); }
 function liveFetchAll(){ DIAG=[]; diag('Iniciando sondeo en vivo…'); setStatus('Probando '+SOURCES.length+' fuentes en paralelo…');
-  return raceSources('https://store.sunlu.com/products.json?limit=250&page=1',9000).then(function(win){
+  return raceSources(sunluURL(1),9000).then(function(win){
     var src=win.src, all=(win.json.products||[]).slice(); diag('Fuente elegida: '+src.n);
     function next(page){ setStatus('Descargando catálogo… (página '+page+', vía '+src.n+')');
-      return trySource(src,'https://store.sunlu.com/products.json?limit=250&page='+page,12000).then(function(r){
+      return trySource(src,sunluURL(page),12000).then(function(r){
         var arr=r.json.products||[]; all=all.concat(arr);
         if(arr.length<250||page>=12){ diag('Fin: '+all.length+' productos'); return all; }
         return next(page+1);
@@ -524,7 +531,7 @@ function runUpdate(){ if(liveBusy)return;
     var items=liveSnapshot(prods);
     diag('Resultado: '+items.length+' referencias EU tras filtrar.');
     if(!items.length)throw {e:'0 referencias tras filtrar'};
-    DATA={ fetched_at:new Date().toISOString(), products:items };
+    DATA={ fetched_at:new Date().toISOString(), currency:SUNLU_CURRENCY, market:SUNLU_MARKET, products:items };
     LIVE=true; liveBusy=false; render();
     setStatus('Actualizado en vivo: '+items.length+' referencias.'+(S.ghToken?' La captura oficial sigue en segundo plano.':''));
   }).catch(function(e){

@@ -844,6 +844,71 @@ html, body {
 .tb-chip-pl{width:28px;height:28px;border-radius:8px;background:rgba(184,124,255,.15);border:1px solid rgba(184,124,255,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;border:none;border-radius:11px;background:var(--violet);color:#fff;font:700 13.5px 'Outfit',sans-serif;cursor:pointer;margin-bottom:14px}
 .sb-cta:hover{background:#bf9dff}
+/* En pantallas estrechas la barra superior se salía 11 px y el último botón
+   (tema) quedaba cortado hasta desplazarla: se aprieta para que quepa entera. */
+@media (max-width:430px){
+  #topbar{gap:4px;padding:0 8px}
+  .tb-btn{padding:0 7px}
+  .tb-btn[onclick*="dpHome"]{padding:0 6px}
+  .tb-chip-pl{width:26px;height:26px}
+}
+
+/* ═══════════════════════════════════════════════
+   USO TÁCTIL Y VENTANAS PEQUEÑAS
+═══════════════════════════════════════════════ */
+/* Sin ratón no hay :hover: lo que solo se veía al pasar por encima
+   (borrar de la cola, editar/borrar en el evento, tirador de duración)
+   tiene que estar visible siempre. */
+@media (hover:none){
+  .q-del{opacity:.85}
+  .ev-actions{opacity:1}
+  .ev-resize{opacity:.9;height:15px}
+  .cal-event:hover{transform:none;box-shadow:none}
+  .q-item:hover{transform:none}
+}
+/* El evento se desplaza con el dedo tras una pulsación larga; hasta entonces
+   el gesto vertical sigue siendo el scroll del calendario. */
+.cal-event{touch-action:pan-y}
+.cal-event.dragging{touch-action:none;pointer-events:auto}
+.ev-resize{touch-action:none}
+
+/* El panel lateral debe poder recorrerse entero aunque la ventana sea baja:
+   antes los bloques fijos empujaban la cola fuera de la pantalla. */
+#sidebar{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.sb-block.grow{flex:1 0 auto;overflow:visible}
+.sb-cta{flex-shrink:0}
+
+@media (max-width:680px){
+  /* El panel arranca justo bajo la barra superior (54 px), no 44 px más abajo:
+     si no, se salía de la pantalla por abajo. */
+  #sidebar{top:54px}
+  .sb-overlay{top:54px}
+}
+/* Compactación progresiva para que quepa todo el menú en pantallas bajas. */
+@media (max-height:780px){
+  .sb-cta{padding:9px;font-size:12.5px;margin-bottom:10px}
+  .sb-block{padding:10px 14px}
+  .sb-title{margin-bottom:7px}
+  .mc-dow{padding:1px 0 4px}
+  .mc-day{font-size:10.5px;border-radius:4px}
+  .mc-nav{margin-bottom:5px}
+  .param-row{margin-bottom:8px}
+  .param-input{padding:6px 9px;font-size:12px}
+  .param-label{margin-bottom:3px}
+  .vt-btn{padding:4px}
+  .q-item{padding:7px 10px;margin-bottom:5px}
+  .q-footer{margin-top:6px;padding:8px 10px;gap:4px}
+}
+@media (max-height:640px){
+  .sb-block{padding:8px 13px}
+  .param-hint{display:none}
+  .mc-day{font-size:10px}
+  .q-name{font-size:11.5px}
+}
+
+/* Tarjeta del método alfanumérico */
+.sm-tag.al{background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.25)}
+
 /* desplegables (select/option) legibles en movil */
 select{color:var(--t1)}
 option{background-color:#161922;color:#E8EBF4}
@@ -879,7 +944,6 @@ option{background-color:#161922;color:#E8EBF4}
     </button>
     <span class="tb-chip-pl"><svg width="15" height="15" viewBox="0 0 22 22" fill="none"><rect x="2" y="4.5" width="18" height="15.5" rx="2" stroke="#B87CFF" stroke-width="1.5" fill="none"/><line x1="2" y1="9.5" x2="20" y2="9.5" stroke="#B87CFF" stroke-width="1"/><rect x="7.5" y="2" width="1.8" height="4" rx=".9" fill="#B87CFF"/><rect x="12.7" y="2" width="1.8" height="4" rx=".9" fill="#B87CFF"/></svg></span>
     <span class="tb-app-name">3DPlanner</span>
-    <span class="tb-badge">Beta</span>
     <button class="tb-btn" onclick="dpHome()" title="Volver a 3DProject" style="gap:5px"><svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M8 2.5L3.5 6.5L8 10.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="btn-label">3DProject</span></button>
     <div class="tb-space"></div>
     <span class="tb-date" id="tb-date"></span>
@@ -1132,6 +1196,14 @@ option{background-color:#161922;color:#E8EBF4}
           <div class="sm-name">Maximizar impresiones</div>
           <div class="sm-desc">Algoritmo greedy que encaja el mayor número posible dentro de la jornada.</div>
           <span class="sm-tag mx">Rendimiento</span>
+        </div>
+      </div>
+      <div class="smart-card" data-method="alpha" onclick="selectMethod('alpha')">
+        <div class="smart-card-icon"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M3 12.5L5.6 5l2.6 7.5M3.9 10.4h3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 5h4l-4 7.5h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="smart-card-body">
+          <div class="sm-name">Orden alfanumérico</div>
+          <div class="sm-desc">Ordena por el título de la impresión (A→Z) con los números en su orden natural: «Pieza 2» antes que «Pieza 10».</div>
+          <span class="sm-tag al">Alfanumérico</span>
         </div>
       </div>
     </div>
@@ -1428,7 +1500,7 @@ function renderDay(root){
   }
 
   // Day column
-  const col=make('div','dv-col'); col.id='dv-col';
+  const col=make('div','dv-col'); col.id='dv-col'; col.dataset.date=dk;
 
   // Off-hours shading
   const dStart=timeToMins(S.params.start), dEnd=timeToMins(S.params.end);
@@ -1510,7 +1582,7 @@ function renderWeek(root){
 
   days.forEach((d,ci)=>{
     const dk=dateKey(d);
-    const col=make('div','wv-col');
+    const col=make('div','wv-col'); col.dataset.date=dk;
 
     // Off-hours
     if(dStart>0){ const s=make('div','dv-offhours'); s.style.top='0'; s.style.height=`${dStart/60*HOUR_PX}px`; col.appendChild(s); }
@@ -1603,29 +1675,27 @@ function clearDay(){
 // impresiones" (params.gap), anclada al final de cada impresión y sin invadir
 // la siguiente.
 function placeGaps(evs, col){
-  if(!evs || evs.length<2) return;
+  if(!evs || !evs.length) return;
   const gp=Math.max(0, Number(S.params && S.params.gap)||0);
   if(!gp) return;
   const sorted=evs.slice().sort((a,b)=>a.startMins-b.startMins);
-  let prevEnd=sorted[0].startMins+sorted[0].durationMins;
-  for(let i=1;i<sorted.length;i++){
-    const s=sorted[i].startMins;
-    const gap=s-prevEnd;            // hueco real hasta la siguiente impresión
-    const bandMins=Math.min(gap, gp); // = tiempo entre impresiones (sin solaparse)
-    if(bandMins>0){
-      const band=make('div','cal-gap');
-      band.title='Tiempo entre impresiones';
-      band.style.top=`${prevEnd/60*HOUR_PX}px`;
-      band.style.height=`${bandMins/60*HOUR_PX}px`;
-      if(bandMins/60*HOUR_PX>=15){
-        const lbl=make('div','cal-gap-label');
-        lbl.textContent=fmtDur(bandMins);
-        band.appendChild(lbl);
-      }
-      col.appendChild(band);
+  sorted.forEach((ev,i)=>{
+    const gs=ev.startMins+ev.durationMins;
+    const nxt=sorted[i+1];
+    const ge=Math.min(gs+gp, nxt?nxt.startMins:1440);
+    const bandMins=ge-gs;
+    if(bandMins<=0) return;
+    const band=make('div','cal-gap');
+    band.title='Tiempo entre impresiones ('+gp+' min): reservado, no puede ocuparse';
+    band.style.top=`${gs/60*HOUR_PX}px`;
+    band.style.height=`${bandMins/60*HOUR_PX}px`;
+    if(bandMins/60*HOUR_PX>=15){
+      const lbl=make('div','cal-gap-label');
+      lbl.textContent=fmtDur(bandMins);
+      band.appendChild(lbl);
     }
-    prevEnd=Math.max(prevEnd, sorted[i].startMins+sorted[i].durationMins);
-  }
+    col.appendChild(band);
+  });
 }
 
 function placeEvent(ev, col){
@@ -1682,72 +1752,189 @@ function make(tag, cls){
   return el;
 }
 
-// ── Drag ───────────────────────────────────────────────────────────────────────
-function setupDrag(el, ev){
-  let startY, startMins, moved=false;
-  el.addEventListener('mousedown', e=>{
-    if(e.target.closest('.ev-actions,.ev-resize')) return;
-    e.preventDefault();
-    startY=e.clientY; startMins=ev.startMins; moved=false;
+// ── Tiempo entre impresiones ───────────────────────────────────────────────
+/* El "tiempo entre impresiones" es tiempo reservado de la maquina (retirar la
+   pieza, limpiar la cama, precalentar): ninguna impresion puede ocuparlo ni
+   solaparlo. Todo lo que coloca impresiones pasa por estas funciones. */
+function gapMins(){ return Math.max(0, Number(S.params && S.params.gap) || 0); }
+function slotFree(dk, id, start, dur){
+  const g=gapMins();
+  return !S.events.some(e=> e.date===dk && e.id!==id &&
+    start < e.startMins+e.durationMins+g && e.startMins < start+dur+g);
+}
+/* Hueco valido mas cercano al punto deseado (antes o despues). */
+function nearestFreeStart(dk, id, desired, dur){
+  const lim=Math.max(0,1440-dur);
+  const d0=Math.max(0,Math.min(lim,desired));
+  if(slotFree(dk,id,d0,dur)) return d0;
+  for(let d=5; d<=1440; d+=5){
+    if(d0-d>=0  && slotFree(dk,id,d0-d,dur)) return d0-d;
+    if(d0+d<=lim && slotFree(dk,id,d0+d,dur)) return d0+d;
+  }
+  return null;
+}
+function dayRespectsGap(dk){
+  const g=gapMins();
+  const evs=S.events.filter(e=>e.date===dk).sort((a,b)=>a.startMins-b.startMins);
+  for(let i=1;i<evs.length;i++)
+    if(evs[i].startMins < evs[i-1].startMins+evs[i-1].durationMins+g) return false;
+  return true;
+}
+/* Recoloca un dia manteniendo el orden actual y dejando siempre el hueco. */
+function repackDay(dk){
+  const g=gapMins();
+  const evs=S.events.filter(e=>e.date===dk).sort((a,b)=>a.startMins-b.startMins);
+  if(!evs.length) return;
+  let cursor=evs[0].startMins;
+  evs.forEach(ev=>{ ev.startMins=cursor; cursor+=ev.durationMins+g; });
+}
+/* Mueve una impresion al hueco valido mas cercano al punto soltado. */
+function moveEventTo(ev, dk, desired){
+  const start=nearestFreeStart(dk, ev.id, desired, ev.durationMins);
+  if(start===null){
+    toast('No hay hueco en ese día que respete los '+gapMins()+' min entre impresiones','var(--orange)');
+    render(); return false;
+  }
+  const exacto=(start===desired && dk===ev.date);
+  pushHistory();
+  const idx=S.events.findIndex(e=>e.id===ev.id);
+  if(idx>=0){ S.events[idx].date=dk; S.events[idx].startMins=start; }
+  ev.date=dk; ev.startMins=start;
+  save(); render(); checkOverlaps(false);
+  toast(exacto
+    ? '🕐 Impresión movida'
+    : '🕐 Movida a '+minsToTime(start)+' para conservar el tiempo entre impresiones','var(--violet)');
+  return true;
+}
+/* Arrastrar una impresion sobre otra las intercambia de sitio. */
+function swapEvents(idA, idB){
+  const a=S.events.find(e=>e.id===idA), b=S.events.find(e=>e.id===idB);
+  if(!a||!b||a===b) return;
+  pushHistory();
+  const A={date:a.date,startMins:a.startMins}, B={date:b.date,startMins:b.startMins};
+  a.date=B.date; a.startMins=B.startMins;
+  b.date=A.date; b.startMins=A.startMins;
+  /* Si por tener duraciones distintas alguna invade el tiempo entre impresiones,
+     se recompacta ese dia conservando el nuevo orden. */
+  let repacked=false;
+  [a.date,b.date].filter((v,i,arr)=>arr.indexOf(v)===i).forEach(dk=>{
+    if(!dayRespectsGap(dk)){ repackDay(dk); repacked=true; }
+  });
+  save(); render(); checkOverlaps(false);
+  toast(repacked?'⇅ Intercambiadas · día recompactado':'⇅ Impresiones intercambiadas','var(--teal)');
+}
 
-    const onMove=me=>{
-      const dy=me.clientY-startY;
-      if(!moved && Math.abs(dy)>4){ moved=true; el.classList.add('dragging'); }
-      if(!moved) return;
-      const newMins=Math.round((startMins+dy/HOUR_PX*60)/15)*15;
-      el.style.top=`${Math.max(0,Math.min(23*60,newMins))/60*HOUR_PX}px`;
-    };
-    const onUp=me=>{
-      document.removeEventListener('mousemove',onMove);
-      document.removeEventListener('mouseup',onUp);
-      if(!moved) return;
-      el.classList.remove('dragging');
-      const dy=me.clientY-startY;
-      const newMins=Math.round((startMins+dy/HOUR_PX*60)/15)*15;
-      const clamped=Math.max(0,Math.min(23*60,newMins));
-      pushHistory();
-      const idx=S.events.findIndex(e=>e.id===ev.id);
-      if(idx>=0){ S.events[idx].startMins=clamped; ev.startMins=clamped; }
-      save(); render();
-      toast('🕐 Evento movido','var(--violet)');
-    };
-    document.addEventListener('mousemove',onMove);
-    document.addEventListener('mouseup',onUp);
+// ── Arrastrar (raton y tactil) ─────────────────────────────────────────────
+/* Con el dedo hace falta una pulsacion larga para arrastrar: asi el gesto de
+   desplazar el calendario sigue funcionando. */
+const TOUCH_HOLD=320;
+function setupDrag(el, ev){
+  let startY=0,startX=0,startMins=0,active=false,moved=false,hold=null,pid=null,lastX=0,lastY=0;
+  const cancelHold=()=>{ if(hold){ clearTimeout(hold); hold=null; } };
+  const arm=()=>{ active=true; el.classList.add('dragging'); };
+  const posMins=y=>{
+    const dy=y-startY;
+    return Math.max(0,Math.min(1440-ev.durationMins, Math.round((startMins+dy/HOUR_PX*60)/15)*15));
+  };
+  const finish=()=>{
+    cancelHold();
+    document.removeEventListener('pointermove',onMove);
+    document.removeEventListener('pointerup',onUp);
+    document.removeEventListener('pointercancel',onCancel);
+  };
+  const onMove=e=>{
+    if(pid!==null && e.pointerId!==pid) return;
+    lastX=e.clientX; lastY=e.clientY;
+    const dy=e.clientY-startY, dx=e.clientX-startX;
+    if(!active){
+      if(hold){ if(Math.abs(dy)>8||Math.abs(dx)>8) cancelHold(); return; }
+      if(e.pointerType==='touch') return;
+      if(Math.abs(dy)<=4) return;
+      arm();
+    }
+    e.preventDefault();
+    moved=true;
+    el.style.top=`${posMins(e.clientY)/60*HOUR_PX}px`;
+  };
+  const onCancel=()=>{ const was=active; finish(); el.classList.remove('dragging'); if(was) render(); };
+  const onUp=e=>{
+    const wasActive=active, wasMoved=moved;
+    finish();
+    el.classList.remove('dragging');
+    if(!wasActive||!wasMoved){ openEditModal(ev.id); return; }
+    const x=(e&&e.clientX!==undefined)?e.clientX:lastX;
+    const y=(e&&e.clientY!==undefined)?e.clientY:lastY;
+    el.style.pointerEvents='none';
+    const under=document.elementFromPoint(x,y);
+    el.style.pointerEvents='';
+    const tgt=(under&&under.closest)?under.closest('.cal-event'):null;
+    if(tgt && tgt.dataset.id && tgt.dataset.id!==ev.id){ swapEvents(ev.id,tgt.dataset.id); return; }
+    const col=(under&&under.closest)?under.closest('[data-date]'):null;
+    moveEventTo(ev,(col&&col.dataset.date)||ev.date,posMins(y));
+  };
+  /* Con touch-action:pan-y el navegador se llevaria el gesto vertical (y
+     cancelaria el puntero) en cuanto el dedo se mueve: mientras se arrastra hay
+     que frenar el desplazamiento a mano. */
+  el.addEventListener('touchmove',e=>{ if(active) e.preventDefault(); },{passive:false});
+  el.addEventListener('pointerdown',e=>{
+    if(e.button>0) return;
+    if(e.target.closest('.ev-actions,.ev-resize')) return;
+    pid=e.pointerId; startY=lastY=e.clientY; startX=lastX=e.clientX;
+    startMins=ev.startMins; moved=false; active=false;
+    if(e.pointerType==='touch') hold=setTimeout(()=>{ hold=null; arm(); },TOUCH_HOLD);
+    else e.preventDefault();
+    document.addEventListener('pointermove',onMove,{passive:false});
+    document.addEventListener('pointerup',onUp);
+    document.addEventListener('pointercancel',onCancel);
   });
 }
 
-// ── Resize ─────────────────────────────────────────────────────────────────────
+// ── Redimensionar (raton y tactil) ─────────────────────────────────────────
 function setupResize(el, ev){
   const handle=el.querySelector('.ev-resize');
-  handle.addEventListener('mousedown', e=>{
+  if(!handle) return;
+  let startY=0,startDur=0,pid=null;
+  /* El final no puede invadir el tiempo previo a la impresion siguiente. */
+  const maxDur=()=>{
+    const g=gapMins();
+    const nexts=S.events.filter(e=>e.date===ev.date && e.id!==ev.id && e.startMins>ev.startMins)
+      .sort((a,b)=>a.startMins-b.startMins);
+    const tope=Math.min(nexts.length?nexts[0].startMins-g:1440,
+      Math.max(timeToMins(S.params.end), ev.startMins+15));
+    return Math.max(15, tope-ev.startMins);
+  };
+  const durAt=y=>Math.max(15, Math.min(maxDur(), Math.round((startDur+(y-startY)/HOUR_PX*60)/15)*15));
+  const finish=()=>{
+    document.removeEventListener('pointermove',onMove);
+    document.removeEventListener('pointerup',onUp);
+    document.removeEventListener('pointercancel',finish);
+  };
+  const onMove=e=>{
+    if(pid!==null && e.pointerId!==pid) return;
+    e.preventDefault();
+    const d=durAt(e.clientY);
+    el.style.height=`${Math.max(d/60*HOUR_PX,22)}px`;
+    const tv=el.querySelector('.ev-time');
+    if(tv) tv.textContent=`${minsToTime(ev.startMins)} – ${minsToTime(ev.startMins+d)}`;
+    const dv=el.querySelector('.ev-dur');
+    if(dv) dv.textContent=`⏱ ${fmtDur(d)}`;
+  };
+  const onUp=e=>{
+    const d=durAt((e&&e.clientY!==undefined)?e.clientY:startY);
+    finish();
+    pushHistory();
+    const idx=S.events.findIndex(x=>x.id===ev.id);
+    if(idx>=0){ S.events[idx].durationMins=d; ev.durationMins=d; }
+    save(); render(); checkOverlaps(false);
+    toast('↕ Duración ajustada','var(--violet)');
+  };
+  handle.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
+  handle.addEventListener('pointerdown',e=>{
     e.preventDefault(); e.stopPropagation();
-    const startY=e.clientY, startDur=ev.durationMins;
-    const maxEnd=timeToMins(S.params.end);
-
-    const onMove=me=>{
-      const dy=me.clientY-startY;
-      const newDur=Math.max(15, Math.round((startDur+dy/HOUR_PX*60)/15)*15);
-      const clamped=Math.min(newDur, maxEnd-ev.startMins);
-      el.style.height=`${Math.max(clamped/60*HOUR_PX,22)}px`;
-      const tv=el.querySelector('.ev-time');
-      if(tv) tv.textContent=`${minsToTime(ev.startMins)} – ${minsToTime(ev.startMins+clamped)}`;
-      const dv=el.querySelector('.ev-dur');
-      if(dv) dv.textContent=`⏱ ${fmtDur(clamped)}`;
-    };
-    const onUp=me=>{
-      document.removeEventListener('mousemove',onMove);
-      document.removeEventListener('mouseup',onUp);
-      const dy=me.clientY-startY;
-      const newDur=Math.max(15, Math.round((startDur+dy/HOUR_PX*60)/15)*15);
-      const clamped=Math.min(newDur, maxEnd-ev.startMins);
-      pushHistory();
-      const idx=S.events.findIndex(e=>e.id===ev.id);
-      if(idx>=0){ S.events[idx].durationMins=clamped; ev.durationMins=clamped; }
-      save(); render();
-      toast('↕ Duración ajustada','var(--violet)');
-    };
-    document.addEventListener('mousemove',onMove);
-    document.addEventListener('mouseup',onUp);
+    pid=e.pointerId; startY=e.clientY; startDur=ev.durationMins;
+    document.addEventListener('pointermove',onMove,{passive:false});
+    document.addEventListener('pointerup',onUp);
+    document.addEventListener('pointercancel',finish);
   });
 }
 
@@ -1756,6 +1943,8 @@ function renderQueue(){
   const dk=dateKey(S.cur);
   const evs=S.events.filter(e=>e.date===dk).sort((a,b)=>a.startMins-b.startMins);
   const c=$('queue-list'); c.innerHTML='';
+  /* El pie vive fuera de #queue-list: hay que retirarlo o se acumula uno por render. */
+  c.parentElement.querySelectorAll('.q-footer').forEach(f=>f.remove());
 
   if(!evs.length){ c.innerHTML='<div class="q-empty">Sin impresiones</div>'; return; }
 
@@ -1888,6 +2077,18 @@ function checkModalOverlap(){
   if(conflicts.length){
     txt.textContent=`Se solapa con: ${conflicts.map(e=>`"${e.title||'Sin título'}"`).join(', ')}`;
     warn.classList.add('visible');
+    return;
+  }
+  /* Sin solape, pero puede estar comiendose el tiempo entre impresiones. */
+  const g=gapMins();
+  const rozan=g>0 ? S.events.filter(e=>{
+    if(e.date!==date) return false;
+    if(S.editingId && e.id===S.editingId) return false;
+    return sM < e.startMins+e.durationMins+g && e.startMins < eM+g;
+  }) : [];
+  if(rozan.length){
+    txt.textContent=`Invade los ${g} min entre impresiones de: ${rozan.map(e=>`"${e.title||'Sin título'}"`).join(', ')}. Al guardar se recolocará.`;
+    warn.classList.add('visible');
   } else { warn.classList.remove('visible'); }
 }
 
@@ -1922,16 +2123,25 @@ function saveEvent(){
   const bed=($('f-bed')?$('f-bed').value.trim():'');
   const id=$('f-id').value;
   if(!date){ toast('Selecciona una fecha','var(--orange)'); return; }
+  /* El tiempo entre impresiones es intocable: si la hora elegida lo invade, la
+     impresion se coloca en el hueco valido mas proximo. */
+  const libre=nearestFreeStart(date, (id && S.editingId)?id:null, startMins, durMins);
+  if(libre===null){
+    toast('No hay hueco en ese día que respete los '+gapMins()+' min entre impresiones','var(--orange)');
+    return;
+  }
+  const movido=(libre!==startMins);
   pushHistory();
   if(id && S.editingId){
     const idx=S.events.findIndex(e=>e.id===id);
-    if(idx>=0) S.events[idx]={...S.events[idx],title,durationMins:durMins,startMins,date,hue:S.hue,colorName,nozzle,bed};
+    if(idx>=0) S.events[idx]={...S.events[idx],title,durationMins:durMins,startMins:libre,date,hue:S.hue,colorName,nozzle,bed};
     toast('✏️ Impresión actualizada','var(--teal)');
   } else {
-    S.events.push({id:uid(),title,durationMins:durMins,startMins,date,nozzle,bed,hue:S.hue,colorName});
+    S.events.push({id:uid(),title,durationMins:durMins,startMins:libre,date,nozzle,bed,hue:S.hue,colorName});
     toast('✅ Impresión añadida','var(--teal)');
   }
   save(); closeAdd(); render(); checkOverlaps(true);
+  if(movido) toast('Colocada a las '+minsToTime(libre)+' para conservar el tiempo entre impresiones','var(--blue)');
 }
 function deleteEvent(id){
   pushHistory(); S.events=S.events.filter(e=>e.id!==id); save(); render();
@@ -2026,6 +2236,9 @@ function toggleBedGroup(){
   updateSmartStats();
 }
 
+/* Orden alfanumerico natural: "Pieza 2" va antes que "Pieza 10". */
+const alphaCmp=(a,b)=>String(a.title||'').localeCompare(String(b.title||''),'es',{numeric:true,sensitivity:'base'});
+
 function buildPlan(method, colorGroup){
   const dk=dateKey(S.cur);
   const gap=S.params.gap||0;
@@ -2034,9 +2247,10 @@ function buildPlan(method, colorGroup){
   if(method==='fifo')   cands.sort((a,b)=>b.durationMins-a.durationMins);
   if(method==='short')  cands.sort((a,b)=>a.durationMins-b.durationMins);
   if(method==='maxfit') cands.sort((a,b)=>a.durationMins-b.durationMins);
+  if(method==='alpha')  cands.sort(alphaCmp);
   // Primero el hardware (cama y boquilla): son los cambios más costosos.
   if(cands.length>1 && (S.bedGroup||S.nozzleGroup)){
-    const durCmp0=method==='fifo'?(a,b)=>b.durationMins-a.durationMins:(a,b)=>a.durationMins-b.durationMins;
+    const durCmp0=method==='alpha'?alphaCmp:(method==='fifo'?(a,b)=>b.durationMins-a.durationMins:(a,b)=>a.durationMins-b.durationMins);
     const key=(ev,f)=>String(ev&&ev[f]||'').trim().toLowerCase();
     const cntBy=(f)=>{ const c={}; cands.forEach(e=>{ const k=key(e,f); c[k]=(c[k]||0)+1; }); return c; };
     const cb=S.bedGroup?cntBy('bed'):null, cn=S.nozzleGroup?cntBy('nozzle'):null;
@@ -2054,7 +2268,7 @@ function buildPlan(method, colorGroup){
       return cols.map(c=>c.hex?.toLowerCase()||`h${c.h}`).sort().join('|');
     };
     const cnt={}; cands.forEach(e=>{ const s=sig(e); cnt[s]=(cnt[s]||0)+1; });
-    const durCmp=method==='fifo'?(a,b)=>b.durationMins-a.durationMins:(a,b)=>a.durationMins-b.durationMins;
+    const durCmp=method==='alpha'?alphaCmp:(method==='fifo'?(a,b)=>b.durationMins-a.durationMins:(a,b)=>a.durationMins-b.durationMins);
     cands.sort((a,b)=>{
       const sa=sig(a),sb=sig(b);
       const byGrp=(cnt[sb]||0)-(cnt[sa]||0);
@@ -2200,201 +2414,330 @@ async function generatePDF(){
   btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Generando…';
   try {
     const JsPDF=await loadJsPDF();
-    const dates=getExportDates();
     const showTL=$('tog-tl').classList.contains('on');
     const showTbl=$('tog-tbl').classList.contains('on');
     const showStats=$('tog-stats').classList.contains('on');
 
     const doc=new JsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const PW=210,PH=297,ML=15,MR=15,MT=15;
-    const CW=PW-ML-MR, FOOT=14, SAFE=PH-FOOT;
 
-    // helpers
-    const C={bg:[8,10,18],card:[18,20,36],card2:[24,27,48],
-      t1:[232,236,244],t2:[120,128,160],t3:[58,63,88],
-      vio:[168,126,255],blue:[74,158,255],teal:[0,212,176],orange:[255,122,69]};
+    /* El PDF está pensado para imprimirse: papel blanco, tinta oscura y el color
+       reservado a lo que identifica cada impresión. */
+    const PW=210, PH=297, ML=16, MR=16, MT=14;
+    const CW=PW-ML-MR, FOOT=13, SAFE=PH-FOOT-3;
+
+    const C={
+      ink:[28,31,40], ink2:[95,102,118], ink3:[152,159,174],
+      line:[210,215,226], line2:[233,236,243],
+      soft:[246,247,251], zebra:[250,251,253],
+      vio:[118,74,214], blue:[33,105,196], teal:[0,146,122], orange:[206,101,30]
+    };
     const FC=c=>doc.setFillColor(...c), DC=c=>doc.setDrawColor(...c);
     const TC=c=>doc.setTextColor(...c), LW=w=>doc.setLineWidth(w);
     const SF=(sz,w='normal')=>{ doc.setFontSize(sz); doc.setFont('helvetica',w); };
-    const TX=(t,x,y,mw,opt={})=>{ const s=String(t??''); doc.text(doc.splitTextToSize(s,mw)[0],x,y,opt); };
+    const TX=(t,x,y,mw,opt={})=>{ const s=String(t==null?'':t); doc.text(doc.splitTextToSize(s,mw)[0]||'',x,y,opt); };
     const RR=(x,y,w,h,r,fill,stroke)=>{
-      if(fill) FC(fill); if(stroke) DC(stroke); else DC([0,0,0,0]);
+      if(fill) FC(fill);
+      if(stroke){ DC(stroke); LW(.2); }
       doc.roundedRect(x,y,w,h,r,r,fill?(stroke?'FD':'F'):'D');
     };
-    const hsl2rgb=(h,s=68,l=55)=>{
+    const hsl2rgb=(h,s=62,l=52)=>{
       h/=360;s/=100;l/=100;
       const q=l<.5?l*(1+s):l+s-l*s, p=2*l-q;
       const hue=t=>{ if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<.5)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p; };
       return [Math.round(hue(h+1/3)*255),Math.round(hue(h)*255),Math.round(hue(h-1/3)*255)];
     };
-    const evRGB=ev=>hsl2rgb(ev.hue||270,68,55);
-    const evName=ev=>ev.colorName||`H${ev.hue||0}`;
+    const evRGB  = ev=>hsl2rgb(ev.hue||270,62,52);
+    const evSoft = ev=>hsl2rgb(ev.hue||270,58,90);
+    const evName = ev=>ev.colorName||('Tono '+(ev.hue||0));
+    const gapM   = ()=>Math.max(0,Number(S.params&&S.params.gap)||0);
+    const nImpr  = n=>n+(n===1?' impresión':' impresiones');
+    const mesMin = m=>MONTHS[m].toLowerCase();
 
-    const pageBG=()=>{ FC(C.bg); doc.rect(0,0,PW,PH,'F'); };
-    const pageFooter=(pg,tot)=>{
-      DC(C.t3); LW(.18); doc.line(ML,PH-FOOT+1,ML+CW,PH-FOOT+1);
-      SF(6); TC(C.t3);
-      TX('3DProject · 3DPlanner',ML,PH-FOOT+5,80);
-      TX(`Pág. ${pg}/${tot}`,ML+CW,PH-FOOT+5,40,{align:'right'});
-    };
-    const sectionHead=(label,y)=>{
-      RR(ML,y,CW,7,1,C.card2); RR(ML,y,2.5,7,1,C.teal);
-      SF(6.5,'bold'); TC(C.t2); TX(label,ML+5.5,y+5,CW-8);
-      return y+7+4;
-    };
+    const newPage=(first)=>{ if(!first) doc.addPage(); };
+
+    /* Cabecera: identidad a la izquierda, periodo y cifras a la derecha. */
     const pageHeader=(title,sub)=>{
-      const H=24; RR(ML,MT,CW,H,3,C.card); RR(ML,MT,3,H,1.5,C.vio);
-      SF(7); TC(C.t2); TX('3DProject Suite',ML+9,MT+9,60);
-      SF(10,'bold'); TC(C.t1); TX('3DPlanner',ML+9,MT+17,60);
-      const tw=84;
-      SF(8.5,'bold'); TC(C.vio);
-      const tl=doc.splitTextToSize(title,tw);
-      if(tl.length>1){ TX(tl[0],ML+CW,MT+9,tw,{align:'right'}); TX(tl[1]||'',ML+CW,MT+14,tw,{align:'right'}); SF(6.5);TC(C.t2);TX(sub,ML+CW,MT+19,tw,{align:'right'}); }
-      else { TX(tl[0],ML+CW,MT+11,tw,{align:'right'}); SF(6.5);TC(C.t2);TX(sub,ML+CW,MT+17,tw,{align:'right'}); }
-      SF(5.5);TC(C.t3); const gen=`Gen. ${new Date().toLocaleDateString('es-ES')}`;
-      TX(gen,ML+CW,MT+21.5,50,{align:'right'});
-      return MT+H+5;
+      const H=21, y=MT;
+      RR(ML,y,CW,H,2.2,null,C.line);
+      FC(C.vio); doc.rect(ML,y+.6,1.6,H-1.2,'F');
+      SF(6.2,'bold'); TC(C.ink3); doc.text('3DPROJECT SUITE',ML+6,y+7.6);
+      SF(12,'bold');  TC(C.ink);  doc.text('3DPlanner',ML+6,y+15);
+      const tw=96, rx=ML+CW-6;
+      SF(11,'bold'); TC(C.vio);
+      const tl=doc.splitTextToSize(String(title),tw);
+      doc.text(tl[0],rx,y+9,{align:'right'});
+      SF(7.5); TC(C.ink2); doc.text(String(sub||''),rx,y+14.4,{align:'right'});
+      SF(6);   TC(C.ink3);
+      doc.text('Generado el '+new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'}),rx,y+18.6,{align:'right'});
+      return y+H+7;
     };
 
-    const drawTL=(evs,y)=>{
-      const dS=timeToMins(S.params.start),dE=timeToMins(S.params.end),span=Math.max(dE-dS,60);
-      const LBL=15,BX=ML+LBL+1,BW=CW-LBL-1,BH=10;
-      RR(ML+LBL,y,BW,BH,1.5,C.card2);
-      evs.forEach(ev=>{
-        const cs=Math.max(ev.startMins,dS),ce=Math.min(ev.startMins+ev.durationMins,dE);
-        if(ce<=cs) return;
-        let ex=BX+(cs-dS)/span*BW, ew=Math.max((ce-cs)/span*BW,1.2);
-        if(ex+ew>BX+BW) ew=BX+BW-ex;
-        if(ew>0) RR(ex,y+1.2,ew,BH-2.4,1,evRGB(ev));
+    const pageFooter=(pg,tot)=>{
+      DC(C.line2); LW(.2); doc.line(ML,PH-FOOT,ML+CW,PH-FOOT);
+      SF(6.2); TC(C.ink3);
+      doc.text('3DProject · 3DPlanner',ML,PH-FOOT+4.6);
+      doc.text('Jornada '+S.params.start+'–'+S.params.end+' · '+gapM()+' min entre impresiones',ML+CW/2,PH-FOOT+4.6,{align:'center'});
+      doc.text('Página '+pg+' de '+tot,ML+CW,PH-FOOT+4.6,{align:'right'});
+    };
+
+    /* Rótulo de sección: cuadrado de color, texto en versalitas y filete. */
+    const sectionHead=(label,y,clr)=>{
+      const L=String(label).toUpperCase();
+      FC(clr||C.vio); doc.roundedRect(ML,y-2.6,2.4,2.4,.5,.5,'F');
+      SF(7,'bold'); TC(C.ink); doc.text(L,ML+4.6,y);
+      const tw=doc.getTextWidth(L);
+      DC(C.line2); LW(.25); doc.line(ML+4.6+tw+3,y-1,ML+CW,y-1);
+      return y+5;
+    };
+
+    /* Línea de tiempo de un día: ventana de jornada, bloques por impresión y
+       el tiempo entre impresiones marcado en gris. */
+    const drawTL=(evs,y,opt)=>{
+      opt=opt||{};
+      const dS=timeToMins(S.params.start), dE=timeToMins(S.params.end);
+      let lo=dS, hi=dE;
+      evs.forEach(e=>{ lo=Math.min(lo,e.startMins); hi=Math.max(hi,e.startMins+e.durationMins+gapM()); });
+      lo=Math.floor(lo/60)*60; hi=Math.ceil(hi/60)*60;
+      const span=Math.max(hi-lo,60);
+      const BX=ML, BW=CW, BH=opt.h||13;
+      const X=m=>BX+(Math.max(lo,Math.min(hi,m))-lo)/span*BW;
+
+      RR(BX,y,BW,BH,1.4,[252,252,254],C.line);
+      FC([243,245,250]); doc.rect(X(dS),y+.5,Math.max(0,X(dE)-X(dS)),BH-1,'F');
+
+      const sorted=evs.slice().sort((a,b)=>a.startMins-b.startMins);
+      sorted.forEach((ev,i)=>{
+        const g=gapM(); if(!g) return;
+        const gs=ev.startMins+ev.durationMins;
+        const nxt=sorted[i+1];
+        const end=nxt?Math.min(gs+g,nxt.startMins):gs+g;
+        if(end<=gs) return;
+        FC([224,228,236]); doc.rect(X(gs),y+2.4,Math.max(X(end)-X(gs),.4),BH-4.8,'F');
       });
-      DC(C.t3);LW(.12);SF(5);TC(C.t3);
-      for(let h=Math.ceil(dS/60);h<=Math.floor(dE/60);h+=2){
-        const tx=Math.max(BX,Math.min(BX+BW,BX+(h*60-dS)/span*BW));
-        doc.line(tx,y+BH,tx,y+BH+1.5);
-        TX(`${pad(h)}h`,tx,y+BH+4.5,8,{align:'center'});
+      sorted.forEach(ev=>{
+        const x=X(ev.startMins), w=Math.max(X(ev.startMins+ev.durationMins)-x,1);
+        RR(x,y+1.6,w,BH-3.2,1,evSoft(ev),evRGB(ev));
+        FC(evRGB(ev)); doc.rect(x,y+1.6,Math.min(1.1,w),BH-3.2,'F');
+        if(w>16){ SF(5.6,'bold'); TC(evRGB(ev)); TX(ev.title||'Sin título',x+2.4,y+BH/2+1,w-4); }
+      });
+      DC(C.line); LW(.2); SF(5.4); TC(C.ink3);
+      const stepH=span/60>12?3:span/60>7?2:1;
+      for(let h=Math.ceil(lo/60);h<=Math.floor(hi/60);h+=stepH){
+        const tx=X(h*60);
+        doc.line(tx,y+BH,tx,y+BH+1.4);
+        doc.text(pad(h)+':00',Math.max(BX+4.5,Math.min(BX+BW-4.5,tx)),y+BH+4.6,{align:'center'});
       }
       return y+BH+7;
     };
 
-    const drawTable=(evs,startY)=>{
-      const CW_MAP=[CW*.05,CW*.33,CW*.17,CW*.13,CW*.15,CW*.12,CW*.05];
-      const HDRS=['#','TÍTULO','COLOR','INICIO','DUR.','FIN',''];
-      const RH=9, HEAD_H=7;
-      let y=startY;
-      // Header
-      RR(ML,y,CW,HEAD_H,1.5,C.card2); RR(ML,y,2,HEAD_H,1,C.teal);
-      SF(5.5,'bold');TC(C.t2);
-      let hx=ML+3; HDRS.forEach((l,i)=>{TX(l,hx,y+4.8,CW_MAP[i]-1);hx+=CW_MAP[i];}); y+=HEAD_H;
-      if(!evs.length){
-        RR(ML,y,CW,10,0,C.card);SF(8);TC(C.t3);doc.text('Sin impresiones',ML+CW/2,y+6.5,{align:'center'});
-        return y+10+3;
-      }
-      evs.slice().sort((a,b)=>a.startMins-b.startMins).forEach((ev,i)=>{
-        if(y+RH>SAFE-4){/* page break handled by caller */return;}
-        RR(ML,y,CW,RH,0,i%2===0?C.card:[20,23,42]);
-        const [r,g,b]=evRGB(ev); FC([r,g,b]); doc.rect(ML,y,2.5,RH,'F');
-        let cx=ML+3;
-        SF(6);TC(C.t2); TX(String(i+1),cx,y+RH/2+1.5,CW_MAP[0]-1); cx+=CW_MAP[0];
-        SF(7,'bold');TC(C.t1); TX(ev.title||'Sin título',cx,y+RH/2+1.5,CW_MAP[1]-3); cx+=CW_MAP[1];
-        doc.setFillColor(r,g,b); doc.circle(cx+2.2,y+RH/2,1.7,'F');
-        SF(6.5);TC([r,g,b]); TX(evName(ev).slice(0,9),cx+6,y+RH/2+1.5,CW_MAP[2]-8); cx+=CW_MAP[2];
-        SF(7,'normal');TC(C.t1);
-        TX(minsToTime(ev.startMins),cx,y+RH/2+1.5,CW_MAP[3]-1); cx+=CW_MAP[3];
-        TX(fmtDur(ev.durationMins),cx,y+RH/2+1.5,CW_MAP[4]-1); cx+=CW_MAP[4];
-        TX(minsToTime(ev.startMins+ev.durationMins),cx,y+RH/2+1.5,CW_MAP[5]-1);
-        y+=RH;
+    /* Tabla de impresiones con corte de página y cabecera repetida. */
+    const COLS=[
+      {k:'n',   t:'#',         w:.055, a:'left'},
+      {k:'tit', t:'IMPRESIÓN', w:.365, a:'left'},
+      {k:'col', t:'COLOR',     w:.175, a:'left'},
+      {k:'ini', t:'INICIO',    w:.115, a:'right'},
+      {k:'fin', t:'FIN',       w:.115, a:'right'},
+      {k:'dur', t:'DURACIÓN',  w:.175, a:'right'}
+    ];
+    const colX=idx=>{ let cx=ML; for(let k=0;k<idx;k++) cx+=CW*COLS[k].w; return cx; };
+    const tblHead=(y)=>{
+      const H=7;
+      FC(C.soft); doc.rect(ML,y,CW,H,'F');
+      DC(C.line); LW(.25); doc.line(ML,y+H,ML+CW,y+H);
+      SF(5.8,'bold'); TC(C.ink2);
+      COLS.forEach((c,i)=>{ const w=CW*c.w, x=colX(i);
+        if(c.a==='right') doc.text(c.t,x+w-2.5,y+4.7,{align:'right'});
+        else doc.text(c.t,x+(c.k==='n'?3.4:3),y+4.7);
       });
-      DC(C.t3);LW(.18);doc.line(ML,y,ML+CW,y);
-      return y+4;
+      return y+H;
+    };
+    const drawTable=(evs,startY,onNewPage)=>{
+      let y=tblHead(startY);
+      if(!evs.length){
+        SF(7.5); TC(C.ink3); doc.text('Sin impresiones programadas',ML+CW/2,y+7,{align:'center'});
+        DC(C.line2); LW(.2); doc.line(ML,y+11,ML+CW,y+11);
+        return y+14;
+      }
+      const sorted=evs.slice().sort((a,b)=>a.startMins-b.startMins);
+      sorted.forEach((ev,i)=>{
+        const extra=[ev.nozzle,ev.bed].filter(Boolean).join(' · ');
+        const RH=extra?11:8.6;
+        const base=y+5.6;
+        if(y+RH>SAFE){ y=onNewPage(); y=tblHead(y); }
+        const yb=extra?y+5:y+5.6;
+        if(i%2){ FC(C.zebra); doc.rect(ML,y,CW,RH,'F'); }
+        const rgb=evRGB(ev);
+        FC(rgb); doc.rect(ML,y+1,1.4,RH-2,'F');
+        SF(6.4); TC(C.ink3); doc.text(String(i+1),colX(0)+3.4,y+5.6);
+        SF(8,'bold'); TC(C.ink);
+        TX(ev.title||'Sin título',colX(1)+3,yb,CW*COLS[1].w-5);
+        if(extra){ SF(5.8); TC(C.ink3); TX(extra,colX(1)+3,y+8.6,CW*COLS[1].w-5); }
+        FC(rgb); doc.circle(colX(2)+4.6,(extra?y+4.6:y+5.2),1.5,'F');
+        SF(6.6); TC(C.ink2); TX(evName(ev),colX(2)+8,(extra?y+5.4:y+5.9),CW*COLS[2].w-9);
+        SF(7.6); TC(C.ink);
+        doc.text(minsToTime(ev.startMins),colX(3)+CW*COLS[3].w-2.5,(extra?y+5.4:y+5.9),{align:'right'});
+        doc.text(minsToTime(ev.startMins+ev.durationMins),colX(4)+CW*COLS[4].w-2.5,(extra?y+5.4:y+5.9),{align:'right'});
+        SF(7.6,'bold'); TC(C.ink2);
+        doc.text(fmtDur(ev.durationMins),colX(5)+CW*COLS[5].w-2.5,(extra?y+5.4:y+5.9),{align:'right'});
+        DC(C.line2); LW(.15); doc.line(ML,y+RH,ML+CW,y+RH);
+        y+=RH;
+        const nxt=sorted[i+1];
+        if(nxt && gapM()>0){
+          const hueco=nxt.startMins-(ev.startMins+ev.durationMins);
+          if(hueco>0 && y+5.4<=SAFE){
+            SF(5.8); TC(C.ink3);
+            doc.text('· '+fmtDur(Math.min(hueco,gapM()))+' entre impresiones'+(hueco>gapM()?' (+'+fmtDur(hueco-gapM())+' libres)':''),colX(1)+3,y+3.8);
+            y+=5.4;
+          }
+        }
+      });
+      DC(C.line); LW(.25); doc.line(ML,y,ML+CW,y);
+      return y+5;
     };
 
     const drawStats=(evs,y)=>{
       const total=evs.reduce((s,e)=>s+e.durationMins,0);
-      const jornada=timeToMins(S.params.end)-timeToMins(S.params.start);
-      const util=jornada>0?Math.min(100,Math.round(total/jornada*100)):0;
-      const BH=30; RR(ML,y,CW,BH,2,C.card); RR(ML,y,3,BH,1.5,C.teal);
-      const earliest=evs.reduce((m,e)=>e.startMins<m?e.startMins:m,Infinity);
-      const latest=evs.reduce((m,e)=>(e.startMins+e.durationMins)>m?(e.startMins+e.durationMins):m,0);
+      const jornada=Math.max(1,timeToMins(S.params.end)-timeToMins(S.params.start));
+      const dias=Math.max(1,new Set(evs.map(e=>e.date)).size);
+      const util=Math.min(100,Math.round(total/(jornada*dias)*100));
+      const earliest=evs.length?evs.reduce((m,e)=>Math.min(m,e.startMins),1440):0;
+      const latest=evs.length?evs.reduce((m,e)=>Math.max(m,e.startMins+e.durationMins),0):0;
+      const BH=26;
+      RR(ML,y,CW,BH,2.2,null,C.line);
       const stats=[
-        {l:'Impresiones',v:String(evs.length),clr:C.t1},
-        {l:'Tiempo total',v:evs.length?fmtDur(total):'—',clr:C.t1},
-        {l:'Utilización',v:`${util}%`,clr:C.teal},
-        {l:'Media/imp.',v:evs.length?fmtDur(Math.round(total/evs.length)):'—',clr:C.t1},
-        {l:'Horario',v:evs.length?`${minsToTime(earliest)}–${minsToTime(latest)}`:'—',clr:C.t1},
+        {l:'IMPRESIONES', v:String(evs.length),                                  c:C.ink},
+        {l:'TIEMPO TOTAL',v:evs.length?fmtDur(total):'—',                        c:C.ink},
+        {l:'UTILIZACIÓN', v:util+'%',                                            c:util>85?C.orange:C.teal},
+        {l:'MEDIA / IMP.',v:evs.length?fmtDur(Math.round(total/evs.length)):'—', c:C.ink},
+        {l:'HORARIO',     v:evs.length?minsToTime(earliest)+'–'+minsToTime(latest):'—', c:C.ink}
       ];
       const cw2=CW/stats.length;
       stats.forEach((st,i)=>{
-        const sx=ML+4+i*cw2;
-        SF(5.5);TC(C.t2);TX(st.l,sx,y+8,cw2-3);
-        SF(9,'bold');TC(st.clr);TX(st.v,sx,y+17,cw2-3);
-        if(i<stats.length-1){DC(C.t3);LW(.18);doc.line(ML+(i+1)*cw2,y+4,ML+(i+1)*cw2,y+BH-4);}
+        const sx=ML+i*cw2+4;
+        SF(5.6,'bold'); TC(C.ink3); doc.text(st.l,sx,y+6.6);
+        SF(11,'bold');  TC(st.c);   TX(st.v,sx,y+14,cw2-5);
+        if(i){ DC(C.line2); LW(.2); doc.line(ML+i*cw2,y+3.5,ML+i*cw2,y+BH-3.5); }
       });
-      const uY=y+BH-5; RR(ML+4,uY,CW-8,2.5,1,C.card2);
-      if(util>0) RR(ML+4,uY,(CW-8)*(util/100),2.5,1,util>80?C.orange:util>50?C.teal:C.blue);
-      return y+BH+4;
+      const bx=ML+4, bw=CW-8, by=y+BH-5.6;
+      RR(bx,by,bw,2.2,1.1,[236,239,245]);
+      if(util>0) RR(bx,by,bw*util/100,2.2,1.1,util>85?C.orange:util>55?C.teal:C.blue);
+      return y+BH+6;
     };
 
+    /* Vista semanal: una fila por día sobre la misma escala horaria. */
     const drawWeekTL=(dates,y)=>{
-      const dS=timeToMins(S.params.start),dE=timeToMins(S.params.end),span=Math.max(dE-dS,60);
-      const LBL=20,BX=ML+LBL+1,BW=CW-LBL-1,RH=10,RG=3;
-      DC(C.t3);LW(.12);SF(5);TC(C.t3);
-      for(let h=Math.ceil(dS/60);h<=Math.floor(dE/60);h+=2){
-        const tx=Math.max(BX,Math.min(BX+BW,BX+(h*60-dS)/span*BW));
-        TX(`${pad(h)}h`,tx,y-0.5,8,{align:'center'});
-        doc.line(tx,y+1,tx,y+dates.length*(RH+RG)-RG);
+      const dS=timeToMins(S.params.start), dE=timeToMins(S.params.end);
+      let lo=dS, hi=dE;
+      dates.forEach(d=>S.events.filter(e=>e.date===dateKey(d)).forEach(e=>{
+        lo=Math.min(lo,e.startMins); hi=Math.max(hi,e.startMins+e.durationMins+gapM()); }));
+      lo=Math.floor(lo/60)*60; hi=Math.ceil(hi/60)*60;
+      const span=Math.max(hi-lo,60);
+      const LBL=22, BX=ML+LBL, BW=CW-LBL, RH=11, RG=2.4;
+      const X=m=>BX+(Math.max(lo,Math.min(hi,m))-lo)/span*BW;
+      SF(5.4); TC(C.ink3); DC(C.line2); LW(.15);
+      const stepH=span/60>12?3:span/60>7?2:1;
+      const bottom=y+1.5+dates.length*(RH+RG)-RG;
+      for(let h=Math.ceil(lo/60);h<=Math.floor(hi/60);h+=stepH){
+        const tx=X(h*60);
+        doc.text(pad(h)+':00',Math.max(BX+4.5,Math.min(BX+BW-4.5,tx)),y-1,{align:'center'});
+        doc.line(tx,y+1.5,tx,bottom);
       }
-      let cy=y+2;
+      let cy=y+1.5;
       dates.forEach(d=>{
-        const dk2=dateKey(d), evs2=S.events.filter(e=>e.date===dk2);
+        const dk2=dateKey(d), evs2=S.events.filter(e=>e.date===dk2).sort((a,b)=>a.startMins-b.startMins);
         const isT=dk2===dateKey(S.today);
-        SF(6,isT?'bold':'normal');TC(isT?C.vio:C.t2);
-        TX(`${DAYS[d.getDay()]} ${d.getDate()}`,ML,cy+RH/2+1.5,LBL-1);
-        RR(ML+LBL,cy,BW,RH,1.5,C.card2);
-        evs2.forEach(ev=>{
-          const cs=Math.max(ev.startMins,dS),ce=Math.min(ev.startMins+ev.durationMins,dE);
-          if(ce<=cs) return;
-          let ex=BX+(cs-dS)/span*BW,ew=Math.max((ce-cs)/span*BW,1.2);
-          if(ex+ew>BX+BW) ew=BX+BW-ex;
-          if(ew>0) RR(ex,cy+1.2,ew,RH-2.4,1,evRGB(ev));
+        SF(7,isT?'bold':'normal'); TC(isT?C.vio:C.ink2);
+        doc.text(DAYS[d.getDay()]+' '+pad(d.getDate()),ML,cy+RH/2+1.6);
+        RR(BX,cy,BW,RH,1.2,[252,252,254],C.line);
+        FC([243,245,250]); doc.rect(X(dS),cy+.5,Math.max(0,X(dE)-X(dS)),RH-1,'F');
+        evs2.forEach((ev,i)=>{
+          const g=gapM();
+          if(g){ const gs=ev.startMins+ev.durationMins, nxt=evs2[i+1];
+            const ge=nxt?Math.min(gs+g,nxt.startMins):gs+g;
+            if(ge>gs){ FC([224,228,236]); doc.rect(X(gs),cy+2,Math.max(X(ge)-X(gs),.4),RH-4,'F'); } }
+          const x=X(ev.startMins), w=Math.max(X(ev.startMins+ev.durationMins)-x,1);
+          RR(x,cy+1.4,w,RH-2.8,.9,evSoft(ev),evRGB(ev));
+          FC(evRGB(ev)); doc.rect(x,cy+1.4,Math.min(1,w),RH-2.8,'F');
+          if(w>18){ SF(5.4,'bold'); TC(evRGB(ev)); TX(ev.title||'Sin título',x+2.2,cy+RH/2+1,w-3.6); }
         });
+        if(!evs2.length){ SF(5.6); TC(C.ink3); doc.text('sin impresiones',BX+3,cy+RH/2+1.4); }
         cy+=RH+RG;
       });
-      return cy+2;
+      return cy+4;
     };
 
-    // ── Render ──
-    const totalPages=S.exportScope==='week'&&showTbl ? 8 : 1;
+    /* Leyenda de colores: ayuda a leer la línea de tiempo de un vistazo. */
+    const drawLegend=(evs,y)=>{
+      const seen=[], map={};
+      evs.forEach(ev=>{ const k=evName(ev); if(!map[k]){ map[k]=1; seen.push(ev); } });
+      if(!seen.length) return y;
+      let x=ML, cy=y;
+      SF(6.4);
+      seen.forEach(ev=>{
+        const label=evName(ev);
+        const w=doc.getTextWidth(label)+8.5;
+        if(x+w>ML+CW){ x=ML; cy+=5.4; }
+        FC(evRGB(ev)); doc.circle(x+1.8,cy-1,1.5,'F');
+        TC(C.ink2); doc.text(label,x+5,cy);
+        x+=w+3;
+      });
+      return cy+5;
+    };
+
+    // ── Render ──────────────────────────────────────────────────────────────
     const allDates=getExportDates();
 
     if(S.exportScope==='day'){
       const d=new Date(S.cur), dk2=dateKey(d);
       const evs=S.events.filter(e=>e.date===dk2).sort((a,b)=>a.startMins-b.startMins);
-      const title=`${DAYS[d.getDay()]}, ${d.getDate()} de ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-      pageBG(); let y=pageHeader(title,`${evs.length} impresión${evs.length!==1?'es':''}`);
-      if(showTL&&evs.length){ y=sectionHead('LÍNEA DE TIEMPO',y); y=drawTL(evs,y); y+=5; }
-      if(showTbl){ y=sectionHead('IMPRESIONES',y); y=drawTable(evs,y); y+=3; }
-      if(showStats){ y=sectionHead('ESTADÍSTICAS',y); y=drawStats(evs,y); }
-      pageFooter(1,1);
-      doc.save(`3DPlanner_${dk2}.pdf`);
+      const total=evs.reduce((s,e)=>s+e.durationMins,0);
+      const title=DAYS[d.getDay()]+', '+d.getDate()+' de '+mesMin(d.getMonth())+' de '+d.getFullYear();
+      const sub=nImpr(evs.length)+(evs.length?' · '+fmtDur(total)+' de impresión':'');
+      newPage(true);
+      let y=pageHeader(title,sub);
+      const nextPage=()=>{
+        newPage(false);
+        SF(6.5); TC(C.ink3); doc.text(title+' · continuación',ML,MT+3);
+        DC(C.line2); LW(.2); doc.line(ML,MT+5,ML+CW,MT+5);
+        return MT+9;
+      };
+      if(showTL&&evs.length){ y=sectionHead('Línea de tiempo',y,C.blue); y=drawTL(evs,y)+1.5; y=drawLegend(evs,y)+3; }
+      if(showTbl){ y=sectionHead('Impresiones del día',y,C.vio); y=drawTable(evs,y,nextPage)+2; }
+      if(showStats){ if(y+34>SAFE) y=nextPage(); y=sectionHead('Resumen',y,C.teal); y=drawStats(evs,y); }
+      const tot=doc.getNumberOfPages();
+      for(let p=1;p<=tot;p++){ doc.setPage(p); pageFooter(p,tot); }
+      doc.save('3DPlanner_'+dk2+'.pdf');
     } else {
-      const mon=allDates[0],sun=allDates[6];
-      const allEvs=S.events.filter(e=>allDates.map(dateKey).includes(e.date));
-      const wTitle=`Semana ${mon.getDate()}–${sun.getDate()} ${MONTHS[sun.getMonth()]} ${sun.getFullYear()}`;
-      pageBG(); let y=pageHeader(wTitle,`${allEvs.length} impresión${allEvs.length!==1?'es':''}`);
-      if(showTL){ y=sectionHead('PLANNING SEMANAL',y); y=drawWeekTL(allDates,y); y+=5; }
-      if(showStats){ y=sectionHead('ESTADÍSTICAS SEMANALES',y); y=drawStats(allEvs,y); }
-      pageFooter(1,totalPages);
+      const mon=allDates[0], sun=allDates[6];
+      const dks=allDates.map(dateKey);
+      const allEvs=S.events.filter(e=>dks.includes(e.date));
+      const total=allEvs.reduce((s,e)=>s+e.durationMins,0);
+      const wTitle='Semana del '+mon.getDate()+' al '+sun.getDate()+' de '+mesMin(sun.getMonth())+' de '+sun.getFullYear();
+      const sub=nImpr(allEvs.length)+(allEvs.length?' · '+fmtDur(total)+' de impresión':'');
+      newPage(true);
+      let y=pageHeader(wTitle,sub);
+      const nextPage=()=>{
+        newPage(false);
+        SF(6.5); TC(C.ink3); doc.text(wTitle+' · continuación',ML,MT+3);
+        DC(C.line2); LW(.2); doc.line(ML,MT+5,ML+CW,MT+5);
+        return MT+9;
+      };
+      if(showTL){ y=sectionHead('Planning semanal',y,C.blue); y=drawWeekTL(allDates,y); y=drawLegend(allEvs,y)+2; }
+      if(showStats){ if(y+34>SAFE) y=nextPage(); y=sectionHead('Resumen de la semana',y,C.teal); y=drawStats(allEvs,y)+2; }
       if(showTbl){
-        allDates.forEach((d,di)=>{
-          doc.addPage(); pageBG();
+        allDates.forEach(d=>{
           const dk2=dateKey(d), dayEvs=S.events.filter(e=>e.date===dk2).sort((a,b)=>a.startMins-b.startMins);
-          let dy=pageHeader(`${DAYS[d.getDay()]} ${d.getDate()} — ${MONTHS[d.getMonth()]}`,`${dayEvs.length} impresión${dayEvs.length!==1?'es':''}`);
-          if(showTL&&dayEvs.length){ dy=sectionHead('LÍNEA DE TIEMPO',dy); dy=drawTL(dayEvs,dy); dy+=5; }
-          dy=sectionHead('IMPRESIONES',dy); dy=drawTable(dayEvs,dy);
-          pageFooter(di+2,totalPages);
+          const dTot=dayEvs.reduce((s,e)=>s+e.durationMins,0);
+          if(y+30>SAFE) y=nextPage();
+          y=sectionHead(DAYS[d.getDay()]+' '+d.getDate()+' de '+mesMin(d.getMonth()),y,C.vio);
+          SF(6.4); TC(C.ink3);
+          doc.text(nImpr(dayEvs.length)+(dayEvs.length?' · '+fmtDur(dTot):''),ML+CW,y-4.6,{align:'right'});
+          y=drawTable(dayEvs,y,nextPage)+3;
         });
       }
-      doc.save(`3DPlanner_semana_${dateKey(mon)}.pdf`);
+      const tot=doc.getNumberOfPages();
+      for(let p=1;p<=tot;p++){ doc.setPage(p); pageFooter(p,tot); }
+      doc.save('3DPlanner_semana_'+dateKey(mon)+'.pdf');
     }
 
     closeExport(); toast('📄 PDF generado','var(--blue)');

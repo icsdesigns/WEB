@@ -4,6 +4,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const BASE = 'https://store.sunlu.com/products.json';
+// El catalogo base de Shopify cotiza en la moneda de la tienda (USD). Pidiendo el
+// mercado espanol se reciben los precios tal y como los ve el comprador europeo
+// (EUR, con el redondeo del propio Shopify), que son los que muestra 3DStock.
+const MARKET = 'ES';
+const CURRENCY = 'EUR';
 const OUTDIR = path.join('3dproject', 'data', 'sunlu');
 const LATEST = path.join(OUTDIR, 'latest.json');
 const CHANGES = path.join(OUTDIR, 'changes.json');
@@ -14,7 +19,7 @@ const RETENTION_MS = 183 * 864e5; // ~6 meses
 async function fetchAll() {
   const out = [];
   for (let page = 1; page <= 20; page++) {
-    const url = BASE + '?limit=250&page=' + page;
+    const url = BASE + '?limit=250&page=' + page + '&country=' + MARKET;
     const res = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (SunluStockWatch; +https://silab3d.com)' } });
     if (!res.ok) throw new Error('HTTP ' + res.status + ' en ' + url);
     const json = await res.json();
@@ -127,7 +132,7 @@ async function main() {
     }
   }
   fs.writeFileSync(PRICES, JSON.stringify(stats), 'utf8');
-  fs.writeFileSync(LATEST, JSON.stringify({ fetched_at: new Date(ts).toISOString(), products }), 'utf8');
+  fs.writeFileSync(LATEST, JSON.stringify({ fetched_at: new Date(ts).toISOString(), currency: CURRENCY, market: MARKET, products }), 'utf8');
   fs.writeFileSync(CHANGES, JSON.stringify(changes), 'utf8');
   const nv = products.reduce((a, p) => a + p.variants.length, 0);
   console.log('Snapshot OK:', products.length, 'productos /', nv, 'variantes EU. Registro:', changes.length, 'eventos (≤6 meses).');
