@@ -509,14 +509,57 @@ body::after {
 }
 .vext:hover { background: rgba(255,255,255,.05); color: var(--t1); border-color: rgba(255,255,255,.2); }
 
-.vframe-wrap { flex: 1; position: relative; }
+.vframe-wrap { flex: 1; position: relative; min-height: 0; overflow: hidden; }
+/* iOS ignora la altura de un iframe y lo estira hasta el alto de su contenido,
+   con lo que la app de dentro se sale del hueco visible y solo se ve un trozo.
+   El ancho con width:1px + min-width:100% y la altura explícita lo evitan. */
 .vframe {
   position: absolute;
   inset: 0;
-  width: 100%;
+  width: 1px;
+  min-width: 100%;
   height: 100%;
+  max-height: 100%;
   border: 0;
   background: var(--bg);
+}
+
+/* Cortina de apertura: el arranque de cada app enseña medio segundo el aviso
+   "Cargando tus datos…" de Firebase. Se tapa con una animación de la misma
+   duración, en el color de la app que se está abriendo. */
+.vload {
+  position: absolute; inset: 0; z-index: 5;
+  display: none; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+  background: var(--bg);
+}
+.vload.on { display: flex; }
+.vload.out { animation: vloadOut .2s ease forwards; }
+.vload-mark {
+  position: relative; width: 68px; height: 68px; border-radius: 21px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--vload-bg, rgba(255,255,255,.06));
+  border: 1px solid var(--vload-bd, rgba(255,255,255,.14));
+  animation: vloadPop .5s cubic-bezier(.2,.9,.3,1) both;
+}
+.vload-mark svg { width: 30px; height: 30px; }
+.vload-mark::after {
+  content: ''; position: absolute; inset: 0; border-radius: 21px;
+  animation: vloadHalo .5s ease-out both;
+}
+.vload-name { font-size: 13px; font-weight: 600; letter-spacing: .2px; color: var(--t2);
+  animation: vloadName .5s ease both; }
+.vload-bar { width: 140px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.09); overflow: hidden; }
+[data-theme=light] .vload-bar { background: rgba(0,0,0,.08); }
+.vload-bar span { display: block; height: 100%; border-radius: 2px;
+  background: var(--vload-c, var(--t1)); transform-origin: left;
+  animation: vloadFill .5s cubic-bezier(.35,0,.15,1) both; }
+@keyframes vloadFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes vloadPop { 0% { opacity: 0; transform: scale(.72); } 60% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes vloadHalo { 0% { box-shadow: 0 0 0 0 var(--vload-c); opacity: .5; } 100% { box-shadow: 0 0 0 28px var(--vload-c); opacity: 0; } }
+@keyframes vloadName { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: .9; transform: translateY(0); } }
+@keyframes vloadOut { to { opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) {
+  .vload-mark, .vload-mark::after, .vload-bar span, .vload-name { animation-duration: .01s; }
 }
 
 /* ── Animations ── */
@@ -1119,12 +1162,34 @@ html.dp-noboot .card{opacity:1!important;animation:none!important}
         });
       } },
     tracker:{ label:'3DTracker', color:'#34D399', onItem:function(it){ if(typeof openTrackerOrder==='function'&&it.code) openTrackerOrder(it.code); else if(typeof launchApp==='function') launchApp('tracker'); dpnClose(); } },
-    stock:{ label:'3DStock', color:'#22D3EE', onItem:function(it){ if(typeof launchApp==='function') launchApp('stock'); dpnClose(); } }
+    /* ephemeral: avisos sin acción propia dentro del panel. Se consideran vistos
+       al abrir el panel y cerrarlo de nuevo, y entonces desaparecen. */
+    stock:{ label:'3DStock', color:'#22D3EE', ephemeral:true, onItem:function(it){ if(typeof launchApp==='function') launchApp('stock'); dpnClose(); } }
   };
   var ORDER=['printflow','tracker','stock'], store={};
+  var SEEN_KEY='dp3-notif-seen', seen={};
+  try{ seen=JSON.parse(localStorage.getItem(SEEN_KEY)||'{}')||{}; }catch(e){ seen={}; }
+  function isEph(k){ return !!(META[k]&&META[k].ephemeral); }
+  function keyOf(k,it){ return k+':'+(it.vid||it.code||it.variant||'')+':'+(it.ts||''); }
+  function visible(k){
+    var items=store[k]||[];
+    return isEph(k) ? items.filter(function(it){ return !seen[keyOf(k,it)]; }) : items;
+  }
+  /* Se llama al cerrar el panel: lo que estaba a la vista queda leído. */
+  function markSeen(){
+    var cambia=false, now=Date.now();
+    ORDER.forEach(function(k){ if(!isEph(k))return;
+      (store[k]||[]).forEach(function(it){ var kk=keyOf(k,it); if(!seen[kk]){ seen[kk]=now; cambia=true; } });
+    });
+    if(!cambia) return;
+    var lim=Date.now()-90*864e5;
+    Object.keys(seen).forEach(function(k){ if(!(seen[k]>lim)) delete seen[k]; });
+    try{ localStorage.setItem(SEEN_KEY,JSON.stringify(seen)); }catch(e){}
+    render();
+  }
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function _dpnFmtDate(ts){ try{ return new Date(ts).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'}); }catch(e){ return ''; } }
-  function total(){ var n=0; ORDER.forEach(function(k){ n+=(store[k]||[]).length; }); return n; }
+  function total(){ var n=0; ORDER.forEach(function(k){ n+=visible(k).length; }); return n; }
   function itemHTML(k,it,idx){
     if(k==='printflow'){
       return '<div class="dpn-item" data-k="printflow" data-i="'+idx+'" title="Abrir la tarea en PrintFlow">'
@@ -1151,7 +1216,7 @@ html.dp-noboot .card{opacity:1!important;animation:none!important}
     if(n===0){ body.innerHTML='<div class="dpn-empty">Todo al día ✓</div>'; return; }
     var h='';
     ORDER.forEach(function(k){
-      var items=store[k]||[]; if(!items.length) return; var m=META[k];
+      var items=visible(k); if(!items.length) return; var m=META[k];
       h+='<div class="dpn-grp"><div class="dpn-gh"><span class="dpn-dot" style="background:'+m.color+'"></span>'+esc(m.label)+'<span class="dpn-gcount">'+items.length+'</span></div>';
       items.slice(0,60).forEach(function(it,idx){ h+=itemHTML(k,it,idx); });
       h+='</div>';
@@ -1159,7 +1224,7 @@ html.dp-noboot .card{opacity:1!important;animation:none!important}
     body.innerHTML=h;
     [].forEach.call(body.querySelectorAll('.dpn-item'),function(el){
       el.addEventListener('click',function(e){
-        var k=el.getAttribute('data-k'), i=+el.getAttribute('data-i'); var it=(store[k]||[])[i]; if(!it||!META[k]) return;
+        var k=el.getAttribute('data-k'), i=+el.getAttribute('data-i'); var it=visible(k)[i]; if(!it||!META[k]) return;
         var btn=e.target&&e.target.closest?e.target.closest('.dpn-act'):null;
         if(btn&&el.contains(btn)){ e.stopPropagation(); if(META[k].onAction) META[k].onAction(it,btn); return; }
         if(META[k].onItem) META[k].onItem(it);
@@ -1167,9 +1232,14 @@ html.dp-noboot .card{opacity:1!important;animation:none!important}
     });
   }
   window.DPNotif={ set:function(k,items){ store[k]=Array.isArray(items)?items:[]; render(); } };
-  window.dpnToggle=function(ev){ if(ev&&ev.stopPropagation)ev.stopPropagation(); var p=document.getElementById('dpnPanel'); if(p)p.classList.toggle('open'); };
-  window.dpnClose=function(){ var p=document.getElementById('dpnPanel'); if(p)p.classList.remove('open'); };
-  document.addEventListener('click',function(e){ var pan=document.getElementById('dpnPanel'),fab=document.getElementById('dpnFab'); if(!pan||!pan.classList.contains('open'))return; if(pan.contains(e.target)||(fab&&fab.contains(e.target)))return; pan.classList.remove('open'); });
+  window.dpnToggle=function(ev){ if(ev&&ev.stopPropagation)ev.stopPropagation();
+    var p=document.getElementById('dpnPanel'); if(!p)return;
+    if(p.classList.contains('open')) dpnClose(); else p.classList.add('open');
+  };
+  window.dpnClose=function(){ var p=document.getElementById('dpnPanel'); if(!p||!p.classList.contains('open'))return;
+    p.classList.remove('open'); markSeen();
+  };
+  document.addEventListener('click',function(e){ var pan=document.getElementById('dpnPanel'),fab=document.getElementById('dpnFab'); if(!pan||!pan.classList.contains('open'))return; if(pan.contains(e.target)||(fab&&fab.contains(e.target)))return; dpnClose(); });
   render();
 })();
 </script>
@@ -1195,6 +1265,11 @@ html.dp-noboot .card{opacity:1!important;animation:none!important}
   </div>
   <div class="vframe-wrap">
     <iframe class="vframe" id="v-frame" title="Aplicación" src="about:blank" allow="clipboard-read; clipboard-write"></iframe>
+    <div class="vload" id="v-load" aria-hidden="true">
+      <div class="vload-mark" id="v-load-mark"></div>
+      <div class="vload-name" id="v-load-name"></div>
+      <div class="vload-bar"><span></span></div>
+    </div>
   </div>
 </div>
 
@@ -1300,11 +1375,40 @@ const APPS = {
 let currentApp = null;
 /* Versión de despliegue: fuerza recarga sin caché de las subapps tras cada cambio.
    Súbela (bump) cuando cambies el código de una subapp. */
-const APP_VER = '20260825-0901';
+const APP_VER = '20260825-2230';
+
+/* La cortina dura lo mismo que el aviso que oculta (~0,5 s) y se va con un
+   fundido corto; si la app tarda más, aparecerá su propio aviso al retirarse. */
+const VLOAD_MS = 500;
+let _vloadT = null;
+function showVLoad(a) {
+  const ov = document.getElementById('v-load');
+  if (!ov) return;
+  const mark = document.getElementById('v-load-mark'), name = document.getElementById('v-load-name');
+  ov.style.setProperty('--vload-c', a.color);
+  ov.style.setProperty('--vload-bg', a.bg || 'rgba(255,255,255,.06)');
+  ov.style.setProperty('--vload-bd', a.border || 'rgba(255,255,255,.14)');
+  if (mark) mark.innerHTML = a.svg || '';
+  if (name) name.textContent = a.name || '';
+  clearTimeout(_vloadT);
+  ov.classList.remove('out');
+  // reinicia las animaciones aunque se abra la misma app dos veces seguidas
+  ov.classList.remove('on'); void ov.offsetWidth; ov.classList.add('on');
+  _vloadT = setTimeout(() => {
+    ov.classList.add('out');
+    _vloadT = setTimeout(() => { ov.classList.remove('on', 'out'); }, 220);
+  }, VLOAD_MS);
+}
+function hideVLoad() {
+  const ov = document.getElementById('v-load');
+  clearTimeout(_vloadT);
+  if (ov) ov.classList.remove('on', 'out');
+}
 
 function launchApp(id) {
   const a = APPS[id];
   if (!a || !a.url) return;
+  showVLoad(a);
   document.getElementById('v-title').textContent = a.name;
   document.getElementById('v-dot').style.background = a.color;
   const ext = document.getElementById('v-ext');
@@ -1316,6 +1420,7 @@ function launchApp(id) {
 }
 
 function closeViewer() {
+  hideVLoad();
   document.getElementById('viewer').classList.remove('open');
   try{ if(window.dpRevealApps) setTimeout(window.dpRevealApps, 30); }catch(e){}
   try{ document.body.style.overflow=''; document.documentElement.style.overflow=''; }catch(e){}
@@ -1672,7 +1777,7 @@ window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type
     var lastSeen=(typeof ST.lastSeen==='number')?ST.lastSeen:0;
     var best={};
     CHG.forEach(function(c){ if(!c||c.type!=='repuesto')return; var vid=String(c.vid); if(!watch[vid])return; if((c.ts||0)<=lastSeen)return; if(!best[vid]||(c.ts||0)>(best[vid].ts||0))best[vid]=c; });
-    var items=Object.keys(best).map(function(vid){ var c=best[vid]; return {variant:c.variant||'',product:c.product||'',ts:c.ts||0}; });
+    var items=Object.keys(best).map(function(vid){ var c=best[vid]; return {vid:vid,variant:c.variant||'',product:c.product||'',ts:c.ts||0}; });
     items.sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
     window.DPNotif.set('stock', items);
   }

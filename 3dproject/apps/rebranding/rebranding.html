@@ -9,7 +9,7 @@
 <style>
   :root{
     --bg:#121215; --bg2:#17171b; --panel:#1d1d23; --panel2:#26262e; --line:#2d2d37; --line2:#3b3b47;
-    --text:#f0edf5; --muted:#9a94aa; --faint:#5f5a6e;
+    --text:#f5f2f9; --muted:#b3adc2; --faint:#8b849c;
     --accent:#f472b6; --accent-dim:#b84c86; --ok:#8fd0a8; --warn:#e6b36a;
     --sidebar-w:220px;
     --mono:ui-monospace,'SF Mono','Cascadia Code',Consolas,monospace;
@@ -53,10 +53,16 @@
   main{max-width:1200px;margin:0 auto;padding:6px 26px}
   .view{display:none}.view.act{display:block}
 
-  h2.sec{font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);
+  h2.sec{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:#ddd8e8;font-weight:700;
     margin:26px 0 12px;display:flex;align-items:center;gap:12px}
   h2.sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
-  h2.sec .hint{font-family:var(--mono);font-size:9.5px;letter-spacing:.02em;text-transform:none;color:var(--faint)}
+  h2.sec .hint{font-family:var(--sans);font-size:11.5px;font-weight:500;letter-spacing:.01em;
+    text-transform:none;color:var(--muted)}
+  /* Indicación de cada paso: es la que guía, así que se lee a tamaño de texto normal. */
+  .stepdesc{font-size:13.5px;line-height:1.55;color:#c6c0d4;margin:-4px 0 16px;max-width:74ch}
+  .stepdesc b{color:var(--text);font-weight:650}
+  .adjnote{font-size:12px;line-height:1.5;color:var(--muted);margin-top:10px}
+  .adjnote b{color:#e7e2f0}
   h2.sec .stepn{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#1a1220;
     display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;letter-spacing:0}
 
@@ -110,9 +116,9 @@
     border-radius:14px;padding:15px 18px}
   #adjust .row{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
   .adj{display:flex;align-items:center;gap:9px}
-  .adj label{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--muted);
-    text-transform:uppercase;width:74px}
-  .adj output{font-family:var(--mono);font-size:10.5px;width:42px}
+  .adj label{font-family:var(--sans);font-size:12.5px;font-weight:550;letter-spacing:.01em;color:#d6d1e2;
+    width:112px;flex-shrink:0}
+  .adj output{font-family:var(--mono);font-size:11.5px;width:46px;color:var(--text)}
   #resetAdj{background:transparent;border:1px solid var(--line2);color:var(--muted);border-radius:8px;
     padding:6px 12px;font-family:var(--mono);font-size:10px;cursor:pointer}
   #resetAdj:hover{color:var(--text);border-color:var(--faint)}
@@ -122,10 +128,36 @@
   .adj .rst.dirty{color:var(--accent)}
 
   /* ---------- comparadores ---------- */
+  /* Los ajustes del paso 3 van en tres bloques con rótulo propio. */
+  .adjgrp{padding:12px 0}
+  .adjgrp+.adjgrp{border-top:1px solid var(--line)}
+  .adjgrp-h{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:10px}
+  #adjust .adjgrp .row{gap:16px 26px}
+  /* Igual en el paso 4, numerados por orden de uso. */
+  .mgrp{padding:11px 0}
+  .mgrp+.mgrp{border-top:1px solid var(--line)}
+  .mgrp-h{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--accent);margin-bottom:9px}
+  .mgrp-n{width:18px;height:18px;border-radius:50%;background:var(--panel2);color:var(--text);
+    font-family:var(--mono);font-size:10px;display:flex;align-items:center;justify-content:center;letter-spacing:0}
+  .mchk{font-size:12px;color:#d6d1e2;display:flex;align-items:center;gap:7px;cursor:pointer}
+  .mbtn{background:transparent;border:1px solid var(--line2);color:var(--muted);border-radius:8px;
+    padding:6px 12px;font-family:var(--sans);font-size:12px;cursor:pointer}
+  .mbtn:hover{color:var(--text);border-color:var(--faint)}
+  /* Deslizador con el 0 en el centro: se marca la mitad. */
+  .msl.bip{position:relative;flex:1}
+  .msl.bip::before{content:'';position:absolute;left:50%;top:50%;width:1px;height:14px;
+    transform:translate(-50%,-50%);background:var(--line2);pointer-events:none}
+
   #stage{margin-top:18px;display:none}
+  /* Solo en el paso 4 el lienzo se queda el gesto (para arrastrar el punto rojo).
+     En el resto, el dedo sobre la foto desplaza la página como en cualquier otro sitio. */
   #cmp{position:relative;border-radius:14px;overflow:hidden;background:#0c0c0f;
-    display:flex;justify-content:center;user-select:none;touch-action:none}
-  #cmp canvas{max-width:100%;max-height:62vh;display:block;cursor:crosshair;touch-action:none}
+    display:flex;justify-content:center;user-select:none;touch-action:pan-y}
+  #cmp canvas{max-width:100%;max-height:62vh;display:block;touch-action:inherit}
+  #cmp.anchor{touch-action:none}
+  #cmp.anchor canvas{cursor:crosshair}
   #dragHint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
     font-family:var(--mono);font-size:11px;color:#fff;background:#000c;backdrop-filter:blur(6px);
     padding:9px 16px;border-radius:22px;pointer-events:none;white-space:nowrap;
@@ -144,12 +176,18 @@
   .obtn{background:var(--panel2);border:1.5px solid var(--line2);color:var(--muted);border-radius:10px;
     padding:9px 14px;font-size:13px;cursor:pointer;min-height:42px}
   .obtn.sel{border-color:var(--accent);color:var(--text);background:rgba(244,114,182,.1)}
-  .crophint{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px;text-align:center}
+  .crophint{font-family:var(--sans);font-size:12px;color:var(--muted);margin-top:8px;text-align:center}
   #prog{font-family:var(--mono);font-size:10.5px;color:var(--ok)}
 
   /* pasos del asistente */
   .step{display:none}
   .step.act{display:block;animation:stepin .2s ease;backface-visibility:hidden}
+  @media (max-width:820px){
+    /* En móvil la animación de entrada coincidía con el repintado de los lienzos
+       y se veía como un parpadeo: el cambio de paso es instantáneo. */
+    .step.act{animation:none}
+    header{backdrop-filter:none;background:var(--bg)}
+  }
   @keyframes stepin{from{opacity:0}to{opacity:1}}
   #wiznav{display:flex;align-items:center;gap:14px;margin:22px 0 8px}
   #wiznav button{flex:1;max-width:200px}
@@ -194,12 +232,17 @@
   #maskPanel .mhead b{font-size:12.5px}
   #maskPanel .mhead label{font-family:var(--mono);font-size:10px;color:var(--muted);display:flex;
     align-items:center;gap:6px;margin-left:auto;cursor:pointer}
-  .mrow{display:flex;gap:14px;flex-wrap:wrap;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
-  .mrow .mname{font-family:var(--mono);font-size:10.5px;width:110px;display:flex;align-items:center;gap:8px}
+  .mrow{display:flex;gap:14px;flex-wrap:wrap;align-items:center;padding:8px 0}
+  #maskRows .mrow+.mrow{border-top:1px solid var(--line)}
+  .mrow .mname{font-family:var(--sans);font-size:12.5px;font-weight:550;color:#d6d1e2;width:112px;
+    display:flex;align-items:center;gap:8px;flex-shrink:0}
   .mrow .mname input{accent-color:var(--accent)}
   .msl{display:flex;align-items:center;gap:6px}
-  .msl label{font-family:var(--mono);font-size:9px;color:var(--faint);text-transform:uppercase}
+  .msl label{font-family:var(--sans);font-size:12.5px;font-weight:550;color:#d6d1e2}
   .msl input[type=range]{width:86px}
+  .msl output{font-family:var(--mono);font-size:11.5px;color:var(--text);min-width:48px;text-align:right}
+  .msl.bip{gap:10px}
+  .msl.bip input[type=range]{width:auto;flex:1;min-width:130px}
   .msl output{font-family:var(--mono);font-size:9.5px;width:34px;color:var(--muted)}
 
   /* ---------- dock ---------- */
@@ -229,7 +272,7 @@
     main{padding:6px 14px}
     #grid{grid-template-columns:repeat(2,1fr)}
     .adj{width:100%;gap:10px}
-    .adj label{width:82px;font-size:10px}
+    .adj label{width:106px;font-size:12px}
     .adj input[type=range]{flex:1;width:auto}
     .mrow{gap:10px}
     .msl{width:100%}
@@ -298,7 +341,8 @@ main{max-width:none;margin:52px 0 0 var(--sidebar-w);padding:22px 28px 60px}
   <section class="view act" id="view-inicio">
 
     <div class="step act" data-step="1">
-      <h2 class="sec"><span class="stepn">1</span> Foto y encuadre <span class="hint">carga, recorta y endereza (proporción fija 3:4)</span></h2>
+      <h2 class="sec"><span class="stepn">1</span> Foto y encuadre <span class="hint">proporción fija 3:4</span></h2>
+      <p class="stepdesc">Carga una o varias fotos y encuádralas: arrastra dentro del marco para mover el recorte y usa los controles para enderezar y acercar.</p>
       <div class="dz" id="dropIn" tabindex="0" role="button">
         Arrastra tus fotos aquí o <em>elígelas</em>
         <div class="small">JPG · PNG · WebP</div>
@@ -321,33 +365,64 @@ main{max-width:none;margin:52px 0 0 var(--sidebar-w);padding:22px 28px 60px}
     </div>
 
     <div class="step" data-step="2">
-      <h2 class="sec"><span class="stepn">2</span> Elige ruta <span class="hint">toca la que prefieras para esta foto</span></h2>
+      <h2 class="sec"><span class="stepn">2</span> Elige ruta <span class="hint">una por cada receta de revelado</span></h2>
+      <p class="stepdesc">Selecciona la ruta con la que <b>más encaje la imagen en términos de color</b>. Todo lo demás (luz, contraste, intensidad y ajustes locales) se afina después.</p>
       <div id="grid"><div class="emptybox">carga una foto para ver las rutas</div></div>
     </div>
 
     <div class="step" data-step="3">
-    <h2 class="sec"><span class="stepn">3</span> Ajustes básicos <span class="hint">se aplican sobre la ruta elegida</span></h2>
+    <h2 class="sec"><span class="stepn">3</span> Ajustes globales <span class="hint">afectan a toda la imagen</span></h2>
+    <p class="stepdesc">Aquí se ajustan los <b>parámetros globales de la imagen</b>, los que afectan por igual a toda la foto. Los ajustes locales (luz y sombra por zonas) se tratan en el paso siguiente.</p>
     <div id="adjust">
-      <div class="row">
-        <div class="adj"><label>Intensidad</label><input type="range" data-adj="k" min="0" max="150" value="100"><output>100%</output><button class="rst" data-rst="k" title="restablecer intensidad">↺</button></div>
-        <div class="adj"><label>Exposición</label><input type="range" data-adj="exp" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="exp" title="restablecer exposición">↺</button></div>
-        <div class="adj"><label>Contraste</label><input type="range" data-adj="con" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="con" title="restablecer contraste">↺</button></div>
-        <div class="adj"><label>Saturación</label><input type="range" data-adj="sat" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="sat" title="restablecer saturación">↺</button></div>
-        <div class="adj"><label>Temperatura</label><input type="range" data-adj="temp" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="temp" title="restablecer temperatura">↺</button></div>
-        <div class="adj"><label>Claridad</label><input type="range" data-adj="cla" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="cla" title="restablecer claridad">↺</button></div>
-        <button id="resetAdj">restablecer todo</button>
+      <div class="adjgrp">
+        <div class="adjgrp-h">Intensidad</div>
+        <div class="row">
+          <div class="adj"><label>Intensidad de preset</label><input type="range" data-adj="k" min="0" max="150" value="100"><output>100%</output><button class="rst" data-rst="k" title="restablecer intensidad de preset">↺</button></div>
+        </div>
       </div>
+      <div class="adjgrp">
+        <div class="adjgrp-h">Luz y sombras</div>
+        <div class="row">
+          <div class="adj"><label>Exposición</label><input type="range" data-adj="exp" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="exp" title="restablecer exposición">↺</button></div>
+          <div class="adj"><label>Altas luces</label><input type="range" data-adj="high" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="high" title="restablecer altas luces">↺</button></div>
+          <div class="adj"><label>Sombras</label><input type="range" data-adj="shad" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="shad" title="restablecer sombras">↺</button></div>
+          <div class="adj"><label>Contraste</label><input type="range" data-adj="con" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="con" title="restablecer contraste">↺</button></div>
+          <div class="adj"><label>Claridad</label><input type="range" data-adj="cla" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="cla" title="restablecer claridad">↺</button></div>
+        </div>
+      </div>
+      <div class="adjgrp">
+        <div class="adjgrp-h">Color</div>
+        <div class="row">
+          <div class="adj"><label>Saturación</label><input type="range" data-adj="sat" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="sat" title="restablecer saturación">↺</button></div>
+          <div class="adj"><label>Temperatura</label><input type="range" data-adj="temp" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="temp" title="restablecer temperatura">↺</button></div>
+          <div class="adj"><label>Tinte</label><input type="range" data-adj="tint" min="-100" max="100" value="0"><output>0</output><button class="rst" data-rst="tint" title="restablecer tinte">↺</button></div>
+        </div>
+        <div class="adjnote">Tinte: hacia la izquierda, verde; hacia la derecha, magenta.</div>
+      </div>
+      <button id="resetAdj">restablecer todo</button>
     </div>
     </div>
 
     <div class="step" data-step="4">
-      <h2 class="sec"><span class="stepn">4</span> Sitúa la luz <span class="hint">toca o arrastra sobre la foto grande: la luz y la sombra siguen al punto rojo</span></h2>
+      <h2 class="sec"><span class="stepn">4</span> Ajustes locales <span class="hint">iluminación por zonas</span></h2>
+      <p class="stepdesc">Ubica la <b>dirección de la luz</b> arrastrando el punto rojo sobre la foto, y ajusta después la <b>fuerza de la luz y de las sombras</b>.</p>
       <div id="maskPanel">
-        <div class="mhead"><b>Máscaras locales de la ruta</b>
-          <label><input type="checkbox" id="showMasks" checked> contornos y punto</label>
-          <label><input type="checkbox" id="showFill"> relleno tenue</label>
+        <div class="mgrp">
+          <div class="mgrp-h"><span class="mgrp-n">1</span> Visibilidad de máscaras</div>
+          <div class="mrow">
+            <label class="mchk"><input type="checkbox" id="showMasks" checked> contornos y punto</label>
+            <label class="mchk"><input type="checkbox" id="showFill"> relleno tenue</label>
+          </div>
         </div>
-        <div id="maskRows"></div>
+        <div class="mgrp">
+          <div class="mgrp-h"><span class="mgrp-n">2</span> Tamaño de la luz</div>
+          <div id="maskSize"></div>
+        </div>
+        <div class="mgrp">
+          <div class="mgrp-h"><span class="mgrp-n">3</span> Intensidad de las máscaras</div>
+          <div id="maskRows"></div>
+          <div class="adjnote">0 % deja la máscara como la trae la ruta. Hacia <b>+100 %</b> la luz ilumina más y la sombra oscurece más; hacia <b>−100 %</b> la luz ilumina menos y la sombra oscurece menos.</div>
+        </div>
       </div>
     </div>
 
@@ -364,7 +439,8 @@ main{max-width:none;margin:52px 0 0 var(--sidebar-w);padding:22px 28px 60px}
     </div>
 
     <div class="step" data-step="5">
-      <h2 class="sec"><span class="stepn">5</span> Descarga <span class="hint">con el prefijo de fecha y contador</span></h2>
+      <h2 class="sec"><span class="stepn">5</span> Descarga <span class="hint">nombre con fecha y contador</span></h2>
+      <p class="stepdesc">Elige el formato y descarga la foto en edición o todas las que hayas cargado.</p>
       <div class="cfgcard">
         <div class="croprow" style="justify-content:center">
           <select id="expFmt"><option value="jpeg">JPG</option><option value="png">PNG</option></select>
@@ -723,10 +799,14 @@ function applyDetailPasses(img,P,k){
   }
 }
 function applyAdjust(img,adj){
-  const{exp,con,sat,temp}=adj,cla=adj.cla||0;
-  if(!exp&&!con&&!sat&&!temp&&!cla)return;
+  const exp=adj.exp||0, con=adj.con||0, sat=adj.sat||0, temp=adj.temp||0;
+  const cla=adj.cla||0, high=adj.high||0, shad=adj.shad||0, tint=adj.tint||0;
+  if(!exp&&!con&&!sat&&!temp&&!cla&&!high&&!shad&&!tint)return;
   const px=img.data,n=img.width*img.height,w=img.width,h=img.height;
   const expMul=Math.pow(2,exp/100*1.2),cf=1+con/100*0.9;
+  /* Altas luces y sombras del usuario: misma respuesta que la receta de la ruta,
+     con algo mas de recorrido por ser un ajuste manual. */
+  const TONE=CAL.tone*2;
   let L0=null,blurC=null;
   if(cla){
     L0=new Float32Array(n);
@@ -739,8 +819,17 @@ function applyAdjust(img,adj){
       r=Math.sqrt(clamp(r*r*(1+temp*0.004),0,1));
       b=Math.sqrt(clamp(b*b*(1-temp*0.004),0,1));
     }
+    /* Tinte: eje verde-magenta. Positivo hacia magenta (baja el verde),
+       negativo hacia verde. */
+    if(tint) g=Math.sqrt(clamp(g*g*(1-tint*0.0034),0,1));
     if(exp){r=Math.sqrt(clamp(r*r*expMul,0,1));g=Math.sqrt(clamp(g*g*expMul,0,1));b=Math.sqrt(clamp(b*b*expMul,0,1))}
     if(con){r=clamp(.5+(r-.5)*cf,0,1);g=clamp(.5+(g-.5)*cf,0,1);b=clamp(.5+(b-.5)*cf,0,1)}
+    if(high||shad){
+      const L=0.299*r+0.587*g+0.114*b;
+      const wH=smooth(0.45,0.95,L),wS=1-smooth(0.05,0.55,L);
+      const dv=TONE*high*wH+TONE*shad*wS;
+      r=clamp(r+dv,0,1);g=clamp(g+dv,0,1);b=clamp(b+dv,0,1);
+    }
     if(sat){
       const L=0.299*r+0.587*g+0.114*b,f=1+sat/100;
       r=clamp(L+(r-L)*f,0,1);g=clamp(L+(g-L)*f,0,1);b=clamp(L+(b-L)*f,0,1);
@@ -771,7 +860,7 @@ function patternMaps(grp,w,h){
   const P=polarFrom(grp,w,h);
   const maps=[null,null];
   // — SOL: elipse recortada por el borde de procedencia —
-  if(grp.per[0].on&&grp.per[0].amt>0){
+  if(grp.per[0].on){
     const dist=P.edge*(0.55+0.6*P.r);
     const sx=P.cx+P.dx*dist,sy=P.cy+P.dy*dist;
     const rx=0.50*u*grp.sc,ry=0.68*u*grp.sc;
@@ -783,10 +872,10 @@ function patternMaps(grp,w,h){
       const uu=(ddx*co+ddy*si)/rx,vv=(-ddx*si+ddy*co)/ry;
       W[y*w+x]=1-smooth(inner,outer,Math.sqrt(uu*uu+vv*vv));
     }
-    W.amt=amtCurve(grp.per[0].amt);maps[0]=W;
+    W.amt=amtCurve(grp.per[0].amt);W.lum=MASK_LUM*(grp.per[0].amt-1);maps[0]=W;
   }
   // — SOMBRA: rampa desde el lado opuesto; retrocede cuando la luz entra —
-  if(grp.per[1].on&&grp.per[1].amt>0){
+  if(grp.per[1].on){
     const startD=P.edge*(0.12+0.45*(1-P.r));
     const zx=P.cx-P.dx*startD,zy=P.cy-P.dy*startD;
     const fx=P.cx-P.dx*P.edge*1.05,fy=P.cy-P.dy*P.edge*1.05;
@@ -796,7 +885,7 @@ function patternMaps(grp,w,h){
       const t=clamp(((x-zx)*vx+(y-zy)*vy)/len2,0,1);
       W[y*w+x]=smooth(0,1,t);
     }
-    W.amt=amtCurve(grp.per[1].amt);maps[1]=W;
+    W.amt=amtCurve(grp.per[1].amt);W.lum=-MASK_LUM*(grp.per[1].amt-1);maps[1]=W;
   }
   return maps;
 }
@@ -807,11 +896,12 @@ function applyLocal(img,route,grp){
   const bk=routeBuckets(route);
   [[maps[0],bk.luz],[maps[1],bk.som]].forEach(([W,L])=>{
     if(!W||!L)return;
-    const amt=W.amt;
+    const amt=W.amt,lumPush=W.lum||0;
     for(let i=0;i<n;i++){
       const a=W[i]*amt;
-      if(a<0.004)continue;
+      if(Math.abs(a)<0.004&&!lumPush)continue;
       let r=px[i*4]/255,g=px[i*4+1]/255,b=px[i*4+2]/255;
+      if(lumPush){const dv=lumPush*W[i];r=clamp(r+dv,0,1);g=clamp(g+dv,0,1);b=clamp(b+dv,0,1)}
       if(L.temp){const t=L.temp*0.004*a;
         r=Math.sqrt(clamp(r*r*(1+t),0,1));b=Math.sqrt(clamp(b*b*(1-t),0,1))}
       if(L.exp){const mul=Math.pow(2,L.exp*a);
@@ -862,8 +952,9 @@ const CAL={wbTemp:0.01118,wbTint:0.00335,con:0.0025,tone:0.00058,
   black:0.00226,tex:0.00029,hazeS:0.39189,hazeT:0.41029,
   hslHue:0.02012,hslSat:0.50727,hslLum:0.00534,vib:0.20011,
   gradeF:0.28844,locTone:0.00699,baseEV:0.41903};
+const MASK_LUM=0.18;   /* empuje de luminosidad de la zona a fuerza +/-100 % */
 /* respuesta de los sliders de fuerza: agresiva por encima de 100 % */
-function amtCurve(a){return a<=1?a:Math.pow(a,1.6)}
+function amtCurve(a){const s=a<0?-1:1,m=Math.abs(a);return s*(m<=1?m:Math.pow(m,1.6));}
 const PATTERN={
   luz:{cx:0,cy:-0.34,rx:0.36,ry:0.27,fe:0.55},   // unidades: min(w,h), relativo al ancla
   sombra:{zy:0.10,fy:0.55}
@@ -1022,7 +1113,8 @@ function extractDNGThumb(bytes){
    ============================================================ */
 const $=s=>document.querySelector(s);
 const state={files:[],selFile:-1,dlCount:0};
-const defaultSettings=()=>({route:0,k:1,adj:{exp:0,con:0,sat:0,temp:0,cla:0},masks:{}});
+const defaultSettings=()=>({route:0,k:1,
+  adj:{exp:0,high:0,shad:0,con:0,cla:0,sat:0,temp:0,tint:0},masks:{}});
 const cfg={autoLight:true,exportRes:'original'};
 function maskStateFor(set,routeIdx){
   if(!set.masks[routeIdx]){
@@ -1253,6 +1345,7 @@ function loadInputs(list){
       $('#dlOne').disabled=$('#dlAll').disabled=false;
       renderCropUI();
       setStep(curStep);   // permanece en el paso 1 para encuadrar
+      autoTone(state.files[state.files.length-1]);
     };
     im.src=url;
   }
@@ -1276,6 +1369,7 @@ function refreshStrip(){
         return;
       }
       state.selFile=i;refreshStrip();syncSliders();buildMaskPanel();renderCropUI();refreshAll();
+      autoTone(state.files[i]);
     });
     s.appendChild(c);
   });
@@ -1355,15 +1449,27 @@ function baseData(file,maxDim){
   return{id:new ImageData(new Uint8ClampedArray(b.id.data),b.w,b.h),w:b.w,h:b.h};
 }
 let previewTimer=null;
+/* Solo se repinta lo que esta a la vista. Antes cada tick de un deslizador
+   reconstruia tambien el mosaico de rutas del paso 2 (una imagen de 300 px por
+   ruta): en movil no daba tiempo entre ticks y la interfaz se quedaba a medio
+   pintar, que es el parpadeo que se veia. */
 function refreshAll(){
   clearTimeout(previewTimer);
-  previewTimer=setTimeout(()=>{renderGrid();renderStage();renderResultCmp()},50);
+  previewTimer=setTimeout(()=>{
+    syncAdjustVisible();
+    if(curStep===2)renderGrid();
+    if(curStep===3||curStep===4)renderStage();
+    renderResultCmp();
+  },90);
+}
+function syncAdjustVisible(){
+  const a=$('#adjust'); if(a) a.style.display=(state.selFile>=0&&curStep===3)?'block':'none';
 }
 function renderGrid(){
   const grid=$('#grid');
   if(state.selFile<0||!state.files.length){
     grid.innerHTML='<div class="emptybox">carga una foto para ver las rutas</div>';
-    $('#adjust').style.display='none';
+    syncAdjustVisible();
     return;
   }
   const file=state.files[state.selFile],set=file.set;
@@ -1391,7 +1497,7 @@ function renderGrid(){
     });
     grid.appendChild(cell);
   });
-  $('#adjust').style.display='block';
+  syncAdjustVisible();
 }
 
 /* --- sliders --- */
@@ -1411,6 +1517,7 @@ document.querySelectorAll('#adjust input').forEach(inp=>{
     if(state.selFile<0)return;
     const set=state.files[state.selFile].set,key=inp.dataset.adj,v=+inp.value;
     if(key==='k')set.k=v/100;else set.adj[key]=v;
+    if(key==='exp'||key==='high'||key==='shad')set.tonedManual=true;   // a partir de aquí manda el usuario
     inp.nextElementSibling.textContent=key==='k'?v+'%':(v>0?'+':'')+v;
     syncDirty();fastPreview();
   });
@@ -1419,7 +1526,8 @@ document.querySelectorAll('#adjust input').forEach(inp=>{
 $('#resetAdj').addEventListener('click',()=>{
   if(state.selFile<0)return;
   const set=state.files[state.selFile].set;
-  set.k=1;set.adj={exp:0,con:0,sat:0,temp:0,cla:0};
+  set.k=1;set.adj={exp:0,high:0,shad:0,con:0,cla:0,sat:0,temp:0,tint:0};
+  set.tonedManual=true;   // restablecer es una decisión del usuario: no se re-iguala
   syncSliders();refreshAll();
 });
 /* reset individual por parámetro */
@@ -1442,17 +1550,86 @@ function syncDirty(){
   });
 }
 
+/* ---- igualado de luz con las imagenes de resultado ---- */
+/* Al elegir una foto se acercan su exposicion, altas luces y sombras a las de
+   las imagenes de resultado. Se escribe en los ajustes del paso 3, asi que los
+   valores quedan a la vista y se pueden retocar o restablecer. */
+function lumaProfile(px,n){
+  let m=0,hi=0,hn=0,sh=0,sn=0;
+  for(let i=0;i<n;i++){
+    const L=(0.299*px[i*4]+0.587*px[i*4+1]+0.114*px[i*4+2])/255;
+    m+=L;
+    if(L>0.62){hi+=L;hn++;}
+    else if(L<0.34){sh+=L;sn++;}
+  }
+  return {mean:m/n, hi:hn?hi/hn:0.75, sh:sn?sh/sn:0.18};
+}
+let resProfile=null,resProfileKey='';
+async function resultProfile(){
+  const refs=resultRefs();
+  if(!refs.length)return null;
+  const key=refs.map(r=>r.url.length).join('|');
+  if(resProfile&&resProfileKey===key)return resProfile;
+  const acc={mean:0,hi:0,sh:0};let n=0;
+  for(const r of refs){
+    try{
+      const im=await decodeImageSource(r.url);
+      const s=Math.min(1,120/Math.max(im.width,im.height));
+      const w=Math.max(1,Math.round(im.width*s)),h=Math.max(1,Math.round(im.height*s));
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      const ctx=c.getContext('2d',{willReadFrequently:true});
+      ctx.drawImage(im,0,0,w,h);
+      const p=lumaProfile(ctx.getImageData(0,0,w,h).data,w*h);
+      acc.mean+=p.mean;acc.hi+=p.hi;acc.sh+=p.sh;n++;
+      try{ im.close&&im.close(); }catch(e){}
+    }catch(e){}
+  }
+  if(!n)return null;
+  resProfile={mean:acc.mean/n,hi:acc.hi/n,sh:acc.sh/n};
+  resProfileKey=key;
+  return resProfile;
+}
+async function autoTone(f){
+  if(!f||f.set.tonedManual)return;
+  const tgt=await resultProfile();if(!tgt)return;
+  const set=f.set;
+  fastPipeline(f,set);                       // deja _s2 = ruta + mascaras, sin ajustes
+  if(!f._s2)return;
+  const src=lumaProfile(f._s2.data,f._s2.w*f._s2.h);
+  const TONE=CAL.tone*2;
+  set.adj.exp =clamp(Math.round(100*Math.log2(clamp(tgt.mean/Math.max(src.mean,0.02),0.55,1.8))/1.2),-60,60);
+  set.adj.high=clamp(Math.round((tgt.hi-src.hi)/TONE),-70,70);
+  set.adj.shad=clamp(Math.round((tgt.sh-src.sh)/TONE),-70,70);
+  set.autoToned=true;
+  syncSliders();refreshAll();
+}
+
 /* --- comparador antes/después --- */
 let stageProcCache=null;
+/* La previsualizacion grande vive dentro del paso activo: en el 3 va encima del
+   panel de ajustes (asi se ve a la vez el efecto en la foto grande y en el feed)
+   y en el 4 encima de las mascaras, que es donde se arrastra el punto rojo. */
+function placeStage(){
+  const stage=$('#stage'); if(!stage)return;
+  const ancla=curStep===3?$('#adjust'):(curStep===4?$('#maskPanel'):null);
+  if(ancla&&ancla.parentNode&&stage.nextElementSibling!==ancla)
+    ancla.parentNode.insertBefore(stage,ancla);
+}
 function renderStage(){
   const visible=state.selFile>=0&&(curStep===3||curStep===4);
   $('#stage').style.display=visible?'block':'none';
   if(!visible)return;
+  placeStage();
+  /* El punto rojo solo se arrastra en el paso 4; en el 3 el dedo sobre la foto
+     tiene que desplazar la pagina como en cualquier otra parte. */
+  $('#cmp').classList.toggle('anchor',curStep===4);
   $('#dragHint').style.display=curStep===4?'':'none';
   const f=state.files[state.selFile],set=f.set;
   const b=baseData(f,1200);
   const after=$('#cvAfter');
-  after.width=b.w;after.height=b.h;
+  /* Cambiar width/height borra el lienzo: solo se toca si cambia de tamano,
+     si no se veia un fogonazo en blanco entre la vista rapida y la definitiva. */
+  if(after.width!==b.w||after.height!==b.h){ after.width=b.w; after.height=b.h; }
   applyRoute(b.id,ROUTES[set.route],set.k,set.adj,maskStateFor(set,set.route),cfg.autoLight);
   stageProcCache=b.id;
   after.getContext('2d').putImageData(b.id,0,0);
@@ -1814,6 +1991,7 @@ function setStep(n){
   if(n===2)renderGrid();
   if(n===3)syncSliders();
   if(n===4)buildMaskPanel();
+  syncAdjustVisible();
   renderStage();   // visible en 3 y 4, oculto en el resto
 }
 $('#wPrev').addEventListener('click',()=>setStep(curStep-1));
@@ -1829,19 +2007,26 @@ document.querySelectorAll('input[name=cfgRes]').forEach(r=>r.addEventListener('c
 let showMaskOutlines=true,showMaskFill=false;
 $('#showMasks').addEventListener('change',e=>{showMaskOutlines=e.target.checked;renderStage()});
 $('#showFill').addEventListener('change',e=>{showMaskFill=e.target.checked;renderStage()});
+/* Fuerza de las mascaras: el deslizador va de -100 % a +100 % con el 0 en el
+   centro. 0 deja la mascara tal y como la trae la ruta; hacia positivos la luz
+   ilumina mas y la sombra oscurece mas; hacia negativos la luz ilumina menos
+   (y pasado el medio, oscurece) y la sombra oscurece menos (y pasado el medio,
+   aclara). amt = 1 + 2·v/100. */
+const amtToPct=a=>clamp(Math.round((a-1)*100),-100,100);
+const pctToAmt=v=>1+v/100;
 function buildMaskPanel(){
-  const panel=$('#maskPanel'),rows=$('#maskRows');
+  const panel=$('#maskPanel'),rows=$('#maskRows'),size=$('#maskSize');
   if(state.selFile<0){panel.style.display='none';return}
   const set=state.files[state.selFile].set;
   panel.style.display='block';
   const grp=maskStateFor(set,set.route);
-  rows.innerHTML='';
+
+  size.innerHTML='';
   const gr=document.createElement('div');gr.className='mrow';
   gr.innerHTML=`
-    <span class="mname" style="width:auto;color:#d43a2f;font-weight:700">● gira el punto alrededor del centro · acércalo/aléjalo para desplazar la luz</span>
-    <span class="msl"><label>Tamaño</label><input type="range" id="grpSc" min="25" max="300" value="${Math.round(grp.sc*100)}"><output>${Math.round(grp.sc*100)}%</output></span>
-    <button id="grpReset" style="background:transparent;border:1px solid var(--line2);color:var(--muted);border-radius:8px;padding:5px 10px;font-family:var(--mono);font-size:10px;cursor:pointer">recentrar</button>`;
-  rows.appendChild(gr);
+    <span class="msl"><label>Tamaño de la luz</label><input type="range" id="grpSc" min="25" max="300" value="${Math.round(grp.sc*100)}"><output>${Math.round(grp.sc*100)}%</output></span>
+    <button id="grpReset" class="mbtn">recentrar</button>`;
+  size.appendChild(gr);
   $('#grpSc').addEventListener('input',e=>{
     grp.sc=+e.target.value/100;e.target.nextElementSibling.textContent=e.target.value+'%';fastPreview();
   });
@@ -1850,13 +2035,16 @@ function buildMaskPanel(){
     grp.gx=0.5;grp.gy=0.22;grp.sc=1;
     buildMaskPanel();refreshAll();
   });
-  [['☀ Luz','#e8d66a'],['☾ Sombra','#a98add']].forEach(([label,color],ci)=>{
+
+  rows.innerHTML='';
+  [['☀ Luz','#e8d66a','fuerza de la luz'],['☾ Sombra','#a98add','fuerza de la sombra']].forEach(([label,color,tit],ci)=>{
     const st=grp.per[ci];
+    const v=amtToPct(st.amt);
     const row=document.createElement('div');row.className='mrow';
     row.innerHTML=`
-      <span class="mname"><input type="checkbox" ${st.on?'checked':''} data-mon="${ci}">
-        <span style="color:${color};font-weight:600">${label}</span></span>
-      <span class="msl"><label>Fuerza</label><input type="range" data-mk="amt" data-ci="${ci}" min="0" max="300" value="${Math.round(st.amt*100)}"><output>${Math.round(st.amt*100)}%</output></span>`;
+      <span class="mname"><input type="checkbox" ${st.on?'checked':''} data-mon="${ci}" title="activar ${tit}">
+        <span style="color:${color};font-weight:700">${label}</span></span>
+      <span class="msl bip"><input type="range" data-mk="amt" data-ci="${ci}" min="-100" max="100" value="${v}"><output>${v>0?'+':''}${v}%</output></span>`;
     rows.appendChild(row);
   });
   rows.querySelectorAll('[data-mon]').forEach(cb=>cb.addEventListener('change',()=>{
@@ -1864,14 +2052,14 @@ function buildMaskPanel(){
   }));
   rows.querySelectorAll('[data-mk]').forEach(inp=>{
     inp.addEventListener('input',()=>{
-      grp.per[+inp.dataset.ci].amt=+inp.value/100;
-      inp.nextElementSibling.textContent=inp.value+'%';
+      const v=+inp.value;
+      grp.per[+inp.dataset.ci].amt=pctToAmt(v);
+      inp.nextElementSibling.textContent=(v>0?'+':'')+v+'%';
       fastPreview();
     });
     inp.addEventListener('change',()=>refreshAll());
   });
 }
-/* contornos de máscara sobre el canvas revelado */
 function drawMaskOutlines(canvas,set){
   if(!showMaskOutlines||curStep!==4)return;   // en el paso 3 la imagen se ve limpia
   const grp=maskStateFor(set,set.route);
