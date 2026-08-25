@@ -2433,326 +2433,344 @@ async function generatePDF(){
     const showTL=$('tog-tl').classList.contains('on');
     const showTbl=$('tog-tbl').classList.contains('on');
     const showStats=$('tog-stats').classList.contains('on');
-
     const doc=new JsPDF({orientation:'portrait',unit:'mm',format:'a4'});
 
-    /* El PDF está pensado para imprimirse: papel blanco, tinta oscura y el color
-       reservado a lo que identifica cada impresión. */
-    const PW=210, PH=297, ML=16, MR=16, MT=14;
-    const CW=PW-ML-MR, FOOT=13, SAFE=PH-FOOT-3;
+    /* ── Retícula ──────────────────────────────────────────────────────────
+       Un único margen (14 mm) y un único paso de separación (SP = 3 mm). Todo
+       lo que se dibuja se apoya en múltiplos de SP, así los aires son siempre
+       los mismos y nada hay que cuadrar a ojo. */
+    const PW=210, PH=297, M=14, SP=3;
+    const CW=PW-M*2, FOOT=11, TOP=M, SAFE=PH-FOOT-SP;
 
     const C={
-      ink:[28,31,40], ink2:[95,102,118], ink3:[152,159,174],
-      line:[210,215,226], line2:[233,236,243],
-      soft:[246,247,251], zebra:[250,251,253],
-      vio:[118,74,214], blue:[33,105,196], teal:[0,146,122], orange:[206,101,30]
+      ink:[26,29,38], ink2:[92,99,116], ink3:[150,157,173],
+      line:[206,212,224], line2:[231,235,242],
+      band:[240,243,249], gap:[221,226,236], hoy:[247,244,254],
+      vio:[112,68,208], blue:[30,102,194], teal:[0,142,118], orange:[203,98,28]
     };
     const FC=c=>doc.setFillColor(...c), DC=c=>doc.setDrawColor(...c);
     const TC=c=>doc.setTextColor(...c), LW=w=>doc.setLineWidth(w);
-    const SF=(sz,w='normal')=>{ doc.setFontSize(sz); doc.setFont('helvetica',w); };
-    const TX=(t,x,y,mw,opt={})=>{ const s=String(t==null?'':t); doc.text(doc.splitTextToSize(s,mw)[0]||'',x,y,opt); };
-    const RR=(x,y,w,h,r,fill,stroke)=>{
+    const SF=(sz,w)=>{ doc.setFontSize(sz); doc.setFont('helvetica',w||'normal'); };
+    const RR=(x,y0,w,h,r,fill,stroke)=>{
+      if(w<=0||h<=0) return;
+      const rr=Math.min(r,w/2,h/2);
       if(fill) FC(fill);
       if(stroke){ DC(stroke); LW(.2); }
-      doc.roundedRect(x,y,w,h,r,r,fill?(stroke?'FD':'F'):'D');
+      doc.roundedRect(x,y0,w,h,rr,rr,fill?(stroke?'FD':'F'):'D');
     };
-    const hsl2rgb=(h,s=62,l=52)=>{
+    const RECT=(x,y0,w,h,fill)=>{ if(w<=0||h<=0)return; FC(fill); doc.rect(x,y0,w,h,'F'); };
+    const HR=(x,y0,w,c)=>{ if(w<=0)return; DC(c||C.line2); LW(.2); doc.line(x,y0,x+w,y0); };
+    /* Recorta con puntos suspensivos: nada puede salirse de su columna. */
+    const cut=(t,mw)=>{
+      let s=String(t==null?'':t);
+      if(mw<=0) return '';
+      if(doc.getTextWidth(s)<=mw) return s;
+      while(s.length>1 && doc.getTextWidth(s+'…')>mw) s=s.slice(0,-1);
+      return s+'…';
+    };
+    const TX=(t,x,y0,mw)=>{ const s=cut(t,mw); if(s) doc.text(s,x,y0); };
+
+    const hsl2rgb=(h,s,l)=>{
       h/=360;s/=100;l/=100;
       const q=l<.5?l*(1+s):l+s-l*s, p=2*l-q;
-      const hue=t=>{ if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<.5)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p; };
-      return [Math.round(hue(h+1/3)*255),Math.round(hue(h)*255),Math.round(hue(h-1/3)*255)];
+      const f=t=>{ if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<.5)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p; };
+      return [Math.round(f(h+1/3)*255),Math.round(f(h)*255),Math.round(f(h-1/3)*255)];
     };
-    const evRGB  = ev=>hsl2rgb(ev.hue||270,62,52);
-    const evSoft = ev=>hsl2rgb(ev.hue||270,58,90);
+    const evRGB  = ev=>hsl2rgb(ev.hue||270,60,50);
+    const evSoft = ev=>hsl2rgb(ev.hue||270,62,91);
     const evName = ev=>ev.colorName||('Tono '+(ev.hue||0));
-    const gapM   = ()=>Math.max(0,Number(S.params&&S.params.gap)||0);
+    const evEnd  = e=>e.startMins+e.durationMins;
+    const gapMin = ()=>Math.max(0,Number(S.params&&S.params.gap)||0);
     const nImpr  = n=>n+(n===1?' impresión':' impresiones');
     const mesMin = m=>MONTHS[m].toLowerCase();
 
-    const newPage=(first)=>{ if(!first) doc.addPage(); };
+    let docTitle='', docSub='', y=0, page=0;
 
-    /* Cabecera: identidad a la izquierda, periodo y cifras a la derecha. */
-    const pageHeader=(title,sub)=>{
-      const H=21, y=MT;
-      RR(ML,y,CW,H,2.2,null,C.line);
-      FC(C.vio); doc.rect(ML,y+.6,1.6,H-1.2,'F');
-      SF(6.2,'bold'); TC(C.ink3); doc.text('3DPROJECT SUITE',ML+6,y+7.6);
-      SF(12,'bold');  TC(C.ink);  doc.text('3DPlanner',ML+6,y+15);
-      const tw=96, rx=ML+CW-6;
-      SF(11,'bold'); TC(C.vio);
-      const tl=doc.splitTextToSize(String(title),tw);
-      doc.text(tl[0],rx,y+9,{align:'right'});
-      SF(7.5); TC(C.ink2); doc.text(String(sub||''),rx,y+14.4,{align:'right'});
-      SF(6);   TC(C.ink3);
-      doc.text('Generado el '+new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'}),rx,y+18.6,{align:'right'});
-      return y+H+7;
-    };
+    /* Cada página repite una cabecera compacta: el contenido siempre empieza a
+       la misma altura y nunca invade el pie. */
+    function head(first){
+      const H=first?19:11;
+      FC(C.vio); doc.rect(M,TOP,1.4,H,'F');
+      if(first){
+        SF(6,'bold'); TC(C.ink3); doc.text('3DPROJECT SUITE · 3DPLANNER',M+4.5,TOP+4.4);
+        SF(15,'bold'); TC(C.ink);  TX(docTitle,M+4.5,TOP+12.4,CW-50);
+        SF(7.6);       TC(C.ink2); TX(docSub,M+4.5,TOP+17.4,CW-50);
+        SF(6);         TC(C.ink3);
+        doc.text('Generado el '+new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'}),M+CW,TOP+4.4,{align:'right'});
+      }else{
+        SF(9,'bold'); TC(C.ink); TX(docTitle,M+4.5,TOP+5.2,CW-40);
+        SF(6.4); TC(C.ink3); doc.text('continuación',M+CW,TOP+5.2,{align:'right'});
+      }
+      HR(M,TOP+H+SP,CW,C.line);
+      return TOP+H+SP*2;
+    }
+    function newPage(){ if(page) doc.addPage(); page++; y=head(page===1); return y; }
+    /* Reserva alto: si no cabe, salta de página. Todo bloque pasa por aquí. */
+    function need(h){ if(y+h>SAFE) newPage(); return y; }
 
-    const pageFooter=(pg,tot)=>{
-      DC(C.line2); LW(.2); doc.line(ML,PH-FOOT,ML+CW,PH-FOOT);
-      SF(6.2); TC(C.ink3);
-      doc.text('3DProject · 3DPlanner',ML,PH-FOOT+4.6);
-      doc.text('Jornada '+S.params.start+'–'+S.params.end+' · '+gapM()+' min entre impresiones',ML+CW/2,PH-FOOT+4.6,{align:'center'});
-      doc.text('Página '+pg+' de '+tot,ML+CW,PH-FOOT+4.6,{align:'right'});
-    };
+    function footer(pg,tot){
+      HR(M,PH-FOOT,CW,C.line2);
+      SF(6); TC(C.ink3);
+      doc.text('3DProject · 3DPlanner',M,PH-FOOT+4);
+      doc.text('Jornada '+S.params.start+'–'+S.params.end+' · '+gapMin()+' min entre impresiones',M+CW/2,PH-FOOT+4,{align:'center'});
+      doc.text(pg+' / '+tot,M+CW,PH-FOOT+4,{align:'right'});
+    }
 
-    /* Rótulo de sección: cuadrado de color, texto en versalitas y filete. */
-    const sectionHead=(label,y,clr)=>{
+    /* Rótulo de sección: cuadro de color, texto y filete hasta el margen. */
+    function section(label,clr,extra){
+      need(10);
+      FC(clr||C.vio); doc.roundedRect(M,y+.6,2.2,2.2,.5,.5,'F');
+      SF(7,'bold'); TC(C.ink);
       const L=String(label).toUpperCase();
-      FC(clr||C.vio); doc.roundedRect(ML,y-2.6,2.4,2.4,.5,.5,'F');
-      SF(7,'bold'); TC(C.ink); doc.text(L,ML+4.6,y);
+      doc.text(L,M+4.4,y+2.6);
       const tw=doc.getTextWidth(L);
-      DC(C.line2); LW(.25); doc.line(ML+4.6+tw+3,y-1,ML+CW,y-1);
-      return y+5;
-    };
+      let right=M+CW;
+      if(extra){ SF(6.2); TC(C.ink3); doc.text(extra,M+CW,y+2.6,{align:'right'}); right=M+CW-doc.getTextWidth(extra)-3; }
+      HR(M+4.4+tw+2.5,y+1.8,Math.max(0,right-(M+4.4+tw+2.5)));
+      y+=SP*2;
+      return y;
+    }
 
-    /* Línea de tiempo de un día: ventana de jornada, bloques por impresión y
-       el tiempo entre impresiones marcado en gris. */
-    const drawTL=(evs,y,opt)=>{
-      opt=opt||{};
+    /* Cifras en fila: casillas iguales dentro de una tarjeta. */
+    function kpis(items){
+      const H=15;
+      need(H+SP*2);
+      RR(M,y,CW,H,1.6,null,C.line);
+      const cw=CW/items.length;
+      items.forEach((it,i)=>{
+        const x=M+i*cw;
+        if(i){ DC(C.line2); LW(.2); doc.line(x,y+2.4,x,y+H-2.4); }
+        SF(5.4,'bold');  TC(C.ink3);      TX(it.l.toUpperCase(),x+3.4,y+5.4,cw-6.8);
+        SF(10.5,'bold'); TC(it.c||C.ink); TX(it.v,x+3.4,y+11.6,cw-6.8);
+      });
+      y+=H+SP*2;
+      return y;
+    }
+
+    function rangeOf(evs){
       const dS=timeToMins(S.params.start), dE=timeToMins(S.params.end);
       let lo=dS, hi=dE;
-      evs.forEach(e=>{ lo=Math.min(lo,e.startMins); hi=Math.max(hi,e.startMins+e.durationMins+gapM()); });
-      lo=Math.floor(lo/60)*60; hi=Math.ceil(hi/60)*60;
-      const span=Math.max(hi-lo,60);
-      const BX=ML, BW=CW, BH=opt.h||13;
-      const X=m=>BX+(Math.max(lo,Math.min(hi,m))-lo)/span*BW;
+      evs.forEach(e=>{ lo=Math.min(lo,e.startMins); hi=Math.max(hi,evEnd(e)+gapMin()); });
+      return {lo:Math.max(0,Math.floor(lo/60)*60), hi:Math.min(1440*2,Math.ceil(hi/60)*60), dS, dE};
+    }
+    const hourStep=span=>span/60>13?3:span/60>7?2:1;
 
-      RR(BX,y,BW,BH,1.4,[252,252,254],C.line);
-      FC([243,245,250]); doc.rect(X(dS),y+.5,Math.max(0,X(dE)-X(dS)),BH-1,'F');
-
-      const sorted=evs.slice().sort((a,b)=>a.startMins-b.startMins);
-      sorted.forEach((ev,i)=>{
-        const g=gapM(); if(!g) return;
-        const gs=ev.startMins+ev.durationMins;
-        const nxt=sorted[i+1];
-        const end=nxt?Math.min(gs+g,nxt.startMins):gs+g;
-        if(end<=gs) return;
-        FC([224,228,236]); doc.rect(X(gs),y+2.4,Math.max(X(end)-X(gs),.4),BH-4.8,'F');
+    /* Línea de tiempo de un día. */
+    function dayTimeline(evs){
+      const H=13, AX=5;
+      need(H+AX+SP*2);
+      const R=rangeOf(evs), span=Math.max(R.hi-R.lo,60);
+      const X=m=>M+(Math.max(R.lo,Math.min(R.hi,m))-R.lo)/span*CW;
+      RR(M,y,CW,H,1.4,[252,253,255],C.line);
+      RECT(X(R.dS),y+.4,Math.max(0,X(R.dE)-X(R.dS)),H-.8,C.band);
+      const ord=evs.slice().sort((a,b)=>a.startMins-b.startMins);
+      ord.forEach((ev,i)=>{
+        const g=gapMin(); if(!g) return;
+        const gs=evEnd(ev), ge=Math.min(gs+g, ord[i+1]?ord[i+1].startMins:gs+g);
+        if(ge>gs) RECT(X(gs),y+2.2,Math.max(X(ge)-X(gs),.35),H-4.4,C.gap);
       });
-      sorted.forEach(ev=>{
-        const x=X(ev.startMins), w=Math.max(X(ev.startMins+ev.durationMins)-x,1);
-        RR(x,y+1.6,w,BH-3.2,1,evSoft(ev),evRGB(ev));
-        FC(evRGB(ev)); doc.rect(x,y+1.6,Math.min(1.1,w),BH-3.2,'F');
-        if(w>16){ SF(5.6,'bold'); TC(evRGB(ev)); TX(ev.title||'Sin título',x+2.4,y+BH/2+1,w-4); }
+      ord.forEach(ev=>{
+        const x=X(ev.startMins), w=Math.max(X(evEnd(ev))-x,.9);
+        RR(x,y+1.4,w,H-2.8,.9,evSoft(ev),evRGB(ev));
+        RECT(x,y+1.4,Math.min(.9,w),H-2.8,evRGB(ev));
+        if(w>15){ SF(5.4,'bold'); TC(evRGB(ev)); TX(ev.title||'Sin título',x+2,y+H/2+.9,w-3.4); }
       });
-      DC(C.line); LW(.2); SF(5.4); TC(C.ink3);
-      const stepH=span/60>12?3:span/60>7?2:1;
-      for(let h=Math.ceil(lo/60);h<=Math.floor(hi/60);h+=stepH){
+      DC(C.line); LW(.2); SF(5.2); TC(C.ink3);
+      const st=hourStep(span);
+      for(let h=Math.ceil(R.lo/60);h<=Math.floor(R.hi/60);h+=st){
         const tx=X(h*60);
-        doc.line(tx,y+BH,tx,y+BH+1.4);
-        doc.text(pad(h)+':00',Math.max(BX+4.5,Math.min(BX+BW-4.5,tx)),y+BH+4.6,{align:'center'});
+        doc.line(tx,y+H,tx,y+H+1.2);
+        doc.text(pad(h%24)+':00',Math.max(M+5,Math.min(M+CW-5,tx)),y+H+4,{align:'center'});
       }
-      return y+BH+7;
-    };
+      y+=H+AX+SP*2;
+      return y;
+    }
 
-    /* Tabla de impresiones con corte de página y cabecera repetida. */
-    const COLS=[
-      {k:'n',   t:'#',         w:.055, a:'left'},
-      {k:'tit', t:'IMPRESIÓN', w:.365, a:'left'},
-      {k:'col', t:'COLOR',     w:.175, a:'left'},
-      {k:'ini', t:'INICIO',    w:.115, a:'right'},
-      {k:'fin', t:'FIN',       w:.115, a:'right'},
-      {k:'dur', t:'DURACIÓN',  w:.175, a:'right'}
-    ];
-    const colX=idx=>{ let cx=ML; for(let k=0;k<idx;k++) cx+=CW*COLS[k].w; return cx; };
-    const tblHead=(y)=>{
-      const H=7;
-      FC(C.soft); doc.rect(ML,y,CW,H,'F');
-      DC(C.line); LW(.25); doc.line(ML,y+H,ML+CW,y+H);
-      SF(5.8,'bold'); TC(C.ink2);
-      COLS.forEach((c,i)=>{ const w=CW*c.w, x=colX(i);
-        if(c.a==='right') doc.text(c.t,x+w-2.5,y+4.7,{align:'right'});
-        else doc.text(c.t,x+(c.k==='n'?3.4:3),y+4.7);
+    /* Rejilla semanal: siete columnas de día y las horas en vertical. */
+    function weekGrid(dates){
+      const all=[]; dates.forEach(d=>S.events.filter(e=>e.date===dateKey(d)).forEach(e=>all.push(e)));
+      const R=rangeOf(all), span=Math.max(R.hi-R.lo,60);
+      const HEAD=7.5, LBL=11;
+      const GH=Math.max(72,Math.min(115,span/60*7.4));
+      need(HEAD+GH+SP*2);
+      const colW=(CW-LBL)/7, X0=M+LBL;
+      const Y=m=>y+HEAD+(Math.max(R.lo,Math.min(R.hi,m))-R.lo)/span*GH;
+
+      dates.forEach((d,i)=>{
+        const x=X0+i*colW, hoy=dateKey(d)===dateKey(S.today);
+        if(hoy) RECT(x,y,colW,HEAD+GH,C.hoy);
+        SF(6.2,'bold'); TC(hoy?C.vio:C.ink2);
+        doc.text(DAYS[d.getDay()].toUpperCase(),x+colW/2,y+3.4,{align:'center'});
+        SF(6,'normal'); TC(hoy?C.vio:C.ink3);
+        doc.text(String(d.getDate()),x+colW/2,y+6.6,{align:'center'});
       });
-      return y+H;
-    };
-    const drawTable=(evs,startY,onNewPage)=>{
-      let y=tblHead(startY);
+      RECT(X0,y+HEAD,CW-LBL,GH,[252,253,255]);
+      RECT(X0,Y(R.dS),CW-LBL,Math.max(0,Y(R.dE)-Y(R.dS)),C.band);
+      SF(5.2);
+      const st=hourStep(span);
+      for(let h=Math.ceil(R.lo/60);h<=Math.floor(R.hi/60);h+=st){
+        const ty=Y(h*60);
+        HR(X0,ty,CW-LBL,C.line2);
+        TC(C.ink3); doc.text(pad(h%24)+':00',X0-2,ty+1.6,{align:'right'});
+      }
+      for(let i=0;i<=7;i++){ DC(C.line); LW(.2); doc.line(X0+i*colW,y+HEAD,X0+i*colW,y+HEAD+GH); }
+      HR(X0,y+HEAD,CW-LBL,C.line); HR(X0,y+HEAD+GH,CW-LBL,C.line);
+      dates.forEach((d,i)=>{
+        const evs=S.events.filter(e=>e.date===dateKey(d)).sort((a,b)=>a.startMins-b.startMins);
+        const x=X0+i*colW;
+        evs.forEach((ev,k)=>{
+          const g=gapMin();
+          if(g){ const gs=evEnd(ev), ge=Math.min(gs+g, evs[k+1]?evs[k+1].startMins:gs+g);
+            if(ge>gs) RECT(x+1,Y(gs),colW-2,Math.max(Y(ge)-Y(gs),.3),C.gap); }
+          const top=Y(ev.startMins), h=Math.max(Y(evEnd(ev))-top,1.3);
+          RR(x+1,top,colW-2,h,.8,evSoft(ev),evRGB(ev));
+          RECT(x+1,top,.8,h,evRGB(ev));
+          if(h>=4.4){ SF(4.8,'bold');   TC(evRGB(ev)); TX(ev.title||'Sin título',x+2.6,top+3.1,colW-4.4); }
+          if(h>=7.8){ SF(4.4,'normal'); TC(evRGB(ev)); TX(minsToTime(ev.startMins)+'–'+minsToTime(evEnd(ev)),x+2.6,top+6.2,colW-4.4); }
+        });
+      });
+      y+=HEAD+GH+SP*2;
+      return y;
+    }
+
+    /* ── Lista de impresiones repartida en columnas ───────────────────────
+       Dos columnas en el día y tres en la semana: cabe el triple por hoja sin
+       apretar el texto. Cada ficha mide su alto antes de dibujarse, así que no
+       se parte entre columnas ni se sale por abajo, y el reparto se equilibra
+       para que las columnas queden a la misma altura. */
+    const itemH=ev=>(ev.nozzle||ev.bed)?9:7.6;
+    function drawItem(ev,n,x,w,yy){
+      const extra=[ev.nozzle,ev.bed].filter(Boolean).join(' · ');
+      const rgb=evRGB(ev), h=itemH(ev);
+      RECT(x,yy+.5,1.1,h-1.6,rgb);
+      SF(5.6); TC(C.ink3); doc.text(String(n),x+2.9,yy+4);
+      const horas=minsToTime(ev.startMins)+'–'+minsToTime(evEnd(ev));
+      SF(6.6,'bold'); const hw=doc.getTextWidth(horas);
+      const x0=x+6.6;
+      SF(7.4,'bold'); TC(C.ink); TX(ev.title||'Sin título',x0,yy+4,w-6.6-hw-3.5);
+      SF(6.6,'bold'); TC(C.ink2); doc.text(horas,x+w-1,yy+4,{align:'right'});
+      SF(5.6,'normal'); TC(C.ink3);
+      TX(fmtDur(ev.durationMins)+' · '+evName(ev)+(extra?('  ·  '+extra):''),x0,yy+(extra?7.6:6.6),w-6.6-2);
+      HR(x,yy+h-.4,w,C.line2);
+    }
+    function itemList(evs,cols){
       if(!evs.length){
-        SF(7.5); TC(C.ink3); doc.text('Sin impresiones programadas',ML+CW/2,y+7,{align:'center'});
-        DC(C.line2); LW(.2); doc.line(ML,y+11,ML+CW,y+11);
-        return y+14;
+        need(10);
+        SF(7.4); TC(C.ink3); doc.text('Sin impresiones programadas',M+CW/2,y+4,{align:'center'});
+        y+=10;
+        return y;
       }
-      const sorted=evs.slice().sort((a,b)=>a.startMins-b.startMins);
-      sorted.forEach((ev,i)=>{
-        const extra=[ev.nozzle,ev.bed].filter(Boolean).join(' · ');
-        const RH=extra?11:8.6;
-        const base=y+5.6;
-        if(y+RH>SAFE){ y=onNewPage(); y=tblHead(y); }
-        const yb=extra?y+5:y+5.6;
-        if(i%2){ FC(C.zebra); doc.rect(ML,y,CW,RH,'F'); }
-        const rgb=evRGB(ev);
-        FC(rgb); doc.rect(ML,y+1,1.4,RH-2,'F');
-        SF(6.4); TC(C.ink3); doc.text(String(i+1),colX(0)+3.4,y+5.6);
-        SF(8,'bold'); TC(C.ink);
-        TX(ev.title||'Sin título',colX(1)+3,yb,CW*COLS[1].w-5);
-        if(extra){ SF(5.8); TC(C.ink3); TX(extra,colX(1)+3,y+8.6,CW*COLS[1].w-5); }
-        FC(rgb); doc.circle(colX(2)+4.6,(extra?y+4.6:y+5.2),1.5,'F');
-        SF(6.6); TC(C.ink2); TX(evName(ev),colX(2)+8,(extra?y+5.4:y+5.9),CW*COLS[2].w-9);
-        SF(7.6); TC(C.ink);
-        doc.text(minsToTime(ev.startMins),colX(3)+CW*COLS[3].w-2.5,(extra?y+5.4:y+5.9),{align:'right'});
-        doc.text(minsToTime(ev.startMins+ev.durationMins),colX(4)+CW*COLS[4].w-2.5,(extra?y+5.4:y+5.9),{align:'right'});
-        SF(7.6,'bold'); TC(C.ink2);
-        doc.text(fmtDur(ev.durationMins),colX(5)+CW*COLS[5].w-2.5,(extra?y+5.4:y+5.9),{align:'right'});
-        DC(C.line2); LW(.15); doc.line(ML,y+RH,ML+CW,y+RH);
-        y+=RH;
-        const nxt=sorted[i+1];
-        if(nxt && gapM()>0){
-          const hueco=nxt.startMins-(ev.startMins+ev.durationMins);
-          if(hueco>0 && y+5.4<=SAFE){
-            SF(5.8); TC(C.ink3);
-            doc.text('· '+fmtDur(Math.min(hueco,gapM()))+' entre impresiones'+(hueco>gapM()?' (+'+fmtDur(hueco-gapM())+' libres)':''),colX(1)+3,y+3.8);
-            y+=5.4;
+      const gut=SP*2, w=(CW-gut*(cols-1))/cols;
+      const ord=evs.slice().sort((a,b)=>a.startMins-b.startMins);
+      let i=0, n=1;
+      while(i<ord.length){
+        const top=y, disp=SAFE-top;
+        let resto=0; for(let k=i;k<ord.length;k++) resto+=itemH(ord[k]);
+        const cabeTodo=resto<=disp*cols;
+        const porCol=cabeTodo?Math.ceil((ord.length-i)/cols):Infinity;
+        let col=0, cy=top, fondo=top, enCol=0;
+        while(i<ord.length && col<cols){
+          const h=itemH(ord[i]);
+          if(enCol>0 && (cy+h>SAFE || enCol>=porCol)){
+            col++; if(col>=cols) break;
+            cy=top; enCol=0;
           }
+          if(cy+h>SAFE) break;
+          drawItem(ord[i],n,M+col*(w+gut),w,cy);
+          cy+=h; enCol++; fondo=Math.max(fondo,cy); i++; n++;
         }
-      });
-      DC(C.line); LW(.25); doc.line(ML,y,ML+CW,y);
-      return y+5;
-    };
+        y=fondo+SP*2;
+        if(i<ord.length) newPage();
+      }
+      return y;
+    }
 
-    const drawStats=(evs,y)=>{
+    /* Leyenda de colores: se reparte por líneas sin salirse del ancho útil. */
+    function legend(evs){
+      const vistos=[],map={};
+      evs.forEach(ev=>{ const k=evName(ev); if(!map[k]){ map[k]=1; vistos.push(ev); } });
+      if(!vistos.length) return y;
+      need(7);
+      let x=M, cy=y+2;
+      SF(6);
+      vistos.forEach(ev=>{
+        const l=evName(ev), w=doc.getTextWidth(l)+9;
+        if(x+w>M+CW){ x=M; cy+=5; }
+        if(cy>SAFE-2){ y=cy; newPage(); cy=y+2; x=M; }
+        FC(evRGB(ev)); doc.circle(x+1.7,cy-1,1.4,'F');
+        TC(C.ink2); doc.text(l,x+4.6,cy);
+        x+=w;
+      });
+      y=cy+SP*2;
+      return y;
+    }
+
+    function resumen(evs,dias){
       const total=evs.reduce((s,e)=>s+e.durationMins,0);
       const jornada=Math.max(1,timeToMins(S.params.end)-timeToMins(S.params.start));
-      const dias=Math.max(1,new Set(evs.map(e=>e.date)).size);
-      const util=Math.min(100,Math.round(total/(jornada*dias)*100));
-      const earliest=evs.length?evs.reduce((m,e)=>Math.min(m,e.startMins),1440):0;
-      const latest=evs.length?evs.reduce((m,e)=>Math.max(m,e.startMins+e.durationMins),0):0;
-      const BH=26;
-      RR(ML,y,CW,BH,2.2,null,C.line);
-      const stats=[
-        {l:'IMPRESIONES', v:String(evs.length),                                  c:C.ink},
-        {l:'TIEMPO TOTAL',v:evs.length?fmtDur(total):'—',                        c:C.ink},
-        {l:'UTILIZACIÓN', v:util+'%',                                            c:util>85?C.orange:C.teal},
-        {l:'MEDIA / IMP.',v:evs.length?fmtDur(Math.round(total/evs.length)):'—', c:C.ink},
-        {l:'HORARIO',     v:evs.length?minsToTime(earliest)+'–'+minsToTime(latest):'—', c:C.ink}
-      ];
-      const cw2=CW/stats.length;
-      stats.forEach((st,i)=>{
-        const sx=ML+i*cw2+4;
-        SF(5.6,'bold'); TC(C.ink3); doc.text(st.l,sx,y+6.6);
-        SF(11,'bold');  TC(st.c);   TX(st.v,sx,y+14,cw2-5);
-        if(i){ DC(C.line2); LW(.2); doc.line(ML+i*cw2,y+3.5,ML+i*cw2,y+BH-3.5); }
-      });
-      const bx=ML+4, bw=CW-8, by=y+BH-5.6;
-      RR(bx,by,bw,2.2,1.1,[236,239,245]);
-      if(util>0) RR(bx,by,bw*util/100,2.2,1.1,util>85?C.orange:util>55?C.teal:C.blue);
-      return y+BH+6;
-    };
+      const util=Math.min(100,Math.round(total/(jornada*Math.max(1,dias))*100));
+      return {
+        total, util,
+        ini:evs.length?evs.reduce((m,e)=>Math.min(m,e.startMins),1440):0,
+        fin:evs.length?evs.reduce((m,e)=>Math.max(m,evEnd(e)),0):0,
+        media:evs.length?Math.round(total/evs.length):0
+      };
+    }
 
-    /* Vista semanal: una fila por día sobre la misma escala horaria. */
-    const drawWeekTL=(dates,y)=>{
-      const dS=timeToMins(S.params.start), dE=timeToMins(S.params.end);
-      let lo=dS, hi=dE;
-      dates.forEach(d=>S.events.filter(e=>e.date===dateKey(d)).forEach(e=>{
-        lo=Math.min(lo,e.startMins); hi=Math.max(hi,e.startMins+e.durationMins+gapM()); }));
-      lo=Math.floor(lo/60)*60; hi=Math.ceil(hi/60)*60;
-      const span=Math.max(hi-lo,60);
-      const LBL=22, BX=ML+LBL, BW=CW-LBL, RH=11, RG=2.4;
-      const X=m=>BX+(Math.max(lo,Math.min(hi,m))-lo)/span*BW;
-      SF(5.4); TC(C.ink3); DC(C.line2); LW(.15);
-      const stepH=span/60>12?3:span/60>7?2:1;
-      const bottom=y+1.5+dates.length*(RH+RG)-RG;
-      for(let h=Math.ceil(lo/60);h<=Math.floor(hi/60);h+=stepH){
-        const tx=X(h*60);
-        doc.text(pad(h)+':00',Math.max(BX+4.5,Math.min(BX+BW-4.5,tx)),y-1,{align:'center'});
-        doc.line(tx,y+1.5,tx,bottom);
-      }
-      let cy=y+1.5;
-      dates.forEach(d=>{
-        const dk2=dateKey(d), evs2=S.events.filter(e=>e.date===dk2).sort((a,b)=>a.startMins-b.startMins);
-        const isT=dk2===dateKey(S.today);
-        SF(7,isT?'bold':'normal'); TC(isT?C.vio:C.ink2);
-        doc.text(DAYS[d.getDay()]+' '+pad(d.getDate()),ML,cy+RH/2+1.6);
-        RR(BX,cy,BW,RH,1.2,[252,252,254],C.line);
-        FC([243,245,250]); doc.rect(X(dS),cy+.5,Math.max(0,X(dE)-X(dS)),RH-1,'F');
-        evs2.forEach((ev,i)=>{
-          const g=gapM();
-          if(g){ const gs=ev.startMins+ev.durationMins, nxt=evs2[i+1];
-            const ge=nxt?Math.min(gs+g,nxt.startMins):gs+g;
-            if(ge>gs){ FC([224,228,236]); doc.rect(X(gs),cy+2,Math.max(X(ge)-X(gs),.4),RH-4,'F'); } }
-          const x=X(ev.startMins), w=Math.max(X(ev.startMins+ev.durationMins)-x,1);
-          RR(x,cy+1.4,w,RH-2.8,.9,evSoft(ev),evRGB(ev));
-          FC(evRGB(ev)); doc.rect(x,cy+1.4,Math.min(1,w),RH-2.8,'F');
-          if(w>18){ SF(5.4,'bold'); TC(evRGB(ev)); TX(ev.title||'Sin título',x+2.2,cy+RH/2+1,w-3.6); }
-        });
-        if(!evs2.length){ SF(5.6); TC(C.ink3); doc.text('sin impresiones',BX+3,cy+RH/2+1.4); }
-        cy+=RH+RG;
-      });
-      return cy+4;
-    };
-
-    /* Leyenda de colores: ayuda a leer la línea de tiempo de un vistazo. */
-    const drawLegend=(evs,y)=>{
-      const seen=[], map={};
-      evs.forEach(ev=>{ const k=evName(ev); if(!map[k]){ map[k]=1; seen.push(ev); } });
-      if(!seen.length) return y;
-      let x=ML, cy=y;
-      SF(6.4);
-      seen.forEach(ev=>{
-        const label=evName(ev);
-        const w=doc.getTextWidth(label)+8.5;
-        if(x+w>ML+CW){ x=ML; cy+=5.4; }
-        FC(evRGB(ev)); doc.circle(x+1.8,cy-1,1.5,'F');
-        TC(C.ink2); doc.text(label,x+5,cy);
-        x+=w+3;
-      });
-      return cy+5;
-    };
-
-    // ── Render ──────────────────────────────────────────────────────────────
-    const allDates=getExportDates();
-
+    // ── Documento ───────────────────────────────────────────────────────────
     if(S.exportScope==='day'){
-      const d=new Date(S.cur), dk2=dateKey(d);
-      const evs=S.events.filter(e=>e.date===dk2).sort((a,b)=>a.startMins-b.startMins);
-      const total=evs.reduce((s,e)=>s+e.durationMins,0);
-      const title=DAYS[d.getDay()]+', '+d.getDate()+' de '+mesMin(d.getMonth())+' de '+d.getFullYear();
-      const sub=nImpr(evs.length)+(evs.length?' · '+fmtDur(total)+' de impresión':'');
-      newPage(true);
-      let y=pageHeader(title,sub);
-      const nextPage=()=>{
-        newPage(false);
-        SF(6.5); TC(C.ink3); doc.text(title+' · continuación',ML,MT+3);
-        DC(C.line2); LW(.2); doc.line(ML,MT+5,ML+CW,MT+5);
-        return MT+9;
-      };
-      if(showTL&&evs.length){ y=sectionHead('Línea de tiempo',y,C.blue); y=drawTL(evs,y)+1.5; y=drawLegend(evs,y)+3; }
-      if(showTbl){ y=sectionHead('Impresiones del día',y,C.vio); y=drawTable(evs,y,nextPage)+2; }
-      if(showStats){ if(y+34>SAFE) y=nextPage(); y=sectionHead('Resumen',y,C.teal); y=drawStats(evs,y); }
+      const d=new Date(S.cur), dk=dateKey(d);
+      const evs=S.events.filter(e=>e.date===dk).sort((a,b)=>a.startMins-b.startMins);
+      const r=resumen(evs,1);
+      docTitle=DAYS[d.getDay()]+', '+d.getDate()+' de '+mesMin(d.getMonth())+' de '+d.getFullYear();
+      docSub=nImpr(evs.length)+(evs.length?' · '+fmtDur(r.total)+' de impresión · jornada '+S.params.start+'–'+S.params.end:'');
+      newPage();
+      if(showStats) kpis([
+        {l:'Impresiones',v:String(evs.length)},
+        {l:'Tiempo total',v:evs.length?fmtDur(r.total):'—'},
+        {l:'Utilización',v:r.util+'%',c:r.util>85?C.orange:C.teal},
+        {l:'Media / imp.',v:evs.length?fmtDur(r.media):'—'},
+        {l:'Horario',v:evs.length?minsToTime(r.ini)+'–'+minsToTime(r.fin):'—'}
+      ]);
+      if(showTL&&evs.length){ section('Línea de tiempo',C.blue,S.params.start+'–'+S.params.end); dayTimeline(evs); legend(evs); }
+      if(showTbl){ section('Impresiones del día',C.vio,gapMin()+' min entre impresiones'); itemList(evs,2); }
       const tot=doc.getNumberOfPages();
-      for(let p=1;p<=tot;p++){ doc.setPage(p); pageFooter(p,tot); }
-      doc.save('3DPlanner_'+dk2+'.pdf');
+      for(let p=1;p<=tot;p++){ doc.setPage(p); footer(p,tot); }
+      doc.save('3DPlanner_'+dk+'.pdf');
     } else {
-      const mon=allDates[0], sun=allDates[6];
-      const dks=allDates.map(dateKey);
-      const allEvs=S.events.filter(e=>dks.includes(e.date));
-      const total=allEvs.reduce((s,e)=>s+e.durationMins,0);
-      const wTitle='Semana del '+mon.getDate()+' al '+sun.getDate()+' de '+mesMin(sun.getMonth())+' de '+sun.getFullYear();
-      const sub=nImpr(allEvs.length)+(allEvs.length?' · '+fmtDur(total)+' de impresión':'');
-      newPage(true);
-      let y=pageHeader(wTitle,sub);
-      const nextPage=()=>{
-        newPage(false);
-        SF(6.5); TC(C.ink3); doc.text(wTitle+' · continuación',ML,MT+3);
-        DC(C.line2); LW(.2); doc.line(ML,MT+5,ML+CW,MT+5);
-        return MT+9;
-      };
-      if(showTL){ y=sectionHead('Planning semanal',y,C.blue); y=drawWeekTL(allDates,y); y=drawLegend(allEvs,y)+2; }
-      if(showStats){ if(y+34>SAFE) y=nextPage(); y=sectionHead('Resumen de la semana',y,C.teal); y=drawStats(allEvs,y)+2; }
+      const dates=getExportDates(), mon=dates[0], sun=dates[6];
+      const dks=dates.map(dateKey);
+      const evs=S.events.filter(e=>dks.includes(e.date)).sort((a,b)=>a.startMins-b.startMins);
+      const r=resumen(evs,7);
+      let carga={d:null,m:0};
+      dates.forEach(d=>{ const m=S.events.filter(e=>e.date===dateKey(d)).reduce((s,e)=>s+e.durationMins,0);
+        if(m>carga.m) carga={d,m}; });
+      docTitle='Semana del '+mon.getDate()+' al '+sun.getDate()+' de '+mesMin(sun.getMonth())+' de '+sun.getFullYear();
+      docSub=nImpr(evs.length)+(evs.length?' · '+fmtDur(r.total)+' de impresión · jornada '+S.params.start+'–'+S.params.end:'');
+      newPage();
+      if(showStats) kpis([
+        {l:'Impresiones',v:String(evs.length)},
+        {l:'Tiempo total',v:evs.length?fmtDur(r.total):'—'},
+        {l:'Utilización',v:r.util+'%',c:r.util>85?C.orange:C.teal},
+        {l:'Media / día',v:evs.length?fmtDur(Math.round(r.total/7)):'—'},
+        {l:'Día más cargado',v:carga.d?DAYS[carga.d.getDay()]+' · '+fmtDur(carga.m):'—'}
+      ]);
+      if(showTL){ section('Planning semanal',C.blue,S.params.start+'–'+S.params.end); weekGrid(dates); legend(evs); }
       if(showTbl){
-        allDates.forEach(d=>{
-          const dk2=dateKey(d), dayEvs=S.events.filter(e=>e.date===dk2).sort((a,b)=>a.startMins-b.startMins);
+        let alguno=false;
+        dates.forEach(d=>{
+          const dkd=dateKey(d), dayEvs=S.events.filter(e=>e.date===dkd).sort((a,b)=>a.startMins-b.startMins);
+          if(!dayEvs.length) return;
+          alguno=true;
           const dTot=dayEvs.reduce((s,e)=>s+e.durationMins,0);
-          if(y+30>SAFE) y=nextPage();
-          y=sectionHead(DAYS[d.getDay()]+' '+d.getDate()+' de '+mesMin(d.getMonth()),y,C.vio);
-          SF(6.4); TC(C.ink3);
-          doc.text(nImpr(dayEvs.length)+(dayEvs.length?' · '+fmtDur(dTot):''),ML+CW,y-4.6,{align:'right'});
-          y=drawTable(dayEvs,y,nextPage)+3;
+          need(10+itemH(dayEvs[0])+SP*2);
+          section(DAYS[d.getDay()]+' '+d.getDate()+' de '+mesMin(d.getMonth()),C.vio,nImpr(dayEvs.length)+' · '+fmtDur(dTot));
+          itemList(dayEvs,3);
         });
+        if(!alguno){ section('Impresiones de la semana',C.vio); itemList([],1); }
       }
       const tot=doc.getNumberOfPages();
-      for(let p=1;p<=tot;p++){ doc.setPage(p); pageFooter(p,tot); }
+      for(let p=1;p<=tot;p++){ doc.setPage(p); footer(p,tot); }
       doc.save('3DPlanner_semana_'+dateKey(mon)+'.pdf');
     }
 
