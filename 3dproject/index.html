@@ -528,6 +528,7 @@ body::after {
    "Cargando tus datos…" de Firebase. Se tapa con una animación de la misma
    duración, en el color de la app que se está abriendo. */
 .vload {
+  --vload-t: 1s;
   position: absolute; inset: 0; z-index: 5;
   display: none; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
   background: var(--bg);
@@ -544,7 +545,7 @@ body::after {
 .vload-mark svg { width: 30px; height: 30px; }
 .vload-mark::after {
   content: ''; position: absolute; inset: 0; border-radius: 21px;
-  animation: vloadHalo .5s ease-out both;
+  animation: vloadHalo .5s ease-out 2 both;
 }
 .vload-name { font-size: 13px; font-weight: 600; letter-spacing: .2px; color: var(--t2);
   animation: vloadName .5s ease both; }
@@ -552,7 +553,7 @@ body::after {
 [data-theme=light] .vload-bar { background: rgba(0,0,0,.08); }
 .vload-bar span { display: block; height: 100%; border-radius: 2px;
   background: var(--vload-c, var(--t1)); transform-origin: left;
-  animation: vloadFill .5s cubic-bezier(.35,0,.15,1) both; }
+  animation: vloadFill var(--vload-t) cubic-bezier(.35,0,.15,1) both; }
 @keyframes vloadFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes vloadPop { 0% { opacity: 0; transform: scale(.72); } 60% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
 @keyframes vloadHalo { 0% { box-shadow: 0 0 0 0 var(--vload-c); opacity: .5; } 100% { box-shadow: 0 0 0 28px var(--vload-c); opacity: 0; } }
@@ -1379,7 +1380,7 @@ const APP_VER = '20260825-2318';
 
 /* La cortina dura lo mismo que el aviso que oculta (~0,5 s) y se va con un
    fundido corto; si la app tarda más, aparecerá su propio aviso al retirarse. */
-const VLOAD_MS = 500;
+const VLOAD_MS = 1000;
 let _vloadT = null;
 function showVLoad(a) {
   const ov = document.getElementById('v-load');
