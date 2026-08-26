@@ -901,9 +901,13 @@ function utilHTML(c){ var u=ensureUtil(c);
   var simpleSel='<select class="selx" onchange="setUtil(\'simple\',\'type\',this.value)"><option value="arandelas" selected>'+esc(utilName('simple'))+'</option></select>';
   var cajaSel='<select class="selx" onchange="setUtil(\'caja\',\'size\',this.value)"><option value="m"'+(u.caja.size!=='l'?' selected':'')+'>'+esc(utilName('caja_m'))+'</option><option value="l"'+(u.caja.size==='l'?' selected':'')+'>'+esc(utilName('caja_l'))+'</option></select>';
   var bolsaSel='<select class="selx" onchange="setUtil(\'bolsa\',\'size\',this.value)"><option value="s"'+(u.bolsa.size==='s'?' selected':'')+'>'+esc(utilName('bolsa_s'))+'</option><option value="m"'+(u.bolsa.size==='m'?' selected':'')+'>'+esc(utilName('bolsa_m'))+'</option><option value="l"'+(u.bolsa.size==='l'?' selected':'')+'>'+esc(utilName('bolsa_l'))+'</option></select>';
-  return '<div class="ut-row"><div class="ut-main"><label class="lbl">'+esc(utilName('g_simple'))+'</label>'+simpleSel+'</div>'+cnt('simple',u.simple.qty)+'</div>'
-    +'<div class="ut-row"><div class="ut-main"><label class="lbl">'+esc(utilName('g_caja'))+'</label>'+cajaSel+'</div>'+cnt('caja',u.caja.qty)+'</div>'
-    +'<div class="ut-row"><div class="ut-main"><label class="lbl">'+esc(utilName('g_bolsa'))+'</label>'+bolsaSel+'</div>'+cnt('bolsa',u.bolsa.qty)+'</div>'
+  /* Tarifa unitaria del accesorio elegido, junto al nombre igual que en el resto
+     de categorías de la calculadora. */
+  function utTag(k){ return ' <em class="prod-src">'+eur(utilPrice(k))+' / ud.</em>'; }
+  var kCaja=(u.caja.size==='l'?'caja_l':'caja_m'), kBolsa={s:'bolsa_s',m:'bolsa_m',l:'bolsa_l'}[u.bolsa.size]||'bolsa_m';
+  return '<div class="ut-row"><div class="ut-main"><label class="lbl">'+esc(utilName('g_simple'))+utTag('simple')+'</label>'+simpleSel+'</div>'+cnt('simple',u.simple.qty)+'</div>'
+    +'<div class="ut-row"><div class="ut-main"><label class="lbl">'+esc(utilName('g_caja'))+utTag(kCaja)+'</label>'+cajaSel+'</div>'+cnt('caja',u.caja.qty)+'</div>'
+    +'<div class="ut-row"><div class="ut-main"><label class="lbl">'+esc(utilName('g_bolsa'))+utTag(kBolsa)+'</label>'+bolsaSel+'</div>'+cnt('bolsa',u.bolsa.qty)+'</div>'
     +'<div class="ut-total">Total accesorios <b>'+eur(accessoriesTotal(c))+'</b></div>';
 }
 function setShared(v){ S.calc_state.is_shared=v; save(); renderCalc(); }
@@ -916,7 +920,17 @@ function go(v){ view=v; document.getElementById('vtitle').textContent=({dash:'Da
    lanzar a mano algún día). */
 function render(){
   if(view==='dash')renderDash(); else if(view==='cli')renderClients(); else if(view==='calc')renderCalc(); else if(view==='ord')renderOrders(); else if(view==='cal')renderCalendar(); else if(view==='plantillas')renderPlantillas(); else renderCfg(); }
-function updateResult(){ var el=document.getElementById('resultBox'); if(el)el.innerHTML=resultHTML(); try{refreshProdCard();}catch(e){} }
+/* Rótulos de tarifa que acompañan a los desplegables: se generan aparte para
+   poder refrescarlos sin repintar todo el formulario (repintar haría perder el
+   foco y el cursor de los campos de texto que se están editando). */
+function hintDisenoHTML(c){ return eur(disenoImporte(c.diseno_modelado,c.diseno_opt))+(c.diseno_opt?(' · optimización ('+Math.round(disenoOptPct()*100)+'%)'):''); }
+function hintPostprocHTML(c){ return eur(postprocPartes(c,num(S.global_config&&S.global_config.labor_cost_h)).postproc); }
+/* Sin esto los importes junto a «Diseño / modelado» y «Post-procesado» se
+   quedaban con la tarifa anterior hasta cambiar de vista. */
+function refreshCalcHints(){ var c=S.calc_state; if(!c)return;
+  var d=document.getElementById('hintDiseno'); if(d)d.innerHTML=hintDisenoHTML(c);
+  var p=document.getElementById('hintPostproc'); if(p)p.innerHTML=hintPostprocHTML(c); }
+function updateResult(){ var el=document.getElementById('resultBox'); if(el)el.innerHTML=resultHTML(); try{refreshCalcHints();}catch(e){} try{refreshProdCard();}catch(e){} }
 
 /* ===== cajón de ahorro =====================================================
    Ingresos automáticos: cada pedido activo/finalizado aporta una tasa calculada
@@ -1247,10 +1261,10 @@ function renderCalc(){
    +'</div>'
    /* ── Complementarios: diseño solo · soportes+postproc · error+asistente · urgencia+misc ── */
    +'<div class="card"><div class="card-h">Parámetros complementarios</div>'
-     +'<div class="fg"><label class="lbl">Diseño / modelado <em class="prod-src">'+eur(disenoImporte(c.diseno_modelado,c.diseno_opt))+(c.diseno_opt?(' · optimización ('+Math.round(disenoOptPct()*100)+'%)'):'')+'</em></label>'
+     +'<div class="fg"><label class="lbl">Diseño / modelado <em class="prod-src" id="hintDiseno">'+hintDisenoHTML(c)+'</em></label>'
        +'<div class="dz-row"><select class="selx" onchange="setCalc(\'diseno_modelado\',this.value)">'+optList(Object.keys(DISENO_PRECIO),disenoNivel(c.diseno_modelado))+'</select>'
        +'<label class="dz-opt'+(c.diseno_opt?' on':'')+'" title="Pedido de optimización: se cobra el porcentaje indicado en Configuración"><input type="checkbox" '+(c.diseno_opt?'checked':'')+' onchange="toggleDisenoOpt()">Optimización</label></div></div>'
-     +'<div class="fg"><label class="lbl">Post-procesado <em class="prod-src">'+eur(postprocPartes(c,num(S.global_config&&S.global_config.labor_cost_h)).postproc)+'</em></label>'
+     +'<div class="fg"><label class="lbl">Post-procesado <em class="prod-src" id="hintPostproc">'+hintPostprocHTML(c)+'</em></label>'
        +'<select class="selx" onchange="setCalc(\'postprocesado\',this.value)">'+optList(postprocOpts(c.postprocesado),c.postprocesado)+'</select></div>'
      +'<div class="fg row"><div><label class="lbl">Probabilidad de error</label><select class="selx" onchange="setCalc(\'probabilidad_error\',this.value)">'+optList(Object.keys(PROBABILIDAD_ERROR),c.probabilidad_error)+'</select></div>'
        +'<div><label class="lbl">Asistente de riesgo</label><button class="btn ghost" style="width:100%;padding:9px 10px;font-size:12.5px" onclick="openRisk()">⚙ Abrir asistente</button></div></div>'
