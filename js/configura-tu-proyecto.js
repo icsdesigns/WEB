@@ -55,8 +55,8 @@ document.addEventListener('DOMContentLoaded', function () {
         petg: []
     };
     const allowedGroupsByPieceType = {
-        tecnica: ['indeterminado', 'petg'],
-        artistica: ['indeterminado', 'pla-basico', 'pla-premium']
+        resistentes: ['indeterminado', 'petg'],
+        artisticas: ['indeterminado', 'pla-basico', 'pla-premium']
     };
     const selectedColorState = {};
     let activeStep = 1;
@@ -91,6 +91,17 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     const deadlineOptions = Array.from(document.querySelectorAll('.plazo-option'));
+    const deadlineDateGroup = document.getElementById('deadlineDateGroup');
+    const deadlineDateInput = document.getElementById('projectDeadlineDate');
+
+    /* Solo pueden señalarse fechas a partir de 2 días desde hoy */
+    if (deadlineDateInput) {
+        const minDate = new Date();
+        minDate.setHours(0, 0, 0, 0);
+        minDate.setDate(minDate.getDate() + 2);
+        deadlineDateInput.min = toDateInputValue(minDate);
+    }
+
     deadlineOptions.forEach(function (option) {
         const input = option.querySelector('input[type="radio"]');
         if (!input) return;
@@ -99,8 +110,52 @@ document.addEventListener('DOMContentLoaded', function () {
                 const radio = opt.querySelector('input[type="radio"]');
                 opt.classList.toggle('selected', !!(radio && radio.checked));
             });
+            updateDeadlineDateVisibility();
         });
     });
+
+    if (deadlineDateInput) {
+        deadlineDateInput.addEventListener('input', function () {
+            deadlineDateInput.classList.remove('input-error');
+            const errorEl = document.getElementById('errDeadlineDate');
+            if (errorEl) errorEl.classList.remove('show');
+        });
+    }
+
+    updateDeadlineDateVisibility();
+
+    function toDateInputValue(date) {
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return date.getFullYear() + '-' + month + '-' + day;
+    }
+
+    function isUrgentDeadline() {
+        const checked = document.querySelector('input[name="projectDeadline"]:checked');
+        return !!(checked && checked.value === 'urgente');
+    }
+
+    function updateDeadlineDateVisibility() {
+        if (!deadlineDateGroup || !deadlineDateInput) return;
+
+        const urgent = isUrgentDeadline();
+        deadlineDateGroup.hidden = !urgent;
+        deadlineDateInput.required = urgent;
+
+        if (!urgent) {
+            deadlineDateInput.value = '';
+            deadlineDateInput.classList.remove('input-error');
+            const errorEl = document.getElementById('errDeadlineDate');
+            if (errorEl) errorEl.classList.remove('show');
+        }
+    }
+
+    function getDeadlineDateLabel() {
+        if (!deadlineDateInput || !deadlineDateInput.value) return '';
+        const parts = deadlineDateInput.value.split('-');
+        if (parts.length !== 3) return deadlineDateInput.value;
+        return parts[2] + '/' + parts[1] + '/' + parts[0];
+    }
 
     colorCatalogSections.addEventListener('change', function (event) {
         if (event.target && event.target.matches('input[name="projectColorChoices"]')) {
@@ -324,9 +379,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const projectDescription = document.getElementById('projectDescription').value.trim();
         const projectMeasures = document.getElementById('projectMeasures').value.trim();
         const deadlineInput = document.querySelector('input[name="projectDeadline"]:checked');
-        const projectDeadline = deadlineInput
-            ? (deadlineInput.value === 'urgente' ? 'Urgente' : 'Flexible')
-            : 'No especificado';
+        const deadlineDateLabel = getDeadlineDateLabel();
+        let projectDeadline = 'No especificado';
+        if (deadlineInput && deadlineInput.value === 'urgente') {
+            projectDeadline = deadlineDateLabel
+                ? 'Urgente (fecha necesaria: ' + deadlineDateLabel + ')'
+                : 'Urgente';
+        } else if (deadlineInput) {
+            projectDeadline = 'Flexible';
+        }
         const projectReferenceFiles = document.getElementById('projectReferenceFiles').value;
         const pieceType = getPieceTypeLabel();
 
@@ -344,7 +405,9 @@ document.addEventListener('DOMContentLoaded', function () {
         colorsBoard.classList.remove('error');
 
         const colorsSummary = buildColorsSummary(selectedGroupValues, selectedGroupLabels, selectedColorLabels);
-        const referenceSummary = projectReferenceFiles === 'si' ? 'Si' : 'No';
+        const referenceSummary = projectReferenceFiles === 'si'
+            ? 'Si, adjunta archivos'
+            : 'No (se podran solicitar mas adelante)';
         const uploadedUrls = (typeof getUploadedFileUrls === 'function') ? getUploadedFileUrls() : [];
         const filesBlock = uploadedUrls.length
             ? '\n' + uploadedUrls.map(function (u, i) { return '  ' + (i + 1) + '. ' + u; }).join('\n')
@@ -358,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function () {
             '- *Descripcion del proyecto:*\n' + projectDescription + '\n\n' +
             '- *Medidas del proyecto:*\n' + (projectMeasures || 'No especificadas') + '\n\n' +
             '- *Plazo de tiempo deseado:*\n' + projectDeadline + '\n\n' +
-            '- *Tipo de pieza:*\n' + pieceType + '\n\n' +
+            '- *Tipo de proyecto:*\n' + pieceType + '\n\n' +
             '- *Colores del proyecto:*\n' + colorsSummary + '\n\n' +
             '- *Proyecto o imagenes de referencia:*\n' + referenceSummary + filesBlock + '\n\n' +
             'Quedo a la espera de respuesta. ¡Muchas gracias!';
@@ -373,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function () {
             '- DESCRIPCION DEL PROYECTO:\n' + projectDescription + '\n\n' +
             '- MEDIDAS DEL PROYECTO:\n' + (projectMeasures || 'No especificadas') + '\n\n' +
             '- PLAZO DE TIEMPO DESEADO:\n' + projectDeadline + '\n\n' +
-            '- TIPO DE PIEZA:\n' + pieceType + '\n\n' +
+            '- TIPO DE PROYECTO:\n' + pieceType + '\n\n' +
             '- COLORES DEL PROYECTO:\n' + colorsSummary + '\n\n' +
             '- PROYECTO O IMAGENES DE REFERENCIA:\n' + referenceSummary + filesBlock + '\n\n' +
             '━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
@@ -394,6 +457,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 descripcion: projectDescription,
                 medidas: projectMeasures || 'No especificadas',
                 plazo: projectDeadline,
+                fechaNecesaria: deadlineDateLabel || 'No especificada',
                 tipoPieza: pieceType,
                 colores: colorsSummary,
                 referencia: referenceSummary,
@@ -479,12 +543,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function getPieceTypeLabel() {
-        if (activePieceType === 'tecnica') {
-            return 'Técnica';
+        if (activePieceType === 'resistentes') {
+            return 'Piezas resistentes';
         }
 
-        if (activePieceType === 'artistica') {
-            return 'Artística';
+        if (activePieceType === 'artisticas') {
+            return 'Piezas artísticas';
         }
 
         return 'Sin especificar';

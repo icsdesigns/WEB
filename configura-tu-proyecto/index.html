@@ -378,9 +378,13 @@
 
     .color-material-selector {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
       gap: 12px;
     }
+
+    /* Los materiales que no corresponden al tipo de proyecto no se muestran */
+    .color-material-card[hidden] { display: none !important; }
 
     .color-material-card {
       display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -399,6 +403,7 @@
       transform:scaleX(0); transform-origin:left; transition:transform 0.3s;
     }
     .color-material-card:hover::after,
+    .color-material-card.active::after,
     .color-material-card.selected::after { transform:scaleX(1); }
 
     .color-material-card:hover {
@@ -407,10 +412,19 @@
       transform: translateY(-4px);
       box-shadow: 0 12px 30px rgba(188,85,109,0.18);
     }
-    .color-material-card.selected {
+    .color-material-card.selected,
+    .color-material-card.active {
       border-color: var(--primary);
       background: var(--primary-light);
       box-shadow: 0 6px 20px rgba(188,85,109,0.22);
+    }
+    .color-material-card.active .card-title { color: var(--primary-dark); }
+    /* Marca de seleccion en la esquina del cuadro */
+    .color-material-card.active::before {
+      content: '✓';
+      position: absolute; top: 6px; right: 9px;
+      font-size: 0.8rem; font-weight: 800; line-height: 1;
+      color: var(--primary);
     }
 
     .card-icon { font-size: 1.8rem; }
@@ -580,6 +594,15 @@
       font-size: 0.78rem; color: var(--gray-text); font-weight: 500;
     }
     .label-opt { color: var(--gray-text); font-weight: 500; }
+    /* Fecha para el plazo urgente · solo visible con plazo Urgente */
+    .deadline-date-group[hidden] { display: none !important; }
+    .deadline-date-group {
+      margin-top: 14px; margin-bottom: 0;
+      padding: 14px 16px;
+      border: 1px solid #ead9e6; border-radius: 12px;
+      background: #fdf7fb;
+    }
+    .deadline-date-group input[type="date"] { max-width: 260px; }
 
     /* Plazo deseado · tarjetas compactas horizontales */
     .plazo-selector {
@@ -716,7 +739,7 @@
       .quote-page-contact { padding: 28px 22px; }
 
       .quote-form-grid-2 { grid-template-columns: 1fr; }
-      .color-material-selector { grid-template-columns: repeat(2, 1fr); }
+      .color-material-selector { grid-auto-flow: row; grid-template-columns: repeat(2, 1fr); }
       .contact-options-grid { grid-template-columns: 1fr; max-width: 280px; }
 
       .quote-step-actions { flex-direction: column-reverse; }
@@ -724,7 +747,7 @@
     }
     @media (max-width: 480px) {
       .plazo-selector { grid-template-columns: 1fr; }
-      .color-material-selector { grid-template-columns: repeat(2, 1fr); }
+      .color-material-selector { grid-auto-flow: row; grid-template-columns: repeat(2, 1fr); }
       .catalog-color-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
       .step-indicator-hero { gap: 0; }
       .step-dot-label { display: none; }
@@ -1171,7 +1194,7 @@
               <span class="field-error" id="errProjectName">Por favor, indica el nombre del proyecto.</span>
             </div>
             <div class="form-group">
-              <label for="projectMeasures">Medidas <span class="label-opt">(opcional)</span></label>
+              <label for="projectMeasures">Medidas <span class="label-opt">(en caso de ser necesario)</span></label>
               <input type="text" id="projectMeasures" name="projectMeasures"
                      placeholder="Algún valor aproximado...">
             </div>
@@ -1209,6 +1232,12 @@
           </div>
           <span class="field-error" id="errDeadline">Por favor, indica el plazo deseado.</span>
 
+          <div class="form-group deadline-date-group" id="deadlineDateGroup" hidden>
+            <label for="projectDeadlineDate">¿Para qué fecha lo necesitas? <span class="label-opt">(no se garantiza la fecha seleccionada)</span> *</label>
+            <input type="date" id="projectDeadlineDate" name="projectDeadlineDate">
+            <span class="field-error" id="errDeadlineDate">Por favor, indica una fecha válida.</span>
+          </div>
+
           <!-- Grupo · archivos de referencia -->
           <div class="field-divider">
             <span class="field-divider-label">Archivos de referencia</span>
@@ -1217,8 +1246,8 @@
             <label for="projectReferenceFiles">¿Dispones de archivos para compartir? *</label>
             <select id="projectReferenceFiles" name="projectReferenceFiles" required>
               <option value="" selected disabled>Selecciona una opción</option>
-              <option value="si">Sí, quiero adjuntar archivos</option>
-              <option value="no">No, de momento no</option>
+              <option value="si">Sí, adjuntar archivos</option>
+              <option value="no">No (los podremos solicitar más adelante)</option>
             </select>
             <span class="field-error" id="errReference">Por favor, selecciona una opción.</span>
           </div>
@@ -1230,7 +1259,7 @@
                        hidden>
                 <span class="dropzone-icon">⬆️</span>
                 <span class="dropzone-text"><strong>Haz clic o arrastra tus archivos aquí</strong></span>
-                <span class="dropzone-hint">Imágenes y modelos 3D (STL, STEP, OBJ, 3MF…) · se suben sin comprimir</span>
+                <span class="dropzone-hint">Imágenes y modelos 3D (STL, STEP, OBJ, 3MF…)</span>
               </label>
               <div class="reference-files-list" id="referenceFilesList"></div>
               <div class="reference-files-meta">
@@ -1257,11 +1286,11 @@
 
           <div class="quote-form-grid quote-form-grid-2" style="margin-bottom: 18px;">
             <div class="form-group form-group-span-2">
-              <label for="projectPieceType">¿De qué tipo de pieza se trata? *</label>
+              <label for="projectPieceType">¿De qué tipo de proyecto se trata? *</label>
               <select id="projectPieceType" name="projectPieceType" required>
                 <option value="" selected disabled>Selecciona una opción</option>
-                <option value="tecnica">Técnica</option>
-                <option value="artistica">Artística</option>
+                <option value="resistentes">Piezas resistentes</option>
+                <option value="artisticas">Piezas artísticas</option>
               </select>
             </div>
           </div>
@@ -1449,7 +1478,7 @@
 
   <!-- Existing project logic (color catalog, WhatsApp/email generation, etc.) -->
   <script defer src="../js/script.js"></script>
-  <script defer src="../js/configura-tu-proyecto.js?v=20260728c"></script>
+  <script defer src="../js/configura-tu-proyecto.js?v=20260826a"></script>
 
   <script>
     const navbar=document.getElementById('navbar');

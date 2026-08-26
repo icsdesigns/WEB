@@ -58,7 +58,8 @@ Deno.serve(async (req) => {
       <tr><td><strong>Proyecto</strong></td><td>${esc(p.proyecto)}</td></tr>
       <tr><td><strong>Descripción</strong></td><td>${esc(p.descripcion)}</td></tr>
       <tr><td><strong>Medidas</strong></td><td>${esc(p.medidas)}</td></tr>
-      <tr><td><strong>Tipo de pieza</strong></td><td>${esc(p.tipoPieza)}</td></tr>
+      <tr><td><strong>Plazo deseado</strong></td><td>${esc(p.plazo)}</td></tr>
+      <tr><td><strong>Tipo de proyecto</strong></td><td>${esc(p.tipoPieza)}</td></tr>
       <tr><td><strong>Colores</strong></td><td>${esc(p.colores)}</td></tr>
       <tr><td><strong>Referencia</strong></td><td>${esc(p.referencia)}</td></tr>
     </table>
