@@ -1224,6 +1224,8 @@ function setCalcRe(f,v){ S.calc_state[f]=v; save(); renderCalc(); }
 /* Conmuta el modo optimización. Repinta el formulario para que el botón refleje
    su estado real (antes el onclick conservaba el valor anterior y parecía atascado). */
 function toggleDisenoOpt(){ S.calc_state.diseno_opt=!S.calc_state.diseno_opt; save(); renderCalc(); }
+/* Cobro del post-procesado: «Total» (una vez por pedido) ↔ «Por unidad». */
+function togglePostprocModo(){ S.calc_state.postproc_modo=postprocPorUnidad(S.calc_state)?'Total':'Por unidad'; save(); renderCalc(); }
 function addMix(){ if(!Array.isArray(S.calc_state.material_breakdown))S.calc_state.material_breakdown=[]; S.calc_state.material_breakdown.push({material:(S.filament_types[0]||{}).name||'',color:'Negro',grams:0}); save(); renderCalc(); }
 function setMix(i,f,v){ var a=S.calc_state.material_breakdown; if(a&&a[i]){a[i][f]=v; save(); updateResult();} }
 function delMix(i){ var a=S.calc_state.material_breakdown; if(a){a.splice(i,1); save(); renderCalc();} }
@@ -1274,9 +1276,9 @@ function renderCalc(){
      +'<div class="fg"><label class="lbl">Diseño / modelado <em class="prod-src" id="hintDiseno">'+hintDisenoHTML(c)+'</em></label>'
        +'<div class="dz-row"><select class="selx" onchange="setCalc(\'diseno_modelado\',this.value)">'+optList(Object.keys(DISENO_PRECIO),disenoNivel(c.diseno_modelado))+'</select>'
        +'<label class="dz-opt'+(c.diseno_opt?' on':'')+'" title="Pedido de optimización: se cobra el porcentaje indicado en Configuración"><input type="checkbox" '+(c.diseno_opt?'checked':'')+' onchange="toggleDisenoOpt()">Optimización</label></div></div>'
-     +'<div class="fg row"><div><label class="lbl">Post-procesado <em class="prod-src" id="hintPostproc">'+hintPostprocHTML(c)+'</em></label>'
-       +'<select class="selx" onchange="setCalc(\'postprocesado\',this.value)">'+optList(postprocOpts(c.postprocesado),c.postprocesado)+'</select></div>'
-       +'<div><label class="lbl">Cobro del post-procesado</label><select class="selx" title="Total: la tarifa se cobra una vez por pedido. Por unidad: se cobra el '+Math.round(postprocUnitPct()*100)+'% de la tarifa por cada unidad." onchange="setCalc(\'postproc_modo\',this.value)">'+optList(POSTPROC_COBRO_OPTS,(c.postproc_modo||'Total'))+'</select></div></div>'
+     +'<div class="fg"><label class="lbl">Post-procesado <em class="prod-src" id="hintPostproc">'+hintPostprocHTML(c)+'</em></label>'
+       +'<div class="dz-row"><select class="selx" onchange="setCalc(\'postprocesado\',this.value)">'+optList(postprocOpts(c.postprocesado),c.postprocesado)+'</select>'
+       +'<label class="dz-opt'+(postprocPorUnidad(c)?' on':'')+'" title="Cobro por unidad: se cobra el '+Math.round(postprocUnitPct()*100)+'% de la tarifa por cada unidad del pedido (sin marcar, la tarifa se cobra una vez en total)"><input type="checkbox" '+(postprocPorUnidad(c)?'checked':'')+' onchange="togglePostprocModo()">Por unidad</label></div></div>'
      +'<div class="fg row"><div><label class="lbl">Probabilidad de error</label><select class="selx" onchange="setCalc(\'probabilidad_error\',this.value)">'+optList(Object.keys(PROBABILIDAD_ERROR),c.probabilidad_error)+'</select></div>'
        +'<div><label class="lbl">Asistente de riesgo</label><button class="btn ghost" style="width:100%;padding:9px 10px;font-size:12.5px" onclick="openRisk()">⚙ Abrir asistente</button></div></div>'
      +'<div class="fg row"><div><label class="lbl">Urgencia</label><select class="selx" onchange="setCalc(\'urgencia_nivel\',this.value)">'+optList(URG_OPTS,c.urgencia_nivel)+'</select></div>'
