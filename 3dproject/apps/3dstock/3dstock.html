@@ -196,7 +196,7 @@ function normTxt(s){ var x=String(s==null?'':s).toLowerCase(); try{ x=x.normaliz
 function kwMatch(q,txt){ var toks=normTxt(q).split(/\s+/).filter(Boolean); if(!toks.length)return true; var h=normTxt(txt); for(var i=0;i<toks.length;i++){ if(h.indexOf(toks[i])<0)return false; } return true; }
 function vHay(v){ return v.vt; }
 function jsq(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
-function norm(){ if(!S||typeof S!=='object')S={}; if(!S.watch||typeof S.watch!=='object')S.watch={}; if(typeof S.lastSeen!=='number')S.lastSeen=0; if(!S.amazon||typeof S.amazon!=='object')S.amazon={}; }
+function norm(){ if(!S||typeof S!=='object')S={}; if(!S.watch||typeof S.watch!=='object')S.watch={}; if(typeof S.lastSeen!=='number')S.lastSeen=0; if(!S.amazon||typeof S.amazon!=='object')S.amazon={}; if(!S.wsku||typeof S.wsku!=='object')S.wsku={}; }
 function save(){ if(!loaded)return; clearTimeout(saveT); saveT=setTimeout(cloudPush,600); }
 function cloudPush(){ try{ if(window.DPCloud&&window.DPCloud.currentUser&&window.DPCloud.currentUser()){ myTs=Date.now(); window.DPCloud.saveState('3dstock',S,myTs).catch(function(e){console.warn('[3DStock] guardado falló:',e&&(e.message||e));}); } }catch(e){} }
 
@@ -211,7 +211,7 @@ function fetchData(){ var v=Date.now();
   return Promise.all([
     fetch('../../data/sunlu/latest.json?v='+v).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
     fetch('../../data/sunlu/changes.json?v='+v).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
-  ]).then(function(res){ if(!LIVE)DATA=res[0]; CH=Array.isArray(res[1])?res[1]:[]; updChip();
+  ]).then(function(res){ if(!LIVE)DATA=res[0]; CH=Array.isArray(res[1])?res[1]:[]; try{syncWatch();}catch(e){} updChip();
     try{ console.log('[3DStock] datos automáticos:', (res[0]&&res[0].products?res[0].products.length:0),'productos ·', (res[0]&&res[0].fetched_at)||'sin capturar','·', CH.length,'cambios'); }catch(e){} });
 }
 function hasData(){ return DATA && Array.isArray(DATA.products) && DATA.products.length>0; }
@@ -222,11 +222,33 @@ function allVariants(){ if(!hasData())return []; var out=[],pos={};
     var key=sku?('s:'+sku):('v:'+row.vid);
     if(pos[key]===undefined){ pos[key]=out.length; out.push(row); return; }
     var cur=out[pos[key]];
+    if(S.watch[row.vid]&&S.watch[cur.vid]){ out.push(row); return; } /* dos vigilados con el mismo SKU: no ocultar ninguno */
     var better=(!!S.watch[row.vid]&&!S.watch[cur.vid]) || (!S.watch[cur.vid]&&!cur.av&&row.av);
     if(better)out[pos[key]]=row;
   }); });
   return out;
 }
+/* Sunlu recrea variantes con id nuevo (eventos "retirado" + "nuevo" del mismo SKU).
+   Sin esto, el filamento vigilado desaparece de Mi panel cromatico por si solo. */
+function rawVariants(){ var out=[]; if(!hasData())return out;
+  DATA.products.forEach(function(p){ (p.variants||[]).forEach(function(v){ out.push({vid:String(v.id),sku:(v.sku==null?'':String(v.sku)).trim().toLowerCase(),av:!!v.av}); }); });
+  return out; }
+function skuOfWatched(vid){ var k=S.wsku[vid]; if(k)return k;
+  for(var i=0;i<CH.length;i++){ if(String(CH[i].vid)===vid){ var s=(CH[i].sku==null?'':String(CH[i].sku)).trim().toLowerCase(); if(s)return s; } }
+  return ''; }
+function syncWatch(){ if(!loaded||!hasData())return;
+  var raw=rawVariants(), live={}, bySku={}, i, v, changed=false;
+  for(i=0;i<raw.length;i++){ v=raw[i]; live[v.vid]=v;
+    if(v.sku && (!bySku[v.sku] || (!bySku[v.sku].av && v.av))) bySku[v.sku]=v; }
+  /* memoriza el SKU de cada vigilado vivo: permite migrarlo aunque el registro caduque */
+  Object.keys(S.watch).forEach(function(vid){ var lv=live[vid]; if(lv&&lv.sku&&S.wsku[vid]!==lv.sku){ S.wsku[vid]=lv.sku; changed=true; } });
+  /* vigilados que ya no existen: si su SKU sigue a la venta con otro id, se traslada la ★ */
+  Object.keys(S.watch).forEach(function(vid){ if(live[vid])return;
+    var sku=skuOfWatched(vid); if(!sku)return; var nv=bySku[sku]; if(!nv||S.watch[nv.vid])return;
+    delete S.watch[vid]; delete S.wsku[vid]; S.watch[nv.vid]=true; S.wsku[nv.vid]=sku; changed=true;
+    diag('Vigilado migrado: '+vid+' → '+nv.vid+' (SKU '+sku+')'); });
+  Object.keys(S.wsku).forEach(function(vid){ if(!S.watch[vid]){ delete S.wsku[vid]; changed=true; } });
+  if(changed)save(); }
 function fmtD(ts){ try{ var d=new Date(ts); return d.toLocaleString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
 function updChip(){ var el=document.getElementById('updChip'); if(el)el.textContent=(DATA&&DATA.fetched_at)?((LIVE?'En vivo: ':'Actualizado: ')+fmtD(DATA.fetched_at)):'';
   var m=document.getElementById('tcMeta'); if(m){ var vs=allVariants(); m.textContent=(DATA&&DATA.fetched_at)?((LIVE?'Datos en vivo · ':'Captura automática · ')+fmtD(DATA.fetched_at)+' · '+vs.length+' referencias'):'Sin datos todavía'; } }
