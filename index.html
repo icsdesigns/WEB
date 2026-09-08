@@ -597,6 +597,8 @@
     }
 
     .productos-grid {
+      --producto-margin: 26px;
+      --producto-space: 16px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 18px;
@@ -608,13 +610,13 @@
       background: var(--white);
       border: 1.5px solid rgba(188,85,109,0.12);
       border-radius: 20px;
-      padding: 28px 20px;
+      padding: var(--producto-margin);
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: var(--producto-space);
       transition: all 0.38s cubic-bezier(0.4,0,0.2,1);
       position: relative;
       overflow: hidden;
@@ -658,7 +660,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 2px;
       transition: transform 0.35s, box-shadow 0.35s;
       box-shadow: 0 3px 14px rgba(188,85,109,0.13);
       position: relative;
@@ -679,138 +680,165 @@
       font-weight: 800;
       color: var(--dark);
       letter-spacing: -0.02em;
+      line-height: 1.3;
+      margin-block: -0.15em;
     }
     .producto-card p {
       font-size: 0.875rem;
       color: var(--gray-text);
       line-height: 1.5;
+      margin-block: -0.25em;
     }
 
     /* ============================================================
-       PRESUPUESTO CTA
+       PROCESO / HAZ TUS PROYECTOS REALIDAD
     ============================================================ */
-    .calc-section {
+    #proceso { scroll-margin-top: calc(var(--nav-h) + 12px); }
+
+    .proceso-section {
       padding: calc(110px * var(--index-spacing-scale)) 0;
-      background: var(--white);
+      background: var(--gray-bg);
       position: relative;
       overflow: hidden;
     }
-    .calc-section::before {
+    .proceso-section::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 4px;
       background: linear-gradient(90deg, var(--primary), var(--primary-dark), #e899ae);
     }
-    .calc-section::after {
+    .proceso-section::after {
       content: '';
       position: absolute;
-      bottom: -100px; right: -100px;
-      width: 400px; height: 400px;
+      top: -140px; left: -140px;
+      width: 480px; height: 480px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(188,85,109,0.06) 0%, transparent 65%);
+      background: radial-gradient(circle, rgba(188,85,109,0.07) 0%, transparent 65%);
       pointer-events: none;
     }
 
-    .calc-cta-card {
-      max-width: 760px;
+    .proceso-grid {
+      --proceso-gap: 32px;
+      --proceso-margin: 26px;
+      --proceso-space: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: stretch;
+      gap: var(--proceso-gap);
+      max-width: 1160px;
       margin: 0 auto;
-      background: var(--gray-bg);
-      border: 1.5px solid var(--border);
-      border-radius: 28px;
-      padding: 52px 52px;
+      position: relative;
+    }
+
+    .proceso-step {
+      background: var(--white);
+      border: 1.5px solid rgba(188,85,109,0.12);
+      border-radius: 22px;
+      padding: var(--proceso-margin);
+      text-align: center;
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 28px;
-      text-align: center;
-      position: relative;
-      z-index: 1;
-      overflow: hidden;
+      justify-content: center;
+      gap: var(--proceso-space);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+      transition: all 0.38s cubic-bezier(0.4,0,0.2,1);
     }
-    .calc-cta-card::after {
+    .proceso-step::before {
       content: '';
       position: absolute;
-      top: -60px; right: -60px;
-      width: 180px; height: 180px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(242,214,220,0.6) 0%, transparent 70%);
+      bottom: 6px; left: 22px; right: 22px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      border-radius: 3px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.38s ease;
+    }
+    .proceso-step:hover::before { transform: scaleX(1); }
+    .proceso-step:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 22px 55px rgba(188,85,109,0.18);
+      border-color: rgba(188,85,109,0.28);
+    }
+
+    /* flecha conectora entre pasos */
+    .proceso-step:not(:last-child)::after {
+      content: '\2192';
+      position: absolute;
+      top: 50%;
+      right: calc(-1 * var(--proceso-gap));
+      transform: translateY(-50%);
+      width: var(--proceso-gap);
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: rgba(188,85,109,0.45);
       pointer-events: none;
+      z-index: 2;
     }
-    .calc-cta-emoji {
-      font-size: 2.4rem;
-      line-height: 1;
-    }
-    .calc-cta-heading {
-      font-size: 1.55rem;
-      font-weight: 900;
-      color: var(--dark);
-      letter-spacing: -0.03em;
-      line-height: 1.3;
-    }
-    .calc-cta-heading .accent { color: var(--primary); }
-    .calc-cta-features {
-      display: flex;
-      gap: 28px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .calc-cta-feature {
+
+    .proceso-img-box {
+      width: 74px; height: 74px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--primary-light), #fbe8ed);
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.88rem;
+      justify-content: center;
+      box-shadow: 0 3px 14px rgba(188,85,109,0.13);
+      transition: transform 0.35s, box-shadow 0.35s;
+    }
+    .proceso-step:hover .proceso-img-box {
+      transform: scale(1.08) rotate(-3deg);
+      box-shadow: 0 8px 22px rgba(188,85,109,0.26);
+    }
+    .proceso-img-box svg { width: 48px; height: 48px; display: block; }
+
+    .proceso-step h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--dark);
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      margin-block: -0.15em;
+      text-wrap: balance;
+    }
+    .proceso-step p {
+      font-size: 0.875rem;
       color: var(--gray-text);
-      font-weight: 600;
+      line-height: 1.55;
+      max-width: 30ch;
+      margin: -0.275em auto;
+      text-wrap: pretty;
     }
-    .calc-cta-feature-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--primary);
-      flex-shrink: 0;
+
+    .proceso-cta {
+      text-align: center;
+      margin-top: 52px;
     }
-    .calc-cta-btn {
+    .proceso-cta-btn {
       display: inline-flex;
       align-items: center;
       gap: 10px;
       background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #fff;
-      padding: 16px 44px;
-      border-radius: 50px;
-      font-size: 1.05rem;
+      color: var(--white);
+      font-size: 1rem;
       font-weight: 700;
-      transition: all 0.3s;
-      box-shadow: 0 6px 28px rgba(188,85,109,0.35);
-      white-space: nowrap;
+      padding: 16px 34px;
+      border-radius: 50px;
+      box-shadow: 0 10px 30px rgba(188,85,109,0.28);
+      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1), box-shadow 0.32s;
     }
-    .calc-cta-btn:hover {
+    .proceso-cta-btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 14px 40px rgba(188,85,109,0.5);
+      box-shadow: 0 18px 42px rgba(188,85,109,0.34);
     }
-    .calc-cta-btn-arrow { transition: transform 0.22s; }
-    .calc-cta-btn:hover .calc-cta-btn-arrow { transform: translateX(5px); }
-    .calc-cta-sub {
-      font-size: 0.82rem;
+    .proceso-cta-sub {
+      margin-top: 20px;
+      font-size: 0.88rem;
       color: var(--gray-text);
-    }
-    @media (max-width: 768px) {
-      .calc-cta-card { 
-        padding: 36px 24px; 
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 28px;
-      }
-      .calc-cta-img-wrap {
-        order: -1;
-      }
-      .calc-cta-features { 
-        gap: 14px; 
-        justify-content: center;
-      }
-      .calc-cta-btn-wrap {
-        justify-content: center;
-        flex-wrap: wrap;
-      }
     }
 
     /* ============================================================
@@ -838,6 +866,23 @@
       background: rgba(188,85,109,0.08);
       pointer-events: none;
     }
+
+    /* contraste sobre el fondo rosa de la franja */
+    .materiales-preview .section-label { color: #8E3B50; }
+    .materiales-preview .section-title { color: var(--darker); }
+    .materiales-preview .section-desc { color: #5A4750; }
+    .materiales-preview .section-desc strong { color: var(--darker); }
+    .materiales-preview .material-preview-card {
+      border-color: rgba(188,85,109,0.3);
+      box-shadow: 0 6px 22px rgba(71,12,59,0.1);
+    }
+    .materiales-preview .material-preview-card:hover {
+      border-color: rgba(188,85,109,0.45);
+    }
+    .materiales-preview .material-preview-card::after { background: rgba(188,85,109,0.13); }
+    .materiales-preview .mat-label { color: #8E3B50; }
+    .materiales-preview .material-preview-card p { color: #5A5560; }
+    .materiales-preview .link-arrow { color: #9C4359; }
 
     .materiales-preview-grid {
       display: grid;
@@ -942,6 +987,8 @@
     .contacto-section .section-desc strong { color: rgba(255,255,255,0.85); }
 
     .contacto-grid {
+      --contacto-margin: 26px;
+      --contacto-space: 16px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 22px;
@@ -951,12 +998,13 @@
       background: rgba(255,255,255,0.05);
       border: 1.5px solid rgba(255,255,255,0.1);
       border-radius: var(--radius);
-      padding: 44px 28px;
+      padding: var(--contacto-margin);
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      justify-content: center;
+      gap: var(--contacto-space);
       transition: all 0.38s ease;
       position: relative;
       overflow: hidden;
@@ -997,11 +1045,15 @@
       font-size: 1.1rem;
       font-weight: 700;
       color: var(--white);
+      line-height: 1.3;
+      margin-block: -0.15em;
       position: relative; z-index: 1;
     }
     .contacto-card p {
       font-size: 0.875rem;
       color: rgba(255,255,255,0.55);
+      line-height: 1.5;
+      margin-block: -0.25em;
       position: relative; z-index: 1;
     }
 
@@ -1308,6 +1360,13 @@
         width: 100%;
         max-width: 320px;
       }
+      .contacto-grid { --contacto-margin: 22px; --contacto-space: 14px; }
+
+      .proceso-grid {
+        grid-template-columns: repeat(2, 1fr);
+        --proceso-gap: 34px;
+      }
+      .proceso-step:nth-child(2n)::after { display: none; }
 
       .quote-modal-content { padding: 30px 22px; }
       .contact-options-grid { grid-template-columns: 1fr; }
@@ -1321,7 +1380,7 @@
         max-width: 100%; 
         margin: 0 auto; 
       }
-      .producto-card { padding: 20px 10px; gap: 8px; }
+      .productos-grid { --producto-margin: 18px; --producto-space: 12px; }
       .producto-img-box { width: 56px; height: 56px; border-radius: 16px; }
       .producto-img-box img { width: 32px; height: 32px; }
       .producto-card h3 { font-size: 0.95rem; }
@@ -1333,6 +1392,27 @@
       .material-preview-card h3 {
         font-size: clamp(2rem, 12vw, 2.3rem);
       }
+      .proceso-grid {
+        grid-template-columns: 1fr;
+        max-width: 340px;
+        --proceso-gap: 46px;
+        --proceso-margin: 22px;
+        --proceso-space: 14px;
+      }
+      .proceso-step:not(:last-child)::after {
+        display: block;
+        content: '\2193';
+        top: auto;
+        bottom: calc(-1 * var(--proceso-gap));
+        right: 50%;
+        width: auto;
+        height: var(--proceso-gap);
+        line-height: var(--proceso-gap);
+        transform: translateX(50%);
+      }
+      .proceso-img-box { width: 68px; height: 68px; border-radius: 18px; }
+      .proceso-img-box svg { width: 44px; height: 44px; }
+      .proceso-cta-btn { width: 100%; justify-content: center; padding: 15px 22px; }
       .section-title  { font-size: 1.9rem; }
     }
   </style>
@@ -1550,29 +1630,96 @@
   </section>
 
   <!-- ======================================================
-       PRESUPUESTO
+       PROCESO - HAZ TUS PROYECTOS REALIDAD
   ====================================================== -->
-  <section id="presupuesto" class="calc-section">
+  <section id="proceso" class="proceso-section">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">✦ Presupuesto</span>
-        <h2 class="section-title">¿Tienes un proyecto en mente?</h2>
+        <span class="section-label">Proceso</span>
+        <h2 class="section-title">Haz tus proyectos realidad</h2>
         <p class="section-desc">
-          Cuéntanos los detalles y te enviamos un presupuesto gratuito y sin compromiso.
+          Tr&aacute;enos tu proyecto y nosotros nos encargamos del resto.
+          Estos son los <strong>4 pasos</strong> que damos contigo desde la idea hasta tenerlo en tus manos.
         </p>
       </div>
 
-      <div class="calc-cta-card reveal">
-        <div class="calc-cta-features">
-          <div class="calc-cta-feature"><span class="calc-cta-feature-dot"></span>Presupuesto gratuito</div>
-          <div class="calc-cta-feature"><span class="calc-cta-feature-dot"></span>Respuesta en menos de 24 h</div>
-          <div class="calc-cta-feature"><span class="calc-cta-feature-dot"></span>Sin compromiso</div>
-          <div class="calc-cta-feature"><span class="calc-cta-feature-dot"></span>Diseño a medida</div>
+      <div class="proceso-grid">
+
+        <!-- Paso 1: figura solo con contornos pespunteados -->
+        <div class="proceso-step reveal reveal-delay-1">
+          <div class="proceso-img-box">
+            <svg viewBox="0 0 80 80" role="img" aria-label="Boceto de una figura dibujada solo con contornos pespunteados">
+              <g fill="none" stroke="#BC556D" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4">
+                <path d="M40 8 C52 22 56 36 54 50 L26 50 C24 36 28 22 40 8 Z"/>
+                <path d="M26 38 L14 60 L26 54"/>
+                <path d="M54 38 L66 60 L54 54"/>
+                <path d="M31 50 L34 64 L46 64 L49 50"/>
+                <circle cx="40" cy="29" r="7"/>
+              </g>
+            </svg>
+          </div>
+          <h3>Env&iacute;anos tu proyecto</h3>
+          <p>En formato .stl, .3mf o similares. Y si solo tienes la idea, no te preocupes: haremos el dise&ntilde;o de 0.</p>
         </div>
-        <a href="/configura-tu-proyecto/" class="calc-cta-btn">
-          Configura tu proyecto <span class="calc-cta-btn-arrow">→</span>
+
+        <!-- Paso 2: presupuesto -->
+        <div class="proceso-step reveal reveal-delay-2">
+          <div class="proceso-img-box">
+            <svg viewBox="0 0 80 80" role="img" aria-label="Documento de presupuesto">
+              <rect x="16" y="10" width="42" height="54" rx="6" fill="#FFFFFF" stroke="#BC556D" stroke-width="2.4"/>
+              <g stroke="#BC556D" stroke-width="2.4" stroke-linecap="round" opacity="0.55">
+                <line x1="24" y1="23" x2="50" y2="23"/>
+                <line x1="24" y1="32" x2="50" y2="32"/>
+                <line x1="24" y1="41" x2="42" y2="41"/>
+              </g>
+              <circle cx="55" cy="55" r="14" fill="#BC556D"/>
+              <text x="55" y="61" text-anchor="middle" font-family="Outfit, sans-serif" font-size="17" font-weight="800" fill="#FFFFFF">&#8364;</text>
+            </svg>
+          </div>
+          <h3>Elaboramos un presupuesto</h3>
+          <p>De forma r&aacute;pida y sencilla. Configuraremos el trabajo cuidando cada detalle.</p>
+        </div>
+
+        <!-- Paso 3: la misma figura del paso 1, ya rellena -->
+        <div class="proceso-step reveal reveal-delay-3">
+          <div class="proceso-img-box">
+            <svg viewBox="0 0 80 80" role="img" aria-label="La misma figura del paso 1, ya impresa y rellena">
+              <g stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+                <path d="M26 38 L14 60 L26 54 Z" fill="#9C4359"/>
+                <path d="M54 38 L66 60 L54 54 Z" fill="#9C4359"/>
+                <path d="M31 50 L34 64 L46 64 L49 50 Z" fill="#8E3B50"/>
+                <path d="M40 8 C52 22 56 36 54 50 L26 50 C24 36 28 22 40 8 Z" fill="#E58BA0"/>
+                <path d="M40 8 C52 22 56 36 54 50 L40 50 Z" fill="#BC556D" stroke="none"/>
+                <path d="M40 8 C52 22 56 36 54 50 L26 50 C24 36 28 22 40 8 Z" fill="none"/>
+                <circle cx="40" cy="29" r="7" fill="#FFFFFF"/>
+              </g>
+            </svg>
+          </div>
+          <h3>Iniciamos la producci&oacute;n</h3>
+          <p>Con los materiales seleccionados para tu proyecto, en nuestro taller y con control de cada capa.</p>
+        </div>
+
+        <!-- Paso 4: entrega -->
+        <div class="proceso-step reveal reveal-delay-4">
+          <div class="proceso-img-box">
+            <svg viewBox="0 0 80 80" role="img" aria-label="Paquete listo para entrega o env&iacute;o">
+              <path d="M14 28 L40 16 L66 28 L40 40 Z" fill="#E58BA0" stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="M14 28 L40 40 L40 68 L14 56 Z" fill="#BC556D" stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="M66 28 L40 40 L40 68 L66 56 Z" fill="#9C4359" stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="M27 22 L53 34" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+            </svg>
+          </div>
+          <h3>Entregamos en el plazo acordado</h3>
+          <p>En nuestro punto de entrega local o mediante env&iacute;o, donde t&uacute; nos digas.</p>
+        </div>
+
+      </div>
+
+      <div class="proceso-cta reveal">
+        <a href="/configura-tu-proyecto/" class="proceso-cta-btn">
+          Configura tu proyecto
         </a>
-        <p class="calc-cta-sub">Solo te llevará 1 minuto</p>
+        <p class="proceso-cta-sub">Gratuito, sin compromiso y con respuesta en menos de 24 h. Solo te llevar&aacute; 1 minuto.</p>
       </div>
     </div>
   </section>
