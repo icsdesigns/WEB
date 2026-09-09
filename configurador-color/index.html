@@ -278,10 +278,8 @@
       color:var(--gray-text);font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:800;
       display:flex;align-items:center;justify-content:center;transition:all .2s;}
     .guia-close:hover{background:var(--primary-light);color:#8E3B50;transform:rotate(90deg);}
-    /* Pie fijo del diálogo: el botón queda siempre a mano al desplazar */
-    .guia-foot{position:sticky;bottom:calc(var(--card-margin) * -1);z-index:2;width:100%;
-      display:flex;justify-content:center;padding-block:var(--card-space) var(--card-margin);
-      background:linear-gradient(rgba(255,255,255,0),var(--white) 45%);}
+    /* Pie del diálogo: sin fijar, para no velar el contenido al desplazar */
+    .guia-foot{width:100%;display:flex;justify-content:center;}
     .guia-ok{min-height:var(--ctl);padding:0 34px;
       border-radius:50px;border:none;cursor:pointer;
       background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;
@@ -312,7 +310,8 @@
     }
 
 
-    .block-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;}
+    .block-head{display:flex;flex-direction:column;align-items:center;text-align:center;
+      gap:var(--stack);}
     .block-title{font-size:clamp(1.15rem,2.4vw,1.45rem);font-weight:900;color:var(--darker);
       letter-spacing:-.03em;line-height:1.25;margin-block:-.125em;
       display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
@@ -377,7 +376,7 @@
     .demo-input{flex:1;min-width:0;padding:7px 11px;border-radius:9px;background:var(--gray-bg);
       border:1.5px solid var(--gray-line);font-size:.82rem;font-weight:700;color:var(--dark);
       overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-    .demo-mats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;width:100%;}
+    .demo-mats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;width:100%;}
     .demo-mat{border:1.5px solid var(--gray-line);border-radius:11px;background:var(--white);min-width:0;
       padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;
       font-size:.66rem;font-weight:800;color:var(--dark);text-align:center;line-height:1.2;
@@ -498,13 +497,13 @@
     .pc-del:hover{background:#fee2e2;border-color:#fca5a5;color:#ef4444;transform:scale(1.05);}
 
     /* Grupos internos de la tarjeta (etiqueta + control) */
-    .card-group{display:flex;flex-direction:column;align-items:center;text-align:center;gap:calc(var(--pc-space) * .55);min-width:0;width:100%;}
+    .card-group{display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--pc-space);min-width:0;width:100%;}
     .group-label{font-size:.68rem;font-weight:800;letter-spacing:.1em;
-      text-transform:uppercase;color:var(--gray-text);}
+      text-transform:uppercase;color:var(--gray-text);line-height:1.3;margin-block:-.15em;}
     .group-head{display:flex;align-items:center;justify-content:center;gap:12px;}
 
     /* ── Material ── */
-    .mat-selector{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;
+    .mat-selector{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;
       gap:8px;}
     .mat-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
       padding:12px 8px;border:1.5px solid var(--gray-line);border-radius:14px;
@@ -518,16 +517,14 @@
       transform:translateY(-2px);}
     .mat-card.mc-active{border-color:var(--primary);background:var(--primary-light);
       box-shadow:0 4px 16px rgba(188,85,109,.18);}
-    .mat-card.mc-gold.mc-active{border-color:#e6a817;background:#fff8dc;
-      box-shadow:0 4px 14px rgba(241,196,2,.25);}
-    .mat-card.mc-gold.mc-active::after{background:linear-gradient(90deg,#f1c402,#e6a817);}
     .mat-icon{font-size:1.45rem;line-height:1;}
-    .mat-name{font-size:.78rem;font-weight:800;color:var(--dark);line-height:1.2;}
+    .mat-name{font-size:.82rem;font-weight:800;color:var(--dark);line-height:1.2;}
+    .mat-desc{font-size:.68rem;font-weight:600;color:var(--gray-text);line-height:1.3;
+      margin-block:-.15em;}
     .mat-check{position:absolute;top:6px;right:7px;width:16px;height:16px;border-radius:50%;
       background:var(--primary);color:#fff;font-size:.55rem;font-weight:900;
       display:none;align-items:center;justify-content:center;}
     .mat-card.mc-active .mat-check{display:flex;}
-    .mat-card.mc-gold.mc-active .mat-check{background:#e6a817;color:#5a3e00;}
 
     /* ── Slots de color ── */
     .slots-progress{display:flex;align-items:center;gap:6px;}
@@ -572,13 +569,24 @@
       background:var(--gray-line);border:none;cursor:pointer;font-size:.8rem;color:var(--dark);
       display:flex;align-items:center;justify-content:center;transition:all .18s;}
     .picker-close-btn:hover{background:var(--primary-light);color:var(--primary);transform:rotate(90deg);}
-    .picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(72px,100%),1fr));
-      gap:8px;max-height:min(46vh,320px);overflow-y:auto;}
+    /* Filas centradas: sin columnas vacías cuando hay pocos colores */
+    .picker-grid{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;
+      gap:8px;max-height:min(46vh,320px);overflow-y:auto;scrollbar-gutter:stable both-edges;}
     .pick-item{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
       gap:6px;padding:9px 5px;border-radius:12px;cursor:pointer;
-      transition:background .18s,transform .18s;border:2px solid transparent;min-width:0;}
+      transition:background .18s,transform .18s;border:2px solid transparent;
+      width:64px;flex:0 0 auto;}
     .pick-item:hover{background:var(--primary-light);transform:translateY(-2px);}
     .pick-item.pi-sel{border-color:var(--primary);background:var(--primary-light);}
+    .pick-circle-wrap{position:relative;display:flex;}
+    /* Acabados premium: mismo brillo que las fichas de /materiales/ */
+    .is-silk{box-shadow:0 4px 14px rgba(0,0,0,.2),inset 0 1px 3px rgba(255,255,255,.5);}
+    .cslot.is-silk{box-shadow:0 5px 16px rgba(0,0,0,.22),inset 0 1px 4px rgba(255,255,255,.55);}
+    .pick-prem{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;
+      background:linear-gradient(135deg,#f1c402,#e6a817);color:#5a3e00;border:1.5px solid var(--white);
+      font-size:.58rem;font-weight:900;display:flex;align-items:center;justify-content:center;}
+    .picker-legend{font-size:.66rem;font-weight:700;color:var(--gray-text);text-align:center;}
+    .picker-legend b{color:#8E3B50;}
     .pick-circle{width:38px;height:38px;border-radius:50%;
       box-shadow:0 3px 10px rgba(0,0,0,.14);transition:transform .18s;flex-shrink:0;}
     .pick-item:hover .pick-circle{transform:scale(1.1);}
@@ -596,7 +604,8 @@
     @media(max-width:1024px){
       .cfg-right{position:static;max-height:none;}
     }
-    .sum-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;}
+    .sum-head{display:flex;flex-direction:column;align-items:center;text-align:center;
+      gap:var(--sum-space);}
     .sum-panel-title{font-size:1.05rem;font-weight:900;color:var(--darker);
       letter-spacing:-.02em;line-height:1.25;margin-block:-.125em;
       display:flex;align-items:center;justify-content:center;gap:8px;}
@@ -632,9 +641,10 @@
       line-height:1.55;}
 
     /* Compartir */
-    .share-block{display:flex;flex-direction:column;align-items:center;gap:calc(var(--sum-space) * .55);
+    .share-block{display:flex;flex-direction:column;align-items:center;gap:var(--sum-space);
       border-top:1px solid var(--gray-line);padding-top:var(--sum-space);}
-    .share-heading{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;text-align:center;
+    .share-heading{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+      line-height:1.3;margin-block:-.15em;text-align:center;
       color:var(--gray-text);}
     .share-col{display:grid;grid-template-columns:minmax(0,1fr);width:100%;
       gap:8px;}
@@ -794,8 +804,9 @@
             <li class="paso">
               <div class="paso-num">2</div>
               <h3>Elige el material</h3>
-              <p>PLA Básico, PLA Premium o PETG. Al cambiar de material se reinician los
-                 colores, porque cada uno tiene su propia carta.</p>
+              <p><strong>PLA</strong> para figuras artísticas o <strong>PETG</strong> para piezas
+                 resistentes. Al cambiar de material se reinician los colores, porque cada uno
+                 tiene su propia carta.</p>
             </li>
             <li class="paso">
               <div class="paso-num">3</div>
@@ -828,8 +839,7 @@
                   <div class="demo-input">Dinosaurio</div>
                 </div>
                 <div class="demo-mats">
-                  <div class="demo-mat demo-mat--sel"><span>🎨</span>PLA Básico</div>
-                  <div class="demo-mat"><span>✦</span>PLA Premium</div>
+                  <div class="demo-mat demo-mat--sel"><span>🎨</span>PLA</div>
                   <div class="demo-mat"><span>💎</span>PETG</div>
                 </div>
                 <div class="demo-slots">
@@ -1040,44 +1050,87 @@
 
   <!-- ══════════════════ CONFIGURADOR ══════════════════ -->
   <script>
-    /* ── Color catalog (defaults, overwritten by sync) ── */
+    /* Respaldo con los mismos nombres y códigos que /materiales/ */
     let allColors = {
       pla:[
-        {name:'Black',        color:'#000000', premium:false},
-        {name:'Silver',       color:'#bbbec3', premium:false},
-        {name:'White',        color:'#ffffff', premium:false},
-        {name:'Beige',        color:'#f0e0d6', premium:false},
-        {name:'Matte Red',    color:'#b0181a', premium:false},
-        {name:'Cherry Red',   color:'#f46974', premium:false},
-        {name:'Sakura Pink',  color:'#f2a8b3', premium:false},
-        {name:'Sunny Orange', color:'#ff7a29', premium:false},
-        {name:'Lemon Yellow', color:'#fbf9ac', premium:false},
-        {name:'Wood',         color:'#cdae81', premium:false},
-        {name:'Coffee Brown', color:'#533421', premium:false},
-        {name:'Grass Green',  color:'#0a9077', premium:false},
-        {name:'Olive Green',  color:'#5a6d3d', premium:false},
-        {name:'Mint Green',   color:'#6ed9ce', premium:false},
-        {name:'Sky Blue',     color:'#63c9f0', premium:false},
-        {name:'Lavender',     color:'#7358c3', premium:false},
-        {name:'Dorado Silk',  color:'#f1c402', premium:true },
-        {name:'Mármol',       color:'#d7d4cc', premium:true }
+        {name:'White',                    color:'#ffffff'},
+        {name:'Silver',                   color:'#bbbec3'},
+        {name:'Black',                    color:'#000000'},
+        {name:'Matte Red',                color:'#a82c2f'},
+        {name:'Cherry Red',               color:'#f46974'},
+        {name:'Sakura Pink',              color:'#f2a8b3'},
+        {name:'Sunny Orange',             color:'#ff7a29'},
+        {name:'Coffee Brown',             color:'#533421'},
+        {name:'Wood',                     color:'#cdae81'},
+        {name:'Beige',                    color:'#f0e0d6'},
+        {name:'Lemon Yellow',             color:'#fbf9ac'},
+        {name:'Olive Green',              color:'#5a6d3d'},
+        {name:'Grass Green',              color:'#0a9077'},
+        {name:'Mint Green',               color:'#6ed9ce'},
+        {name:'Sky Blue',                 color:'#63c9f0'},
+        {name:'Lavender Purple',          color:'#7358c3'},
+        {name:'Mármol (Chesnut Marble)',  color:'#d7d4cc', premium:true},
+        {name:'Dorado (Silk Yellow)',     color:'#f1c402', premium:true}
       ],
       petg:[
-        {name:'Black', color:'#000000', premium:false},
-        {name:'White', color:'#ffffff', premium:false},
-        {name:'Blue',  color:'#1b49e0', premium:false},
-        {name:'Red',   color:'#ff5454', premium:false}
+        {name:'White', color:'#ffffff'},
+        {name:'Black', color:'#000000'},
+        {name:'Red',   color:'#ff3131'},
+        {name:'Blue',  color:'#1800ac'}
       ]
     };
+    /* ── Mismas reglas que /materiales/: qué es premium y cómo se pinta ── */
+    function isPremiumColor(name, hexRaw, premiumFlag) {
+      const hasGradient = Array.isArray(hexRaw) && hexRaw.length > 1;
+      return Boolean(premiumFlag) || hasGradient || /(silk|marble|marmol|mármol|seda)/i.test(String(name||''));
+    }
+    function isMarbleColor(name) { return /(marble|marmol|mármol)/i.test(String(name||'')); }
+    function isSilkColor(name)   { return /(silk|seda)/i.test(String(name||'')); }
+    /* Estilo del círculo: el mármol lleva su textura y las sedas, brillo */
+    function swatchStyle(c) {
+      const name = String(c.name||'');
+      let s = isMarbleColor(name)
+        ? "background-image:url('../img/marble-texture.webp');background-size:cover;background-position:center;"
+        : 'background:' + c.color + ';';
+      if (/^#?fff(?:fff)?$/i.test(c.color) || /white/i.test(name)) s += 'border:1.5px solid #ccc;';
+      return s;
+    }
+    function swatchClass(c) {
+      const name = String(c.name||'');
+      return (isMarbleColor(name) || isSilkColor(name)) ? ' is-silk' : '';
+    }
+
+    /* ── Orden por similitud cromática (idéntico al catálogo) ── */
+    function claveCromatica(hexStr) {
+      const hex = String(hexStr || '').replace('#', '');
+      const r = parseInt(hex.substr(0,2),16)/255, g = parseInt(hex.substr(2,2),16)/255, b = parseInt(hex.substr(4,2),16)/255;
+      if ([r,g,b].some(isNaN)) return [2,0,0];
+      const max = Math.max(r,g,b), min = Math.min(r,g,b);
+      const l = (max+min)/2, d = max-min;
+      const s = d === 0 ? 0 : d/(1-Math.abs(2*l-1));
+      let h = 0;
+      if (d !== 0) {
+        if (max === r) h = ((g-b)/d)%6;
+        else if (max === g) h = (b-r)/d+2;
+        else h = (r-g)/d+4;
+        h *= 60; if (h < 0) h += 360;
+      }
+      if (s < 0.15 || d < 0.08) return [0,0,1-l];
+      return [1,(h+30)%360,1-l];
+    }
+    function compararCromatica(a, b) {
+      const ka = claveCromatica(a.color), kb = claveCromatica(b.color);
+      return (ka[0]-kb[0]) || (ka[1]-kb[1]) || (ka[2]-kb[2]);
+    }
+
 
     function colorsFor(mat) {
-      if (mat === 'pla-basico')  return allColors.pla.filter(c => !c.premium);
-      if (mat === 'pla-premium') return allColors.pla.filter(c =>  c.premium);
-      if (mat === 'petg')        return allColors.petg;
+      if (mat === 'pla')  return allColors.pla;
+      if (mat === 'petg') return allColors.petg;
       return [];
     }
     function matLabel(mat) {
-      return {'pla-basico':'PLA Básico','pla-premium':'PLA Premium','petg':'PETG'}[mat] || mat;
+      return {'pla':'PLA','petg':'PETG'}[mat] || mat;
     }
     function esc(v) {
       return String(v)
@@ -1122,14 +1175,12 @@
           const filled  = i < p.colors.length;
           const c       = filled ? p.colors[i] : null;
           const isOpen  = openPick && openPick.pid === p.id && openPick.si === i;
-          /* BUG FIX: always use c.color (includes #) for the background */
-          const borderStyle = filled && isLight(c.color) ? 'border:2px solid #ccc;' : '';
-          const slotStyle   = filled ? `background:${c.color};${borderStyle}` : '';
+          const slotStyle   = filled ? swatchStyle(c) + (isLight(c.color) && !isMarbleColor(c.name) ? 'border:2px solid #ccc;' : '') : '';
           const isInvite    = !filled && i === p.colors.length; // next available slot
           return `
             <div class="slot-wrap">
               <div class="slot-btn-group">
-                <button class="cslot${filled?' cs-filled':''}${isOpen?' cs-active':''}${isInvite&&p.colors.length===0?' cs-invite':''}"
+                <button class="cslot${filled?' cs-filled'+swatchClass(c):''}${isOpen?' cs-active':''}${isInvite&&p.colors.length===0?' cs-invite':''}"
                   style="${slotStyle}"
                   data-act="slot" data-pid="${p.id}" data-si="${i}"
                   title="${filled ? esc(c.name) : (i===p.colors.length ? 'Elegir color' : '')}"
@@ -1149,6 +1200,9 @@
           const emptyNote = colors.length === 0
             ? '<p style="font-size:.82rem;color:var(--gray-text);padding:4px 0;">Sin colores disponibles para este material.</p>'
             : '';
+          const legend = colors.some(c => c.premium)
+            ? '<p class="picker-legend"><b>✦</b> Acabado premium</p>'
+            : '';
           pickerHtml = `
             <div class="picker-panel">
               <div class="picker-header">
@@ -1158,16 +1212,19 @@
               ${emptyNote}
               <div class="picker-grid">
                 ${colors.map(c => {
-                  const isW = c.color === '#ffffff';
                   const alreadyPicked = p.colors.some(pc => pc.color === c.color);
                   return `<div class="pick-item${alreadyPicked?' pi-sel':''}"
                     data-act="pickc" data-pid="${p.id}" data-si="${openPick.si}"
                     data-chex="${esc(c.color)}" data-cname="${esc(c.name)}">
-                    <div class="pick-circle" style="background:${c.color};${isW?'border:1.5px solid #ccc;':''}"></div>
+                    <div class="pick-circle-wrap">
+                      <div class="pick-circle${swatchClass(c)}" style="${swatchStyle(c)}"></div>
+                      ${c.premium ? '<span class="pick-prem" title="Acabado premium">✦</span>' : ''}
+                    </div>
                     <span class="pick-name">${esc(c.name)}</span>
                   </div>`;
                 }).join('')}
               </div>
+              ${legend}
             </div>`;
         }
 
@@ -1184,14 +1241,14 @@
             <div class="card-group">
               <div class="group-label">Material</div>
               <div class="mat-selector">
-                ${[['pla-basico','🎨','PLA Básico',''],
-                   ['pla-premium','✦','PLA Premium','mc-gold'],
-                   ['petg','💎','PETG','']].map(([m,icon,label,extra]) => `
-                  <div class="mat-card${p.material===m?' mc-active':''}${extra?' '+extra:''}"
+                ${[['pla','🎨','PLA','Figuras artísticas'],
+                   ['petg','💎','PETG','Piezas resistentes']].map(([m,icon,label,desc]) => `
+                  <div class="mat-card${p.material===m?' mc-active':''}"
                     data-act="setmat" data-pid="${p.id}" data-mat="${m}">
                     <div class="mat-check">✓</div>
                     <span class="mat-icon">${icon}</span>
                     <span class="mat-name">${label}</span>
+                    <span class="mat-desc">${desc}</span>
                   </div>`).join('')}
               </div>
             </div>
@@ -1223,9 +1280,8 @@
         const colorsHtml = p.colors.length
           ? `<div class="sum-colors">
               ${p.colors.map(c => {
-                const isW = c.color === '#ffffff';
                 return `<div class="sum-dot-wrap">
-                  <div class="sum-dot" style="background:${c.color};${isW?'border:1.5px solid #ccc;':''}" title="${esc(c.name)}"></div>
+                  <div class="sum-dot${swatchClass(c)}" style="${swatchStyle(c)}" title="${esc(c.name)}"></div>
                   <span class="sum-dot-name">${esc(c.name)}</span>
                 </div>`;
               }).join('')}
@@ -1253,7 +1309,7 @@
 
     /* ── Events: project list (delegation) ── */
     document.getElementById('btnAdd').addEventListener('click', () => {
-      projects.push({ id:nextId++, name:`Figura ${projects.length + 1}`, material:'pla-basico', colors:[] });
+      projects.push({ id:nextId++, name:`Figura ${projects.length + 1}`, material:'pla', colors:[] });
       openPick = null;
       render();
     });
@@ -1361,57 +1417,74 @@
     render();
   </script>
 
-  <!-- ══════════════════ CATALOG SYNC ══════════════════ -->
+  <!-- ══════════════════ CATÁLOGO (mismo origen que /materiales/) ══════════════════ -->
   <script defer>
-    window.FILAMENTS_SHEET = {
-      id: '1kWsHasAfQa7kAqSKHue72_kV3ZS_7SElBD6R8lmjoPM',
-      sheet: 'Stock de Filamentos'
-    };
+    const SILAB_SUPABASE = { url: 'https://yyezkumbjqnushwgqkzf.supabase.co', key: 'sb_publishable_S-YCLKYozH7T9DFE1gMtUw_1jWLZnIf' };
 
-    async function fetchFromSheet() {
-      if (!window.FILAMENTS_SHEET) return null;
+    async function fetchFilamentosFromSupabase() {
       try {
-        const url = `https://opensheet.elk.sh/${window.FILAMENTS_SHEET.id}/${encodeURIComponent(window.FILAMENTS_SHEET.sheet)}`;
-        const res = await fetch(url, { cache:'no-store' });
+        const res = await fetch(SILAB_SUPABASE.url + '/rest/v1/filamentos?select=material,nombre,hex&visible=eq.true&order=nombre.asc', {
+          headers: { apikey: SILAB_SUPABASE.key, Authorization: 'Bearer ' + SILAB_SUPABASE.key },
+          cache: 'no-store'
+        });
         if (!res.ok) return null;
         const rows = await res.json();
-        const mats = {};
-        rows.forEach(row => {
-          const tipo    = (row.Tipo    || row.tipo    || '').trim();
-          const subtipo = (row.Subtipo || row.subtipo || '').trim();
-          const color   = (row.Color   || row.color   || '').trim();
-          const hexRaw  = (row['Código HEX'] || row['código hex'] || row['Codigo HEX'] || row.hex || '').toString().trim();
-          if (!tipo || /^TOTAL\b/i.test(color)) return;
-          if (!mats[tipo]) mats[tipo] = { nombre:tipo, colores:[] };
-          let hex = hexRaw;
-          if (hex && !hex.startsWith('#')) hex = '#' + hex;
-          mats[tipo].colores.push({ nombre:color, hex:hex||'#cccccc', premium:/premium/i.test(subtipo) });
+        if (!Array.isArray(rows) || !rows.length) return null;
+        const grupos = {};
+        rows.forEach(r => {
+          const principal = String(r.material || '').toUpperCase();
+          const key = principal.indexOf('PLA') === 0 ? 'PLA' : (principal.indexOf('PETG') === 0 ? 'PETG' : null);
+          if (!key) return;
+          if (!grupos[key]) grupos[key] = { nombre: key, colores: [] };
+          const color = { nombre: r.nombre, hex: r.hex || '#cccccc' };
+          if (principal === 'PLA PREMIUM') color.premium = true;
+          grupos[key].colores.push(color);
         });
-        return { filamentos: Object.values(mats) };
-      } catch(e) { console.warn('Sheet fetch error:', e); return null; }
+        const filamentos = Object.keys(grupos).map(k => grupos[k]);
+        return filamentos.length ? { filamentos } : null;
+      } catch(e) { return null; }
     }
 
-    function applyData(data) {
-      if (!data?.filamentos) return;
+    async function fetchFilamentosFromRepo() {
+      try {
+        const res = await fetch('/data/filamentos.json', { cache: 'no-store' });
+        if (!res.ok) return null;
+        const json = await res.json();
+        if (json && Array.isArray(json.filamentos)) return json;
+        if (json && Array.isArray(json)) return { filamentos: json };
+        return null;
+      } catch(e) { return null; }
+    }
+
+    /* En vivo desde Supabase; si falla, el checkpoint del repositorio */
+    async function fetchFilamentos() {
+      return (await fetchFilamentosFromSupabase()) || (await fetchFilamentosFromRepo());
+    }
+
+    function applyCatalog(data) {
       const norm = { pla:[], petg:[] };
-      data.filamentos.forEach(mat => {
-        const key = mat.nombre.toUpperCase() === 'PLA' ? 'pla'
-                  : mat.nombre.toUpperCase() === 'PETG' ? 'petg' : null;
+      const filamentos = Array.isArray(data && data.filamentos) ? data.filamentos : [];
+      filamentos.forEach(material => {
+        const nombre = String(material && material.nombre ? material.nombre : '').toUpperCase();
+        const key = nombre === 'PLA' ? 'pla' : (nombre === 'PETG' ? 'petg' : null);
         if (!key) return;
-        (mat.colores || []).forEach(c => {
-          let hex = Array.isArray(c.hex) ? c.hex[0] : c.hex;
-          if (hex && !hex.startsWith('#')) hex = '#' + hex;
-          const isPrem = Boolean(c.premium) || /(silk|marble|marmol|mármol)/i.test(c.nombre||'');
-          norm[key].push({ name:c.nombre||'Color', color:hex||'#cccccc', premium:isPrem });
+        (material.colores || []).forEach(color => {
+          const rawHex   = color && color.hex;
+          const firstHex = Array.isArray(rawHex) ? (rawHex[0] || '#cccccc') : (rawHex || '#cccccc');
+          const name     = String(color && color.nombre ? color.nombre : 'Color');
+          norm[key].push({ name, color:firstHex, premium:isPremiumColor(name, rawHex, color && color.premium) });
         });
       });
+      if (!norm.pla.length && !norm.petg.length) return;
+      norm.pla.sort(compararCromatica);
+      norm.petg.sort(compararCromatica);
       allColors = norm;
-      if (openPick) render(); else updateSummary();
+      render();
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      const data = await fetchFromSheet();
-      if (data) applyData(data);
+      const data = await fetchFilamentos();
+      if (data) applyCatalog(data);
     });
   </script>
 
