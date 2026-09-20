@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SILAB 3D - Tarjeta digital</title>
+  <meta name="description" content="Tarjeta digital de SILAB 3D. Accede a nuestros productos, materiales, valoraciones y configura tu proyecto de impresión 3D en Salamanca.">
+  <meta name="keywords" content="SILAB 3D, tarjeta digital, Impresión 3D Salamanca">
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://silab3d.com/tarjeta/">
+  <link rel="apple-touch-icon" href="https://silab3d.com/img/favicon.png">
+  <meta property="og:site_name" content="SILAB 3D">
+  <meta property="og:locale" content="es_ES">
+  <link rel="icon" type="image/png" href="../img/favicon.png">
+  <meta property="og:title" content="SILAB 3D - Tarjeta digital">
+  <meta property="og:description" content="Impresión 3D en Salamanca. Todos nuestros enlaces en un solo sitio.">
+  <meta property="og:image" content="https://silab3d.com/img/inicio3.webp">
+  <meta property="og:url" content="https://silab3d.com/tarjeta/">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       VARIABLES & RESET  (mismos tokens que index)
+    ============================================================ */
+    :root {
+      --primary:        #BC556D;
+      --primary-dark:   #B7516B;
+      --primary-light:  #F2D6DC;
+      --dark:           #2F2F2F;
+      --darker:         #1A1A1A;
+      --white:          #FFFFFF;
+      --gray-bg:        #F9F7F8;
+      --gray-text:      #6B7280;
+      --border:         rgba(188,85,109,0.15);
+      --radius:         18px;
+      --radius-sm:      12px;
+      --shadow:         0 4px 24px rgba(0,0,0,0.07);
+      --shadow-hover:   0 20px 50px rgba(188,85,109,0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      color: var(--dark);
+      background: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    img { max-width: 100%; height: auto; display: block; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ============================================================
+       ANIMATIONS
+    ============================================================ */
+    @keyframes fadeInUp   { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes spin-slow  { to { transform: rotate(360deg); } }
+    @keyframes badge-pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(188,85,109,0.4); }
+      50%     { box-shadow: 0 0 0 8px rgba(188,85,109,0); }
+    }
+
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity .75s ease, transform .75s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: .06s; }
+    .reveal-delay-2 { transition-delay: .12s; }
+    .reveal-delay-3 { transition-delay: .18s; }
+    .reveal-delay-4 { transition-delay: .24s; }
+    .reveal-delay-5 { transition-delay: .30s; }
+    .reveal-delay-6 { transition-delay: .36s; }
+
+    /* ============================================================
+       LAYOUT
+    ============================================================ */
+    .tarjeta-main {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--white);
+      background-image: radial-gradient(circle, rgba(188,85,109,0.11) 1.5px, transparent 1.5px);
+      background-size: 30px 30px;
+      position: relative;
+      overflow: hidden;
+      padding: 64px 0 72px;
+    }
+    .tarjeta-main::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 560px; height: 560px;
+      background: radial-gradient(circle, rgba(242,214,220,0.6) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .tarjeta-main::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -60px;
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(188,85,109,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    /* ============================================================
+       CABECERA
+    ============================================================ */
+    .tarjeta-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      animation: fadeInUp 1s ease .05s both;
+    }
+    .tarjeta-avatar-wrap {
+      position: relative;
+      width: 168px; height: 168px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 58px;
+    }
+    .ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid rgba(188,85,109,0.22);
+    }
+    .ring:nth-child(2) { inset: -14px; border-color: rgba(188,85,109,0.13); }
+    .ring:nth-child(3) { inset: -28px; border-color: rgba(188,85,109,0.07); }
+    .ring-spin {
+      position: absolute;
+      inset: -42px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(188,85,109,0.3);
+      animation: spin-slow 22s linear infinite;
+    }
+    .ring-spin::before,
+    .ring-spin::after {
+      content: '';
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      top: 50%; left: -4px;
+      transform: translateY(-50%);
+    }
+    .ring-spin::after { left: auto; right: -4px; background: var(--primary-light); }
+    .tarjeta-avatar {
+      width: 168px; height: 168px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: var(--shadow-hover);
+      position: relative;
+      z-index: 2;
+    }
+
+    .tarjeta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-light);
+      color: #8E3B50;   /* 5.34:1 sobre el rosa --primary-light */
+      padding: 7px 16px;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .badge-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation: badge-pulse 2.4s infinite;
+    }
+
+    .tarjeta-logo {
+      width: 268px;
+      max-width: 78%;
+      margin-bottom: 14px;
+    }
+    .tarjeta-claim {
+      font-size: 1.02rem;
+      color: var(--gray-text);
+      max-width: 460px;
+      margin-bottom: 44px;
+    }
+    .tarjeta-claim strong { color: var(--dark); font-weight: 700; }
+
+    /* ============================================================
+       BOTONES DE PÁGINAS  (carteles: margen 26 / espaciado 16)
+    ============================================================ */
+    .tarjeta-grid {
+      --tarjeta-margin: 26px;
+      --tarjeta-space:  16px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      width: 100%;
+    }
+    .tarjeta-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: var(--tarjeta-space);
+      padding: var(--tarjeta-margin);
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: transform .35s, box-shadow .35s, border-color .35s;
+    }
+    .tarjeta-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(188,85,109,0.35);
+    }
+    .tarjeta-card:active { transform: translateY(-1px); }
+    .tarjeta-card-icon {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .35s;
+    }
+    .tarjeta-card:hover .tarjeta-card-icon { background: var(--primary); }
+    .tarjeta-card-icon svg {
+      width: 26px; height: 26px;
+      fill: none;
+      stroke: #8E3B50;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke .35s;
+    }
+    .tarjeta-card:hover .tarjeta-card-icon svg { stroke: var(--white); }
+    .tarjeta-card h2 {
+      font-size: 1.06rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--darker);
+      /* compensación óptica del interlineado (line-height 1.3 -> -0.15em) */
+      margin-block: -0.15em;
+    }
+    .tarjeta-card p {
+      font-size: 0.86rem;
+      line-height: 1.5;
+      color: var(--gray-text);
+      margin-block: -0.25em;
+    }
+
+    /* Carteles a todo el ancho */
+    .tarjeta-card--wide { grid-column: 1 / -1; }
+
+    .tarjeta-card--cta {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-color: transparent;
+      box-shadow: 0 8px 32px rgba(188,85,109,0.38);
+    }
+    .tarjeta-card--cta:hover { box-shadow: 0 14px 44px rgba(188,85,109,0.5); border-color: transparent; }
+    .tarjeta-card--cta h2 { color: var(--white); }
+    .tarjeta-card--cta p   { color: var(--white); }
+    .tarjeta-card--cta .tarjeta-card-icon { background: rgba(255,255,255,0.18); }
+    .tarjeta-card--cta:hover .tarjeta-card-icon { background: var(--white); }
+    .tarjeta-card--cta .tarjeta-card-icon svg { stroke: var(--white); }
+    .tarjeta-card--cta:hover .tarjeta-card-icon svg { stroke: var(--primary); }
+
+    /* ============================================================
+       CONTACTO
+    ============================================================ */
+    .tarjeta-sep {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      margin: 30px 0 22px;
+      color: var(--gray-text);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .tarjeta-sep::before,
+    .tarjeta-sep::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .contacto-grid {
+      --tarjeta-margin: 26px;
+      --tarjeta-space:  16px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      width: 100%;
+    }
+    .contacto-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: var(--tarjeta-space);
+      padding: var(--tarjeta-margin);
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: transform .35s, box-shadow .35s, border-color .35s;
+    }
+    .contacto-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(188,85,109,0.35);
+    }
+    .contacto-card img { width: 42px; height: 42px; }
+    .contacto-card h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--darker);
+      margin-block: -0.15em;
+    }
+    .contacto-card p {
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: var(--gray-text);
+      margin-block: -0.25em;
+    }
+
+    /* Guardar contacto */
+    .tarjeta-vcard {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 30px;
+      padding: 15px 30px;
+      border-radius: 50px;
+      border: 1.5px solid var(--primary);
+      color: var(--primary-dark);
+      background: var(--white);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .3s, color .3s, transform .3s, box-shadow .3s;
+    }
+    .tarjeta-vcard svg {
+      width: 19px; height: 19px;
+      fill: none; stroke: currentColor;
+      stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .tarjeta-vcard:hover {
+      background: var(--primary);
+      color: var(--white);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(188,85,109,0.34);
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .footer {
+      background: var(--darker);
+      padding: 38px 0;
+      border-top: 1px solid rgba(188,85,109,0.2);
+    }
+    .footer .container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      text-align: center;
+    }
+    .footer p { font-size: 0.875rem; color: rgba(255,255,255,0.42); }
+    .footer a { color: var(--primary); font-weight: 600; transition: color .2s; }
+    .footer a:hover { color: #e899ae; }
+    .footer .sep { color: rgba(255,255,255,0.2); margin: 0 8px; }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 560px) {
+      .tarjeta-main { padding: 44px 0 56px; }
+      .container { padding: 0 20px; }
+      .tarjeta-avatar-wrap,
+      .tarjeta-avatar { width: 132px; height: 132px; }
+      .tarjeta-avatar-wrap { margin-bottom: 52px; }
+      .tarjeta-logo { width: 214px; }
+      .tarjeta-claim { font-size: 0.95rem; margin-bottom: 34px; }
+      .tarjeta-grid, .contacto-grid { gap: 14px; }
+      .contacto-card img { width: 34px; height: 34px; }
+      .contacto-card p { display: none; }
+    }
+    @media (max-width: 480px) {
+      .tarjeta-grid, .contacto-grid { --tarjeta-margin: 18px; --tarjeta-space: 12px; }
+      .tarjeta-card h2 { font-size: 0.98rem; }
+      .tarjeta-card p  { font-size: 0.8rem; }
+      .contacto-card h2 { font-size: 0.88rem; }
+      .tarjeta-card-icon { width: 48px; height: 48px; }
+      .tarjeta-card-icon svg { width: 23px; height: 23px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ring-spin, .badge-dot { animation: none; }
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="tarjeta-main">
+    <div class="container">
+
+      <header class="tarjeta-header">
+        <div class="tarjeta-avatar-wrap">
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="ring-spin"></div>
+          <img src="../img/inicio3.webp" alt="SILAB 3D" class="tarjeta-avatar" width="168" height="168">
+        </div>
+
+        <span class="tarjeta-badge">
+          <span class="badge-dot"></span>
+          Impresión 3D · Salamanca
+        </span>
+
+        <img src="../img/SILAB3D_v3_horizontal_negro-compressed.png" alt="SILAB 3D" class="tarjeta-logo" width="1257" height="361">
+
+        <p class="tarjeta-claim">
+          Innovación <strong>capa a capa</strong>. Todo lo nuestro, en un solo sitio.
+        </p>
+      </header>
+
+      <nav class="tarjeta-grid" aria-label="Páginas principales">
+
+        <a href="/configura-tu-proyecto/" class="tarjeta-card tarjeta-card--cta reveal reveal-delay-1">
+          <span class="tarjeta-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 2l1.7 5.1a3 3 0 0 0 1.9 1.9L20.7 10.7l-5.1 1.7a3 3 0 0 0-1.9 1.9L12 19.4l-1.7-5.1a3 3 0 0 0-1.9-1.9L3.3 10.7l5.1-1.7a3 3 0 0 0 1.9-1.9z"/></svg>
+          </span>
+          <h2>Configura tu proyecto</h2>
+          <p>Calcula tu presupuesto en unos pocos pasos</p>
+        </a>
+
+        <a href="/" class="tarjeta-card reveal reveal-delay-2">
+          <span class="tarjeta-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 9.6 12 3l9 6.6"/><path d="M5 10.5V20h14v-9.5"/><path d="M9.5 20v-5.5h5V20"/></svg>
+          </span>
+          <h2>Inicio</h2>
+          <p>Conoce SILAB 3D</p>
+        </a>
+
+        <a href="/productos/" class="tarjeta-card reveal reveal-delay-3">
+          <span class="tarjeta-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M6 2 3 6.5V20a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6.5L18 2z"/><path d="M3 6.5h18"/><path d="M16 10.5a4 4 0 0 1-8 0"/></svg>
+          </span>
+          <h2>Productos</h2>
+          <p>Nuestro catálogo completo</p>
+        </a>
+
+        <a href="/materiales/" class="tarjeta-card reveal reveal-delay-4">
+          <span class="tarjeta-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 2.5 2.5 7 12 11.5 21.5 7z"/><path d="m2.5 12 9.5 4.5L21.5 12"/><path d="m2.5 17 9.5 4.5L21.5 17"/></svg>
+          </span>
+          <h2>Materiales</h2>
+          <p>Filamentos, acabados y colores</p>
+        </a>
+
+        <a href="/valoraciones/" class="tarjeta-card reveal reveal-delay-5">
+          <span class="tarjeta-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3.2l2.75 5.57 6.15.9-4.45 4.34 1.05 6.12L12 17.35 6.5 20.13l1.05-6.12L3.1 9.67l6.15-.9z"/></svg>
+          </span>
+          <h2>Valoraciones</h2>
+          <p>Lo que opinan nuestros clientes</p>
+        </a>
+
+        <a href="/pedidos/" class="tarjeta-card tarjeta-card--wide reveal reveal-delay-6">
+          <span class="tarjeta-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5"/><path d="M12 12v9"/></svg>
+          </span>
+          <h2>Pedidos</h2>
+          <p>Consulta el estado de tu pedido</p>
+        </a>
+
+      </nav>
+
+      <p class="tarjeta-sep">Contacto</p>
+
+      <nav class="contacto-grid" aria-label="Contacto">
+        <a href="https://api.whatsapp.com/send/?phone=34644070487&amp;text=%C2%A1Hola%21+Me+gustar%C3%ADa+solicitar+un+presupuesto+de+impresi%C3%B3n.&amp;type=phone_number&amp;app_absent=0" class="contacto-card reveal reveal-delay-1" target="_blank" rel="noopener noreferrer">
+          <img src="../img/WhatsApp.png" alt="" width="42" height="42">
+          <h2>WhatsApp</h2>
+          <p>+34 644 07 04 87</p>
+        </a>
+
+        <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=silab3d@gmail.com&amp;su=Presupuesto%20de%20impresi%C3%B3n&amp;body=%C2%A1Hola!%20Me%20gustar%C3%ADa%20solicitar%20presupuesto%20para%20el%20siguiente%20proyecto%3A" class="contacto-card reveal reveal-delay-2" target="_blank" rel="noopener noreferrer">
+          <img src="../img/Email.png" alt="" width="42" height="42">
+          <h2>Email</h2>
+          <p>silab3d@gmail.com</p>
+        </a>
+
+        <a href="https://ig.me/m/silab3d" class="contacto-card reveal reveal-delay-3" target="_blank" rel="noopener noreferrer">
+          <img src="../img/Instagram.png" alt="" width="42" height="42">
+          <h2>Instagram</h2>
+          <p>@silab3d</p>
+        </a>
+      </nav>
+
+      <div style="text-align:center;">
+        <button type="button" class="tarjeta-vcard" id="btnVcard">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 17.5V20h16v-2.5"/></svg>
+          Guardar contacto
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 SILAB 3D. Todos los derechos reservados.</p>
+      <p>📧 silab3d@gmail.com &nbsp;&nbsp;|&nbsp;&nbsp; 📱 +34 644 07 04 87</p>
+      <p>
+        <a href="/terminos/">Términos y Condiciones</a>
+        <span class="sep">|</span>
+        <a href="/privacidad/">Política de Privacidad</a>
+        <span class="sep">|</span>
+        <a href="/aviso-legal/">Aviso Legal</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    /* Scroll-reveal (mismo comportamiento que index) */
+    (function () {
+      var items = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) {
+        items.forEach(function (el) { el.classList.add('visible'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      items.forEach(function (el) { io.observe(el); });
+    })();
+
+    /* Guardar contacto (.vcf) */
+    document.getElementById('btnVcard').addEventListener('click', function () {
+      var vcard = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        'N:;SILAB 3D;;;',
+        'FN:SILAB 3D',
+        'ORG:SILAB 3D',
+        'TITLE:Impresión 3D · Salamanca',
+        'TEL;TYPE=CELL:+34644070487',
+        'EMAIL;TYPE=INTERNET:silab3d@gmail.com',
+        'URL:https://silab3d.com',
+        'ADR;TYPE=WORK:;;Salamanca;Salamanca;;;España',
+        'END:VCARD'
+      ].join('\r\n');
+      var blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'SILAB-3D.vcf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    });
+  </script>
+
+</body>
+</html>
