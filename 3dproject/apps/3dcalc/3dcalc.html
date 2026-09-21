@@ -364,6 +364,37 @@ option{background-color:#161922;color:#E8EBF4}
 .bill-fab{position:fixed;right:22px;bottom:22px;z-index:120;display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 18px;border:none;border-radius:24px;background:#F4B740;color:#3a2400;font:700 13.5px 'Outfit',sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(244,183,64,.35)}
 .bill-fab:hover{filter:brightness(1.05)}
 .bill-fab-n{min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:rgba(58,36,0,.22);color:#3a2400;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+
+/* === catálogo de productos === */
+.cat-tb table.t{table-layout:fixed}
+.cat-tb table.t th,.cat-tb table.t td{vertical-align:top}
+.cat-tb .c-prod{width:auto}
+.cat-tb .c-med{width:152px}
+.cat-tb .c-pre{width:146px;text-align:right;white-space:nowrap}
+.cat-tb table.t tbody tr:last-child td{border-bottom:none}
+.cat-tb .c-act{width:76px;text-align:right}
+.cat-nm{font-weight:700;font-size:13.5px;line-height:1.3;overflow-wrap:anywhere}
+.cat-ds{font-size:11.5px;color:var(--t2);line-height:1.45;margin-top:3px;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cat-md{color:var(--t2);font-size:12.5px;line-height:1.3;overflow-wrap:anywhere}
+.cat-pr{font-weight:700;white-space:nowrap}
+.cat-act{white-space:nowrap}
+.cat-foot{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between;font-size:12px;color:var(--t3);border-top:1px solid var(--border);margin-top:2px;padding-top:12px}
+.cat-foot b{color:var(--t2);font-weight:700}
+/* En móvil la tabla se apila en fichas para que nada se corte ni desborde. */
+@media(max-width:640px){
+  .cat-tb table.t{min-width:0;table-layout:auto;display:block}
+  .cat-tb table.t thead{display:none}
+  .cat-tb table.t tbody{display:block}
+  .cat-tb table.t tr{display:grid;grid-template-columns:1fr auto;gap:7px 12px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--border)}
+  .cat-tb table.t tbody tr:first-child{padding-top:0}
+  .cat-tb table.t tbody tr:last-child{padding-bottom:0;border-bottom:none}
+  .cat-tb table.t td{display:block;width:auto;padding:0;border:none}
+  .cat-tb .c-prod{grid-column:1/-1}
+  .cat-tb .c-med{grid-column:1}
+  .cat-tb .c-pre{grid-column:2;text-align:right}
+  .cat-tb .c-act{grid-column:1/-1;text-align:right;margin-top:1px}
+  .cat-foot{gap:4px 12px}
+}
 </style>
 <style>
 @media(max-width:760px){.side{position:fixed;top:52px;bottom:0;left:0;z-index:60;width:78vw;max-width:280px;margin-left:0;transform:translateX(0);transition:transform .25s ease;box-shadow:8px 0 30px rgba(0,0,0,.4)}body.side-off .side{transform:translateX(-101%);margin-left:0}.main{padding:18px 14px 44px}}
@@ -653,6 +684,7 @@ option{background-color:#161922;color:#E8EBF4}
       <a data-v="cal" onclick="go('cal')"><svg width="17" height="17" viewBox="0 0 22 22" fill="none"><rect x="3" y="4.5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h16M7 2.5v3.5M15 2.5v3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="6" y="12" width="3" height="3" rx="0.6" fill="currentColor"/></svg> Calendario</a>
       <a data-v="cli" onclick="go('cli')"><svg width="17" height="17" viewBox="0 0 22 22" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 18a5.5 5.5 0 0 1 11 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M15 5.2a3 3 0 0 1 0 5.6M16.5 18a5.5 5.5 0 0 0-3-4.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Clientes</a>
       <a data-v="plantillas" onclick="go('plantillas')"><svg width="17" height="17" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="12" width="16" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg> Plantillas</a>
+      <a data-v="cat" onclick="go('cat')"><svg width="17" height="17" viewBox="0 0 22 22" fill="none"><rect x="2.5" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="12.5" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="2.5" y="12" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M13 15.5h6M16 12.5v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Catálogo</a>
       <a data-v="cfg" onclick="go('cfg')"><svg width="17" height="17" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M11 2v2.5M11 17.5V20M2 11h2.5M17.5 11H20M4.6 4.6l1.8 1.8M15.6 15.6l1.8 1.8M17.4 4.6l-1.8 1.8M6.4 15.6l-1.8 1.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Configuración</a>
     </nav>
   </aside>
@@ -750,7 +782,7 @@ function defData(){return {
   filament_stock:[{material:'PLA',color:'Negro',remaining_g:1000,buy_threshold_g:150},{material:'PLA',color:'Blanco',remaining_g:1000,buy_threshold_g:150},{material:'PETG',color:'Transparente',remaining_g:1000,buy_threshold_g:150}],
   global_config:{energy_cost_kwh:0.24,labor_cost_h:15,money_unit:'€',precio_minimo:3,optimizacion_pct:30,postproc_unit_pct:50,brand_color:'#3b82f6',util_prices:{simple:0.30,caja_m:1,caja_l:2,bolsa_s:0.15,bolsa_m:0.80,bolsa_l:1.50}},
   calc_state:{empresa:'3DCC',cliente:'',cliente_email:'',tipo_proyecto:'Técnico',fecha:new Date().toISOString().slice(0,10),descripcion:'',impresora:'Creality K1SE Combo',filamento_tipo:'PLA',filamento_color:'Negro',is_multimaterial:false,material_breakdown:[],peso_g:'50',tiempo_h:'1',diseno_modelado:'No necesario',busqueda_modelos:'No',eliminacion_soportes:'No',postprocesado:'Limpio (pocos soportes sin lijado)',postproc_modo:'Total',probabilidad_error:'Baja (25%)',markup:'Normal (230%)',urgencia_nivel:'Normal',gasto_misc:0,cantidad:1,is_shared:false,shared_percent_3dcc:50,shared_percent_silab3d:50,prod_on:false,prod:null},
-  orders:[], oseq:0, clients:[], calDays:[], purge:{values:[],active:{},colors:[]},
+  orders:[], oseq:0, clients:[], catalog:[], calDays:[], purge:{values:[],active:{},colors:[]},
   cajon:{movs:[]}
 };}
 var S=defData();
@@ -774,6 +806,7 @@ function load(){ try{var d=JSON.parse(localStorage.getItem(SK)); if(d&&typeof d=
   if(!Array.isArray(S.calc_state.material_breakdown))S.calc_state.material_breakdown=[];
   if(Array.isArray(d.orders))S.orders=d.orders.map(normOrder);
   if(Array.isArray(d.clients))S.clients=d.clients;
+  if(Array.isArray(d.catalog))S.catalog=d.catalog.map(normProd);
   if(d.purge&&typeof d.purge==='object')S.purge=Object.assign({values:[],active:{},colors:[]},d.purge);
   S.oseq=Number(d.oseq)||0; if(Array.isArray(d.calDays))S.calDays=d.calDays;
 } }catch(e){} }
@@ -924,12 +957,12 @@ function setShared(v){ S.calc_state.is_shared=v; save(); renderCalc(); }
 function setShare(v){ v=Math.max(0,Math.min(100,num(v))); S.calc_state.shared_percent_3dcc=v; S.calc_state.shared_percent_silab3d=100-v; save(); renderCalc(); }
 
 /* ===== navegación ===== */
-function go(v){ view=v; document.getElementById('vtitle').textContent=({dash:'Dashboard',calc:'Calculadora',ord:'Pedidos',cal:'Calendario',cli:'Clientes',plantillas:'Plantillas',cfg:'Configuración'}[v]||''); document.querySelectorAll('#nav a').forEach(function(a){a.classList.toggle('on',a.getAttribute('data-v')===v);}); if(window.innerWidth<=760)document.body.classList.add('side-off'); render(); }
+function go(v){ view=v; document.getElementById('vtitle').textContent=({dash:'Dashboard',calc:'Calculadora',ord:'Pedidos',cal:'Calendario',cli:'Clientes',plantillas:'Plantillas',cat:'Catálogo',cfg:'Configuración'}[v]||''); document.querySelectorAll('#nav a').forEach(function(a){a.classList.toggle('on',a.getAttribute('data-v')===v);}); if(window.innerWidth<=760)document.body.classList.add('side-off'); render(); }
 /* En 3DCalc no se borra NADA de forma automática: la purga de seguimiento quedó
    desactivada a petición del usuario (se conserva la función por si se quisiera
    lanzar a mano algún día). */
 function render(){
-  if(view==='dash')renderDash(); else if(view==='cli')renderClients(); else if(view==='calc')renderCalc(); else if(view==='ord')renderOrders(); else if(view==='cal')renderCalendar(); else if(view==='plantillas')renderPlantillas(); else renderCfg(); }
+  if(view==='dash')renderDash(); else if(view==='cli')renderClients(); else if(view==='calc')renderCalc(); else if(view==='ord')renderOrders(); else if(view==='cal')renderCalendar(); else if(view==='plantillas')renderPlantillas(); else if(view==='cat')renderCatalog(); else renderCfg(); }
 /* Rótulos de tarifa que acompañan a los desplegables: se generan aparte para
    poder refrescarlos sin repintar todo el formulario (repintar haría perder el
    foco y el cursor de los campos de texto que se están editando). */
@@ -2379,6 +2412,53 @@ function renderClients(){ if(syncClientsFromOrders())save();
 }
 
 
+/* ===== catálogo de productos =====
+   Fichas de producto creadas a mano (nombre, descripción, medidas y precio
+   estimado). Es un listado de referencia: no entra en el motor de cálculo. */
+var catQ='';
+function normProd(p){ p=p||{}; return {id:p.id||uid(),name:String(p.name||''),desc:String(p.desc||''),medidas:String(p.medidas||''),precio:num(p.precio)}; }
+function catalog(){ if(!Array.isArray(S.catalog))S.catalog=[]; return S.catalog; }
+function getProduct(id){ return catalog().filter(function(p){return p.id===id;})[0]; }
+function catSearch(v){ catQ=(v||'').toLowerCase(); renderCatalog(); }
+function newProduct(){ editProductForm({id:'',name:'',desc:'',medidas:'',precio:''}); }
+function editProductById(id){ var p=getProduct(id); if(p)editProductForm(p); }
+function editProductForm(p){
+  openModal('<h3>'+(p.id?'Editar producto':'Nuevo producto')+'</h3>'
+   +'<div class="fg"><label class="lbl">Nombre</label><input class="inp" id="pf_name" value="'+esc(p.name)+'" placeholder="Ej.: Soporte de auriculares"></div>'
+   +'<div class="fg"><label class="lbl">Descripción</label><textarea class="inp" id="pf_desc" rows="3" placeholder="Acabado, material recomendado, variantes…">'+esc(p.desc)+'</textarea></div>'
+   +'<div class="fg row"><div><label class="lbl">Medidas</label><input class="inp" id="pf_med" value="'+esc(p.medidas)+'" placeholder="120 × 80 × 40 mm"></div>'
+   +'<div><label class="lbl">Precio estimado</label><div class="suffix"><input class="inp" id="pf_pre" inputmode="decimal" value="'+esc(p.precio===''?'':String(num(p.precio)).replace('.',','))+'" placeholder="0,00"><span class="u">€</span></div></div></div>'
+   +'<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn" onclick="saveProduct(\''+p.id+'\')">Guardar</button></div>');
+  try{ document.getElementById('pf_name').focus(); }catch(e){}
+}
+function saveProduct(id){
+  var name=document.getElementById('pf_name').value.trim(); if(!name){ alert('El nombre es obligatorio'); return; }
+  var obj=normProd({id:id||uid(),name:name,desc:document.getElementById('pf_desc').value.trim(),medidas:document.getElementById('pf_med').value.trim(),precio:num(document.getElementById('pf_pre').value)});
+  if(id){ S.catalog=catalog().map(function(p){return p.id===id?obj:p;}); } else { catalog().push(obj); }
+  save(); closeModal(); renderCatalog(); toast3(id?'Producto actualizado':'Producto añadido','#34D399');
+}
+function delProduct(id){ var p=getProduct(id); if(!p)return; if(!confirm('¿Eliminar «'+p.name+'» del catálogo?'))return; S.catalog=catalog().filter(function(x){return x.id!==id;}); save(); renderCatalog(); toast3('Producto eliminado','#FF6B8A'); }
+function dupProduct(id){ var p=getProduct(id); if(!p)return; var c=normProd(JSON.parse(JSON.stringify(p))); c.id=uid(); c.name=p.name+' (copia)'; catalog().unshift(c); save(); renderCatalog(); toast3('Producto duplicado','#34D399'); }
+function renderCatalog(){
+  var all=catalog().map(normProd);
+  var list=all.filter(function(p){ if(!catQ)return true; return ((p.name+' '+p.desc+' '+p.medidas).toLowerCase().indexOf(catQ)>=0); });
+  var rows=list.map(function(p){
+    return '<tr><td class="c-prod"><div class="cat-nm">'+esc(p.name)+'</div>'+(p.desc?'<div class="cat-ds">'+esc(p.desc)+'</div>':'')+'</td>'
+     +'<td class="c-med"><div class="cat-md">'+esc(p.medidas||'—')+'</div></td>'
+     +'<td class="c-pre"><div class="cat-pr">'+(num(p.precio)>0?eur(p.precio):'—')+'</div></td>'
+     +'<td class="c-act cat-act"><button class="del" title="Editar" onclick="editProductById(\''+p.id+'\')">✎</button> <button class="del" title="Duplicar" onclick="dupProduct(\''+p.id+'\')">⧉</button> <button class="del" title="Eliminar" onclick="delProduct(\''+p.id+'\')">✕</button></td></tr>';
+  }).join('');
+  var tot=list.reduce(function(a,p){return a+num(p.precio);},0);
+  var body = list.length
+   ? '<div class="cat-tb"><table class="t"><thead><tr><th class="c-prod">Producto</th><th class="c-med">Medidas</th><th class="c-pre">Precio estimado</th><th class="c-act"></th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+     +'<div class="cat-foot"><span><b>'+list.length+'</b> producto'+(list.length===1?'':'s')+(catQ?' de '+all.length:'')+'</span><span>Precio estimado acumulado: <b>'+eur(tot)+'</b></span></div>'
+   : '<div class="empty">'+(catQ?'Ningún producto coincide con la búsqueda.':'Aún no hay productos en el catálogo. Añade el primero con «＋ Nuevo producto».')+'</div>';
+  document.getElementById('view').innerHTML=
+   '<div class="h1">Catálogo</div><div class="h-sub">Tus productos con sus medidas y precio estimado de referencia.</div>'
+   +'<div class="ord-toolbar"><input class="inp ord-search" placeholder="Buscar producto…" value="'+esc(catQ)+'" oninput="catSearch(this.value)"><span class="sp"></span><button class="btn" onclick="newProduct()">＋ Nuevo producto</button></div>'
+   +'<div class="card">'+body+'</div>';
+}
+
 /* ===== util extra ===== */
 function toast3(msg,clr){ var t=document.getElementById('toast3'); if(!t){t=document.createElement('div');t.id='toast3';document.body.appendChild(t);} t.textContent=msg; t.style.borderColor=(clr||'var(--ac)'); t.style.color=(clr||'var(--ac)'); t.classList.add('show'); clearTimeout(toast3._t); toast3._t=setTimeout(function(){t.classList.remove('show');},2800); }
 function fmtD(iso){ if(!iso)return''; try{return new Date(iso).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return'';} }
@@ -2988,9 +3068,13 @@ function _pdfOpenNamed(blob,name){
     setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(e){} },60000); return w; }
   try{
     w.document.open();
-    w.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>'+_pdfTitleEsc(name)+'</title>'
-      +'<style>html,body{margin:0;height:100%;background:#525659}iframe{border:0;width:100%;height:100%;display:block}</style>'
-      +'</head><body><iframe src="'+url+'" title="'+_pdfTitleEsc(name)+'"></iframe></body></html>');
+    /* Las etiquetas de cierre de esta cadena van escapadas con barra invertida para
+       que ninguna herramienta que inyecta código buscando el primer cierre de BODY
+       del archivo (Live Server, por ejemplo) lo confunda con el final de ESTA página
+       y parta el script. En JavaScript la barra invertida ahí no cambia nada. */
+    w.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>'+_pdfTitleEsc(name)+'<\/title>'
+      +'<style>html,body{margin:0;height:100%;background:#525659}iframe{border:0;width:100%;height:100%;display:block}<\/style>'
+      +'<\/head><body><iframe src="'+url+'" title="'+_pdfTitleEsc(name)+'"><\/iframe><\/body><\/html>');
     w.document.close();
     try{ w.document.title=name; }catch(e){}
   }catch(e){ try{ w.location.href=url; }catch(_e){} }
@@ -3091,7 +3175,7 @@ function _purge(){ try{localStorage.removeItem(SK);localStorage.removeItem(SK+'_
 /* Ayuda contextual de la app (icono ? en el banner superior) */
 (function(){
   if(window.DPHelp) return;
-  var C={"title": "3DCalc", "accent": "#00DDB8", "tagline": "Precio de impresión con desglose", "sections": [{"h": "Qué es", "p": "Calcula el precio de cada impresión con desglose (filamento, tiempo, energía y mano de obra) e inventario de filamentos."}, {"h": "Primeros pasos", "steps": ["Configura tus parámetros: coste de energía, margen y mano de obra.", "Mantén al día el inventario de filamentos.", "Crea un cálculo introduciendo gramos y tiempo.", "Consulta el desglose y, si quieres, actívalo como pedido en 3DTracker."]}, {"h": "Funciones clave", "defs": [["Desglose de coste", "Ve cuánto aporta cada factor al precio."], ["Inventario", "Filamentos con coste por kilo y stock."], ["Lógica editable", "Ajusta las fórmulas a tu caso."], ["A 3DTracker", "Genera un pedido con código de seguimiento."]]}]};
+  var C={"title": "3DCalc", "accent": "#00DDB8", "tagline": "Precio de impresión con desglose", "sections": [{"h": "Qué es", "p": "Calcula el precio de cada impresión con desglose (filamento, tiempo, energía y mano de obra) e inventario de filamentos."}, {"h": "Primeros pasos", "steps": ["Configura tus parámetros: coste de energía, margen y mano de obra.", "Mantén al día el inventario de filamentos.", "Crea un cálculo introduciendo gramos y tiempo.", "Consulta el desglose y, si quieres, actívalo como pedido en 3DTracker."]}, {"h": "Funciones clave", "defs": [["Desglose de coste", "Ve cuánto aporta cada factor al precio."], ["Inventario", "Filamentos con coste por kilo y stock."], ["Lógica editable", "Ajusta las fórmulas a tu caso."], ["A 3DTracker", "Genera un pedido con código de seguimiento."], ["Catálogo", "Fichas de producto con medidas y precio estimado."]]}]};
   var CSS=".dph-veil{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,8,15,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}.dph-veil.open{display:flex}.dph-modal{width:min(660px,96vw);max-height:88vh;overflow:auto;background:#12141d;color:#e7eaf2;border:1px solid rgba(255,255,255,.1);border-radius:16px;box-shadow:0 30px 90px rgba(0,0,0,.6);font-family:'Outfit',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.55}[data-theme=light] .dph-modal{background:#fff;color:#1b1e27;border-color:rgba(0,0,0,.1)}.dph-hd{position:sticky;top:0;display:flex;align-items:center;gap:11px;padding:15px 18px;background:inherit;border-bottom:1px solid rgba(255,255,255,.09);border-radius:16px 16px 0 0}[data-theme=light] .dph-hd{border-color:rgba(0,0,0,.09)}.dph-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}.dph-ti{font-weight:700;font-size:16px}.dph-tg{font-size:12px;opacity:.7}.dph-x{margin-left:auto;border:none;background:transparent;color:inherit;opacity:.55;font-size:22px;cursor:pointer;line-height:1;padding:0 4px}.dph-x:hover{opacity:1}.dph-bd{padding:4px 18px 20px}.dph-sec{margin-top:15px}.dph-h{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;opacity:.6;margin-bottom:5px}.dph-p{margin:0 0 3px}.dph-bd ul,.dph-bd ol{margin:4px 0 0;padding-left:20px}.dph-bd li{margin:3px 0}.dph-def{display:flex;gap:10px;margin:5px 0}.dph-def b{flex-shrink:0;min-width:130px}";
   var HDIC="<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9.3\"/><path d=\"M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4\"/><circle cx=\"12\" cy=\"17.3\" r=\".6\" fill=\"currentColor\"/></svg>";
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}

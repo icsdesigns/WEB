@@ -524,9 +524,11 @@ function _pdfOpenNamed(blob,name){
     setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(e){} },60000); return w; }
   try{
     w.document.open();
-    w.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>'+_pdfTitleEsc(name)+'</title>'
-      +'<style>html,body{margin:0;height:100%;background:#525659}iframe{border:0;width:100%;height:100%;display:block}</style>'
-      +'</head><body><iframe src="'+url+'" title="'+_pdfTitleEsc(name)+'"></iframe></body></html>');
+    /* Cierres escapados con barra invertida: si no, Live Server inyecta aquí dentro
+       su script (busca el primer cierre de BODY del archivo) y parte el JavaScript. */
+    w.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>'+_pdfTitleEsc(name)+'<\/title>'
+      +'<style>html,body{margin:0;height:100%;background:#525659}iframe{border:0;width:100%;height:100%;display:block}<\/style>'
+      +'<\/head><body><iframe src="'+url+'" title="'+_pdfTitleEsc(name)+'"><\/iframe><\/body><\/html>');
     w.document.close();
     try{ w.document.title=name; }catch(e){}
   }catch(e){ try{ w.location.href=url; }catch(_e){} }
