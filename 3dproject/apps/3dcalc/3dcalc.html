@@ -957,7 +957,10 @@ function setShared(v){ S.calc_state.is_shared=v; save(); renderCalc(); }
 function setShare(v){ v=Math.max(0,Math.min(100,num(v))); S.calc_state.shared_percent_3dcc=v; S.calc_state.shared_percent_silab3d=100-v; save(); renderCalc(); }
 
 /* ===== navegación ===== */
-function go(v){ view=v; document.getElementById('vtitle').textContent=({dash:'Dashboard',calc:'Calculadora',ord:'Pedidos',cal:'Calendario',cli:'Clientes',plantillas:'Plantillas',cat:'Catálogo',cfg:'Configuración'}[v]||''); document.querySelectorAll('#nav a').forEach(function(a){a.classList.toggle('on',a.getAttribute('data-v')===v);}); if(window.innerWidth<=760)document.body.classList.add('side-off'); render(); }
+/* Al entrar en la Calculadora, el «Primer día de inicio» del formulario de tiempo
+   de producción vuelve siempre a la fecha de hoy. */
+function _calcStartToday(){ if(!S.calc_state)return; if(!S.calc_state.prod)S.calc_state.prod={tipo:'Técnico',diseno:'Nulo',tests:[],printh:''}; S.calc_state.prod.startDay=_dk(_md(Date.now())); save(); }
+function go(v){ view=v; if(v==='calc')_calcStartToday(); document.getElementById('vtitle').textContent=({dash:'Dashboard',calc:'Calculadora',ord:'Pedidos',cal:'Calendario',cli:'Clientes',plantillas:'Plantillas',cat:'Catálogo',cfg:'Configuración'}[v]||''); document.querySelectorAll('#nav a').forEach(function(a){a.classList.toggle('on',a.getAttribute('data-v')===v);}); if(window.innerWidth<=760)document.body.classList.add('side-off'); render(); }
 /* En 3DCalc no se borra NADA de forma automática: la purga de seguimiento quedó
    desactivada a petición del usuario (se conserva la función por si se quisiera
    lanzar a mano algún día). */
