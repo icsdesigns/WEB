@@ -1174,13 +1174,89 @@ Quedo a la espera de respuesta. ¡Muchas gracias!`;
         showPalomiteraContactModal();
     }
 
+    // Productos que alterna la ventana emergente: cambia de uno a otro en cada apertura
+    const PALOMITERA_POPUP_PRODUCTS = [
+        {
+            id: 'cuadros-got',
+            chip: 'Novedad',
+            title: 'Cuadros bicolor Juego de Tronos',
+            description: 'Hazte con los emblemas de las <strong>grandes casas de Poniente</strong>. ¡Elige tus <strong>casas favoritas</strong> y colecciónalos!',
+            cta: 'Lo quiero',
+            url: '/cuadros-juego-de-tronos/',
+            slides: [
+                { src: 'Cuadros-GOT-1.webp', alt: 'Cuadros bicolor de Juego de Tronos' },
+                { src: 'Cuadros-GOT-2.webp', alt: 'Colección de cuadros de las casas de Juego de Tronos' }
+            ]
+        },
+        {
+            id: 'palomitera-yoshi',
+            chip: 'Novedad',
+            title: 'Palomitera de Yoshi',
+            description: 'Encarga tu unidad personalizada con los <strong>colores</strong> de nuestro catálogo. ¡Disponible en varios <strong>tamaños</strong>!',
+            cta: 'La quiero',
+            url: '/palomitera-formulario/',
+            slides: [
+                { src: 'Palomitera-frontal.webp', alt: 'Palomitera de Yoshi vista frontal' },
+                { src: 'Palomitera-trasera.webp', alt: 'Palomitera de Yoshi vista trasera' }
+            ]
+        }
+    ];
+
+    const PALOMITERA_POPUP_PRODUCT_KEY = 'silab_popup_producto';
+    let palomiteraPopupProductIndex = 0;
+
+    function getNextPalomiteraProductIndex() {
+        let last = -1;
+        try {
+            const stored = Number(localStorage.getItem(PALOMITERA_POPUP_PRODUCT_KEY));
+            if (Number.isInteger(stored) && stored >= 0) {
+                last = stored;
+            }
+        } catch (error) {
+            last = -1;
+        }
+        return (last + 1) % PALOMITERA_POPUP_PRODUCTS.length;
+    }
+
+    function rememberPalomiteraProductIndex(index) {
+        try {
+            localStorage.setItem(PALOMITERA_POPUP_PRODUCT_KEY, String(index));
+        } catch (error) {
+            /* almacenamiento no disponible */
+        }
+    }
+
+    function applyPalomiteraPopupProduct(index) {
+        const popup = document.getElementById('palomiteraPopup');
+        if (!popup) return;
+        const product = PALOMITERA_POPUP_PRODUCTS[index] || PALOMITERA_POPUP_PRODUCTS[0];
+        palomiteraPopupProductIndex = index;
+
+        const chip = popup.querySelector('.palomitera-popup-chip');
+        const title = popup.querySelector('.palomitera-popup-title');
+        const description = popup.querySelector('.palomitera-popup-description');
+        const cta = popup.querySelector('.palomitera-popup-cta');
+        const carousel = popup.querySelector('.palomitera-carousel');
+
+        if (chip) chip.textContent = product.chip;
+        if (title) title.textContent = product.title;
+        if (description) description.innerHTML = product.description;
+        if (cta) cta.textContent = product.cta;
+        if (carousel) {
+            carousel.innerHTML = product.slides.map((slide, slideIndex) =>
+                `<img src="${imagePrefix}${slide.src}" alt="${slide.alt}" class="palomitera-slide${slideIndex === 0 ? ' active' : ''}" loading="eager" decoding="async">`
+            ).join('');
+        }
+    }
+
     function openPalomiteraRequestFlow() {
         const activePalomiteraPopup = document.getElementById('palomiteraPopup');
         if (activePalomiteraPopup) {
             activePalomiteraPopup.classList.remove('show');
         }
-        // Redirigir a la página del formulario de los cuadros de Juego de Tronos
-        window.location.href = '/cuadros-juego-de-tronos/';
+        // Redirigir a la página del producto que se está mostrando
+        const product = PALOMITERA_POPUP_PRODUCTS[palomiteraPopupProductIndex] || PALOMITERA_POPUP_PRODUCTS[0];
+        window.location.href = product.url;
     }
 
     function createPalomiteraPopup() {
@@ -1195,14 +1271,11 @@ Quedo a la espera de respuesta. ¡Muchas gracias!`;
             <div class="palomitera-popup-modal">
                 <button type="button" class="palomitera-popup-close" id="palomiteraPopupClose" aria-label="Cerrar ventana">&times;</button>
                 <div class="palomitera-popup-head">
-                    <span class="palomitera-popup-chip">Novedad</span>
-                    <h2 id="palomiteraPopupTitle" class="palomitera-popup-title">Cuadros bicolor Juego de Tronos</h2>
+                    <span class="palomitera-popup-chip"></span>
+                    <h2 id="palomiteraPopupTitle" class="palomitera-popup-title"></h2>
                 </div>
-                <div class="palomitera-carousel" id="palomiteraCarousel">
-                    <img src="${imagePrefix}Cuadros-GOT-1.webp" alt="Cuadros bicolor de Juego de Tronos" class="palomitera-slide active" loading="eager" decoding="async">
-                    <img src="${imagePrefix}Cuadros-GOT-2.webp" alt="Colección de cuadros de las casas de Juego de Tronos" class="palomitera-slide" loading="eager" decoding="async">
-                </div>
-                <p class="palomitera-popup-description">Hazte con los emblemas de las <strong>grandes casas de Poniente</strong>. ¡Elige tus <strong>casas favoritas</strong> y colecciónalos!</p>
+                <div class="palomitera-carousel" id="palomiteraCarousel"></div>
+                <p class="palomitera-popup-description"></p>
                 <button type="button" class="palomitera-popup-cta" id="palomiteraPopupCTA">Lo quiero</button>
             </div>
         `;
@@ -1221,19 +1294,21 @@ Quedo a la espera de respuesta. ¡Muchas gracias!`;
     }
 
     if (isIndexPage) {
-        const palomiteraAutoShow = shouldShowPalomiteraPopup();
         const palomiteraPopup = createPalomiteraPopup();
         const palomiteraCloseBtn = document.getElementById('palomiteraPopupClose');
         const palomiteraCTA = document.getElementById('palomiteraPopupCTA');
-        const palomiteraSlides = palomiteraPopup.querySelectorAll('.palomitera-slide');
         let palomiteraSlideIndex = 0;
         let palomiteraIntervalId = null;
         const palomiteraProductName = 'Cuadros bicolor Juego de Tronos';
         const palomiteraWhatsAppURL = `https://wa.me/34644070487?text=${encodeURIComponent(`¡Hola! Me gustaría encargar una ${palomiteraProductName} personalizada. ¿Podéis darme más información?`)}`;
         const palomiteraEmailURL = `https://mail.google.com/mail/?view=cm&fs=1&to=silab3d@gmail.com&su=${encodeURIComponent(`Consulta sobre ${palomiteraProductName}`)}&body=${encodeURIComponent(`¡Hola!\n\nMe gustaría encargar una ${palomiteraProductName} personalizada. ¿Podéis darme más información?\n\nGracias.`)}`;
 
+        function getPalomiteraSlides() {
+            return palomiteraPopup.querySelectorAll('.palomitera-slide');
+        }
+
         function showPalomiteraSlide(nextIndex) {
-            palomiteraSlides.forEach((slide, index) => {
+            getPalomiteraSlides().forEach((slide, index) => {
                 slide.classList.toggle('active', index === nextIndex);
             });
         }
@@ -1249,15 +1324,26 @@ Quedo a la espera de respuesta. ¡Muchas gracias!`;
         }
 
         function startPalomiteraCarousel() {
-            if (palomiteraSlides.length > 1 && !palomiteraIntervalId) {
+            if (getPalomiteraSlides().length > 1 && !palomiteraIntervalId) {
                 palomiteraIntervalId = setInterval(() => {
-                    palomiteraSlideIndex = (palomiteraSlideIndex + 1) % palomiteraSlides.length;
+                    const slides = getPalomiteraSlides();
+                    palomiteraSlideIndex = (palomiteraSlideIndex + 1) % slides.length;
                     showPalomiteraSlide(palomiteraSlideIndex);
                 }, 2000);
             }
         }
 
-        // ── Icono minimizado (cara de Yoshi) en la esquina inferior derecha ──
+        // Cada apertura muestra el siguiente producto: alterna cuadros GOT ↔ palomitera de Yoshi
+        function openPalomiteraPopup() {
+            const nextIndex = getNextPalomiteraProductIndex();
+            applyPalomiteraPopupProduct(nextIndex);
+            rememberPalomiteraProductIndex(nextIndex);
+            palomiteraSlideIndex = 0;
+            palomiteraPopup.classList.add('show');
+            startPalomiteraCarousel();
+        }
+
+        // ── Icono minimizado (estrella premium) en la esquina inferior derecha ──
         let palomiteraMinIcon = null;
 
         function showPalomiteraMinIcon() {
@@ -1266,21 +1352,25 @@ Quedo a la espera de respuesta. ¡Muchas gracias!`;
                 palomiteraMinIcon.type = 'button';
                 palomiteraMinIcon.id = 'palomiteraMinIcon';
                 palomiteraMinIcon.className = 'palomitera-min-icon';
-                palomiteraMinIcon.title = 'Cuadros bicolor Juego de Tronos';
-                palomiteraMinIcon.setAttribute('aria-label', 'Ver novedad: Cuadros bicolor Juego de Tronos');
+                palomiteraMinIcon.title = 'Novedades SILAB 3D';
+                palomiteraMinIcon.setAttribute('aria-label', 'Ver novedades de SILAB 3D');
                 palomiteraMinIcon.innerHTML = `
                     <svg viewBox="0 0 64 64" aria-hidden="true">
-                        <path d="M10 44 L14 22 L24 33 L32 16 L40 33 L50 22 L54 44 Z" fill="#e8b93c" stroke="#8a6712" stroke-width="1.4" stroke-linejoin="round"/>
-                        <rect x="10" y="44" width="44" height="6" rx="2" fill="#e8b93c" stroke="#8a6712" stroke-width="1.4"/>
-                        <circle cx="14" cy="20" r="2.6" fill="#e8b93c" stroke="#8a6712" stroke-width="1.2"/>
-                        <circle cx="32" cy="14" r="2.8" fill="#e8b93c" stroke="#8a6712" stroke-width="1.2"/>
-                        <circle cx="50" cy="20" r="2.6" fill="#e8b93c" stroke="#8a6712" stroke-width="1.2"/>
-                        <circle cx="32" cy="40" r="2.4" fill="#a5262d"/>
+                        <defs>
+                            <linearGradient id="palomiteraStarGold" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#FFE9A3"/>
+                                <stop offset="45%" stop-color="#F5C542"/>
+                                <stop offset="100%" stop-color="#D9971B"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M32 6 L39.6 22.6 L57.6 24.8 L44.4 37.2 L47.9 55 L32 46.2 L16.1 55 L19.6 37.2 L6.4 24.8 L24.4 22.6 Z" fill="url(#palomiteraStarGold)" stroke="#A9741A" stroke-width="1.6" stroke-linejoin="round"/>
+                        <path d="M32 13.5 L37 24.5 L26.5 33 Z" fill="#FFF6D6" opacity="0.75"/>
+                        <circle cx="52" cy="12" r="2.2" fill="#FFE9A3"/>
+                        <circle cx="12" cy="14" r="1.6" fill="#FFE9A3" opacity="0.85"/>
                     </svg>`;
                 palomiteraMinIcon.addEventListener('click', function() {
                     hidePalomiteraMinIcon();
-                    palomiteraPopup.classList.add('show');
-                    startPalomiteraCarousel();
+                    openPalomiteraPopup();
                 });
                 document.body.appendChild(palomiteraMinIcon);
             }
@@ -1291,15 +1381,8 @@ Quedo a la espera de respuesta. ¡Muchas gracias!`;
             if (palomiteraMinIcon) palomiteraMinIcon.classList.remove('visible');
         }
 
-        if (palomiteraAutoShow) {
-            startPalomiteraCarousel();
-            setTimeout(() => {
-                palomiteraPopup.classList.add('show');
-            }, 5000);
-        } else {
-            // Popup suprimido (cerrado hace poco): queda minimizado en el icono
-            showPalomiteraMinIcon();
-        }
+        // La ventana emergente arranca siempre minimizada: solo se abre al pulsar el icono
+        showPalomiteraMinIcon();
 
         if (palomiteraCloseBtn) {
             palomiteraCloseBtn.addEventListener('click', function() {
