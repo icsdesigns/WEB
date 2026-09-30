@@ -4,20 +4,20 @@
       "nombre": "PETG",
       "colores": [
         {
-          "nombre": "Black",
-          "hex": "#000000"
-        },
-        {
-          "nombre": "Blue",
+          "nombre": "Azul",
           "hex": "#1800AC"
         },
         {
-          "nombre": "Red",
-          "hex": "#FF3131"
+          "nombre": "Blanco",
+          "hex": "#FFFFFF"
         },
         {
-          "nombre": "White",
-          "hex": "#FFFFFF"
+          "nombre": "Negro",
+          "hex": "#000000"
+        },
+        {
+          "nombre": "Rojo",
+          "hex": "#FF3131"
         }
       ]
     },
@@ -29,78 +29,88 @@
           "hex": "#F0E0D6"
         },
         {
-          "nombre": "Black",
-          "hex": "#000000"
-        },
-        {
-          "nombre": "Cherry Red",
-          "hex": "#F46974"
-        },
-        {
-          "nombre": "Coffee Brown",
-          "hex": "#533421"
-        },
-        {
-          "nombre": "Cyan",
-          "hex": "#00A3E0"
-        },
-        {
-          "nombre": "Grass Green",
-          "hex": "#0A9077"
-        },
-        {
-          "nombre": "Lavender Purple",
-          "hex": "#7358C3"
-        },
-        {
-          "nombre": "Lemon Yellow",
-          "hex": "#FBF9AC"
-        },
-        {
-          "nombre": "Matte Red",
-          "hex": "#B0181B"
-        },
-        {
-          "nombre": "Mint Green",
-          "hex": "#6ED9CE"
-        },
-        {
-          "nombre": "Oak",
-          "hex": "#CDAE81"
-        },
-        {
-          "nombre": "Olive Green",
-          "hex": "#5A6D3D"
-        },
-        {
-          "nombre": "Sakura Pink",
-          "hex": "#F2A8B3"
-        },
-        {
-          "nombre": "Silver",
-          "hex": "#BBBEC3"
-        },
-        {
-          "nombre": "Sunny Orange",
-          "hex": "#FF7A29"
-        },
-        {
-          "nombre": "White",
+          "nombre": "Blanco",
           "hex": "#FFFFFF"
         },
         {
-          "nombre": "Mármol (Chesnut Marble)",
-          "hex": "#D7D4CC",
-          "premium": true
+          "nombre": "Café",
+          "hex": "#533421"
         },
         {
-          "nombre": "Silk Light Gold (Dorado)",
-          "hex": "#f1be48",
-          "premium": true
+          "nombre": "Césped",
+          "hex": "#0A9077"
         },
         {
-          "nombre": "Silk Yellow (Amarillo)",
+          "nombre": "Cian",
+          "hex": "#00A3E0"
+        },
+        {
+          "nombre": "Lavanda",
+          "hex": "#7358C3"
+        },
+        {
+          "nombre": "Limón",
+          "hex": "#FBF9AC"
+        },
+        {
+          "nombre": "Madera",
+          "hex": "#CDAE81"
+        },
+        {
+          "nombre": "Menta",
+          "hex": "#6ED9CE"
+        },
+        {
+          "nombre": "Naranja",
+          "hex": "#FF7A29"
+        },
+        {
+          "nombre": "Negro",
+          "hex": "#000000"
+        },
+        {
+          "nombre": "Plata",
+          "hex": "#BBBEC3"
+        },
+        {
+          "nombre": "Rojo cereza",
+          "hex": "#F46974"
+        },
+        {
+          "nombre": "Rojo mate",
+          "hex": "#B0181B"
+        },
+        {
+          "nombre": "Rosa",
+          "hex": "#F2A8B3"
+        },
+        {
+          "nombre": "Verde oliva",
+          "hex": "#5A6D3D"
+        },
+        {
+          "nombre": "Amarillo brillante",
           "hex": "#F1C402",
+          "premium": true
+        },
+        {
+          "nombre": "Arco iris",
+          "hex": "#BC556D,#3A7BD5,#FF7A29,#27AE60",
+          "premium": true
+        },
+        {
+          "nombre": "Azul fosforescente",
+          "hex": "#F1F4ED,#3A7BD5",
+          "premium": true
+        },
+        {
+          "nombre": "Dorado brillante",
+          "hex": "#F1BE48",
+          "premium": true
+        },
+        {
+          "nombre": "Mármol",
+          "hex": "#D7D4CC",
           "premium": true
         }
       ]
