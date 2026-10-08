@@ -130,7 +130,7 @@
     setInterval(function () { if (visible && !parado && !pausado && !document.hidden) mostrar(actual + 1, false); }, 7000);
   }
 
-  fetch('/data/resenas.json', { cache: 'no-cache' })
+  fetch('/new-version/data/resenas.json', { cache: 'no-cache' })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
       if (!d || !d.resenas || !d.resenas.length) return;

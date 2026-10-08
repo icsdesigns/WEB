@@ -29,7 +29,7 @@
   }
 
   function fromRepo() {
-    return fetch('/data/filamentos.json', { cache: 'no-store' })
+    return fetch('/new-version/data/filamentos.json', { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (json) {
         var list = json && Array.isArray(json.filamentos) ? json.filamentos : [];

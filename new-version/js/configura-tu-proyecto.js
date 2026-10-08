@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //      (checkpoint que mantiene al día un GitHub Action cada hora).
     async function fetchFilamentos() {
         // Ruta absoluta: funciona igual sea cual sea la profundidad de la página actual.
-        const localPath = '/data/filamentos.json';
+        const localPath = '/new-version/data/filamentos.json';
         const sb = window.SILAB_SUPABASE || {};
         const sbKey = sb.anonKey || sb.key;
 
