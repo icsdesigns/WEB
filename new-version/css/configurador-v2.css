@@ -1,0 +1,20 @@
+/* ============================================================
+   SILAB 3D · Configurador de color — ajustes al sistema nuevo
+   (se carga después de configurador.css)
+   ============================================================ */
+.page-wrap { padding-top: 0; background: var(--s3d-white); }
+.page-wrap .cfg .shell { max-width: var(--s3d-max); margin-inline: auto; padding-inline: var(--s3d-gutter); }
+.cfg :is(button, input, select, textarea), .guia-modal :is(button, input) { font-family: var(--s3d-sans); }
+
+/* Iconos que sustituyen a los emojis */
+.cfg .s3d-icon, .guia-modal .s3d-icon { width: 18px; height: 18px; vertical-align: -3px; }
+.cfg-empty-icon { color: var(--s3d-brand); line-height: 0; }
+.cfg-empty-icon .s3d-icon { width: 40px; height: 40px; }
+.mat-icon { color: var(--s3d-brand); line-height: 0; }
+.mat-icon .s3d-icon { width: 24px; height: 24px; }
+.pc-del { color: var(--s3d-muted); line-height: 0; }
+.pc-del .s3d-icon { width: 18px; height: 18px; }
+.btn-add { display: inline-flex; align-items: center; gap: 8px; }
+.share-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.demo-mat span { display: inline-grid; place-items: center; color: var(--s3d-brand); line-height: 0; }
+.demo-mat span .s3d-icon { width: 16px; height: 16px; }

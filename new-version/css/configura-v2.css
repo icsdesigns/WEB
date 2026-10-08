@@ -1,0 +1,232 @@
+/* ============================================================
+   SILAB 3D · Configura tu proyecto — ajustes al sistema nuevo
+   (se carga después de configura.css)
+   ============================================================ */
+
+/* Cabecera centrada con el indicador de pasos */
+.page-hero--center .page-hero__grid { max-width: 780px; margin-inline: auto; }
+.page-hero--center .page-hero__copy { align-items: center; text-align: center; }
+.page-hero--center .crumbs { justify-content: center; }
+.page-hero--center .step-indicator-hero { margin-top: 18px; }
+
+/* Formulario: mismas formas y colores que el resto del sitio */
+.quote-page { background: var(--s3d-white); padding: clamp(28px, 4vw, 44px) 0 clamp(64px, 8vw, 96px); }
+.quote-section-card {
+  border: 1px solid var(--s3d-line) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 1px 2px rgba(34,28,31,.04), 0 12px 32px rgba(34,28,31,.05) !important;
+}
+
+.quote-page :is(button, input, select, textarea) { font-family: var(--s3d-sans); }
+
+/* Iconos que sustituyen a los emojis */
+.plazo-icon, .dropzone-icon, .contact-option-icon, .card-icon, .empty-icon { display: inline-grid; place-items: center; color: var(--s3d-brand); line-height: 0; }
+.card-icon .s3d-icon { width: 24px; height: 24px; }
+.empty-icon .s3d-icon { width: 22px; height: 22px; }
+.plazo-icon .s3d-icon { width: 22px; height: 22px; }
+.dropzone-icon .s3d-icon { width: 30px; height: 30px; }
+.contact-option-icon .s3d-icon { width: 30px; height: 30px; }
+.contact-options-lead { font-size: .95rem; color: var(--s3d-muted); margin-bottom: 32px; }
+
+/* Paso «Enviar»: nombre y teléfono; al rellenarlos aparecen las opciones de envío */
+.send-lead { margin: -4px 0 18px; color: var(--s3d-muted); font-size: 15.5px; }
+.quote-section-card .quote-page-contact {
+  margin: 22px 0 4px; padding: 22px 0 0; border-top: 1px solid var(--s3d-line);
+  background: none; box-shadow: none; text-align: center;
+  animation: s3d-aparece .3s ease both;
+}
+.quote-section-card .quote-page-contact[hidden] { display: none; }
+.quote-section-card .contact-options-title { font-size: 17px; font-weight: 700; margin: 0 0 16px; color: var(--s3d-ink); }
+@keyframes s3d-aparece { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .quote-section-card .quote-page-contact { animation: none; } }
+.quote-section-card .quote-page-contact,
+.quote-section-card .quote-page-contact.active {
+  display: block; border: 0; border-top: 1px solid var(--s3d-line); border-radius: 0;
+  padding: 22px 0 0; max-width: none; width: 100%;
+}
+.quote-section-card .quote-page-contact[hidden] { display: none; }
+.quote-section-card .quote-page-contact .contact-options-grid { margin: 0 auto; }
+
+/* ============================================================
+   Página 2 · Archivos de referencia (03/10/2026)
+   Tres opciones; «Archivos de diseño» despliega la tasadora.
+   ============================================================ */
+.ref-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ref-medidas { margin-top: 18px; }
+.ref-medidas[hidden], .reference-upload[hidden] { display: none; }
+.reference-upload + .ref-medidas { margin-top: 18px; }
+
+/* Tasadora: visor a la izquierda y resultado + opciones a la derecha (norma de carteles: margin > space) */
+.ct-tasadora {
+  --pi-margin: 22px; --pi-space: 14px;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px;
+  margin-top: 18px; animation: fadeInUp .3s ease;
+}
+.ct-tasadora[hidden] { display: none; }
+.ct-tasadora .pi-visor { position: relative; top: 0; aspect-ratio: 1 / 1; max-height: none; }
+.ct-tasadora .pi-panel { gap: 12px; }
+.ct-tasadora .pi-resultado[hidden] { display: none; }
+.ct-tasadora .pi-cifra__valor { font-size: clamp(20px, 2.4vw, 24px); white-space: nowrap; }
+.ct-tasadora .pi-opcion { grid-template-columns: 1fr; padding: 14px; }
+.ct-tasadora .pi-opcion__nota, .ct-tasadora .pi-extra { grid-column: 1; }
+.ct-tasadora .pi-carga__titulo { font-size: 16px; }
+.ct-tasadora > .field-error { grid-column: 1 / -1; }
+
+@media (max-width: 680px) {
+  .ref-selector { grid-template-columns: 1fr; }
+  .ct-tasadora { grid-template-columns: 1fr; }
+  .ct-tasadora .pi-visor { aspect-ratio: 4 / 3; }
+}
+@media (max-width: 480px) {
+  .ct-tasadora { --pi-margin: 18px; --pi-space: 12px; }
+}
+
+/* Página 2: panel más ancho en PC para ver mejor la tasadora (transición fluida al cambiar de página) */
+.quote-wrapper { transition: max-width .5s cubic-bezier(.22, .61, .36, 1); }
+@media (min-width: 1024px) {
+  .quote-wrapper.is-ancho { max-width: 1120px; }
+  .quote-wrapper.is-ancho .ct-tasadora { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; }
+  .quote-wrapper.is-ancho .ct-tasadora .pi-visor { aspect-ratio: 4 / 3; }
+}
+@media (prefers-reduced-motion: reduce) { .quote-wrapper { transition: none; } }
+
+/* Tasadora: avisos e información (archivo, medidas, errores) fuera del visor, para no tapar la pieza */
+.ct-visor-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.ct-visor-col .pi-visor__barra, .ct-visor-col .pi-visor__error { position: static; }
+.ct-visor-col .pi-visor__barra { justify-content: flex-start; }
+.ct-visor-col .pi-visor__error { text-align: left; }
+.ct-visor-col .pi-chip--archivo { max-width: 260px; }
+/* El resumen va bajo el visor y cierra la columna a la misma altura que el panel de opciones (solo PC) */
+
+/* Modo de impresión (Normal / Personalizado) y elección ante los umbrales */
+.ct-tasadora .pi-modo { border: 1px solid var(--s3d-line); border-radius: 18px; background: var(--s3d-white); }
+.ct-tasadora .pi-modo[hidden] { display: none; }
+.ct-tasadora .pi-opciones[hidden] { display: none; }
+.pi-seg--aviso { width: 100%; background: var(--s3d-white); }
+
+/* Aviso de umbrales superpuesto al visor */
+.ct-tasadora .pi-visor #piUmbral {
+  position: absolute; inset: 12px; margin: auto; z-index: 3;
+  height: fit-content; max-height: calc(100% - 24px); overflow: auto; max-width: 400px;
+  box-shadow: 0 12px 36px rgba(34, 28, 31, .22);
+}
+.ct-tasadora .pi-visor #piUmbral[hidden] { display: none; }
+
+/* Medidas: largo, ancho y alto (proporcionales o independientes) */
+.ct-tasadora .pi-dims { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+.pi-dims__fila { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.pi-dim { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--s3d-muted); }
+.pi-dim .pi-medida { width: 100%; padding-right: 8px; }
+.pi-dim .pi-medida input { width: 100%; min-width: 0; padding-left: 8px; }
+
+/* Flechas para pasar de una cama (o archivo) a otra */
+.ct-tasadora .pi-flecha {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+  display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+  border: 1px solid var(--s3d-line); border-radius: 50%; background: rgba(255, 255, 255, .92); color: var(--s3d-brand-ink);
+  box-shadow: var(--s3d-shadow); cursor: pointer; transition: background-color .15s, border-color .15s;
+}
+.ct-tasadora .pi-flecha[hidden] { display: none; }
+.ct-tasadora .pi-flecha:hover { border-color: var(--s3d-brand); background: #fff; }
+.ct-tasadora .pi-flecha:focus-visible { outline: 2px solid var(--s3d-brand); outline-offset: 2px; }
+.ct-tasadora .pi-flecha .s3d-icon { width: 20px; height: 20px; }
+.pi-flecha--ant { left: 10px; }
+.pi-flecha--sig { right: 10px; }
+.ct-tasadora .pi-visor:focus { outline: none; }
+
+/* Columnas equilibradas (PC): el resumen va a la columna más corta (lo decide equilibrar() en la tasadora);
+   el visor crece para rellenar la izquierda y el último bloque de la derecha, para rellenar la derecha */
+@media (min-width: 681px) {
+  .ct-visor-col .pi-visor { flex: 1 0 auto; }
+  .ct-tasadora .crece { flex: 1 0 auto; }
+  .ct-tasadora .pi-opciones.crece { justify-content: space-around; }
+  .ct-tasadora .pi-modo.crece { align-content: center; }
+  .ct-tasadora.midiendo { align-items: start; }
+  .ct-tasadora.midiendo .pi-visor, .ct-tasadora.midiendo .crece { flex: none; }
+}
+
+/* 04/10/2026 · Tasadora: botones de archivo encima del visor, datos del archivo centrados debajo */
+.ct-acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.ct-acciones[hidden] { display: none; }
+.ct-visor-col .pi-visor__barra { justify-content: center; }
+.ct-visor-col .pi-visor__error { text-align: center; }
+/* Tamaño predeterminado: sin campos de medidas */
+.ct-tasadora .pi-dims[hidden] { display: none; }
+/* Sin archivos: solo la zona de carga, centrada (sin resumen ni opciones) */
+.ct-tasadora.vacia, .quote-wrapper.is-ancho .ct-tasadora.vacia { grid-template-columns: minmax(0, 1fr); }
+.ct-tasadora.vacia .pi-panel, .ct-tasadora.vacia #piResultado, .ct-tasadora.vacia #piRevision { display: none; }
+.ct-tasadora.vacia .ct-visor-col { width: 100%; max-width: 560px; margin-inline: auto; }
+.plazo-title__extra { font-weight: 500; color: var(--gray-text); }
+/* Ventana emergente simple (archivo demasiado grande) */
+.pi-ventana {
+  max-width: min(420px, calc(100vw - 32px)); padding: 26px; border: 0; border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(34, 28, 31, .3); text-align: center; font-family: var(--s3d-sans);
+}
+.pi-ventana::backdrop { background: rgba(34, 28, 31, .45); }
+.pi-ventana__titulo { margin: 0 0 10px; font-size: 18px; font-weight: 700; color: var(--s3d-ink); }
+.pi-ventana__texto { margin: 0 0 18px; font-size: 15px; line-height: 1.5; color: var(--s3d-muted); }
+/* Página 3: material apropiado para el tipo de proyecto */
+.card-recomendado {
+  display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 999px;
+  background: var(--primary-light); color: #8E3B50; font-size: .68rem; font-weight: 700; line-height: 1.4;
+}
+.card-recomendado[hidden] { display: none; }
+
+/* Ventana de umbrales minimizada (tras «Dejar como está»): botón de alerta junto a los de archivos */
+.pi-chip--alerta { border-color: #E9A23B; background: #FFF6E6; color: #8A5A12; }
+.pi-chip--alerta:hover { border-color: #C9821B; }
+.pi-chip--alerta .s3d-icon { width: 15px; height: 15px; }
+.pi-chip--alerta[hidden] { display: none; }
+
+/* Página 4 · «Solicitar presupuesto» y resultado (localizador, precio o evaluación) */
+.ct-solicitar { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 22px 0 4px; padding-top: 22px; border-top: 1px solid var(--s3d-line); }
+.ct-solicitar[hidden] { display: none; }
+.ct-solicitar__boton { min-width: 240px; }
+.ct-solicitar__boton:disabled { opacity: .6; cursor: wait; }
+.ct-enviado {
+  display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;
+  margin: 0 auto 24px; padding: 26px; max-width: 520px;
+  border: 1px solid #E3C3CC; border-radius: 18px; background: #FBEFF2;
+}
+.ct-enviado__rotulo { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #8E3B50; }
+.ct-enviado__localizador { margin: 0; font: 600 26px/1.2 'IBM Plex Mono', ui-monospace, monospace; color: var(--s3d-ink); letter-spacing: .04em; }
+.ct-enviado__precio { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 22px; border-radius: 14px; background: var(--s3d-ink); color: #fff; }
+.ct-enviado__precio[hidden] { display: none; }
+.ct-enviado__precio-rotulo { font-size: 13px; color: #CDBFC4; }
+.ct-enviado__precio-valor { font-size: 28px; font-weight: 700; line-height: 1.15; }
+.ct-enviado__precio-nota { font-size: 12px; line-height: 1.4; color: #CDBFC4; }
+/* Información legal bajo «Solicitar presupuesto» (art. 13 RGPD) */
+.ct-legal { margin: 4px 0 0; max-width: 60ch; font-size: 12.5px; line-height: 1.5; color: #5A4750; text-align: center; }
+.ct-legal a { color: #8E3B50; text-decoration: underline; }
+.ct-enviado__texto { margin: 0; font-size: 15px; line-height: 1.5; color: #5A4750; max-width: 44ch; }
+
+/* Página 4: título de contacto centrado */
+.quote-section-card .contact-options-title { text-align: center; }
+/* Zona de carga: el texto nunca toca el borde discontinuo */
+.ct-tasadora .pi-carga { padding: 18px; }
+.ct-tasadora .pi-carga__titulo, .ct-tasadora .pi-carga__ayuda { max-width: 100%; overflow-wrap: anywhere; }
+@media (max-width: 480px) {
+  .ct-tasadora .pi-carga { inset: 12px; gap: 10px; }
+  .ct-tasadora .pi-carga__titulo { font-size: 15px; }
+  .ct-tasadora .pi-carga__ayuda { font-size: 13px; }
+  .ct-tasadora .pi-dims__fila { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .ct-tasadora .pi-dim .pi-medida input { padding-left: 4px; font-size: 14px; }
+  .ct-tasadora .pi-seg span { padding: 5px 3px; }
+  .ct-tasadora .pi-seg b { font-size: 13px; }
+  .ct-tasadora .pi-seg small { font-size: 10.5px; }
+  .ct-enviado { padding: 20px 16px; }
+  .ct-enviado__localizador { font-size: 22px; }
+}
+
+/* Página 4: copia del resumen al email del cliente */
+.ct-copia { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 14px; border-top: 1px solid #E3C3CC; }
+.ct-copia__rotulo { font-size: 14px; font-weight: 600; color: var(--s3d-ink); }
+.ct-copia__fila { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
+.ct-copia__fila input { flex: 1 1 200px; min-width: 0; max-width: 300px; height: 46px; padding: 0 14px; border: 1.5px solid #E3C3CC; border-radius: 12px; font: inherit; background: #fff; }
+.ct-copia__fila input:focus { outline: none; border-color: var(--s3d-brand); }
+.ct-copia__fila .quote-step-button { flex: 0 0 auto; }
+.ct-copia__nota { margin: 0; font-size: 12.5px; line-height: 1.45; color: #5A4750; }
+.ct-copia__estado { margin: 0; font-size: 13px; line-height: 1.45; color: #5A4750; }
+.ct-copia__estado:empty { display: none; }
+.ct-copia__estado.ok { color: #0E7C68; }
+.ct-copia__estado.error { color: #B42318; }

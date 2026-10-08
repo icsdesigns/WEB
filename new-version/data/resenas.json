@@ -1,0 +1,252 @@
+{
+  "_ayuda": "Reseñas de Google que muestra la web (portada y Valoraciones). Las actualiza cada semana .github/workflows/resenas-google.yml con scripts/resenas-google.mjs; también se pueden editar a mano. La web solo muestra las de 4 o 5 estrellas con texto. idsElfsight = reseñas ya contadas.",
+  "actualizado": "2026-10-06",
+  "lugar": {
+    "nombre": "SILAB 3D",
+    "placeId": "ChIJGQ63KweGFG8R46Cqr-kS67k",
+    "nota": 5,
+    "total": 27,
+    "url": "https://www.google.com/maps?cid=13396822311427547363",
+    "escribir": "https://g.page/r/CeOgqq_pEuu5EBM/review"
+  },
+  "resenas": [
+    {
+      "id": "elfsight-8a3123e8-8060-4301-902f-83c43241a41f",
+      "autor": "Beatriz Perez",
+      "nota": 5,
+      "texto": "Necesitábamos unos accesorios para la FitBit y Silab 3D los ha realizado perfectos!!! Son geniales y muy profesionales. Muy muy recomendable.",
+      "fecha": "2026-08-28",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT21GbGNrbGtaR2swU2taR1J6Tm9UME5KUm5sNVpsRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOmFlcklkZGk0SkZGRzNoT0NJRnl5ZlE%7C%7C"
+    },
+    {
+      "id": "elfsight-9699e817-a70b-4153-9333-a500424af893",
+      "autor": "VICTOR GONZALEZ",
+      "nota": 5,
+      "texto": "Muy buen trabajo y te explican todo muy bien",
+      "fecha": "2026-08-21",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2tkUlNYaERSRlJyUjNsaWNHWmhiM0ZhZUZOYVFVRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOkdRSXhDRFRrR3licGZhb3FaeFNaQUE%7C%7C"
+    },
+    {
+      "id": "elfsight-3300e338-f130-46a8-8276-e5a53526c494",
+      "autor": "Carlos",
+      "nota": 5,
+      "texto": "Un 10! Desde el primer momento dispuestos a ayudar en cualquier detalle y un trabajo de primera. Super recomendable para cualquiera que necesite alguna cosa impresa en 3D. Y a un precio super económico. No se puede pedir más!",
+      "fecha": "2026-07-28",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2pCSlZVZFZTM2cxTFd0Mk9WWjFiR2hmWjJNMk9IYxAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOjBJVUdVS3g1LWt2OVZ1bGhfZ2M2OHc%7C%7C"
+    },
+    {
+      "id": "elfsight-94f6f335-1374-420b-96b6-1a081f9e40ef",
+      "autor": "Óscar",
+      "nota": 5,
+      "texto": "Todo perfecto, facilidades para la entrega, muy rápido y las piezas tal como las necesitaba",
+      "fecha": "2026-07-24",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT25ScFFVSnFZMGxLTjB0V1FqUnVhRlpZYlU1NVIzYxAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOnRpQUJqY0lKN0tWQjRuaFZYbU55R3c%7C%7C"
+    },
+    {
+      "id": "elfsight-8b1bdea3-a4ea-442a-aa2b-7c677e03a390",
+      "autor": "Rodolfo Cortes romero",
+      "nota": 5,
+      "texto": "Mi experiencia es increíble, el trato recibido es excelente. En todo momento se han preocupado por la perfección del diseño, del acabado final. El nivel de detalle y capacidad para lograr llevar la idea a la realidad demuestra confianza en su trabajo, sin tener esta oferta en el catálogo han conseguido hacer la idea realidad con un gran nivel de perfección. Encantado con los productos, muy recomendable para fanáticos del mundo Westeros.",
+      "fecha": "2026-06-22",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT25GamNrWjBiRGgyZFhoR1dWcHRWRWxLUXpCMVNrRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOnFjckZ0bDh2dXhGWVptVElKQzB1SkE%7C%7C"
+    },
+    {
+      "id": "elfsight-cfab5e19-2c90-4eda-9ab9-ec127024dfb2",
+      "autor": "Angel Cuadrado",
+      "nota": 5,
+      "texto": "Pertiguin salva vidas, una replica perfecta, buen trabajo de diseño",
+      "fecha": "2026-06-16",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2xwNmVXVmZMWFpmZVVGdWFXdHdVa0k0YkRWcGJIYxAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOlp6eWVfLXZfeUFuaWtwUkI4bDVpbHc%7C%7C"
+    },
+    {
+      "id": "elfsight-e89f21ed-7e32-46e5-be79-37fbdd8f2dff",
+      "autor": "Cristian _Gon_Alv",
+      "nota": 5,
+      "texto": "Increíble lo de esta gente!\nEstaba desesperado por unos protectores me hacían falta para mi caravana,\nLas piezas estaban descatalogadas…. Pero ellos dieron con la tecla y solucionaron!!!\nOs aseguro volveremos a vernos!",
+      "fecha": "2026-06-06",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT21WTlIwc3hla05qV0hOUlNHSktXSHB5Um10V1VWRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOmVNR0sxekNjWHNRSGJKWHpyRmtWUVE%7C%7C"
+    },
+    {
+      "id": "elfsight-9c61b170-ba85-4995-b378-33e49f3ce506",
+      "autor": "Cecilia",
+      "nota": 5,
+      "texto": "Encargué unos llaveros personalizados con NFC y quedé encantada con el resultado. El trato fue genial desde el primer momento, muy majos y con mucha facilidad para gestionar todo. Sin complicaciones, rápidos y el acabado perfecto. 100% recomendables ⭐",
+      "fecha": "2026-06-04",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2pCbFNIQnljVmxCTkdGdmJIbGFURVoyYUVsZlMxRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOjBlSHBycVlBNGFvbHlaTEZ2aElfS1E%7C%7C"
+    },
+    {
+      "id": "elfsight-fb82098f-9616-420a-9bb6-7c3e1b1ca467",
+      "autor": "Jorge Cuadrado beato",
+      "nota": 5,
+      "texto": "Muy buen trato rapidez y profesionalidad.",
+      "fecha": "2026-06-02",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2xkVlpUbEtVVEpRV2pGalZqRlpOMnQxVGpWd1MxRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOldVZTlKUTJQWjFjVjFZN2t1TjVwS1E%7C%7C"
+    },
+    {
+      "id": "elfsight-a17510ff-63e0-461d-9e99-26db7aa9795c",
+      "autor": "David",
+      "nota": 1,
+      "texto": "Ni Maradona llegó a ver semejantes rayas",
+      "fecha": "2026-05-15",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT214dVRsWlZlVlZRWjNSU2JrdFpVbWhMYTJOVVVHYxAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOmxuTlZVeVVQZ3RSbktZUmhLa2NUUGc%7C%7C"
+    },
+    {
+      "id": "elfsight-8af3f622-7727-49cb-a08b-4d8460c7d7c9",
+      "autor": "Alejandro Alonso",
+      "nota": 5,
+      "texto": "Mi encargo fue realizado en el tiempo acordado y es de la mas alta calidad. Muy recomendable!",
+      "fecha": "2026-05-05",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2pCVlZXTjZOMlJyYzI4dGFXbHZhRXhZZWtrM1FsRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOjBVVWN6N2Rrc28taWlvaExYekk3QlE%7C%7C"
+    },
+    {
+      "id": "elfsight-faa6a8f7-fc9e-472c-95fe-14f58612a7d5",
+      "autor": "Emi Lau",
+      "nota": 5,
+      "texto": "Calidad de productos excelente, un trato cercano y sin problemas para modificar el pedido y la entrega rápida y adaptada al cliente, un gran descubrimiento!!!",
+      "fecha": "2026-04-25",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2pGaGJIbElaVjlxVW1kelptZFpTblpvZFd3MVRWRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOjFhbHlIZV9qUmdzZmdZSnZodWw1TVE%7C%7C"
+    },
+    {
+      "id": "elfsight-dc2c6e73-6b15-4c56-91e3-ab8c98a275e6",
+      "autor": "Javier Quintero",
+      "nota": 5,
+      "texto": "Buen servicio, amable, disponible y calidad",
+      "fecha": "2026-04-20",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2xSRlJWTmhUVzVQTWtsRFpEbEpZM1ZEV0c5ZlVYYxAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOlRFRVNhTW5PMklDZDlJY3VDWG9fUXc%7C%7C"
+    },
+    {
+      "id": "elfsight-661419eb-344f-41a6-a66e-e4ac8cf209d2",
+      "autor": "Gloria Cuadrado",
+      "nota": 5,
+      "texto": "Muy contenta con el resultado y muy atentos. Quise hacer un llavero con el cartel de una estación de tren japonesa y lo replicaron a la perfección :) muchas gracias.",
+      "fecha": "2026-04-19",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2w5Q1lWTlNSWGh2Y2tkS056TnZUMkpmV0hsc2RuYxAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOl9CYVNSRXhvckdKNzNvT2JfWHlsdnc%7C%7C"
+    },
+    {
+      "id": "elfsight-e4bb809c-630b-4647-b095-ad4048de6edf",
+      "autor": "María",
+      "nota": 5,
+      "texto": "Se nota el cuidado y mimo que le ponen a todo el proceso, desde el diseño que les mandas, el boceto, las asesorías, todo. Si tienes sugerencias sobre cómo hacerlo te las tienen muy en cuenta en la medida de lo posible. Los precios son muy razonables considerando los materiales, la mano de obra y el trabajo. 100% recomendado, repetiría",
+      "fecha": "2026-04-16",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2tWVFluaDVXR00xU0hwMVZHY3RNVEJPZVRkR01FRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOkVTYnh5WGM1SHp1VGctMTBOeTdGMEE%7C%7C"
+    },
+    {
+      "id": "elfsight-e0a3f91e-4623-41c7-98a9-8729a1dec88f",
+      "autor": "Antonio Leon",
+      "nota": 5,
+      "texto": "Las dos impresiones 3D realizadas por SILAB 3D para mi instrumento científico (inercioscpio) han sido completamente satisfactorias,",
+      "fecha": "2026-03-16",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2tkb1pFaERZVlpJUkhoVFIzWXlURXRHZW10aWIwRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOkdoZEhDYVZIRHhTR3YyTEtGemtib0E%7C%7C"
+    },
+    {
+      "id": "elfsight-549b22bc-a1e1-4989-ac4e-faa00b8c4864",
+      "autor": "María Perez",
+      "nota": 5,
+      "texto": "Implecables. Les pedí unas figuritas de unos gatitos con un corte en medio para intercambiar cada parte, y el resultado ha sido perfecto. Un trabajo increíble, muy atentos y un trato super detallista. Todo ello muy bien de precio, y en poco tiempo.\nLo recomiendo mucho. Muchas gracias.",
+      "fecha": "2026-01-21",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2pCZmMzVnFMWGhUV1d0WlRsWnZWak5mY1dWdmJuYxAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOjBfc3VqLXhTWWtZTlZvVjNfcWVvbnc%7C%7C"
+    },
+    {
+      "id": "elfsight-63982c5c-530e-48f4-8a69-c8e9abbe3015",
+      "autor": "Laura Sánchez",
+      "nota": 5,
+      "texto": "Encargué estas navidades un pedido de un funko de Vinicius y el resultado no me ha podido gustar más.\nHan sido súper atentos y detallistas. Hacen todo lo posible para que el pedido quede exactamente igual a lo que les pides y perfecto en todos los sentidos.\nAdemás, han sido muy rápidos a pesar de estar en estas fechas.\nEstoy muy contenta con el resultado final y no dudaré en volver a contar con ellos.\nLo recomiendo al 100%",
+      "fecha": "2026-01-02",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT21FMWQza3hhRUpxWkcxc01tYzNTbmM0VUhaS2NrRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOmE1d3kxaEJqZG1sMmc3Snc4UHZKckE%7C%7C"
+    },
+    {
+      "id": "elfsight-03cc298e-b029-4c9c-97b1-da6742631e26",
+      "autor": "lourdes sánchez",
+      "nota": 5,
+      "texto": "Encargué un pedido de una funko “profe” para un llavero y estoy encantada.\nSuper detallistas y muy implicados con el pedido para que saliera perfecto.\nEn cuanto a tiempos de entrega, muy contenta, han tardado poquísimo.\nEl resultado es igual a lo pedido.\nLo recomiendo.",
+      "fecha": "2025-11-22",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT25CUGVWSllWM1ZzT1hGbk1FYzBPRVJUZDFCa1UxRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOnBPeVJYV3VsOXFnMEc0OERTd1BkU1E%7C%7C"
+    },
+    {
+      "id": "elfsight-a1611020-57bf-486d-974b-04e0dbcd8be9",
+      "autor": "Jennifer Pascual",
+      "nota": 5,
+      "texto": "Muy buena experiencia, estoy muy contenta con el resultado de los llaveros que pedí. Trato muy bueno y tiempo de entrega rápido. ¡Totalmente recomendado!",
+      "fecha": "2025-10-16",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2tkSFJsOWFTM3BhUWxsaFFsbHJjM1pIZDBsQlgxRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOkdHRl9aS3paQllhQllrc3ZHd0lBX1E%7C%7C"
+    },
+    {
+      "id": "elfsight-524cb98d-252f-495b-8870-c5a7b0d3bbbb",
+      "autor": "Juan carlos Blanco",
+      "nota": 5,
+      "texto": "Muy implicados con su trabajo y servicio excelente",
+      "fecha": "2025-10-11",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2kxRVRrbHdTV3B2Tkhsc1NsUmplbTlIV1dWVWIwRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOi1ETklwSWpvNHlsSlRjem9HWWVUb0E%7C%7C"
+    },
+    {
+      "id": "elfsight-84691f4a-d4c4-45a4-84d2-ad9e0e41af21",
+      "autor": "Borja Delgado",
+      "nota": 5,
+      "texto": "Estoy súper contento con el servicio. La impresión quedó genial, con muy buena calidad y justo como lo necesitaba. Además, me atendieron de maravilla, siempre atentos y rápidos. Se nota que saben lo que hacen y les importa que el cliente quede satisfecho.\n¡Totalmente recomendado! Sin duda volveré a imprimir más cosas con ellos.",
+      "fecha": "2025-10-08",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT21Sc2NVbHFXRlpWUVdwTVVHbFNjVTVsTm0xbWMxRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOmRscUlqWFZVQWpMUGlScU5lNm1mc1E%7C%7C"
+    },
+    {
+      "id": "elfsight-4bb128ca-902e-43b8-89c3-82f152e244e4",
+      "autor": "Flor Calenda",
+      "nota": 5,
+      "texto": "Encantadísima con el trabajo realizado. Desde el primer momento se implicaron al máximo en el diseño de unos llaveros personalizados para mi agencia de viajes, Scapeviajes, dedicando tiempo y paciencia hasta dar con la idea que mejor encajaba con lo que yo buscaba. Supieron captar a la perfección la esencia de lo que quería transmitir y el resultado final ha sido excelente: un producto cuidado, original y de gran calidad. ¡Mil gracias por hacerlo tan fácil y tan bien! Sin duda, muy recomendable",
+      "fecha": "2025-10-02",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2xCUWMzUXRaMXAzUVhSdlNFdHhTR3RXWVdwRWVHYxAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOlBQc3QtZ1p3QXRvSEtxSGtWYWpEeGc%7C%7C"
+    },
+    {
+      "id": "elfsight-d744005d-916b-4d8c-992e-305932c1f238",
+      "autor": "mablama b",
+      "nota": 5,
+      "texto": "Servicio impecable, modelos 3D de gran calidad ,superan expectativas y cumplen siempre en tiempo  y calidad\ntotalmente recomendado!",
+      "fecha": "2025-10-01",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT21obWFsVnphazVVTmxKWGJYcFllVFYxWldOR05HYxAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOmhmalVzak5UNlJXbXpYeTV1ZWNGNGc%7C0crGQ4Nreqh%7C"
+    },
+    {
+      "id": "elfsight-28691007-7461-455c-9cd4-93baf246fac9",
+      "autor": "Irene Blanco Noreña",
+      "nota": 5,
+      "texto": "Me hicieron una representación exacta de lo que les pedí, súper agradecida, volveré a comprar sin duda!",
+      "fecha": "2025-09-30",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2xZMFYwZFNaa2x5WTBSV1EwMXFWM0pxVFRCd2RFRRAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOlY0V0dSZklyY0RWQ01qV3JqTTBwdEE%7C0cr3--loweE%7C"
+    },
+    {
+      "id": "elfsight-8gdWEt",
+      "autor": "Jorge Cuadrado Criado",
+      "nota": 5,
+      "texto": "Gran trabajo, crearon una pieza a medida tal y como la necesitaba y me aconsejaron al maximo",
+      "fecha": "2025-09-30",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT21ZNFNHOXBTbE5wY0V3MGJYVkJXRXczTlVsdFVuYxAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOmY4SG9pSlNpcEw0bXVBWEw3NUltUnc%7C0cr-BZIwdOr%7C"
+    }
+  ],
+  "idsElfsight": [
+    "8a3123e8-8060-4301-902f-83c43241a41f",
+    "9699e817-a70b-4153-9333-a500424af893",
+    "3300e338-f130-46a8-8276-e5a53526c494",
+    "94f6f335-1374-420b-96b6-1a081f9e40ef",
+    "8b1bdea3-a4ea-442a-aa2b-7c677e03a390",
+    "cfab5e19-2c90-4eda-9ab9-ec127024dfb2",
+    "e89f21ed-7e32-46e5-be79-37fbdd8f2dff",
+    "9c61b170-ba85-4995-b378-33e49f3ce506",
+    "fb82098f-9616-420a-9bb6-7c3e1b1ca467",
+    "a17510ff-63e0-461d-9e99-26db7aa9795c",
+    "8af3f622-7727-49cb-a08b-4d8460c7d7c9",
+    "a0ca0c01-77a6-4a88-b41b-c40f4b4c1ba7",
+    "faa6a8f7-fc9e-472c-95fe-14f58612a7d5",
+    "dc2c6e73-6b15-4c56-91e3-ab8c98a275e6",
+    "661419eb-344f-41a6-a66e-e4ac8cf209d2",
+    "e62ef7ef-b6c4-4018-8553-dcf91ca92d8f",
+    "e4bb809c-630b-4647-b095-ad4048de6edf",
+    "e0a3f91e-4623-41c7-98a9-8729a1dec88f",
+    "549b22bc-a1e1-4989-ac4e-faa00b8c4864",
+    "63982c5c-530e-48f4-8a69-c8e9abbe3015",
+    "03cc298e-b029-4c9c-97b1-da6742631e26",
+    "a1611020-57bf-486d-974b-04e0dbcd8be9",
+    "524cb98d-252f-495b-8870-c5a7b0d3bbbb",
+    "84691f4a-d4c4-45a4-84d2-ad9e0e41af21",
+    "4bb128ca-902e-43b8-89c3-82f152e244e4",
+    "d744005d-916b-4d8c-992e-305932c1f238",
+    "28691007-7461-455c-9cd4-93baf246fac9",
+    "8gdWEt"
+  ]
+}

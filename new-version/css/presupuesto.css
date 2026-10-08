@@ -1,0 +1,209 @@
+/* ============================================================
+   SILAB 3D · Presupuesto instantáneo
+   Visor 3D (izquierda, fijo al hacer scroll) + panel con resultado
+   y opciones (derecha). En móvil: visor arriba, panel debajo.
+   Variables propias en .pi__grid (norma de carteles):
+   --pi-margin (padding) > --pi-space (gap).
+   ============================================================ */
+
+.pi-hero { padding-bottom: clamp(20px, 3vw, 32px); text-align: center; }
+.pi-hero .page-hero__copy { align-items: center; margin-inline: auto; }
+.pi-hero .page-hero__lead { margin-inline: auto; }
+
+.pi { padding-block: 0 clamp(56px, 8vw, 96px); }
+.pi__grid {
+  --pi-margin: 26px; --pi-space: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+/* ---------- Visor ---------- */
+.pi-visor {
+  position: sticky; top: calc(var(--s3d-header-h) + 16px);
+  aspect-ratio: 1 / 1; max-height: calc(100vh - var(--s3d-header-h) - 32px);
+  width: 100%;
+  border: 1px solid var(--s3d-line); border-radius: 18px;
+  background: radial-gradient(120% 90% at 50% 20%, #FFFFFF 0%, var(--s3d-paper) 70%, var(--s3d-mist-soft) 100%);
+  overflow: hidden;
+}
+.pi-visor__lienzo { position: absolute; inset: 0; }
+.pi-visor__lienzo canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.pi-visor__lienzo canvas:active { cursor: grabbing; }
+
+.pi-carga {
+  position: absolute; inset: 16px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  border: 2px dashed #E3C3CC; border-radius: 14px;
+  text-align: center; cursor: pointer;
+  transition: border-color .2s, background-color .2s;
+}
+.pi-carga:hover, .pi-visor.is-arrastrando .pi-carga { border-color: var(--s3d-brand); background: rgba(242, 214, 220, .35); }
+.pi-carga__icono {
+  display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%;
+  background: var(--s3d-white); color: var(--s3d-brand); box-shadow: var(--s3d-shadow);
+}
+.pi-carga__icono .s3d-icon { width: 26px; height: 26px; }
+.pi-carga__titulo { font-weight: 600; font-size: 17px; line-height: 1.3; }
+.pi-carga__titulo u { color: var(--s3d-brand-ink); text-underline-offset: 3px; }
+.pi-carga__ayuda { font-size: 14px; color: var(--s3d-muted); line-height: 1.3; }
+.pi-visor.tiene-modelo .pi-carga { display: none; }
+
+.pi-visor__estado {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: rgba(251, 247, 248, .8); font-weight: 500; color: var(--s3d-muted);
+}
+.pi-visor__estado[hidden] { display: none; }
+.pi-spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--s3d-mist); border-top-color: var(--s3d-brand);
+  animation: pi-giro .8s linear infinite;
+}
+@keyframes pi-giro { to { transform: rotate(360deg); } }
+
+.pi-visor__barra {
+  position: absolute; left: 12px; right: 12px; bottom: 12px;
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  pointer-events: none;
+}
+.pi-visor__barra[hidden] { display: none; }
+.pi-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 32px; padding: 0 12px; border-radius: 999px;
+  background: rgba(255, 255, 255, .92); border: 1px solid var(--s3d-line);
+  font: 500 13.5px/1 var(--s3d-sans); color: var(--s3d-ink);
+  font-variant-numeric: tabular-nums; pointer-events: auto;
+  max-width: 100%;
+}
+.pi-chip--archivo { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; line-height: 30px; }
+.pi-chip[hidden] { display: none; }
+.pi-chip--voladizo i { width: 10px; height: 10px; border-radius: 3px; background: #E9A23B; }
+.pi-chip--boton { cursor: pointer; color: var(--s3d-brand-ink); font-weight: 600; }
+.pi-chip--boton:hover { border-color: var(--s3d-brand); }
+.pi-visor__error {
+  position: absolute; left: 16px; right: 16px; top: 16px;
+  padding: 10px 14px; border-radius: 10px;
+  background: #FFF4F4; border: 1px solid #F1C7C7; color: #8A2C2C; font-size: 14.5px; line-height: 1.4; text-align: center;
+}
+.pi-visor__error[hidden] { display: none; }
+
+/* ---------- Panel ---------- */
+.pi-panel { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.pi-resultado {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--pi-space);
+  padding: var(--pi-margin);
+  border-radius: 18px; background: var(--s3d-ink); color: var(--s3d-white);
+  text-align: center;
+}
+.pi-cifras { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+.pi-cifra { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.pi-cifra + .pi-cifra { border-left: 1px solid rgba(255, 255, 255, .14); }
+.pi-cifra__valor {
+  font-size: clamp(26px, 3vw, 32px); font-weight: 700; line-height: 1.15; margin-block: -.075em;
+  letter-spacing: -.01em; font-variant-numeric: tabular-nums;
+}
+.pi-cifra__rotulo { font-size: 14px; line-height: 1.3; margin-block: -.15em; color: #CDBFC4; }
+.pi-resultado__nota { font-size: 14px; line-height: 1.5; margin-block: -.25em; color: #CDBFC4; max-width: 42ch; text-wrap: balance; }
+.pi-resultado__nota strong { color: var(--s3d-white); font-weight: 600; }
+.pi-resultado__cta { width: 100%; min-height: 48px; }
+.pi-resultado__cta:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+.pi-resultado.is-calculando .pi-cifra__valor { opacity: .5; }
+
+/* Avisos (modificadores, malla no válida): mismos márgenes y espaciado que el resultado (norma de carteles), centrado */
+.pi-aviso {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--pi-space);
+  padding: var(--pi-margin);
+  border: 1px solid #E3C3CC; border-radius: 18px; background: #FBEFF2;
+  text-align: center;
+}
+.pi-aviso[hidden] { display: none; }
+.pi-aviso .s3d-icon { width: 26px; height: 26px; color: var(--s3d-brand-ink); }
+.pi-aviso__titulo { font-size: 16px; font-weight: 600; line-height: 1.3; margin-block: -.15em; color: var(--s3d-ink); }
+.pi-aviso__texto { font-size: 14.5px; line-height: 1.5; margin-block: -.25em; color: var(--s3d-muted); max-width: 46ch; text-wrap: balance; }
+.pi-aviso__texto strong { color: var(--s3d-brand-ink); font-weight: 600; }
+
+.pi-opciones {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--s3d-line); border-radius: 18px; background: var(--s3d-white);
+}
+.pi-opcion {
+  margin: 0; min-width: 0; border: 0;
+  padding: 14px 18px;
+  display: grid; grid-template-columns: 128px minmax(0, 1fr); align-items: center; column-gap: 14px; row-gap: 10px;
+}
+.pi-opcion + .pi-opcion { border-top: 1px solid var(--s3d-line); }
+.pi-opcion legend {
+  float: left; padding: 0; /* float: la leyenda entra en la rejilla como un hijo más */
+  font-size: 14.5px; font-weight: 600; line-height: 1.3; color: var(--s3d-ink);
+}
+.pi-opcion[disabled] { opacity: .5; }
+.pi-opcion[hidden] { display: none; } /* grupo oculto (p. ej. «Orientación»): la rejilla de .pi-opcion lo mostraría igualmente */
+.pi-opcion[hidden] + .pi-opcion { border-top: 0; }
+
+/* Control segmentado */
+.pi-seg {
+  display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; gap: 4px;
+  padding: 4px; border-radius: 12px; background: var(--s3d-paper); border: 1px solid var(--s3d-line);
+}
+.pi-seg label { position: relative; display: block; cursor: pointer; }
+.pi-seg input { position: absolute; opacity: 0; pointer-events: none; }
+.pi-seg span {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-height: 44px; padding: 5px 6px; border-radius: 9px;
+  text-align: center; transition: background-color .15s, color .15s, box-shadow .15s;
+}
+.pi-seg b { font-size: 14px; font-weight: 600; line-height: 1.2; color: var(--s3d-ink); }
+.pi-seg small { font-size: 11.5px; line-height: 1.2; color: var(--s3d-muted); }
+.pi-seg label:hover span { background: var(--s3d-mist-soft); }
+.pi-seg input:checked + span { background: var(--s3d-white); box-shadow: 0 1px 2px rgba(34,28,31,.08), 0 0 0 1.5px var(--s3d-brand); }
+.pi-seg input:checked + span b { color: var(--s3d-brand-ink); }
+.pi-seg input:focus-visible + span { outline: 2px solid var(--s3d-brand); outline-offset: 1px; }
+
+.pi-opcion__nota, .pi-extra { grid-column: 2; }
+.pi-opcion__nota { font-size: 13px; line-height: 1.4; color: var(--s3d-muted); }
+.pi-opcion__nota:empty { display: none; }
+.pi-opcion__nota.is-aviso { color: #8A5A12; }
+.pi-extra { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--s3d-muted); }
+.pi-extra[hidden] { display: none; }
+.pi-extra select, .pi-medida {
+  height: 38px; border: 1px solid var(--s3d-line); border-radius: 10px; background: var(--s3d-white);
+  font: 500 15px var(--s3d-sans); color: var(--s3d-ink);
+}
+.pi-extra select { padding: 0 10px; }
+.pi-medida { display: inline-flex; align-items: center; padding-right: 10px; }
+.pi-medida input {
+  width: 84px; height: 100%; border: 0; background: transparent; padding: 0 6px 0 12px;
+  font: inherit; text-align: right; color: inherit; font-variant-numeric: tabular-nums;
+}
+.pi-medida input:focus { outline: none; }
+.pi-medida:focus-within { border-color: var(--s3d-brand); }
+
+/* ---------- Resumen fijo (móvil) ---------- */
+.pi-barra-movil {
+  position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 900;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 8px 8px 8px 18px; border-radius: 999px;
+  background: var(--s3d-ink); color: var(--s3d-white);
+  box-shadow: 0 10px 30px rgba(34, 28, 31, .25);
+}
+.pi-barra-movil[hidden] { display: none; }
+.pi-barra-movil__cifras { display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; font-size: 16px; }
+.pi-barra-movil__cifras span { color: #CDBFC4; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  .pi__grid { grid-template-columns: 1fr; }
+  .pi-visor { position: relative; top: 0; aspect-ratio: 4 / 3; max-height: 62vh; }
+}
+@media (max-width: 480px) {
+  .pi__grid { --pi-margin: 20px; --pi-space: 14px; gap: 16px; }
+  .pi-visor { aspect-ratio: 1 / 1; border-radius: 14px; }
+  .pi-opcion { grid-template-columns: 1fr; padding: 14px; }
+  .pi-opcion__nota, .pi-extra { grid-column: 1; }
+  .pi-seg small { font-size: 11px; }
+  .pi-chip--archivo { max-width: 150px; }
+  /* El botón flotante de WhatsApp taparía el visor y el botón de solicitud */
+  .page-presupuesto-instantaneo .wa-fab { display: none; }
+}

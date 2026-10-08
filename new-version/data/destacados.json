@@ -1,0 +1,45 @@
+{
+  "_ayuda": "Productos que anuncia la ventana de novedades. Para añadir uno, copia un bloque y cambia los textos. 'desde' y 'hasta' (AAAA-MM-DD) son opcionales: fuera de esas fechas no se muestra. Las imágenes van en /img.",
+  "destacados": [
+    {
+      "id": "cuadros-got",
+      "etiqueta": "Novedad",
+      "titulo": "Cuadros bicolor Juego de Tronos",
+      "texto": "Los emblemas de las grandes casas de Poniente. Elige tus casas favoritas y colecciónalos.",
+      "imagenes": [
+        {
+          "src": "/img/Cuadros-GOT-1.webp",
+          "alt": "Cuadros bicolor de Juego de Tronos"
+        },
+        {
+          "src": "/img/Cuadros-GOT-2.webp",
+          "alt": "Colección de cuadros de las casas de Juego de Tronos"
+        }
+      ],
+      "url": "/configura-tu-proyecto/?producto=Cuadros%20bicolor%20Juego%20de%20Tronos",
+      "boton": "Configura tu proyecto",
+      "desde": "",
+      "hasta": ""
+    },
+    {
+      "id": "palomitera-yoshi",
+      "etiqueta": "Novedad",
+      "titulo": "Palomitera de Yoshi",
+      "texto": "Personalizada con los colores de nuestro catálogo y disponible en varios tamaños.",
+      "imagenes": [
+        {
+          "src": "/img/Palomitera-frontal.webp",
+          "alt": "Palomitera de Yoshi vista frontal"
+        },
+        {
+          "src": "/img/Palomitera-trasera.webp",
+          "alt": "Palomitera de Yoshi vista trasera"
+        }
+      ],
+      "url": "/configura-tu-proyecto/?producto=Palomitera%20de%20Yoshi",
+      "boton": "Personalizar la mía",
+      "desde": "",
+      "hasta": ""
+    }
+  ]
+}

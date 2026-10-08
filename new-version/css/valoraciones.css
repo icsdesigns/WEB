@@ -1,0 +1,55 @@
+/* ============================================================
+   SILAB 3D · Valoraciones y página de agradecimiento (reseña)
+   ============================================================ */
+
+/* ---------- Barra de valoración ---------- */
+.rating-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 28px;
+  max-width: 880px; margin: 0 auto 32px; padding: 20px 26px;
+  background: var(--s3d-white); border: 1px solid var(--s3d-line); border-radius: 18px;
+}
+.rating { display: flex; align-items: center; gap: 14px; }
+.rating__score { font-size: 44px; font-weight: 700; line-height: 1; letter-spacing: -.02em; }
+.rating__meta { display: flex; flex-direction: column; gap: 4px; font-size: 14.5px; color: var(--s3d-muted); }
+.rating__stars { color: #E0A11B; font-size: 17px; letter-spacing: 2px; line-height: 1; }
+.rating-bar__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 560px) {
+  .rating-bar { justify-content: center; text-align: center; }
+  .rating-bar__actions { width: 100%; }
+  .rating-bar__actions .s3d-btn { flex: 1 1 100%; }
+}
+
+/* ---------- Widgets ---------- */
+.widget { min-height: 160px; }
+.widget__foot { margin-top: 28px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.widget__foot .s3d-btn--ghost { background: var(--s3d-white); }
+.page-hero__actions .s3d-icon, .widget__foot .s3d-icon { width: 18px; height: 18px; }
+
+/* ---------- Recomienda y gana ---------- */
+.reward-grid {
+  --premio-margin: 26px; --premio-space: 16px;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px;
+  max-width: 720px; margin: 0 auto;
+}
+.reward-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--premio-space); padding: var(--premio-margin); text-align: center;
+  background: var(--s3d-white); border: 1px solid var(--s3d-line); border-radius: 18px;
+}
+.reward-icon {
+  width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center;
+  background: var(--s3d-mist-soft); color: var(--s3d-brand);
+}
+.reward-icon .s3d-icon { width: 26px; height: 26px; }
+.reward-amount { font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -.02em; color: var(--s3d-brand); margin-block: 0; }
+.reward-note {
+  max-width: 720px; margin: 24px auto 0; padding: 18px 22px;
+  display: flex; flex-direction: column; gap: 8px;
+  background: var(--s3d-paper); border: 1px solid var(--s3d-line); border-radius: 14px;
+  font-size: 15px; color: var(--s3d-muted);
+}
+.reward-note strong { color: var(--s3d-ink); }
+.reward-bye { margin-top: 28px; text-align: center; font-size: 17px; font-weight: 500; color: var(--s3d-ink); }
+@media (max-width: 560px) {
+  .reward-grid { grid-template-columns: 1fr; max-width: 360px; --premio-margin: 20px; --premio-space: 12px; }
+}

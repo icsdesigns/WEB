@@ -1,0 +1,109 @@
+{
+  "filamentos": [
+    {
+      "nombre": "PETG",
+      "colores": [
+        {
+          "nombre": "Black",
+          "hex": "#000000"
+        },
+        {
+          "nombre": "Blue",
+          "hex": "#1800AC"
+        },
+        {
+          "nombre": "Red",
+          "hex": "#FF3131"
+        },
+        {
+          "nombre": "White",
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "nombre": "PLA",
+      "colores": [
+        {
+          "nombre": "Beige",
+          "hex": "#F0E0D6"
+        },
+        {
+          "nombre": "Black",
+          "hex": "#000000"
+        },
+        {
+          "nombre": "Cherry Red",
+          "hex": "#F46974"
+        },
+        {
+          "nombre": "Coffee Brown",
+          "hex": "#533421"
+        },
+        {
+          "nombre": "Cyan",
+          "hex": "#00A3E0"
+        },
+        {
+          "nombre": "Grass Green",
+          "hex": "#0A9077"
+        },
+        {
+          "nombre": "Lavender Purple",
+          "hex": "#7358C3"
+        },
+        {
+          "nombre": "Lemon Yellow",
+          "hex": "#FBF9AC"
+        },
+        {
+          "nombre": "Matte Red",
+          "hex": "#B0181B"
+        },
+        {
+          "nombre": "Mint Green",
+          "hex": "#6ED9CE"
+        },
+        {
+          "nombre": "Oak",
+          "hex": "#CDAE81"
+        },
+        {
+          "nombre": "Olive Green",
+          "hex": "#5A6D3D"
+        },
+        {
+          "nombre": "Sakura Pink",
+          "hex": "#F2A8B3"
+        },
+        {
+          "nombre": "Silver",
+          "hex": "#BBBEC3"
+        },
+        {
+          "nombre": "Sunny Orange",
+          "hex": "#FF7A29"
+        },
+        {
+          "nombre": "White",
+          "hex": "#FFFFFF"
+        },
+        {
+          "nombre": "Mármol (Chesnut Marble)",
+          "hex": "#D7D4CC",
+          "premium": true
+        },
+        {
+          "nombre": "Silk Light Gold (Dorado)",
+          "hex": "#f1be48",
+          "premium": true
+        },
+        {
+          "nombre": "Silk Yellow (Amarillo)",
+          "hex": "#F1C402",
+          "premium": true
+        }
+      ]
+    }
+  ]
+}
