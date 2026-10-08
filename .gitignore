@@ -3,3 +3,6 @@
 
 # Rediseño en curso: no publicar hasta nuevo aviso
 copia-web/
+
+# Token de Instagram para pruebas locales (nunca al repositorio)
+.instagram-token

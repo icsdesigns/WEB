@@ -11,12 +11,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth, setPersistence, browserLocalPersistence,
-  signInWithEmailAndPassword, signInAnonymously, signOut, onAuthStateChanged
+  signInWithEmailAndPassword, signInAnonymously, signOut, onAuthStateChanged,
+  reauthenticateWithCredential, EmailAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore, collection, doc,
   getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc,
-  query, orderBy, serverTimestamp, onSnapshot
+  query, orderBy, where, serverTimestamp, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { firebaseConfig, FIREBASE_LISTO } from "./firebase-config.js";
 
@@ -113,6 +114,26 @@ async function addFeedback(d) {
 async function updateFeedback(id, d) { await updateDoc(doc(db, "feedback", id), d); }
 async function deleteFeedback(id)    { await deleteDoc(doc(db, "feedback", id)); }
 
+// ── REAUTENTICACIÓN ──
+// Comprueba la contraseña del usuario que tiene la sesión abierta SIN cambiar de sesión
+// (se usa para confirmar cambios delicados, p. ej. la Configuración de 3DCalc).
+// Resuelve {ok:true} si es correcta; si no, {ok:false, code, message}. Los invitados
+// (sesión anónima, sin email) no pueden reautenticarse: devuelve code 'no-email'.
+async function reauth(password) {
+  const u = auth.currentUser;
+  if (!u) return { ok: false, code: "no-user", message: "No hay ninguna sesión abierta." };
+  if (!u.email) return { ok: false, code: "no-email", message: "Esta sesión no tiene correo (invitado): no se puede confirmar con contraseña." };
+  if (!password) return { ok: false, code: "empty", message: "Escribe la contraseña." };
+  try {
+    await reauthenticateWithCredential(u, EmailAuthProvider.credential(u.email, String(password)));
+    return { ok: true };
+  } catch (e) {
+    const c = (e && e.code) || "error";
+    const wrong = (c === "auth/wrong-password" || c === "auth/invalid-credential" || c === "auth/invalid-login-credentials");
+    return { ok: false, code: c, message: wrong ? "Contraseña incorrecta." : (c === "auth/too-many-requests" ? "Demasiados intentos: espera un momento y vuelve a probar." : "No se pudo comprobar la contraseña (" + c + ").") };
+  }
+}
+
 // ── ESTADO DE APPS (PrintFlow, 3DPlanner…) por usuario ──
 async function loadState(appKey) {
   const u = auth.currentUser; if (!u) return null;
@@ -166,6 +187,23 @@ function watchOrderByCode(code, cb) {
   } catch (e) { return function(){}; }
 }
 
+// ── SOLICITUDES WEB (colección "pedidos_web") ──
+// «Solicitar presupuesto» de la web crea un documento por solicitud (id = localizador sin «#»).
+// 3DCalc los escucha mientras importado == false y, tras guardarlos como pedido, los marca importados.
+// Solo con sesión de verdad: un invitado (anónimo) no escucha (las reglas exigen sesión).
+function watchWebOrders(cb, onErr) {
+  const u = auth.currentUser; if (!u || u.isAnonymous) return function(){};
+  try {
+    return onSnapshot(query(collection(db, "pedidos_web"), where("importado", "==", false)),
+      (snap) => { cb(snap.docs.map(d => ({ id: d.id, ...d.data() }))); },
+      (err) => { console.warn("watchWebOrders", err && err.message); if (onErr) { try { onErr(err); } catch (e) {} } });
+  } catch (e) { return function(){}; }
+}
+async function markWebOrderImported(id) {
+  if (!id) return;
+  await updateDoc(doc(db, "pedidos_web", id), { importado: true, importado_en: serverTimestamp() });
+}
+
 window.DPCloud = {
   ready, configured: FIREBASE_LISTO,
   login:  (email, pwd) => signInWithEmailAndPassword(auth, email, pwd),
@@ -173,10 +211,12 @@ window.DPCloud = {
   logout: () => signOut(auth),
   onAuth: (cb) => onAuthStateChanged(auth, cb),
   currentUser: () => auth.currentUser,
+  reauth,
   listOrders, createOrder, updateOrder, getOrderById, getOrderByCode,
   addStep, setStepStatus, updateStep, deleteStep, deleteOrder,
   listFeedback, addFeedback, updateFeedback, deleteFeedback,
   loadState, saveState, watchState, watchOrders, watchFeedback, watchOrderByCode,
-  listPresets, createPreset, deletePreset
+  listPresets, createPreset, deletePreset,
+  watchWebOrders, markWebOrderImported
 };
 window.dispatchEvent(new Event("dpcloud-ready"));
