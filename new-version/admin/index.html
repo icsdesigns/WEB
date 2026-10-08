@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Dashboard · SILAB 3D</title>
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <link rel="preload" href="/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/css/fuentes.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/admin.css?v=20261006e">
+</head>
+<body>
+
+  <!-- ============================================================
+       CONFIGURACIÓN — LO ÚNICO QUE TIENES QUE EDITAR
+       Pega aquí los dos datos de tu proyecto de Supabase
+       (los encuentras en: Project Settings → API)
+       ============================================================ -->
+  <script>
+    const SUPABASE_URL = 'https://yyezkumbjqnushwgqkzf.supabase.co';      // ej: https://abcdefgh.supabase.co (SIN /rest/v1/)
+    const SUPABASE_ANON_KEY = 'sb_publishable_S-YCLKYozH7T9DFE1gMtUw_1jWLZnIf';    // la clave larga que empieza por "eyJ..." o "sb_publishable_..."
+  </script>
+
+  <!-- ---------- PANTALLA DE LOGIN ---------- -->
+  <div id="pantalla-login">
+    <div class="caja-login">
+      <img src="/img/logo-silab3d.png" alt="SILAB 3D" class="logo-login">
+      <h1>Panel de <span class="accent">gestión</span></h1>
+      <div class="acceso-badge"><span class="badge-dot"></span> Acceso privado</div>
+      <div id="aviso-config" class="aviso-config oculto">
+        Falta configurar este archivo: abre <strong>admin/index.html</strong> y pega tu
+        <strong>Project URL</strong> y tu <strong>anon key</strong> de Supabase en la sección
+        CONFIGURACIÓN (parte superior del archivo).
+      </div>
+      <div id="login-error" class="error-msg oculto"></div>
+      <form id="form-login">
+        <label for="email">Email</label>
+        <input type="email" id="email" required autocomplete="username">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" required autocomplete="current-password">
+        <button type="submit" class="btn" id="btn-entrar">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------- DASHBOARD ---------- -->
+  <div id="pantalla-dashboard" class="oculto">
+    <header class="barra">
+      <div class="barra-container">
+        <a href="/" title="Ir a la web"><img src="/img/logo-silab3d.png" alt="SILAB 3D" class="logo-barra"></a>
+        <div class="barra-derecha">
+          <span class="usuario" id="usuario-email"></span>
+          <button class="btn-salir" id="btn-salir">Cerrar sesión</button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="pestanas">
+      <button data-tab="resumen" class="activa">Resumen</button>
+      <button data-tab="filamentos">Filamentos</button>
+      <button data-tab="productos">Productos</button>
+      <button data-tab="trabajos">Trabajos</button>
+      <button data-tab="galeria">Galería</button>
+      <button data-tab="tasadora">Tasadora</button>
+      <button data-tab="notas">Notas</button>
+      <button data-tab="analitica">Analítica</button>
+    </nav>
+
+    <main>
+      <!-- RESUMEN -->
+      <section id="tab-resumen">
+        <div class="kpis" id="kpis"></div>
+      </section>
+
+      <!-- NOTAS -->
+      <section id="tab-notas" class="oculto">
+        <div class="panel">
+          <h2>Nueva nota</h2>
+          <form class="fila" id="form-nota">
+            <input type="text" id="nota-titulo" placeholder="Título" required>
+            <textarea id="nota-contenido" placeholder="Contenido de la nota..." required></textarea>
+            <button type="submit" class="btn">Guardar nota</button>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Notas</h2>
+          <div class="toolbar">
+            <input type="search" id="buscar-notas" placeholder="Buscar en las notas...">
+          </div>
+          <div id="lista-notas"></div>
+        </div>
+      </section>
+
+      <!-- FILAMENTOS (STOCK) -->
+      <section id="tab-filamentos" class="oculto">
+        <div class="panel">
+          <h2 id="titulo-form-filamento">Nuevo filamento</h2>
+          <form class="fila" id="form-filamento">
+            <select id="filamento-material" required title="Material principal">
+              <option value="" disabled selected>Material principal...</option>
+              <option value="PLA">PLA</option>
+              <option value="PLA Premium">PLA Premium</option>
+              <option value="PETG">PETG</option>
+              <option value="PETG-CF">PETG-CF</option>
+              <option value="TPU">TPU</option>
+              <option value="ASA">ASA</option>
+            </select>
+            <select id="filamento-secundario" title="Material secundario (tipos SUNLU)">
+              <option value="">Material secundario...</option>
+            </select>
+            <input type="text" id="filamento-nombre" placeholder="Nombre del material (ej: Matte Red)" required>
+            <select id="filamento-tipo-color" title="Tipo de color" style="flex:0 1 200px">
+              <option value="1">Color sólido</option>
+              <option value="2">Degradado 2 colores</option>
+              <option value="4">Multicolor 4 colores</option>
+            </select>
+            <div class="colores-filamento" id="filamento-colores"></div>
+            <input type="text" id="filamento-proveedor" placeholder="Proveedor (SUNLU, Bambu Lab...)">
+            <label class="campo-inline">Cantidad
+              <input type="number" id="filamento-cantidad" value="1" min="0" step="0.5" inputmode="decimal" required style="width:84px">
+            </label>
+            <button type="submit" class="btn" id="btn-filamento">Añadir</button>
+            <button type="button" class="btn btn-cancelar oculto" id="btn-cancelar-filamento">Cancelar</button>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Stock de filamentos <span class="pista">(con 0,5 o menos se marcan en rojo · la cantidad no se muestra en la web)</span></h2>
+          <div class="toolbar">
+            <input type="search" id="buscar-filamentos" placeholder="Buscar nombre, tipo o proveedor...">
+            <select id="filtro-material">
+              <option value="todos">Todos los materiales</option>
+              <option value="PLA">PLA</option>
+              <option value="PLA Premium">PLA Premium</option>
+              <option value="PETG">PETG</option>
+              <option value="PETG-CF">PETG-CF</option>
+              <option value="TPU">TPU</option>
+              <option value="ASA">ASA</option>
+            </select>
+          </div>
+          <div id="lista-filamentos"></div>
+        </div>
+      </section>
+
+      <!-- PRODUCTOS -->
+      <section id="tab-productos" class="oculto">
+        <div class="panel">
+          <h2 id="titulo-form-producto">Nuevo producto</h2>
+          <form class="fila" id="form-producto">
+            <input type="text" id="producto-nombre" placeholder="Nombre" required>
+            <select id="producto-categoria" title="Categoría"></select>
+            <button type="button" class="btn btn-cancelar" id="btn-nueva-categoria" title="Crear una categoría nueva"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Categoría</button>
+            <input type="text" id="producto-descripcion" placeholder="Descripción corta (la que se ve en la tarjeta)">
+            <input type="number" id="producto-precio" placeholder="Precio interno (€, opcional)" step="0.01" min="0">
+            <label class="campo-archivo"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Imagen
+              <input type="file" id="producto-imagen" accept="image/*">
+            </label>
+            <span class="pista" style="flex-basis:100%">La imagen se comprime automáticamente (máx. 800 px, WebP) antes de subirse, para ocupar el mínimo espacio.</span>
+            <button type="submit" class="btn" id="btn-producto">Añadir</button>
+            <button type="button" class="btn btn-cancelar oculto" id="btn-cancelar-producto">Cancelar</button>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Productos de la web <span class="pista">· marca «Novedad» para que salga en la ventana de la home (rota entre los marcados)</span></h2>
+          <div class="toolbar">
+            <input type="search" id="buscar-productos" placeholder="Buscar producto...">
+            <select id="filtro-categoria">
+              <option value="todas">Todas las categorías</option>
+            </select>
+          </div>
+          <div id="lista-productos"></div>
+          <input type="file" id="input-cambiar-imagen" accept="image/*" class="oculto">
+        </div>
+      </section>
+
+      <!-- TRABAJOS REALIZADOS -->
+      <section id="tab-trabajos" class="oculto">
+        <div class="panel">
+          <h2>Nuevo trabajo realizado</h2>
+          <form class="fila" id="form-trabajo">
+            <input type="text" id="trabajo-titulo" placeholder="Título del trabajo" required>
+            <input type="text" id="trabajo-cliente" placeholder="Cliente (opcional)">
+            <input type="date" id="trabajo-fecha">
+            <input type="number" id="trabajo-precio" placeholder="Precio cobrado (€)" step="0.01" min="0">
+            <textarea id="trabajo-descripcion" placeholder="Descripción, materiales usados, tiempo de impresión..."></textarea>
+            <button type="submit" class="btn">Guardar</button>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Historial de trabajos</h2>
+          <div class="toolbar">
+            <input type="search" id="buscar-trabajos" placeholder="Buscar título o cliente...">
+          </div>
+          <div id="lista-trabajos"></div>
+        </div>
+      </section>
+      <!-- GALERÍA: fotos de trabajos realizados que se ven en Valoraciones (js/admin-galeria.js) -->
+      <section id="tab-galeria" class="oculto">
+        <div class="panel">
+          <h2>Subir fotos a la galería <span class="pista">· se ven en Valoraciones › Nuestros trabajos</span></h2>
+          <label class="gal-zona" id="gal-zona">
+            <input type="file" id="gal-archivos" accept="image/*" multiple>
+            <svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+            <strong>Arrastra aquí las fotos o pulsa para elegirlas</strong>
+            <span class="pista">JPG, PNG, HEIC (si tu navegador lo abre) o WebP. Se convierten a WebP: 1600 px para verlas en grande y 640 px para la rejilla.</span>
+          </label>
+          <div id="gal-cola"></div>
+        </div>
+        <div class="panel">
+          <h2>Fotos publicadas <span class="pista" id="gal-cuenta"></span></h2>
+          <div id="gal-lista"><p class="vacio">Cargando…</p></div>
+        </div>
+      </section>
+      <!-- TASADORA: la misma del formulario «Configura tu proyecto» + funciones extra (js/admin-tasadora.js monta la pestaña) -->
+      <section id="tab-tasadora" class="oculto">
+        <div data-tasadora><div class="panel"><p class="vacio">Cargando la tasadora…</p></div></div>
+      </section>
+
+      <!-- ANALÍTICA -->
+      <section id="tab-analitica" class="oculto">
+        <div class="panel panel-analitica">
+          <h2>Tráfico de la web <span class="pista">(visitas, páginas, procedencia y clics en contacto y presupuesto)</span></h2>
+          <div id="analitica-contenido"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Enlace compartido de Umami (Ajustes del sitio → Compartir → activar URL compartida). Es de solo lectura.
+    const UMAMI_SHARE_URL = '';
+    (function () {
+      const cont = document.getElementById('analitica-contenido');
+      if (!UMAMI_SHARE_URL) {
+        cont.innerHTML = '<p class="vacio">La analítica aún no está conectada. Pega el enlace compartido de Umami en UMAMI_SHARE_URL (parte superior del script de esta página).</p>';
+        return;
+      }
+      cont.innerHTML = '<iframe class="analitica-frame" src="' + UMAMI_SHARE_URL + '" title="Estadísticas de silab3d.com" loading="lazy"></iframe>' +
+        '<p class="pista" style="margin-top:10px"><a href="' + UMAMI_SHARE_URL + '" target="_blank" rel="noopener">Abrir en pantalla completa</a></p>';
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ================= INICIALIZACIÓN =================
+    const configurado = !SUPABASE_URL.includes('PEGA_AQUI') && !SUPABASE_ANON_KEY.includes('PEGA_AQUI');
+    if (!configurado) document.getElementById('aviso-config').classList.remove('oculto');
+
+    const sb = configurado ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    const $ = (id) => document.getElementById(id);
+    const pantallaLogin = $('pantalla-login');
+    const pantallaDash = $('pantalla-dashboard');
+
+    // ================= SESIÓN =================
+    async function comprobarSesion() {
+      if (!sb) return;
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) mostrarDashboard(session.user);
+    }
+
+    function mostrarDashboard(user) {
+      pantallaLogin.classList.add('oculto');
+      pantallaDash.classList.remove('oculto');
+      $('usuario-email').textContent = user.email;
+      cargarCategorias().then(cargarProductos);
+      cargarNotas();
+      cargarFilamentos();
+      cargarTrabajos();
+    }
+
+    $('form-login').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!sb) return;
+      const btn = $('btn-entrar');
+      btn.disabled = true;
+      $('login-error').classList.add('oculto');
+      const { data, error } = await sb.auth.signInWithPassword({
+        email: $('email').value.trim(),
+        password: $('password').value,
+      });
+      btn.disabled = false;
+      if (error) {
+        $('login-error').textContent = traducirErrorLogin(error);
+        $('login-error').classList.remove('oculto');
+        return;
+      }
+      mostrarDashboard(data.user);
+    });
+
+    $('btn-salir').addEventListener('click', async () => {
+      await sb.auth.signOut();
+      location.reload();
+    });
+
+    // ================= PESTAÑAS =================
+    document.querySelectorAll('nav.pestanas button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('nav.pestanas button').forEach((b) => b.classList.remove('activa'));
+        btn.classList.add('activa');
+        ['resumen', 'notas', 'productos', 'filamentos', 'trabajos', 'galeria', 'tasadora', 'analitica'].forEach((t) => $('tab-' + t).classList.add('oculto'));
+        $('tab-' + btn.dataset.tab).classList.remove('oculto');
+        if (btn.dataset.tab === 'tasadora') abrirTasadora();
+        if (btn.dataset.tab === 'galeria' && window.abrirGaleria) window.abrirGaleria();
+      });
+    });
+
+    // ================= TASADORA =================
+    // Se monta al abrir la pestaña por primera vez, leyendo la del formulario (ver js/admin-tasadora.js)
+    let tasadoraLista = null;
+    function abrirTasadora() {
+      if (!tasadoraLista) tasadoraLista = (async () => {
+        const html = await (await fetch('/configura-tu-proyecto/', { cache: 'no-cache' })).text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        // El import map (three.js) tiene que estar antes del primer módulo de la página
+        const mapa = doc.querySelector('script[type="importmap"]');
+        if (mapa && !document.querySelector('script[type="importmap"]')) {
+          const s = document.createElement('script');
+          s.type = 'importmap'; s.textContent = mapa.textContent;
+          document.head.appendChild(s);
+        }
+        const { montar } = await import('/js/admin-tasadora.js?v=20261006b');
+        return montar(doc, { sb, raiz: $('tab-tasadora') });
+      })().catch((err) => {
+        tasadoraLista = null;
+        const hueco = document.querySelector('#tab-tasadora [data-tasadora]');
+        if (hueco) hueco.innerHTML = `<p class="vacio">No se pudo cargar la tasadora: ${esc(err.message)}</p>`;
+      });
+      tasadoraLista.then((t) => { if (t) requestAnimationFrame(() => t.mostrar()); });
+    }
+
+    window.irATab = (tab) => {
+      const btn = document.querySelector(`nav.pestanas button[data-tab="${tab}"]`);
+      if (btn) btn.click();
+    };
+
+    // Buscadores y filtros: re-renderizan la lista al escribir o cambiar
+    [['buscar-filamentos', () => renderFilamentos()], ['filtro-material', () => renderFilamentos()],
+     ['buscar-productos', () => renderProductos()], ['filtro-categoria', () => renderProductos()],
+     ['buscar-trabajos', () => renderTrabajos()],
+     ['buscar-notas', () => renderNotas()]].forEach(([id, fn]) => {
+      $(id).addEventListener('input', fn);
+      $(id).addEventListener('change', fn);
+    });
+
+    // ================= CATEGORÍAS =================
+    let categoriasCache = [];
+
+    async function cargarCategorias() {
+      const { data, error } = await sb.from('categorias').select('*').order('nombre', { ascending: true });
+      if (error) { alert('Error al cargar categorías: ' + error.message); return; }
+      categoriasCache = data;
+      renderSelectsCategorias();
+    }
+
+    function renderSelectsCategorias() {
+      const opciones = categoriasCache.map((c) => `<option value="${esc(c.nombre)}">${esc(c.nombre)}</option>`).join('');
+      const filtroActual = $('filtro-categoria').value;
+      $('producto-categoria').innerHTML = '<option value="">Categoría...</option>' + opciones;
+      $('filtro-categoria').innerHTML = '<option value="todas">Todas las categorías</option>' + opciones;
+      if ([...$('filtro-categoria').options].some((o) => o.value === filtroActual)) {
+        $('filtro-categoria').value = filtroActual;
+      }
+    }
+
+    $('btn-nueva-categoria').addEventListener('click', async () => {
+      const nombre = (prompt('Nombre de la nueva categoría (minúsculas, sin espacios; ej: "mascotas"):') || '')
+        .toLowerCase().trim().replace(/\s+/g, '-');
+      if (!nombre) return;
+      const { error } = await sb.from('categorias').insert({ nombre });
+      if (error) { alert('Error al crear la categoría: ' + error.message); return; }
+      await cargarCategorias();
+      $('producto-categoria').value = nombre;
+    });
+
+    // ================= NOTAS =================
+    let notasCache = [];
+
+    async function cargarNotas() {
+      const { data, error } = await sb.from('notas').select('*').order('creado_en', { ascending: false });
+      if (error) { $('lista-notas').innerHTML = `<p class="vacio">Error: ${error.message}</p>`; return; }
+      notasCache = data;
+      renderNotas();
+    }
+
+    function renderNotas() {
+      const cont = $('lista-notas');
+      if (!notasCache.length) { cont.innerHTML = '<p class="vacio">No hay notas todavía.</p>'; return; }
+      const q = $('buscar-notas').value.toLowerCase().trim();
+      const data = notasCache.filter((n) => !q || (n.titulo + ' ' + n.contenido).toLowerCase().includes(q));
+      if (!data.length) { cont.innerHTML = '<p class="vacio">Sin resultados para esta búsqueda.</p>'; return; }
+      cont.innerHTML = data.map((n) => `
+        <div class="nota-card">
+          <h3>${esc(n.titulo)}</h3>
+          <p>${esc(n.contenido)}</p>
+          <div class="meta">
+            <span>${new Date(n.creado_en).toLocaleString('es-ES')}</span>
+            <button class="btn-borrar" onclick="borrarNota('${n.id}')">Borrar</button>
+          </div>
+        </div>`).join('');
+    }
+
+    $('form-nota').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const { error } = await sb.from('notas').insert({
+        titulo: $('nota-titulo').value.trim(),
+        contenido: $('nota-contenido').value.trim(),
+      });
+      if (error) { alert('Error al guardar: ' + error.message); return; }
+      e.target.reset();
+      cargarNotas();
+    });
+
+    window.borrarNota = async (id) => {
+      if (!confirm('¿Borrar esta nota?')) return;
+      const { error } = await sb.from('notas').delete().eq('id', id);
+      if (error) alert('Error: ' + error.message);
+      cargarNotas();
+    };
+
+    // ================= PRODUCTOS =================
+    let productosCache = [];
+
+    // Devuelve la URL mostrable de la imagen: subida a Supabase (http...)
+    // o archivo antiguo de la carpeta /img de la web
+    function urlImagenProducto(imagen) {
+      if (!imagen) return null;
+      return imagen.startsWith('http') ? imagen : '../img/' + imagen;
+    }
+
+    async function cargarProductos() {
+      const { data, error } = await sb.from('productos').select('*').order('creado_en', { ascending: false });
+      if (error) { $('lista-productos').innerHTML = `<p class="vacio">Error: ${error.message}</p>`; return; }
+      productosCache = data;
+      renderProductos();
+      renderResumen();
+    }
+
+    window.cambiarDestacado = async (id, destacado, input) => {
+      const { error } = await sb.from('productos').update({ destacado }).eq('id', id);
+      if (error) {
+        if (input) input.checked = !destacado;
+        alert(/destacado/.test(error.message)
+          ? 'Falta crear la columna «destacado» en Supabase. En SQL Editor ejecuta:\n\nalter table productos add column destacado boolean not null default false;'
+          : 'Error: ' + error.message);
+        return;
+      }
+      const p = productosCache.find((x) => x.id === id);
+      if (p) p.destacado = destacado;
+    };
+
+    function renderProductos() {
+      const cont = $('lista-productos');
+      if (!productosCache.length) { cont.innerHTML = '<p class="vacio">No hay productos todavía.</p>'; return; }
+      const q = $('buscar-productos').value.toLowerCase().trim();
+      const fCat = $('filtro-categoria').value;
+      const data = productosCache.filter((p) =>
+        (fCat === 'todas' || p.categoria === fCat) &&
+        (!q || (p.nombre + ' ' + (p.descripcion || '')).toLowerCase().includes(q)));
+      if (!data.length) { cont.innerHTML = '<p class="vacio">Sin resultados para esta búsqueda.</p>'; return; }
+      cont.innerHTML = `<table>
+        <thead><tr><th>Imagen</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Visible en web</th><th title="Sale en la ventana de novedades de la home">Novedad</th><th></th></tr></thead>
+        <tbody>${data.map((p) => {
+          const url = urlImagenProducto(p.imagen);
+          return `
+          <tr>
+            <td data-label="Imagen">${url ? `<img class="mini" src="${esc(url)}" alt="" loading="lazy">` : '<span class="mini-vacia"><svg class=\"s3d-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 16V4\"/><path d=\"m7 9 5-5 5 5\"/><path d=\"M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3\"/></svg></span>'}
+                <button class="btn-mini" onclick="cambiarImagenProducto('${p.id}')">${url ? 'Cambiar' : 'Subir'}</button></td>
+            <td data-label="Nombre"><strong>${esc(p.nombre)}</strong><br><span class="pista">${esc(p.descripcion || '')}</span></td>
+            <td data-label="Categoría">
+              <select onchange="cambiarCategoria('${p.id}', this.value)">
+                <option value="">—</option>
+                ${categoriasCache.map((c) => `<option value="${esc(c.nombre)}" ${c.nombre === p.categoria ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('')}
+              </select>
+            </td>
+            <td data-label="Precio">${p.precio != null ? Number(p.precio).toFixed(2) + ' €' : '—'}</td>
+            <td data-label="Visible en web"><input type="checkbox" ${p.visible ? 'checked' : ''} onchange="cambiarVisible('${p.id}', this.checked)"></td>
+            <td data-label="Novedad"><input type="checkbox" ${p.destacado ? 'checked' : ''} onchange="cambiarDestacado('${p.id}', this.checked, this)" title="Mostrar en la ventana de novedades de la home"></td>
+            <td data-label="">
+              <button class="btn-mini" onclick="editarProducto('${p.id}')">Editar</button>
+              <button class="btn-borrar" onclick="borrarProducto('${p.id}')">Borrar</button>
+            </td>
+          </tr>`;
+        }).join('')}
+        </tbody></table>`;
+    }
+
+    window.cambiarCategoria = async (id, categoria) => {
+      const { error } = await sb.from('productos').update({ categoria: categoria || null }).eq('id', id);
+      if (error) alert('Error: ' + error.message);
+      cargarProductos();
+    };
+
+    // ---- Modo edición de productos ----
+    let productoEditando = null;
+
+    window.editarProducto = (id) => {
+      const p = productosCache.find((x) => x.id === id);
+      if (!p) return;
+      productoEditando = p;
+      $('producto-nombre').value = p.nombre;
+      $('producto-categoria').value = p.categoria || '';
+      $('producto-descripcion').value = p.descripcion || '';
+      $('producto-precio').value = p.precio != null ? p.precio : '';
+      $('titulo-form-producto').textContent = 'Editando: ' + p.nombre;
+      $('btn-producto').textContent = 'Guardar cambios';
+      $('btn-cancelar-producto').classList.remove('oculto');
+      $('titulo-form-producto').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    function salirEdicionProducto() {
+      productoEditando = null;
+      $('form-producto').reset();
+      $('titulo-form-producto').textContent = 'Nuevo producto';
+      $('btn-producto').textContent = 'Añadir';
+      $('btn-cancelar-producto').classList.add('oculto');
+    }
+
+    $('btn-cancelar-producto').addEventListener('click', salirEdicionProducto);
+
+    // ---- Compresión en el navegador: máx 800px lado largo, WebP 80% ----
+    async function comprimirImagen(file, maxDim = 800, calidad = 0.8) {
+      const img = await new Promise((res, rej) => {
+        const i = new Image();
+        i.onload = () => res(i);
+        i.onerror = () => rej(new Error('No se pudo leer la imagen'));
+        i.src = URL.createObjectURL(file);
+      });
+      const escala = Math.min(1, maxDim / Math.max(img.width, img.height));
+      const w = Math.round(img.width * escala);
+      const h = Math.round(img.height * escala);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(img.src);
+      const blob = await new Promise((res) => canvas.toBlob(res, 'image/webp', calidad));
+      if (!blob) throw new Error('No se pudo comprimir la imagen');
+      return blob;
+    }
+
+    async function subirImagenProducto(file, nombreProducto) {
+      const blob = await comprimirImagen(file);
+      // normalize('NFD') separa las tildes y el filtro [^a-z0-9] las elimina
+      const ruta = (nombreProducto || 'producto')
+        .toLowerCase().normalize('NFD')
+        .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+        + '-' + Date.now() + '.webp';
+      const { error } = await sb.storage.from('productos').upload(ruta, blob, { contentType: 'image/webp' });
+      if (error) throw error;
+      return sb.storage.from('productos').getPublicUrl(ruta).data.publicUrl;
+    }
+
+    // Si la imagen estaba en el Storage de Supabase, la borra para liberar espacio
+    async function borrarImagenDeStorage(imagen) {
+      const marca = '/storage/v1/object/public/productos/';
+      const i = (imagen || '').indexOf(marca);
+      if (i === -1) return;
+      try {
+        await sb.storage.from('productos').remove([decodeURIComponent(imagen.slice(i + marca.length))]);
+      } catch (e) { /* no bloquea la operación principal */ }
+    }
+
+    $('form-producto').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = $('btn-producto');
+      const editando = productoEditando;
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+      try {
+        const nombre = $('producto-nombre').value.trim();
+        const precioProd = $('producto-precio').value;
+        const campos = {
+          nombre,
+          categoria: $('producto-categoria').value || null,
+          descripcion: $('producto-descripcion').value.trim(),
+          precio: precioProd === '' ? null : Number(precioProd),
+        };
+        const archivo = $('producto-imagen').files[0];
+        if (archivo) {
+          btn.textContent = 'Subiendo imagen...';
+          campos.imagen = await subirImagenProducto(archivo, nombre);
+        }
+        const { error } = editando
+          ? await sb.from('productos').update(campos).eq('id', editando.id)
+          : await sb.from('productos').insert(campos);
+        if (error) throw error;
+        if (editando && archivo) await borrarImagenDeStorage(editando.imagen);
+        salirEdicionProducto();
+        cargarProductos();
+      } catch (err) {
+        alert('Error al guardar: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = productoEditando ? 'Guardar cambios' : 'Añadir';
+      }
+    });
+
+    // ---- Cambiar/subir imagen de un producto existente ----
+    let productoPendienteImagen = null;
+
+    window.cambiarImagenProducto = (id) => {
+      productoPendienteImagen = productosCache.find((p) => p.id === id) || null;
+      if (productoPendienteImagen) $('input-cambiar-imagen').click();
+    };
+
+    $('input-cambiar-imagen').addEventListener('change', async (e) => {
+      const archivo = e.target.files[0];
+      const producto = productoPendienteImagen;
+      e.target.value = '';
+      productoPendienteImagen = null;
+      if (!archivo || !producto) return;
+      try {
+        const nuevaUrl = await subirImagenProducto(archivo, producto.nombre);
+        const { error } = await sb.from('productos').update({ imagen: nuevaUrl }).eq('id', producto.id);
+        if (error) throw error;
+        await borrarImagenDeStorage(producto.imagen);
+        cargarProductos();
+      } catch (err) {
+        alert('Error al subir la imagen: ' + err.message);
+      }
+    });
+
+    window.cambiarVisible = async (id, visible) => {
+      const { error } = await sb.from('productos').update({ visible }).eq('id', id);
+      if (error) alert('Error: ' + error.message);
+    };
+
+    window.borrarProducto = async (id) => {
+      if (!confirm('¿Borrar este producto?')) return;
+      const producto = productosCache.find((p) => p.id === id);
+      const { error } = await sb.from('productos').delete().eq('id', id);
+      if (error) { alert('Error: ' + error.message); return; }
+      if (producto) await borrarImagenDeStorage(producto.imagen);
+      cargarProductos();
+    };
+
+    // ================= FILAMENTOS (STOCK) =================
+    let filamentosCache = [];
+
+    // Tipos de filamento del catálogo de SUNLU, sin repetidos,
+    // agrupados por material principal
+    const SECUNDARIOS = {
+      'PLA': ['PLA Básico', 'PLA+', 'PLA Matte', 'PLA Meta', 'PLA Macaron', 'High Speed PLA', 'PLA Carbon Fiber'],
+      'PLA Premium': ['Silk PLA', 'PLA Marble', 'PLA Wood', 'PLA Glow in the Dark', 'PLA Twinkling', 'PLA Rainbow'],
+      'PETG': ['PETG Básico', 'PETG Matte'],
+      'PETG-CF': ['PETG Carbon Fiber'],
+      'TPU': ['TPU Básico', 'TPU Silk'],
+      'ASA': ['ASA Básico'],
+    };
+
+    // El desplegable secundario depende del material principal elegido
+    $('filamento-material').addEventListener('change', () => {
+      const tipos = SECUNDARIOS[$('filamento-material').value] || [];
+      $('filamento-secundario').innerHTML =
+        '<option value="">Material secundario...</option>' +
+        tipos.map((t) => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+    });
+
+    // ---- Colores del filamento: 1 (sólido), 2 (degradado) o 4 (multicolor) ----
+    // Se guardan en «hex» separados por coma: «#AA0000» · «#AA0000,#0000AA» · «#A,#B,#C,#D»
+    const COLORES_BASE = ['#BC556D', '#3A7BD5', '#F2C94C', '#27AE60'];
+    const normHex = (v) => { let t = String(v || '').trim(); if (t && !t.startsWith('#')) t = '#' + t; return t.toUpperCase(); };
+    const esHex = (v) => /^#[0-9A-F]{6}$/.test(v);
+
+    function pintarColores(lista) {
+      const n = Number($('filamento-tipo-color').value);
+      const actuales = lista || [...$('filamento-colores').querySelectorAll('.hex-mini')].map((i) => normHex(i.value));
+      const cols = Array.from({ length: n }, (_, i) => esHex(actuales[i]) ? actuales[i] : COLORES_BASE[i]);
+      $('filamento-colores').innerHTML = cols.map((c, i) => `
+        <label class="campo-inline" title="Color ${i + 1}">${n > 1 ? i + 1 : 'Color'}
+          <input type="color" value="${c}" data-i="${i}">
+          <input type="text" class="hex-mini" value="${c}" maxlength="7" pattern="^#?[0-9a-fA-F]{6}$" data-i="${i}" aria-label="Hex del color ${i + 1}">
+        </label>`).join('');
+    }
+    // Cuadro de tonos y hex sincronizados en ambos sentidos
+    $('filamento-colores').addEventListener('input', (e) => {
+      const i = e.target.dataset.i;
+      if (i == null) return;
+      const par = $('filamento-colores').querySelectorAll(`[data-i="${i}"]`);
+      if (e.target.type === 'color') par[1].value = e.target.value.toUpperCase();
+      else if (esHex(normHex(e.target.value))) par[0].value = normHex(e.target.value).toLowerCase();
+    });
+    $('filamento-tipo-color').addEventListener('change', () => pintarColores());
+    function leerColores() {
+      const lista = [...$('filamento-colores').querySelectorAll('.hex-mini')].map((i) => normHex(i.value));
+      return lista.every(esHex) ? lista.join(',') : null;
+    }
+    // Lista guardada → tipo (1, 2 o 4); los degradados antiguos de 3 colores pasan a multicolor
+    function cargarColores(hex) {
+      const lista = String(hex || '').split(',').map(normHex).filter(esHex);
+      $('filamento-tipo-color').value = lista.length >= 3 ? '4' : lista.length === 2 ? '2' : '1';
+      pintarColores(lista.length ? lista : null);
+    }
+    pintarColores();
+
+    async function cargarFilamentos() {
+      const { data, error } = await sb.from('filamentos').select('*')
+        .order('material', { ascending: true }).order('nombre', { ascending: true });
+      if (error) { $('lista-filamentos').innerHTML = `<p class="vacio">Error: ${error.message}</p>`; return; }
+      filamentosCache = data;
+      renderFilamentos();
+      renderResumen();
+    }
+
+    function renderFilamentos() {
+      const cont = $('lista-filamentos');
+      if (!filamentosCache.length) { cont.innerHTML = '<p class="vacio">No hay filamentos todavía.</p>'; return; }
+      const q = $('buscar-filamentos').value.toLowerCase().trim();
+      const fMat = $('filtro-material').value;
+      const data = filamentosCache.filter((f) =>
+        (fMat === 'todos' || f.material === fMat) &&
+        (!q || (f.nombre + ' ' + (f.secundario || '') + ' ' + (f.proveedor || '')).toLowerCase().includes(q)));
+      if (!data.length) { cont.innerHTML = '<p class="vacio">Sin resultados para esta búsqueda.</p>'; return; }
+      cont.innerHTML = `<table>
+        <thead><tr><th>Material</th><th>Nombre</th><th>Color</th><th>Proveedor</th><th>Cantidad</th><th>Visible en web</th><th></th></tr></thead>
+        <tbody>${data.map((f) => `
+          <tr class="${cantidadDe(f) <= STOCK_BAJO ? 'stock-bajo' : ''}">
+            <td data-label="Material"><strong>${esc(f.material)}</strong>${f.secundario ? `<br><span class="pista">${esc(f.secundario)}</span>` : ''}</td>
+            <td data-label="Nombre">${esc(f.nombre)}</td>
+            <td data-label="Color"><span class="swatch" style="background:${swatchCss(f.hex)}"></span><span class="pista">${esc(f.hex || '—')}</span></td>
+            <td data-label="Proveedor">${esc(f.proveedor || '—')}</td>
+            <td data-label="Cantidad">
+              <input type="number" class="cantidad" value="${cantidadDe(f)}" min="0" step="0.5" inputmode="decimal" onchange="cambiarCantidad('${f.id}', this)" aria-label="Cantidad de ${esc(f.nombre)}">
+            </td>
+            <td data-label="Visible en web"><input type="checkbox" ${f.visible ? 'checked' : ''} onchange="cambiarVisibleFilamento('${f.id}', this.checked)"></td>
+            <td data-label="">
+              <button class="btn-mini" onclick="editarFilamento('${f.id}')">Editar</button>
+              <button class="btn-borrar" onclick="borrarFilamento('${f.id}')">Borrar</button>
+            </td>
+          </tr>`).join('')}
+        </tbody></table>`;
+    }
+
+    window.cambiarVisibleFilamento = async (id, visible) => {
+      const { error } = await sb.from('filamentos').update({ visible }).eq('id', id);
+      if (error) alert('Error: ' + error.message);
+    };
+
+    // ---- Modo edición de filamentos ----
+    let filamentoEditando = null;
+
+    window.editarFilamento = (id) => {
+      const f = filamentosCache.find((x) => x.id === id);
+      if (!f) return;
+      filamentoEditando = f;
+      $('filamento-material').value = f.material;
+      $('filamento-material').dispatchEvent(new Event('change'));
+      $('filamento-secundario').value = f.secundario || '';
+      $('filamento-nombre').value = f.nombre;
+      cargarColores(f.hex);
+      $('filamento-proveedor').value = f.proveedor || '';
+      $('filamento-cantidad').value = cantidadDe(f);
+      $('titulo-form-filamento').textContent = 'Editando: ' + f.nombre;
+      $('btn-filamento').textContent = 'Guardar cambios';
+      $('btn-cancelar-filamento').classList.remove('oculto');
+      $('titulo-form-filamento').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    function salirEdicionFilamento() {
+      filamentoEditando = null;
+      $('form-filamento').reset();
+      pintarColores(COLORES_BASE);
+      $('filamento-secundario').innerHTML = '<option value="">Material secundario...</option>';
+      $('titulo-form-filamento').textContent = 'Nuevo filamento';
+      $('btn-filamento').textContent = 'Añadir';
+      $('btn-cancelar-filamento').classList.add('oculto');
+    }
+
+    $('btn-cancelar-filamento').addEventListener('click', salirEdicionFilamento);
+
+    // 1 color: sólido · 2: degradado · 4 (o 3 antiguos): multicolor por cuartos
+    function swatchCss(hex) {
+      const partes = String(hex || '#888').split(',').map(normHex);
+      if (partes.length === 1) return esc(partes[0]);
+      if (partes.length === 2) return `linear-gradient(135deg, ${esc(partes.join(', '))})`;
+      const paso = 100 / partes.length;
+      // Cada cuarto se funde tenuemente con el siguiente, como en la web
+      const costura = `color-mix(in srgb, ${partes[partes.length - 1]}, ${partes[0]})`;
+      return esc(`conic-gradient(${costura} 0%, ${partes.map((c, i) => `${c} ${i * paso + 4}% ${(i + 1) * paso - 4}%`).join(', ')}, ${costura} 100%)`);
+    }
+
+    $('form-filamento').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const hex = leerColores();
+      if (!hex) { alert('Revisa los colores: cada uno debe ser un hex de 6 cifras, p. ej. #BC556D.'); return; }
+      const campos = {
+        material: $('filamento-material').value,
+        secundario: $('filamento-secundario').value || null,
+        nombre: $('filamento-nombre').value.trim(),
+        hex,
+        proveedor: $('filamento-proveedor').value.trim() || null,
+        cantidad: leerCantidad($('filamento-cantidad').value),
+      };
+      if (campos.cantidad === null) { alert(AVISO_PASO); return; }
+      const { error } = filamentoEditando
+        ? await sb.from('filamentos').update(campos).eq('id', filamentoEditando.id)
+        : await sb.from('filamentos').insert(campos);
+      if (error) { alert(errorCantidad(error)); return; }
+      salirEdicionFilamento();
+      cargarFilamentos();
+    });
+
+    // Cantidad en stock (de 0,5 en 0,5). Solo la ve el panel: la web pública no la pide.
+    const STOCK_BAJO = 0.5;
+    const AVISO_PASO = 'La cantidad va de 0,5 en 0,5 (0 · 0,5 · 1 · 1,5…).';
+    const SQL_CANTIDAD = 'alter table filamentos add column cantidad numeric(5,1) not null default 1 check (cantidad >= 0 and cantidad * 2 = floor(cantidad * 2));';
+    // Mientras no exista la columna, se deduce de la antigua «abundancia»
+    const cantidadDe = (f) => f.cantidad != null ? Number(f.cantidad) : (f.abundancia === 'reducida' ? 0.5 : 1);
+    function leerCantidad(v) {
+      const n = Number(String(v).replace(',', '.'));
+      return String(v).trim() !== '' && Number.isFinite(n) && n >= 0 && Number.isInteger(n * 2) ? n : null;
+    }
+    const errorCantidad = (error) => /cantidad/.test(error.message)
+      ? 'Falta crear la columna «cantidad» en Supabase. En SQL Editor ejecuta:\n\n' + SQL_CANTIDAD
+      : 'Error al guardar: ' + error.message;
+
+    window.cambiarCantidad = async (id, input) => {
+      const f = filamentosCache.find((x) => x.id === id);
+      const cantidad = leerCantidad(input.value);
+      if (cantidad === null) { alert(AVISO_PASO); input.value = cantidadDe(f); return; }
+      const { error } = await sb.from('filamentos').update({ cantidad }).eq('id', id);
+      if (error) { alert(errorCantidad(error)); input.value = cantidadDe(f); return; }
+      if (f) f.cantidad = cantidad;
+      input.closest('tr').classList.toggle('stock-bajo', cantidad <= STOCK_BAJO);
+      renderResumen();
+    };
+
+    window.borrarFilamento = async (id) => {
+      if (!confirm('¿Borrar este filamento?')) return;
+      const { error } = await sb.from('filamentos').delete().eq('id', id);
+      if (error) alert('Error: ' + error.message);
+      cargarFilamentos();
+    };
+
+    // ================= TRABAJOS REALIZADOS =================
+    let trabajosCache = [];
+
+    async function cargarTrabajos() {
+      const { data, error } = await sb.from('trabajos').select('*').order('fecha', { ascending: false });
+      if (error) { $('lista-trabajos').innerHTML = `<p class="vacio">Error: ${error.message}</p>`; return; }
+      trabajosCache = data;
+      renderTrabajos();
+      renderResumen();
+    }
+
+    function renderTrabajos() {
+      const cont = $('lista-trabajos');
+      if (!trabajosCache.length) { cont.innerHTML = '<p class="vacio">No hay trabajos registrados todavía.</p>'; return; }
+      const q = $('buscar-trabajos').value.toLowerCase().trim();
+      const data = trabajosCache.filter((t) =>
+        !q || (t.titulo + ' ' + (t.cliente || '') + ' ' + (t.descripcion || '')).toLowerCase().includes(q));
+      if (!data.length) { cont.innerHTML = '<p class="vacio">Sin resultados para esta búsqueda.</p>'; return; }
+      const total = data.reduce((s, t) => s + (Number(t.precio) || 0), 0);
+      cont.innerHTML = `<p class="pista" style="margin-bottom:.7rem">
+          ${data.length} trabajos · ${total.toFixed(2)} € en total</p>
+        <table>
+        <thead><tr><th>Título</th><th>Cliente</th><th>Fecha</th><th>Precio</th><th></th></tr></thead>
+        <tbody>${data.map((t) => `
+          <tr>
+            <td data-label="Título"><strong>${esc(t.titulo)}</strong><br><span class="pista">${esc(t.descripcion || '')}</span></td>
+            <td data-label="Cliente">${esc(t.cliente || '—')}</td>
+            <td data-label="Fecha">${t.fecha ? new Date(t.fecha).toLocaleDateString('es-ES') : '—'}</td>
+            <td data-label="Precio">${t.precio != null ? Number(t.precio).toFixed(2) + ' €' : '—'}</td>
+            <td data-label=""><button class="btn-borrar" onclick="borrarTrabajo('${t.id}')">Borrar</button></td>
+          </tr>`).join('')}
+        </tbody></table>`;
+    }
+
+    $('form-trabajo').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const precio = $('trabajo-precio').value;
+      const { error } = await sb.from('trabajos').insert({
+        titulo: $('trabajo-titulo').value.trim(),
+        cliente: $('trabajo-cliente').value.trim() || null,
+        fecha: $('trabajo-fecha').value || null,
+        precio: precio === '' ? null : Number(precio),
+        descripcion: $('trabajo-descripcion').value.trim() || null,
+      });
+      if (error) { alert('Error al guardar: ' + error.message); return; }
+      e.target.reset();
+      cargarTrabajos();
+    });
+
+    window.borrarTrabajo = async (id) => {
+      if (!confirm('¿Borrar este trabajo?')) return;
+      const { error } = await sb.from('trabajos').delete().eq('id', id);
+      if (error) alert('Error: ' + error.message);
+      cargarTrabajos();
+    };
+
+    // ================= RESUMEN (KPIs) =================
+    function renderResumen() {
+      const materiales = [...new Set(filamentosCache.map((f) => f.material))].length;
+      const bajos = filamentosCache.filter((f) => cantidadDe(f) <= STOCK_BAJO).length;
+      const visibles = productosCache.filter((p) => p.visible).length;
+      const totalIngresos = trabajosCache.reduce((s, t) => s + (Number(t.precio) || 0), 0);
+
+      const detalleFilamentos = filamentosCache.length
+        ? `${materiales} ${materiales === 1 ? 'material' : 'materiales'}` +
+          (bajos ? ` · <span class="alerta-texto">${bajos} con poca cantidad</span>` : ' · stock al día')
+        : 'Añade tu primer filamento';
+      const detalleProductos = productosCache.length
+        ? `${visibles} visibles en la web`
+        : 'Añade tu primer producto';
+      const detalleTrabajos = trabajosCache.length
+        ? `${totalIngresos.toFixed(2)} € acumulados`
+        : 'Registra tu primer trabajo';
+
+      $('kpis').innerHTML =
+        kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 2.5 7 12 11.5 21.5 7z"/><path d="m2.5 12 9.5 4.5L21.5 12"/><path d="m2.5 17 9.5 4.5L21.5 17"/></svg>', 'Filamentos', filamentosCache.length, detalleFilamentos, 'filamentos') +
+        kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/><path d="m7.8 5.3 8.5 4.5"/></svg>', 'Productos', productosCache.length, detalleProductos, 'productos') +
+        kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.75 5.57 6.15.9-4.45 4.34 1.05 6.12L12 17.35 6.5 20.13l1.05-6.12L3.1 9.67l6.15-.9z"/></svg>', 'Trabajos realizados', trabajosCache.length, detalleTrabajos, 'trabajos');
+    }
+
+    function kpiHtml(icono, titulo, valor, detalle, tab) {
+      return `<div class="kpi" onclick="irATab('${tab}')" title="Ir a ${titulo.toLowerCase()}">
+        <div class="kpi-icono">${icono}</div>
+        <div class="kpi-valor">${valor}</div>
+        <div class="kpi-titulo">${titulo}</div>
+        <div class="kpi-detalle">${detalle}</div>
+      </div>`;
+    }
+
+    // Mensajes de error de login claros según la causa real
+    function traducirErrorLogin(error) {
+      const msg = (error.message || '').toLowerCase();
+      const code = error.code || '';
+      if (code === 'invalid_credentials' || msg.includes('invalid login credentials'))
+        return 'Email o contraseña incorrectos.';
+      if (code === 'email_not_confirmed' || msg.includes('email not confirmed'))
+        return 'El usuario existe pero no está confirmado. En Supabase: Authentication → Users → confirma el usuario (o recréalo marcando "Auto Confirm User").';
+      if (msg.includes('email logins are disabled') || msg.includes('email provider'))
+        return 'El inicio de sesión por email está desactivado. En Supabase: Authentication → Sign In / Up → activa el proveedor Email.';
+      if (msg.includes('failed to fetch') || msg.includes('network'))
+        return 'No se pudo conectar con Supabase. Revisa la SUPABASE_URL (debe ser https://xxxx.supabase.co, sin nada detrás), tu conexión, o si el proyecto está pausado (supabase.com → Restore project).';
+      if (msg.includes('invalid api key') || msg.includes('apikey'))
+        return 'La clave (SUPABASE_ANON_KEY) no es válida. Copia la "anon / publishable key" desde Project Settings → API.';
+      return 'Error: ' + (error.message || 'desconocido') + (code ? ' (código: ' + code + ')' : '');
+    }
+
+    // ================= UTILIDADES =================
+    function esc(texto) {
+      const div = document.createElement('div');
+      div.textContent = texto ?? '';
+      return div.innerHTML;
+    }
+
+    comprobarSesion();
+  </script>
+  <script src="/js/admin-galeria.js?v=20261007"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+/* ============================================================
+   SILAB 3D · Seguimiento de pedidos — ajustes al sistema nuevo
+   (se carga después de pedidos.css)
+   ============================================================ */
+.page-hero--center .page-hero__grid { max-width: 780px; margin-inline: auto; }
+.page-hero--center .page-hero__copy { align-items: center; text-align: center; }
+.page-hero--center .crumbs { justify-content: center; }
+.track-section { padding-top: clamp(24px, 3vw, 36px); }
+.track-section :is(button, input) { font-family: var(--s3d-sans); }
+.tf-ic, .track-state-ic { display: grid; place-items: center; color: var(--s3d-brand); line-height: 0; }
+.tf-ic .s3d-icon { width: 24px; height: 24px; }
+.track-state-ic .s3d-icon { width: 32px; height: 32px; }
+.tr-meta .s3d-icon { width: 15px; height: 15px; vertical-align: -2px; color: var(--s3d-brand); }
+
+/* 06/10/2026 · resultado en su propia tarjeta y botones del sistema común */
+.track-go { width: auto; margin: 0; min-height: 48px; padding: 0 24px; }
+.track-result { max-width: 600px; margin: 22px auto 0; padding: clamp(22px, 4vw, 32px); background: var(--s3d-white); border: 1px solid var(--s3d-line); border-radius: 22px; box-shadow: var(--s3d-shadow); }
+.track-state { max-width: 560px; margin-inline: auto; }
+.tr-again { display: flex; justify-content: center; margin-top: 22px; }
+@media (max-width: 600px) { .track-go { width: 100%; } }
+
+/* Contraste ≥ 4.5:1 (revisión 07/10/2026) */
+.track-hint { color: var(--s3d-muted); }
+.track-hint code, .tr-code { color: #8E3B50; }
+.tr-step.pending .smeta { color: #6B7280; }

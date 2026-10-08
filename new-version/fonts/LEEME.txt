@@ -1,0 +1,5 @@
+Fuentes servidas desde la web (sin Google Fonts).
+- Outfit (variable 100-900): https://github.com/Outfitio/Outfit-Fonts
+- IBM Plex Mono 500: https://github.com/IBM/plex
+Ambas con licencia SIL Open Font License 1.1 (https://openfontlicense.org): se pueden usar, alojar y distribuir libremente.
+Archivos: subconjuntos latin y latin-ext en WOFF2, descargados de fonts.gstatic.com el 07/10/2026.

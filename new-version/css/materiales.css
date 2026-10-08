@@ -1,0 +1,139 @@
+/* ============================================================
+   SILAB 3D · Materiales
+   Normas de carteles: MÁRGENES > ESPACIADO, contenido centrado.
+   ============================================================ */
+
+/* ---------- Pestañas de material ---------- */
+.mat-tabs {
+  position: sticky; top: calc(var(--s3d-header-h) + 10px); z-index: 20;
+  display: flex; gap: 4px; width: fit-content; max-width: calc(100% - 32px);
+  margin: -26px auto 0; padding: 6px;
+  background: rgba(255,255,255,.9);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-radius: 999px; box-shadow: 0 0 0 1px var(--s3d-line), 0 8px 24px rgba(34,28,31,.08);
+}
+.mat-tab {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 40px; padding: 0 18px; border-radius: 999px;
+  font-size: 15px; font-weight: 500; text-decoration: none; color: var(--s3d-ink);
+  transition: background-color .2s, color .2s;
+}
+.mat-tab:hover { background: var(--s3d-mist-soft); }
+.mat-tab.active { background: var(--s3d-ink); color: var(--s3d-white); }
+@media (max-width: 380px) {
+  .mat-tabs { gap: 2px; padding: 4px; }
+  .mat-tab { padding: 0 12px; gap: 6px; font-size: 14px; }
+}
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot--pla { background: var(--s3d-brand); }
+.dot--petg { background: #0A9077; }
+
+/* ---------- Secciones de material ---------- */
+.material__head {
+  max-width: 760px; margin: 0 auto clamp(32px, 4vw, 44px);
+  display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;
+}
+.material__head h2 { font-size: clamp(40px, 5vw, 56px); font-weight: 800; line-height: 1; letter-spacing: -.03em; }
+.material__head p { color: var(--s3d-muted); font-size: 17px; max-width: 62ch; }
+.material__head strong { color: var(--s3d-ink); font-weight: 600; }
+.features { list-style: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.features li {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 999px;
+  background: var(--s3d-white); border: 1px solid var(--s3d-line);
+  font-size: 14.5px; font-weight: 500;
+}
+.features .s3d-icon { width: 17px; height: 17px; color: var(--s3d-brand); }
+
+/* Secciones de material más compactas */
+.material { padding-block: clamp(44px, 6vw, 72px); }
+.material .material__head { margin-bottom: clamp(24px, 3vw, 32px); gap: 12px; }
+
+/* ---------- Tarjetas de color (compactas) ---------- */
+.color-grid {
+  --color-margin: 14px; --color-space: 10px;
+  --cols: 7; --gap: 10px;
+  display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap);
+  max-width: 1080px; margin-inline: auto;
+}
+/* Catálogo: tarjetas centradas en la fila (también la última) y componentes alineados
+   entre tarjetas: el nombre reserva dos líneas. */
+.color-card {
+  flex: 0 1 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+  min-width: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--color-space); padding: var(--color-margin);
+  text-align: center; cursor: pointer; font: inherit; color: inherit;
+  background: var(--s3d-white); border: 1px solid var(--s3d-line); border-radius: 14px;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.color-card:hover { border-color: var(--s3d-mist); box-shadow: var(--s3d-shadow); transform: translateY(-2px); }
+.color-card h3 { font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+/* Si algún nombre de la rejilla ocupa dos líneas, todos reservan dos para seguir alineados */
+.color-grid.names-2 .color-card h3 { min-height: 2.6em; }
+.color-card p { font-size: 12px; }
+.color-card .tag { color: var(--s3d-brand-ink); font-weight: 500; }
+.swatch {
+  width: 48px; height: 48px; border-radius: 50%; flex: none;
+  box-shadow: inset 0 0 0 1px rgba(34,28,31,.12), 0 4px 10px rgba(34,28,31,.12);
+}
+.swatch--light { box-shadow: inset 0 0 0 1px rgba(34,28,31,.2), 0 6px 14px rgba(34,28,31,.08); }
+.swatch--silk { background-image: linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,0) 45%, rgba(0,0,0,.15)); }
+.swatch--sm { width: 36px; height: 36px; box-shadow: inset 0 0 0 1px rgba(34,28,31,.14); }
+@media (max-width: 1100px) { .color-grid { --cols: 6; } }
+@media (max-width: 900px)  { .color-grid { --cols: 5; } }
+@media (max-width: 640px)  { .color-grid { --cols: 4; } }
+@media (max-width: 480px) {
+  .color-grid { --color-margin: 12px; --color-space: 8px; --cols: 3; --gap: 8px; }
+  .color-card h3 { font-size: 13px; }
+  .swatch { width: 42px; height: 42px; }
+}
+
+/* ---------- ¿Qué material elegir? ---------- */
+.choose-grid {
+  --elegir-margin: 26px; --elegir-space: 16px;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px;
+  max-width: 880px; margin: 0 auto;
+}
+.choose-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--elegir-space); padding: var(--elegir-margin); text-align: center;
+  background: var(--s3d-white); border: 1px solid var(--s3d-line); border-radius: 18px;
+}
+.choose-card .mat-code { font: 500 12px/1.2 var(--s3d-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--s3d-brand-ink); margin-block: -.1em; }
+.specs { width: 100%; max-width: 280px; margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; text-align: left; font-size: 14px; }
+.specs dt { color: var(--s3d-muted); }
+.specs dd { margin: 0; justify-self: end; align-self: center; }
+.meter { display: inline-flex; gap: 3px; }
+.meter i { width: 16px; height: 6px; border-radius: 3px; background: var(--s3d-mist); }
+.meter i.on { background: var(--s3d-brand); }
+.choose__cta { margin-top: 36px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.choose__cta .s3d-btn { min-height: 48px; padding: 0 24px; font-size: 15.5px; }
+@media (max-width: 760px) { .choose-grid { grid-template-columns: 1fr; max-width: 460px; } }
+@media (max-width: 480px) { .choose-grid { --elegir-margin: 20px; --elegir-space: 12px; } }
+
+/* ---------- Ventana del color ---------- */
+.color-modal__box { width: min(460px, 100%); padding-top: 22px; gap: 12px; }
+.color-modal__stage {
+  --tint: #BC556D;
+  width: 100%; aspect-ratio: 4 / 3; border-radius: 16px; overflow: hidden;
+  background: radial-gradient(circle at 50% 40%, #FFFFFF, var(--s3d-paper) 70%);
+  box-shadow: inset 0 -6px 0 var(--tint);
+}
+.color-modal__stage model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
+/* Colores que combinan: mini tarjetas iguales, como las del catálogo */
+.match-grid {
+  --match-margin: 14px; --match-space: 10px;
+  width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;
+}
+.match {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--match-space); padding: var(--match-margin);
+  text-align: center; cursor: pointer; border-radius: 14px;
+  border: 1px solid var(--s3d-line); background: var(--s3d-white);
+  font: 600 13px/1.3 var(--s3d-sans); color: var(--s3d-ink);
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.match span:last-child { min-height: 2.6em; margin-block: -.15em; display: flex; align-items: center; }
+.match:hover { border-color: var(--s3d-mist); box-shadow: var(--s3d-shadow); transform: translateY(-2px); }
+@media (max-width: 480px) { .match-grid { --match-margin: 10px; --match-space: 8px; gap: 8px; } }
