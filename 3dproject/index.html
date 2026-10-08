@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>3DProject</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1743,6 +1744,7 @@ window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type
   }
   function activeList(){
     return (orders||[]).filter(function(o){
+      if(o.calc_status==='rechazado') return false; /* rechazados en 3DCalc: fuera de 3DTracker */
       var st=Array.isArray(o.order_steps)?o.order_steps:[];
       var total=st.length, done=st.filter(function(x){return x.status==='done';}).length;
       return !(total>0 && done===total);

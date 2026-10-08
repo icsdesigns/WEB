@@ -64,6 +64,8 @@ function getOrderStatus(order) {
   // Si el pedido viene de 3DCalc con seguimiento activado, manda su clasificación.
   const sync = order.calc_status;
   if (sync === 'archivado')  return { label: 'Archivado',  css: 'pending' };
+  if (sync === 'pendiente')  return { label: 'Pendiente',  css: 'pending' };
+  if (sync === 'rechazado')  return { label: 'Rechazado',  css: 'rejected' };
   if (sync === 'finalizado') return { label: 'Finalizado', css: 'done' };
   if (sync === 'activo')     return { label: 'Activo',     css: 'partial' };
 
@@ -79,6 +81,8 @@ function getOrderStatus(order) {
 // Cuenta desde que se activó el pedido en 3DTracker hasta que se completan
 // todas las etapas (a partir de ahí el número queda congelado).
 function activeDaysLabel(order){
+  // Pendientes o rechazados en 3DCalc: aún no han empezado, no cuentan días.
+  if (!order.activated_at && (order.calc_status === 'pendiente' || order.calc_status === 'rechazado')) return '—';
   const ini = order.activated_at || order.created_at;
   if (!ini) return '—';
   const desde = new Date(ini);
@@ -99,6 +103,8 @@ function activeDaysLabel(order){
 
 // ── Renderizar tabla ──────────────────────────
 function renderTable(orders) {
+  // Los pedidos rechazados en 3DCalc no se muestran en 3DTracker.
+  orders = (orders || []).filter(o => o.calc_status !== 'rechazado');
   const tbody     = document.getElementById('orders-tbody');
   const table     = document.getElementById('orders-table');
   const emptyEl   = document.getElementById('table-empty');
@@ -147,6 +153,7 @@ function renderTable(orders) {
 
 // ── Actualizar stats ──────────────────────────
 function updateStats(orders) {
+  orders = (orders || []).filter(o => o.calc_status !== 'rechazado');
   document.getElementById('stat-total').textContent    = orders.length;
 
   // Nota: sin datos de steps detallados en listado, stats básicos
