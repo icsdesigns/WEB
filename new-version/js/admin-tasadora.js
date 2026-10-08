@@ -30,7 +30,7 @@ import { vinculacion3dcalc, DEFECTO as DEFECTO_VINC } from './admin-vinculacion.
 import { OPCIONES } from './presupuesto-motor.js?v=20261002g';
 import { CLAVE, GRUPOS, GRUPOS_NORMAL, DEFECTO, mezclar, opcionesVisibles, SQL as SQL_AJUSTES } from './tasadora-config.js?v=20261005a';
 
-const ORIGEN = '/configura-tu-proyecto/';
+const ORIGEN = '/new-version/configura-tu-proyecto/';
 
 /* ---------- Iconos (trazo, como el resto del panel) ---------- */
 const svg = (d) => `<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;

@@ -19,7 +19,7 @@
       if (!Array.isArray(fotos) || fotos.length < 3) return; // con menos de 3 fotos no luce: se queda oculto
       pista.innerHTML = fotos.map(function (f) {
         var pie = [f.titulo, f.material].filter(Boolean).join(' · ');
-        return '<a class="carrusel__foto" href="/valoraciones/#trabajos">' +
+        return '<a class="carrusel__foto" href="/new-version/valoraciones/#trabajos">' +
           '<img src="' + esc(f.miniatura) + '" alt="' + esc(f.titulo || 'Pedido impreso en 3D por SILAB 3D') + '" width="640" height="640" loading="lazy" decoding="async">' +
           (pie ? '<span>' + esc(pie) + '</span>' : '') + '</a>';
       }).join('');

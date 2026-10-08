@@ -15,7 +15,7 @@
   /* js/elfsight.js espera a esta promesa: true = hay fotos propias y Elfsight no se carga */
   /* La galería propia (js/galeria.js) tiene prioridad: si hay fotos, Instagram no se pinta */
   window.silabInstagram = (window.silabGaleria || Promise.resolve(false))
-    .then(function (hayGaleria) { return hayGaleria ? 'galeria' : fetch('/data/instagram.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }); })
+    .then(function (hayGaleria) { return hayGaleria ? 'galeria' : fetch('/new-version/data/instagram.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }); })
     .then(function (d) {
       if (d === 'galeria') return true;
       if (!d || !d.publicaciones || !d.publicaciones.length) return false;

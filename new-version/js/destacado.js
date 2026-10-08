@@ -35,14 +35,14 @@
         return {
           id: p.nombre, etiqueta: 'Novedad', titulo: p.nombre, texto: p.descripcion || '',
           imagenes: img ? [{ src: img, alt: p.nombre }] : [],
-          url: '/configura-tu-proyecto/?producto=' + encodeURIComponent(p.nombre),
+          url: '/new-version/configura-tu-proyecto/?producto=' + encodeURIComponent(p.nombre),
           boton: 'Configura tu proyecto'
         };
       });
     }).catch(function () { return null; });
   }
   function fromJson() {
-    return fetch('/data/destacados.json', { cache: 'no-store' })
+    return fetch('/new-version/data/destacados.json', { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) { return (data && data.destacados || []).filter(active); })
       .catch(function () { return []; });

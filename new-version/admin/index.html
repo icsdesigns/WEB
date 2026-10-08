@@ -6,10 +6,10 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Dashboard · SILAB 3D</title>
   <link rel="icon" type="image/png" href="/img/favicon.png">
-  <link rel="preload" href="/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/css/fuentes.css">
-  <link rel="stylesheet" href="/css/base.css">
-  <link rel="stylesheet" href="/css/admin.css?v=20261006e">
+  <link rel="preload" href="/new-version/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/new-version/css/fuentes.css">
+  <link rel="stylesheet" href="/new-version/css/base.css">
+  <link rel="stylesheet" href="/new-version/css/admin.css?v=20261006e">
 </head>
 <body>
 
@@ -26,7 +26,7 @@
   <!-- ---------- PANTALLA DE LOGIN ---------- -->
   <div id="pantalla-login">
     <div class="caja-login">
-      <img src="/img/logo-silab3d.png" alt="SILAB 3D" class="logo-login">
+      <img src="/new-version/img/logo-silab3d.png" alt="SILAB 3D" class="logo-login">
       <h1>Panel de <span class="accent">gestión</span></h1>
       <div class="acceso-badge"><span class="badge-dot"></span> Acceso privado</div>
       <div id="aviso-config" class="aviso-config oculto">
@@ -49,7 +49,7 @@
   <div id="pantalla-dashboard" class="oculto">
     <header class="barra">
       <div class="barra-container">
-        <a href="/" title="Ir a la web"><img src="/img/logo-silab3d.png" alt="SILAB 3D" class="logo-barra"></a>
+        <a href="/new-version/" title="Ir a la web"><img src="/new-version/img/logo-silab3d.png" alt="SILAB 3D" class="logo-barra"></a>
         <div class="barra-derecha">
           <span class="usuario" id="usuario-email"></span>
           <button class="btn-salir" id="btn-salir">Cerrar sesión</button>
@@ -310,7 +310,7 @@
     let tasadoraLista = null;
     function abrirTasadora() {
       if (!tasadoraLista) tasadoraLista = (async () => {
-        const html = await (await fetch('/configura-tu-proyecto/', { cache: 'no-cache' })).text();
+        const html = await (await fetch('/new-version/configura-tu-proyecto/', { cache: 'no-cache' })).text();
         const doc = new DOMParser().parseFromString(html, 'text/html');
         // El import map (three.js) tiene que estar antes del primer módulo de la página
         const mapa = doc.querySelector('script[type="importmap"]');
@@ -319,7 +319,7 @@
           s.type = 'importmap'; s.textContent = mapa.textContent;
           document.head.appendChild(s);
         }
-        const { montar } = await import('/js/admin-tasadora.js?v=20261006b');
+        const { montar } = await import('/new-version/js/admin-tasadora.js?v=20261006b');
         return montar(doc, { sb, raiz: $('tab-tasadora') });
       })().catch((err) => {
         tasadoraLista = null;
@@ -947,6 +947,6 @@
 
     comprobarSesion();
   </script>
-  <script src="/js/admin-galeria.js?v=20261007"></script>
+  <script src="/new-version/js/admin-galeria.js?v=20261007"></script>
 </body>
 </html>

@@ -60,7 +60,7 @@
     var b = e.target.closest('.btn-comprar, .btn-action');
     if (b) {
       var url = b.getAttribute('data-config-url');
-      window.location.href = url || '/configura-tu-proyecto/?producto=' + encodeURIComponent(b.getAttribute('data-product') || '');
+      window.location.href = url || '/new-version/configura-tu-proyecto/?producto=' + encodeURIComponent(b.getAttribute('data-product') || '');
       return;
     }
     if (e.target.closest('.btn-explorar, #btnExplorarBibliotecas')) openLibrary();
@@ -102,10 +102,10 @@
   }
   /* Las fotos del catálogo están reencuadradas en /img/productos/; si un producto nuevo
      aún no tiene versión reencuadrada, se usa la original de /img/. */
-  function imgUrl(img) { return !img ? '' : /^https?:/.test(img) ? img : '/img/productos/' + img; }
+  function imgUrl(img) { return !img ? '' : /^https?:/.test(img) ? img : '/new-version/img/productos/' + img; }
   grid.addEventListener('error', function (e) {
     var el = e.target;
-    var m = el.tagName === 'IMG' && !el.dataset.fallback && el.getAttribute('src').match(/^\/img\/productos\/(.+)$/);
+    var m = el.tagName === 'IMG' && !el.dataset.fallback && el.getAttribute('src').match(/^(?:\/new-version)?\/img\/productos\/(.+)$/);
     if (m) { el.dataset.fallback = '1'; el.src = '/img/' + m[1]; }
   }, true);
   function api(route) {
