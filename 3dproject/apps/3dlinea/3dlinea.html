@@ -145,19 +145,153 @@ input[type=range]{width:100%;accent-color:var(--ac);height:22px;background:trans
   .ab-name,.ab-bktx,.ab-priv{display:none}
   .ab-back{padding:0 9px}
 }
+
+/* ===== modo automático, guía y ayuda ===== */
+body[data-mode=auto] #adv{display:none}
+body[data-mode=adv] #auto{display:none}
+body[data-mode=auto] #backAuto{display:none}
+.ab-mode{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:9px;border:1px solid rgba(var(--acr),.5);background:rgba(var(--acr),.12);color:var(--ac);font:600 12.5px 'Outfit',sans-serif;flex-shrink:0;white-space:nowrap}
+.ab-mode:hover{background:rgba(var(--acr),.2)}
+#auto{position:fixed;top:52px;left:0;right:0;bottom:0;overflow:auto;background:var(--bg)}
+.ag{display:grid;gap:14px;padding:16px;max-width:1280px;margin:0 auto;grid-template-columns:390px minmax(0,1fr);grid-template-areas:"s1 v" "s2 v" "s3 v";grid-template-rows:auto auto 1fr;align-items:start}
+.ag>*{min-width:0}
+.acard{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.as1{grid-area:s1}.as2{grid-area:s2}.as3{grid-area:s3}.as-view{grid-area:v;position:sticky;top:0}
+.ah{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700;margin-bottom:10px}
+.ah .n{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:rgba(var(--acr),.18);color:var(--ac);font-size:13px;flex-shrink:0}
+.adrop{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--border);border-radius:12px;padding:12px;background:var(--glass);cursor:pointer;color:var(--t2);font-size:13px;min-height:64px}
+.adrop:hover,.adrop.over{border-color:var(--ac);background:rgba(var(--acr),.08)}
+.adrop b{color:var(--t1)}
+.adrop .atxt{min-width:0}
+.adrop.has #aFile{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.adrop canvas{width:56px;height:56px;border-radius:8px;border:1px solid var(--border);background:#fff;object-fit:contain;flex-shrink:0;display:none}
+.adrop.has canvas{display:block}
+.adrop .ic{flex-shrink:0;color:var(--ac)}.adrop.has .ic{display:none}
+.atxt{min-width:0;display:flex;flex-direction:column;gap:2px}
+.atxt b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.atxt span{overflow-wrap:anywhere}
+.asize{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.asize .inp{width:96px;font-size:16px;font-weight:600;text-align:right}
+.asize .u{font-size:14px;color:var(--t2)}
+.adim{font-size:12.5px;color:var(--t2);margin-top:8px}
+.alev{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.alev .seg button{height:32px;padding:0 12px;font-size:12.5px}
+.athumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ath{position:relative;display:flex;flex-direction:column;gap:5px;padding:6px;border-radius:12px;border:2px solid var(--border);background:var(--glass);color:var(--t1);text-align:left;min-width:0}
+.ath:hover{background:rgba(128,128,128,.1)}
+.ath[aria-pressed=true]{border-color:var(--ac);background:rgba(var(--acr),.1)}
+.ath canvas{width:100%;aspect-ratio:1/1;object-fit:contain;background:#fff;border-radius:7px;display:block}
+.ath .ph0{width:100%;aspect-ratio:1/1;border-radius:7px;background:var(--glass);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--t3)}
+.ath .nm{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;line-height:1.2}
+.ath .qd{width:10px;height:10px}
+.ath .rb{position:absolute;top:10px;left:10px;background:var(--ac);color:var(--acfg);font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px}
+[data-theme=light] .ath .rb{color:#fff}
+.adesc{font-size:12px;color:var(--t2);margin:8px 0 0;line-height:1.45}
+.asem{margin-top:10px;display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--glass)}
+.asem .qd{width:16px;height:16px;margin-top:2px}
+.asem b{display:block;font-size:14.5px}
+.asem .why{font-size:12.5px;color:var(--t2);line-height:1.5;margin-top:2px}
+.asem .btn{margin-top:6px}
+.adl{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.adl .btn.pri{flex:1 1 100%;height:46px;font-size:14.5px}
+.adl .btn:not(.pri){flex:1 1 0}
+.alink{margin-top:12px;font-size:12.5px;color:var(--t2);line-height:1.5}
+.alink button{background:none;border:none;color:var(--ac);font:600 12.5px 'Outfit',sans-serif;text-decoration:underline;padding:0;cursor:pointer}
+.av-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.av-head .tt{font-weight:700;font-size:14px;flex:1;min-width:120px}
+.av-box{position:relative;height:min(calc(100vh - 52px - 32px - 120px),760px);min-height:280px;border-radius:12px;overflow:hidden;background:var(--view);border:1px solid var(--border)}
+.av-box canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.av-box.empty0 canvas{display:none}
+.av-empty{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:20px}
+.av-box.empty0 .av-empty{display:flex}
+.av-empty .adrop{flex-direction:column;text-align:center;max-width:420px;width:100%;padding:34px 20px;background:var(--panel);font-size:14px}
+.av-prog{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;background:rgba(10,11,18,.78);color:#E8EBF4;font-size:12.5px;display:none}
+.av-prog.on{display:block}
+.av-prog .bar{height:5px;border-radius:99px;background:rgba(255,255,255,.18);margin-top:6px;overflow:hidden}
+.av-prog .bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
+.av-note{font-size:11.5px;color:var(--t3);margin-top:8px}
+[data-theme=light] .av-note{color:#656C79}
+.ib{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:6px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--t2);font:700 11px 'Outfit',sans-serif;padding:0;vertical-align:middle;cursor:pointer;flex-shrink:0}
+.ib:hover,.ib[aria-expanded=true]{color:var(--ac);border-color:var(--ac)}
+.helpbox{flex:1 1 100%;font-size:11.5px;line-height:1.5;color:var(--t2);background:rgba(var(--acr),.08);border:1px solid rgba(var(--acr),.25);border-radius:9px;padding:7px 10px;margin:0 0 8px}
+.helpbox[hidden]{display:none}
+.sec-h .ib{margin-left:2px}
+.bigmodal{max-width:760px}
+.bigmodal h3{font-size:14px;margin:16px 0 6px;color:var(--t1)}
+.bigmodal p,.bigmodal li{font-size:13px;color:var(--t2);line-height:1.6}
+.bigmodal ol,.bigmodal ul{padding-left:20px}
+.bigmodal b{color:var(--t1)}
+.hx{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.hx h2{margin:0}
+.pgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:8px 0}
+.pg{border:1px solid var(--border);border-radius:10px;padding:8px;background:var(--glass);font-size:11.5px;color:var(--t2);line-height:1.4;text-align:center}
+.pg svg{display:block;margin:0 auto 6px;width:64px;height:44px}
+.pg b{display:block;color:var(--t1);font-size:12.5px}
+.sgrid{display:grid;gap:6px;margin:8px 0}
+.sg{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--t2);line-height:1.5}
+.sg .qd{margin-top:4px}
+.tour-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9900;display:none;align-items:center;justify-content:center;padding:16px}
+.tour-bg.on{display:flex}
+.tour{background:var(--panel);border:1px solid var(--border);border-radius:18px;max-width:420px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.tour .tic{width:64px;height:64px;border-radius:16px;background:rgba(var(--acr),.14);border:1px solid rgba(var(--acr),.32);display:flex;align-items:center;justify-content:center;color:var(--ac);margin-bottom:12px}
+.tour h2{font-size:18px;margin-bottom:6px}
+.tour p{font-size:14px;color:var(--t2);line-height:1.6;min-height:66px}
+.tdots{display:flex;gap:6px;margin:12px 0}
+.tdots i{width:8px;height:8px;border-radius:50%;background:var(--border)}
+.tdots i.on{background:var(--ac)}
+.trow{display:flex;gap:8px;align-items:center;justify-content:space-between}
+@media(max-width:900px){
+  #auto{position:static;margin-top:52px}
+  .ag{grid-template-columns:minmax(0,1fr);grid-template-areas:"s1" "s2" "v" "s3";padding:12px;gap:12px}
+  .as-view{position:static}
+  .av-box{height:min(96vw,520px);min-height:260px}
+  .ab-mode .mt{display:none}
+  .pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .athumbs{gap:6px}
+}
 </style>
 <link rel="stylesheet" href="../../css/light-theme.css?v=20260731">
 </head>
-<body>
+<body data-mode="auto">
 <div class="appbar">
   <span class="ab-app"><span class="ab-appic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A3E635" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" id="abIc"><path d="M4 17c3-9 6-9 8-4s5 3 8-6"/><circle cx="4" cy="17" r="1.4" fill="#A3E635"/><circle cx="20" cy="7" r="1.4" fill="#A3E635"/></svg></span><span class="ab-name">Conversor a línea</span></span>
   <button class="ab-back" onclick="dpHome()" title="Volver a 3DProject"><svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M8 2.5L3.5 6.5L8 10.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> <span class="ab-bktx">3DProject</span></button>
+  <button class="ab-mode" id="backAuto" title="Volver al modo automático" aria-label="Volver al modo automático"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span><span class="mt">Volver al modo </span>automático</span></button>
   <span class="ab-sp"></span>
   <span class="ab-priv">La imagen se procesa en tu navegador y no se sube a ningún sitio</span>
-  <button class="ab-theme" id="helpBtn" title="Cómo usar esta app" aria-label="Ayuda"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.3"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4"/><circle cx="12" cy="17.3" r=".6" fill="currentColor"/></svg></button>
+  <button class="ab-theme" id="helpBtn" title="Cómo se usa" aria-label="Cómo se usa (ayuda)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.3"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4"/><circle cx="12" cy="17.3" r=".6" fill="currentColor"/></svg></button>
   <button class="ab-theme" id="dpThemeBtn" onclick="dpToggleTheme()" title="Cambiar tema" aria-label="Tema"></button>
 </div>
 
+<div id="auto">
+<div class="ag">
+  <section class="acard as1" aria-labelledby="h1"><div class="ah" id="h1"><span class="n">1</span>Sube tu imagen</div>
+    <label class="adrop" id="aDrop" for="file"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><canvas id="aThumb" width="56" height="56"></canvas><span class="atxt"><b id="aFile">Elegir imagen</b><span id="aFileSub">o arrástrala aquí · JPG, PNG o WebP</span></span></label>
+  </section>
+  <section class="acard as2" aria-labelledby="h2"><div class="ah" id="h2"><span class="n">2</span>Elige el tamaño</div>
+    <div class="asize"><div class="seg" id="aDim" role="group" aria-label="Medir por"><button data-d="w" class="on">Ancho</button><button data-d="h">Alto</button></div>
+      <input class="inp" type="text" inputmode="decimal" autocomplete="off" id="aSize" value="80" aria-label="Tamaño en milímetros"><span class="u">mm</span></div>
+    <div class="adim" id="aDimTxt">Tamaño final: 80 × 80 mm</div>
+    <div class="alev"><span class="lbl">Nivel de detalle</span><div class="seg" id="aLev" role="group" aria-label="Nivel de detalle"><button data-l="0">Simple</button><button data-l="1" class="on">Normal</button><button data-l="2">Detallado</button></div></div>
+  </section>
+  <section class="acard as3" aria-labelledby="h3"><div class="ah" id="h3"><span class="n">3</span>Elige un resultado y descarga</div>
+    <div class="athumbs" id="aThumbs"></div>
+    <p class="adesc" id="aDesc">Sube una imagen para ver las propuestas.</p>
+    <div class="asem" id="aSem" aria-live="polite"><span class="qd" id="aSemDot"></span><div><b id="aSemT">Esperando imagen</b><div class="why" id="aSemW"></div><button class="btn sm" id="aSemBtn" style="display:none"></button></div></div>
+    <div class="adl"><button class="btn pri" id="aSvg" disabled>Descargar SVG para Fusion</button><button class="btn" id="aDxf" disabled>DXF</button><button class="btn" id="aPng" disabled>PNG</button></div>
+    <div class="alink">¿No queda como quieres? <button id="aManual" type="button">Ajustar a mano</button> · <button id="aHelp2" type="button">Cómo se usa</button></div>
+  </section>
+  <section class="as-view acard" aria-label="Vista previa">
+    <div class="av-head"><span class="tt" id="aTitle">Vista previa</span><div class="seg" id="aView" role="group" aria-label="Qué ver"><button data-v="res" class="on">Resultado</button><button data-v="orig">Original</button></div></div>
+    <div class="av-box empty0" id="aBox"><canvas id="aCv" width="8" height="8" aria-label="Vista previa del resultado"></canvas>
+      <div class="av-empty"><label class="adrop" id="aDrop2" for="file"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><b>Arrastra aquí una ilustración</b><span>JPG, PNG o WebP · o pulsa para elegirla</span><span class="hint">Se procesa en tu navegador; la imagen no sale de tu equipo.</span></label></div>
+      <div class="av-prog" id="aProg" role="status"><span id="aProgT">Calculando…</span><div class="bar"><i id="aProgB"></i></div></div></div>
+    <div class="av-note">Blanco = hueco, negro = lo que se extruye. Las propuestas se calculan en tu navegador.</div>
+  </section>
+</div>
+</div>
+
+<div id="adv">
 <div class="layout">
 <main class="stage">
   <div class="tbar">
@@ -227,6 +361,7 @@ input[type=range]{width:100%;accent-color:var(--ac);height:22px;background:trans
     <div class="sec-h"><span class="n">3</span>Papel de cada color</div>
     <div class="pal" id="pal"><div class="hint">Carga una imagen para ver la paleta.</div></div>
     <div class="hint"><b>Negro</b> macizo · <b>Blanco</b> · <b>Contorno</b> blanco con borde negro · <b>Fondo</b> se elimina (blanco sin borde).</div>
+    <label class="chk" style="margin-top:8px"><input type="checkbox" id="textOn"><span>Letras y detalles claros finos → Negro<br><span class="hint">Las zonas claras de menos de 3 mm de grosor sobre otro color (texto crema sobre verde…) pasan a Negro.</span></span></label>
     <div class="row" style="margin-top:8px"><button class="btn sm" id="autoPap">Proponer papeles</button></div>
     <div class="row" style="margin-top:4px"><span class="lbl">Decoración del fondo</span><div class="seg" id="decoSeg"><button data-v="keep" class="on" title="Las zonas pequeñas de color sobre el fondo se dibujan como línea">Conservar como línea</button><button data-v="remove" title="Las zonas pequeñas de color sobre el fondo pasan a Fondo">Quitar</button></div></div>
     <div class="hint">Zonas pequeñas en Blanco o Contorno rodeadas por un color con papel Fondo (motivos de ADN, burbujas…). Un clic en zona manda sobre esta opción.</div>
@@ -279,20 +414,38 @@ input[type=range]{width:100%;accent-color:var(--ac);height:22px;background:trans
   </div>
 </aside>
 </div>
+</div>
 
-<div class="modal-bg" id="helpBg"><div class="modal" role="dialog" aria-label="Ayuda">
-  <h2>Cómo usar el Conversor a línea</h2>
-  <ol>
-    <li><b>Carga</b> una ilustración y elige el <b>ancho en mm</b> de la pieza.</li>
-    <li>Ajusta <b>suavizado</b> y <b>número de colores</b>: aparece la paleta.</li>
-    <li>Asigna un <b>papel</b> a cada color: Negro, Blanco, Contorno o Fondo.</li>
-    <li>Con <b>Clic en zona</b> cambia el papel de una región concreta (p. ej. el texto crema a Negro con «Zonas parecidas» sin tocar la bata).</li>
-    <li>La <b>decoración del fondo</b> (ADN, burbujas…) se conserva como línea; si a tu tamaño se rompe en motas, el aviso te deja quitarla con un clic.</li>
-    <li>Mira el <b>semáforo</b>: las marcas de colores señalan líneas finas, huecos estrechos, piezas sueltas y solapes.</li>
-    <li>Exporta <b>SVG</b> o <b>DXF</b> (1 unidad = 1 mm) para Fusion, o el <b>PNG</b> del mapa.</li>
-  </ol>
-  <p class="hint" style="margin-top:10px">En Fusion: Insertar › Insertar SVG (o Insertar DXF, eligiendo milímetros como unidad), comprueba la medida y extruye todos los perfiles a la vez. Los huecos interiores (el centro de la O, los ojos…) salen como perfiles aparte: no los selecciones al extruir. Todo el procesado ocurre en tu navegador.</p>
+<div class="modal-bg" id="helpBg"><div class="modal bigmodal" role="dialog" aria-modal="true" aria-labelledby="helpT">
+  <div class="hx"><h2 id="helpT">Cómo se usa</h2><button class="btn sm" id="helpX" aria-label="Cerrar">Cerrar</button></div>
+  <p><b>Qué hace esta app:</b> convierte una ilustración en color en un dibujo de línea en blanco y negro, listo para extruir en Autodesk Fusion. Exporta SVG y DXF en milímetros, con un grosor mínimo de 0,5 mm en todas las líneas.</p>
+  <p style="margin-top:8px"><button class="btn sm" id="helpTour">Ver la guía rápida</button></p>
+  <h3>Modo automático: 3 pasos</h3>
+  <ol><li><b>Sube tu imagen</b> (JPG, PNG o WebP).</li><li><b>Elige el tamaño</b> en milímetros, por ancho o por alto. El «Nivel de detalle» (Simple, Normal, Detallado) decide cuántos colores se separan.</li><li><b>Elige un resultado</b> entre las tres propuestas y pulsa <b>Descargar SVG para Fusion</b>. El DXF y el PNG están a su lado. La marcada como «Recomendada» es la que mejor puntúa.</li></ol>
+  <h3>Cuándo usar «Ajustar a mano»</h3>
+  <p>Si una propuesta se queda cerca pero no del todo (una letra que debería ser negra, un color que sobra, un fondo que se cuela), pulsa «Ajustar a mano». Se abre la herramienta completa con la propuesta elegida ya cargada. Cada color de la imagen tiene un <b>papel</b>:</p>
+  <div class="pgrid">
+    <div class="pg"><svg viewBox="0 0 64 44" aria-hidden="true"><rect x="6" y="4" width="52" height="36" rx="8" fill="#000"/></svg><b>Negro</b>Se rellena de negro: es lo que se extruye.</div>
+    <div class="pg"><svg viewBox="0 0 64 44" aria-hidden="true"><rect x="6" y="4" width="52" height="36" rx="8" fill="#fff" stroke="#9aa" stroke-width="1" stroke-dasharray="3 3"/></svg><b>Blanco</b>Queda vacío, sin borde.</div>
+    <div class="pg"><svg viewBox="0 0 64 44" aria-hidden="true"><rect x="6" y="4" width="52" height="36" rx="8" fill="#fff" stroke="#000" stroke-width="5"/></svg><b>Contorno</b>Interior vacío con un borde negro alrededor.</div>
+    <div class="pg"><svg viewBox="0 0 64 44" aria-hidden="true"><defs><pattern id="ck" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="#bbb"/><rect x="4" y="4" width="4" height="4" fill="#bbb"/><rect x="4" width="4" height="4" fill="#fff"/><rect y="4" width="4" height="4" fill="#fff"/></pattern></defs><rect x="6" y="4" width="52" height="36" rx="8" fill="url(#ck)" stroke="#889" stroke-width="1"/></svg><b>Fondo</b>Se elimina: ni relleno ni borde.</div>
+  </div>
+  <p>Con «Clic en zona» puedes dar un papel distinto a una región concreta (por ejemplo, las letras crema de un escudo).</p>
+  <h3>El semáforo</h3>
+  <div class="sgrid">
+    <div class="sg"><span class="qd g"></span><span><b>Listo para extruir.</b> Líneas y huecos de 0,5 mm o más, sin trazos que se crucen.</span></div>
+    <div class="sg"><span class="qd y"></span><span><b>Revisa.</b> Se puede usar, pero algo se ha simplificado (letras pequeñas que se pierden, detalles que se empastan…). Te lo explica con palabras y te sugiere un tamaño.</span></div>
+    <div class="sg"><span class="qd r"></span><span><b>No apto a este tamaño.</b> Hay demasiado detalle para esa medida. Prueba con un tamaño mayor (te sugiere uno) o con el nivel «Simple».</span></div>
+  </div>
+  <h3>Consejos</h3>
+  <ul><li>Las imágenes con <b>fondo liso</b> (o transparente) funcionan mejor.</li><li><b>Tamaño mínimo para texto:</b> las letras pequeñas necesitan que sus trazos midan al menos 0,5 mm. Si no se leen, aumenta el tamaño.</li><li>Las <b>fotos</b> solo dan una silueta con detalles sueltos: mejor ilustraciones, logos o dibujos planos.</li><li>Todo se procesa en tu navegador: la imagen no se sube a ningún sitio.</li></ul>
+  <h3>Importar en Fusion</h3>
+  <ul><li><b>SVG:</b> Insertar › Insertar SVG (en inglés, Insert › Insert SVG). Elige el plano y comprueba que la pieza mide lo que indica la app; si no, usa el DXF.</li><li><b>DXF:</b> Insertar › Insertar DXF (Insert › Insert DXF) y elige <b>milímetros</b> como unidad.</li><li><b>Al extruir</b>, selecciona los perfiles de las zonas negras. Los huecos (el centro de la O, los ojos…) son perfiles aparte: déjalos sin seleccionar o quedarán rellenos.</li></ul>
   <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn pri" id="helpOk">Entendido</button></div>
+</div></div>
+<div class="tour-bg" id="tourBg"><div class="tour" role="dialog" aria-modal="true" aria-labelledby="tourT">
+  <div class="tic" id="tourIc"></div><h2 id="tourT"></h2><p id="tourP"></p><div class="tdots" id="tourDots"></div>
+  <div class="trow"><button class="btn" id="tourSkip">Saltar</button><button class="btn pri" id="tourNext">Siguiente</button></div>
 </div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1770,24 +1923,38 @@ function finalizeComps(L,k){
   cc.sur=sur;cc.maxd=maxd;
   return cc;
 }
-function doQuant(m){
-  W=m.w;H=m.h;N=W*H;
-  var k=m.k,rgba=new Uint8ClampedArray(m.rgba),i,c,j;
+/* imagen cargada y cachés: el motor guarda la imagen y las cuantizaciones para reutilizarlas entre variantes */
+var IMG=null,QC={},QCK=[],SMC={},SMK=[];
+function setImg(m){
+  IMG={rgba:new Uint8ClampedArray(m.rgba),alpha:m.alpha?new Uint8Array(m.alpha):null,w:m.w,h:m.h};
+  W=m.w;H=m.h;N=W*H;QC={};QCK=[];SMC={};SMK=[];ST=null;
+}
+function getSmooth(smooth){
+  if(SMC[smooth])return SMC[smooth];
+  prog('Suavizando bordes…');
+  var sm=bilateral(IMG.rgba,W,H,smooth);
+  var sc={sm:sm,lab:toLab(sm,N)};
+  SMC[smooth]=sc;SMK.push(smooth);
+  while(SMK.length>2){delete SMC[SMK.shift()];}
+  return sc;
+}
+function getQ(k,smooth,quiet){
+  var key=k+'|'+smooth;
+  if(QC[key])return QC[key];
+  W=IMG.w;H=IMG.h;N=W*H;
+  var rgba=IMG.rgba,i,c,j;
   /* transparencia: los píxeles transparentes forman su propio grupo («Transparente», papel Fondo)
      y no entran en el k-means, para que una figura blanca no se funda con un fondo transparente */
-  var tr=m.alpha?new Uint8Array(m.alpha):null,nT=0;
+  var tr=IMG.alpha,nT=0;
   if(tr){for(i=0;i<N;i++)nT+=tr[i];if(!nT)tr=null;}
-  prog('Suavizando bordes…');
-  var sm=bilateral(rgba,W,H,m.smooth);
+  var sc=getSmooth(smooth),sm=sc.sm,lab=sc.lab,C,L;
   prog('Agrupando colores…');
-  var lab=toLab(sm,N),C,L;
   if(tr){
     var nO=N-nT,lo=new Float32Array(nO*3);
     for(i=0,j=0;i<N;i++)if(!tr[i]){lo[j*3]=lab[i*3];lo[j*3+1]=lab[i*3+1];lo[j*3+2]=lab[i*3+2];j++;}
     C=kmeansLab(lo,nO,k);lo=null;
   }else C=kmeansLab(lab,N,k);
   L=assignAll(lab,N,C,k);
-  lab=null;
   /* ordenar por luminosidad; el grupo transparente va el último */
   var ord=[];for(c=0;c<k;c++)ord.push(c);
   ord.sort(function(a,b){return C[a*3]-C[b*3]||a-b;});
@@ -1815,7 +1982,12 @@ function doQuant(m){
   for(c=0;c<K;c++){
     pal.push({rgb:c===trL?[255,255,255]:[Math.round(sr[c]/cnt[c]),Math.round(sg[c]/cnt[c]),Math.round(sb[c]/cnt[c])],pct:cnt[c]/N,border:bcnt[c],cnt:cnt[c],tr:c===trL});
   }
-  /* propuesta automática: más oscuro → Negro; el que ocupa al menos un 25 % del borde (el que más) → Fondo; resto → Contorno.
+  /* Lab de cada color de la paleta y contacto entre colores (para las propuestas automáticas) */
+  var prgba=new Uint8ClampedArray(K*4);
+  for(c=0;c<K;c++){prgba[c*4]=pal[c].rgb[0];prgba[c*4+1]=pal[c].rgb[1];prgba[c*4+2]=pal[c].rgb[2];prgba[c*4+3]=255;}
+  var palLab=toLab(prgba,K),adj=new Float64Array(K*K);
+  for(i=0;i<cc.nbA.length;i++){var la=cc.lbl[cc.nbA[i]],lb=cc.lbl[cc.nbB[i]];if(la!==lb)adj[la*K+lb]+=cc.nbV[i];}
+  /* propuesta del modo manual: más oscuro → Negro; el que ocupa al menos un 25 % del borde (el que más) → Fondo; resto → Contorno.
      Fondo oscuro (el color más oscuro llena la mitad del borde y un 35 % de la imagen): se invierte → oscuro a Fondo, resto a Negro.
      Transparente → Fondo. */
   var papers=[],dark=0;
@@ -1831,8 +2003,19 @@ function doQuant(m){
     else if(darkBg)papers.push(Ls[c]<=Ls[dark]+10?3:0);
     else papers.push(Ls[c]<=Ls[dark]+10?0:(c===fb?3:2));
   }
-  ST={labels:L,cc:cc,k:K};
-  post({t:'quant',labels:L.slice(),palette:pal,papers:papers,ncomp:cc.n,darkBg:darkBg},[]);
+  var ST2={labels:L,cc:cc,k:K,palLab:palLab};
+  var Q={key:key,k:k,smooth:smooth,ST:ST2,pal:pal,papers:papers,darkBg:darkBg,K:K,trL:trL,btot:btot,palLab:palLab,adj:adj};
+  QC[key]=Q;QCK.push(key);
+  while(QCK.length>6){delete QC[QCK.shift()];}
+  return Q;
+}
+function postQuant(Q,papers){
+  post({t:'quant',labels:Q.ST.labels.slice(),palette:Q.pal,papers:papers||Q.papers,ncomp:Q.ST.cc.n,darkBg:Q.darkBg},[]);
+}
+function doQuant(m){
+  var Q=getQ(m.k,m.smooth);
+  ST=Q.ST;
+  postQuant(Q);
 }
 
 /* ---------- etapa 2: papeles → mapa B/N ---------- */
@@ -1848,7 +2031,7 @@ function compPapers(P){
   }
   return {cp:cp,forced:forced};
 }
-function doRender(P){
+function renderCore(P){
   var t0=Date.now(),s=P.mm/W,cc=ST.cc,i,c,x,y,p;
   var rm=0.25/s;           /* radio mínimo en px (0,5 mm de línea) */
   var tpx=Math.max(P.line,0.5)/s;
@@ -1863,6 +2046,21 @@ function doRender(P){
     if((cp[c]===1||cp[c]===2)&&cc.area[c]<decoMax&&allT[c]>0&&bgT[c]>=0.35*allT[c]){isDeco[c]=1;decoN++;}
   }
   if(P.deco==='remove')for(c=0;c<cc.n;c++)if(isDeco[c])cp[c]=3;
+  /* letras y detalles claros finos sobre un color más oscuro (que no sea Negro ni Fondo): pasan a Negro,
+     porque con su contorno ya no quedaría nada blanco dentro (p. ej. el texto crema sobre un disco verde) */
+  var textN=0;
+  if(P.textMm>0){
+    var tmax=P.textMm/s/2,pl0=ST.palLab;
+    for(c=0;c<cc.n;c++){
+      if(forced[c]||isDeco[c])continue;
+      if(cp[c]!==1&&cp[c]!==2)continue;
+      if(cc.maxd[c]>tmax)continue;
+      var sl=cc.sur[c];if(sl<0)continue;
+      var spp=P.papers[sl];if(spp===0||spp===3)continue;
+      if(pl0[cc.lbl[c]*3]-pl0[sl*3]<25)continue;
+      cp[c]=0;textN++;
+    }
+  }
   /* regla de manchas pequeñas → negro (no se aplica a la decoración: se conserva como línea) */
   var spotN=0;
   if(P.spotOn){
@@ -1897,7 +2095,7 @@ function doRender(P){
   var cw=labelBin(B,W,H,false,0);
   for(i=0;i<N;i++){c=cw.id[i];if(c>=0&&!cw.tb[c]&&cw.area[c]<holePx)B[i]=1;}
   cb=null;cw=null;
-  var widenN=0;
+  var Bpre=B.slice(),widenN=0;
   if(P.widenGaps){
     /* ensanchar rendijas blancas finas (texto calado en un fondo negro…) hasta 0,5 mm:
        mismo método que el engrosado, sobre el blanco; lo de fuera de la imagen no cuenta como estrecho */
@@ -1934,6 +2132,14 @@ function doRender(P){
     var cw3=labelBin(B,W,H,false,0);for(i=0;i<N;i++){c=cw3.id[i];if(c>=0&&!cw3.tb[c]&&cw3.area[c]<holePx)B[i]=1;}
     cb3=cw3=null;
   }
+  /* cuánto ha cambiado el dibujo al ensanchar, engrosar y cerrar (mide cuánto detalle no cabe a este tamaño) */
+  var chgPx=0,inkPre=0,blackPx0=0;
+  for(i=0;i<N;i++){if(Bpre[i])inkPre++;if(B[i]!==Bpre[i])chgPx++;if(B[i])blackPx0++;}
+  var chg=chgPx/Math.max(1,inkPre),ink=blackPx0/N;
+  /* detalles perdidos: «chg» es una media sobre todo el negro y diluye lo pequeño (un subtítulo dentro de un disco negro);
+     aquí se cuentan uno a uno los huecos blancos y las piezas negras de al menos 0,1 mm² que desaparecen en más de la mitad */
+  var lost=lostDetails(Bpre,B,0.1/(s*s));Bpre=null;
+  if(P.light){return {t:'render',stats:{chg:chg,ink:ink,lost:lost,widenN:widenN,thickN:thickN,textN:textN,ms:Date.now()-t0}};}
   /* ---- vectorizar ---- */
   prog('Vectorizando…');
   var pl=Potrace.trace(B,W,H,{turdsize:1,alphamax:P.alpha,opttolerance:P.tol,optcurve:true});
@@ -1975,9 +2181,19 @@ function doRender(P){
     for(c=0;c<cb2.n;c++)if(inD[c]>0.5*tot2[c]){decoPieces++;if(isTiny[c])decoTiny++;}
     if(thickMask){var tc=labelBin(thickMask,W,H,true,1),hit=new Uint8Array(tc.n);for(i=0;i<N;i++){c=tc.id[i];if(c>=0&&dm[i])hit[c]=1;}for(c=0;c<tc.n;c++)if(hit[c])decoThick++;}
   }
-  post({t:'render',B:B,marks:marks,np:np,pn:pn,tags:tags,pts:pts,
-    stats:{nodes:tot,paths:np,thinCount:thinBl.countLine,thinMinW:thinBl.countLine?thinBl.minW*s:null,thickN:thickN,gapCount:gapCount,gapLevel:gapLevel,tiny:tiny,blackPx:blackPx,spots:spotN,pieces:cb2.n,decoN:decoN,decoPieces:decoPieces,decoTiny:decoTiny,decoThick:decoThick,widenN:widenN,ms:Date.now()-t0}},[]);
+  return {t:'render',B:B,marks:marks,np:np,pn:pn,tags:tags,pts:pts,
+    stats:{chg:chg,ink:ink,lost:lost,textN:textN,nodes:tot,paths:np,thinCount:thinBl.countLine,thinMinW:thinBl.countLine?thinBl.minW*s:null,thickN:thickN,gapCount:gapCount,gapLevel:gapLevel,tiny:tiny,blackPx:blackPx,spots:spotN,pieces:cb2.n,decoN:decoN,decoPieces:decoPieces,decoTiny:decoTiny,decoThick:decoThick,widenN:widenN,ms:Date.now()-t0}};
 }
+function lostDetails(Bp,B,amin){
+  var n=0,i,c,cw=labelBin(Bp,W,H,false,0),k=new Int32Array(cw.n);
+  for(i=0;i<N;i++){c=cw.id[i];if(c>=0&&B[i])k[c]++;}
+  for(c=0;c<cw.n;c++)if(!cw.tb[c]&&cw.area[c]>=amin&&k[c]>0.5*cw.area[c])n++;
+  var cb=labelBin(Bp,W,H,true,1);k=new Int32Array(cb.n);
+  for(i=0;i<N;i++){c=cb.id[i];if(c>=0&&B[i])k[c]++;}
+  for(c=0;c<cb.n;c++)if(cb.area[c]>=amin&&k[c]<0.5*cb.area[c])n++;
+  return n;
+}
+function doRender(P){var r=renderCore(P);post(r,[]);}
 
 /* ---------- etapa 3: selección de zona ---------- */
 function doPick(m){
@@ -1986,10 +2202,115 @@ function doPick(m){
   post({t:'pick',comp:c,label:l,area:cc.area[c],similar:similar,x:m.x,y:m.y});
 }
 
+/* ---------- modo automático: propuestas ---------- */
+/* nivel de detalle: suavizado y número de colores. Las tres variantes de un nivel comparten el suavizado (se calcula una vez). */
+var LEVELS=[{smooth:60,k:4,kD:6,cl:2.2},{smooth:40,k:6,kD:8,cl:1},{smooth:25,k:8,kD:10,cl:0.6}];
+var VARIANTS=['contornos','macizo','detalle'];
+function r2(v,d){var p=Math.pow(10,d);return Math.round(v*p)/p;}
+function variantQ(vid,level){
+  var lv=LEVELS[level];
+  return {k:vid==='detalle'?lv.kD:lv.k,smooth:lv.smooth};
+}
+/* decide papeles y ajustes de una variante a partir de los colores (reparto, contacto con el borde y entre sí) */
+function planAuto(Q,vid,mm,level){
+  var K=Q.K,pal=Q.pal,lab=Q.palLab,adj=Q.adj,trL=Q.trL,btot=Q.btot,c,o,lv=LEVELS[level];
+  function L(c){return lab[c*3];}
+  function dE(a,b){var x=lab[a*3]-lab[b*3],y=lab[a*3+1]-lab[b*3+1],z=lab[a*3+2]-lab[b*3+2];return Math.sqrt(x*x+y*y+z*z);}
+  var valid=[];for(c=0;c<K;c++)if(c!==trL)valid.push(c);
+  var info={darkBg:false,bg:[],notes:[]};
+  var papers=[];for(c=0;c<K;c++)papers.push(2);
+  if(trL>=0)papers[trL]=3;
+  if(valid.length>1){
+    var dark=valid[0];for(c=0;c<valid.length;c++)if(L(valid[c])<L(dark))dark=valid[c];
+    var isD=function(c){return L(c)<=L(dark)+10;};
+    var bg=new Uint8Array(K);if(trL>=0)bg[trL]=1;
+    var dsh=0,dpct=0;valid.forEach(function(c){if(isD(c)){dsh+=pal[c].border;dpct+=pal[c].pct;}});dsh/=btot;
+    var darkBg=(dsh>=0.5&&dpct>=0.35)||(dsh>=0.85&&L(dark)<35);
+    if(darkBg)valid.forEach(function(c){if(isD(c))bg[c]=1;});
+    else{
+      var fb=-1,fv=0;valid.forEach(function(c){if(!isD(c)&&pal[c].border>fv){fv=pal[c].border;fb=c;}});
+      if(fb>=0&&fv>=0.25*btot){
+        bg[fb]=1;
+        /* otros tonos casi iguales que también tocan el borde (degradados del fondo) */
+        valid.forEach(function(c){if(!isD(c)&&c!==fb&&pal[c].border>=0.06*btot&&dE(c,fb)<=14)bg[c]=1;});
+      }
+    }
+    info.darkBg=darkBg;
+    var nb=valid.filter(function(c){return !bg[c];});
+    for(c=0;c<K;c++)if(bg[c])papers[c]=3;
+    if(nb.length){
+      var nbSet={};nb.forEach(function(c){nbSet[c]=1;});
+      if(!darkBg){
+        if(vid==='macizo'){
+          /* oscuros y medios → Negro; claros → Contorno. El corte baja si el negro ocuparía más de la mitad del dibujo */
+          var Lmax=-1,tot=0;nb.forEach(function(c){if(L(c)>Lmax)Lmax=L(c);tot+=pal[c].pct;});
+          var cut=L(dark)+0.45*(Lmax-L(dark)),cov;
+          for(;;){
+            cov=0;nb.forEach(function(c){if(isD(c)||L(c)<=cut)cov+=pal[c].pct;});
+            if(cov<=0.55*tot||cut<=L(dark)+10)break;
+            cut-=5;
+          }
+          nb.forEach(function(c){papers[c]=(isD(c)||L(c)<=cut)?0:2;});
+        }else nb.forEach(function(c){papers[c]=isD(c)?0:2;});
+      }else{
+        nb.forEach(function(c){
+          papers[c]=0;
+          var cbg=0,cot=0,best=-1,bv=0;
+          for(o=0;o<K;o++){
+            if(o===c)continue;var v=adj[c*K+o];
+            if(bg[o])cbg+=v;else{cot+=v;if(v>bv){bv=v;best=o;}}
+          }
+          var f=cot/Math.max(1,cbg+cot);
+          /* color claro que está sobre otros colores (no sobre el fondo): se queda como zona con contorno / blanca */
+          if(f>0.6&&best>=0&&L(c)-L(best)>=30)papers[c]=vid==='macizo'?1:2;
+        });
+      }
+      /* colores minoritarios (restos de antialias): toman el papel de su vecino más parecido */
+      var minor=nb.filter(function(c){return pal[c].pct<0.005;}).sort(function(a,b){return pal[a].pct-pal[b].pct;});
+      minor.forEach(function(c){
+        var best=-1,bd=1e9;
+        for(o=0;o<K;o++){if(o===c||adj[c*K+o]<=0)continue;var d=dE(c,o);if(d<bd){bd=d;best=o;}}
+        if(best>=0)papers[c]=papers[best];
+      });
+    }
+  }
+  /* ajustes según la variante y el nivel */
+  var base=Math.min(1.6,Math.max(0.6,mm*0.011)),P;
+  if(vid==='macizo')P={line:base*1.2,spotA:5,speck:0.3*lv.cl,hole:0.6*lv.cl,deco:'remove',textMm:3};
+  else if(vid==='detalle')P={line:Math.max(0.5,base*0.75),spotA:1.5,speck:0.08*lv.cl,hole:0.2*lv.cl,deco:(mm>=70&&level>=1)?'keep':'remove',textMm:2.2};
+  else P={line:base,spotA:3,speck:0.15*lv.cl,hole:0.3*lv.cl,deco:(mm>=70&&level>=1)?'keep':'remove',textMm:3};
+  P.line=r2(Math.max(0.5,P.line),2);P.speck=r2(P.speck,2);P.hole=r2(P.hole,2);
+  P.mm=mm;P.equal=false;P.spotOn=true;P.close=1;P.soft=1;P.fillGaps=true;P.widenGaps=true;P.alpha=1;P.tol=0.4;P.tiny=0.4;
+  P.papers=papers;P.ov=[];
+  return {papers:papers,P:P,info:info};
+}
+function autoVariant(m){
+  var vq=variantQ(m.id,m.level);
+  var Q=getQ(vq.k,vq.smooth);
+  var pl=planAuto(Q,m.id,m.mm,m.level);
+  ST=Q.ST;
+  if(m.light){
+    var P0=m.P||pl.P;P0.light=true;P0.mm=m.mm;
+    var r0=renderCore(P0);r0.t='arec';r0.id=m.id;r0.gen=m.gen;r0.rg=m.rg;r0.mm=m.mm;post(r0,[]);return;
+  }
+  var P=pl.P;P.light=false;
+  prog('Dibujando «'+m.name+'»…');
+  var r=renderCore(P);
+  r.t='variant';r.id=m.id;r.gen=m.gen;r.papers=pl.papers;r.P=P;r.k=vq.k;r.smooth=vq.smooth;r.info=pl.info;r.W=W;r.H=H;
+  r.pal=Q.pal;
+  post(r,[]);
+}
+/* el motor vuelve a poner activa la cuantización pedida y la envía al modo manual (sin recalcular si ya está) */
+function useQuant(m){
+  var Q=getQ(m.k,m.smooth);ST=Q.ST;postQuant(Q,m.papers);
+}
+
 self.onmessage=function(e){
   var m=e.data;
   try{
-    if(m.t==='quant')doQuant(m);
+    if(m.t==='img'){setImg(m);post({t:'imgok'});}
+    else if(m.t==='auto')autoVariant(m);
+    else if(m.t==='quant')doQuant(m);
     else if(m.t==='render')doRender(m.P);
     else if(m.t==='pick')doPick(m);
   }catch(err){post({t:'error',msg:String(err&&err.stack||err),for:m.t});}
@@ -2025,7 +2346,7 @@ var S={
   bmp:null,name:'',W:0,H:0,rgba:null,
   work:1600,smooth:40,k:6,
   palette:[],papers:[],ov:[],labels:null,
-  P:{mm:80,line:0.8,equal:false,spotOn:true,spotA:3,speck:0.15,hole:0.3,close:1,soft:1,fillGaps:false,widenGaps:false,alpha:1,tol:0.4,tiny:0.4,deco:'keep'},
+  P:{mm:80,line:0.8,equal:false,spotOn:true,spotA:3,speck:0.15,hole:0.3,close:1,soft:1,fillGaps:false,widenGaps:false,alpha:1,tol:0.4,tiny:0.4,deco:'keep',textMm:0},
   res:null,ev:null,
   tool:false,toolPap:0,toolScope:'comp',
   undo:[],leftView:'orig',rightView:'map',
@@ -2042,15 +2363,37 @@ function startWorker(){
   worker.onmessage=onWorker;
   worker.onerror=function(e){setBusy(false,'');toast('Error en el motor de procesado');console.error(e.message||e);};
 }
+/* modo automático: hasta dos motores más para calcular las tres propuestas a la vez (mismo código, mismos resultados) */
+var AUXW=[],AUXQ=[];
+function auxCount(){var hc=navigator.hardwareConcurrency||2,dm=navigator.deviceMemory;if(dm&&dm<4)return 0;return Math.max(0,Math.min(2,hc-2));}
+function startAux(){
+  var n=auxCount(),src=$('wk').textContent;
+  for(var i=AUXW.length;i<n;i++)(function(wi){
+    try{var w=new Worker(URL.createObjectURL(new Blob([src],{type:'text/javascript'})));}catch(e){return;}
+    w.onmessage=function(e){
+      var m=e.data;
+      if(m.t==='error'){console.warn('Motor auxiliar: '+m.msg);auxFail(wi);return;}
+      if(m.t==='variant'||m.t==='arec'){var q=AUXQ[wi];if(q){var k=q.indexOf(m.id);if(k>=0)q.splice(k,1);}}
+      onWorker(e);
+    };
+    w.onerror=function(e){console.warn('Motor auxiliar: '+(e.message||e));auxFail(wi);};
+    AUXW[wi]=w;AUXQ[wi]=[];
+  })(i);
+}
+/* si un motor auxiliar falla, sus propuestas pendientes las calcula el principal */
+function auxFail(wi){
+  var q=AUXQ[wi]||[];AUXW[wi]=null;AUXQ[wi]=[];
+  q.forEach(function(id){if(A.running&&A.queue.indexOf(id)>=0)worker.postMessage({t:'auto',gen:A.gen,id:id,name:vdef(id).name,level:A.level,mm:A.mm});});
+}
+function engineFor(j){var ws=[null];for(var i=0;i<AUXW.length;i++)if(AUXW[i])ws.push(i);return ws[j%ws.length];}
+function postTo(wi,msg){if(wi===null||!AUXW[wi]){worker.postMessage(msg);return null;}AUXQ[wi].push(msg.id);AUXW[wi].postMessage(msg);return wi;}
 function setBusy(on,txt){$('busy').classList.toggle('on',!!on);$('busyTxt').textContent=on?(txt||'Procesando…'):'';}
 function pump(){
   if(busy||!S.rgba)return;
   if(wantQuant){
     wantQuant=false;busy=true;jobKind='quant';jobGen=qgen;
     setBusy(true,'Procesando colores…');
-    var copy=S.rgba.buffer.slice(0);
-    var ac=S.alpha?S.alpha.buffer.slice(0):null;
-    worker.postMessage({t:'quant',rgba:copy,alpha:ac,w:S.W,h:S.H,smooth:S.smooth,k:S.k},ac?[copy,ac]:[copy]);
+    worker.postMessage({t:'quant',smooth:S.smooth,k:S.k});
   }else if(wantRender&&S.quantReady){
     wantRender=false;busy=true;jobKind='render';jobGen=rgen;
     setBusy(true,'Procesando…');
@@ -2060,12 +2403,15 @@ function pump(){
 function renderParams(){
   var P=S.P,o=[];
   for(var i=0;i<S.ov.length;i++)o.push({c:S.ov[i].c,paper:S.ov[i].paper,scope:S.ov[i].scope});
-  return {papers:S.papers.slice(),ov:o,mm:P.mm,line:Math.max(MINLINE,P.line),equal:P.equal,spotOn:P.spotOn,spotA:P.spotA,speck:P.speck,hole:P.hole,close:P.close,soft:P.soft,fillGaps:P.fillGaps,widenGaps:P.widenGaps,alpha:P.alpha,tol:P.tol,tiny:P.tiny,deco:P.deco};
+  return {papers:S.papers.slice(),ov:o,mm:P.mm,line:Math.max(MINLINE,P.line),equal:P.equal,spotOn:P.spotOn,spotA:P.spotA,speck:P.speck,hole:P.hole,close:P.close,soft:P.soft,fillGaps:P.fillGaps,widenGaps:P.widenGaps,alpha:P.alpha,tol:P.tol,tiny:P.tiny,deco:P.deco,textMm:P.textMm};
 }
 function onWorker(e){
   var m=e.data;
-  if(m.t==='prog'){$('busyTxt').textContent=m.msg;return;}
-  if(m.t==='error'){busy=false;setBusy(false);console.error(m.msg);toast('No se pudo procesar la imagen');return;}
+  if(m.t==='prog'){$('busyTxt').textContent=m.msg;autoProg(m.msg);return;}
+  if(m.t==='variant'){autoVariantIn(m);return;}
+  if(m.t==='arec'){autoRecIn(m);return;}
+  if(m.t==='imgok')return;
+  if(m.t==='error'){busy=false;setBusy(false);console.error(m.msg);toast('No se pudo procesar la imagen');if(m.for==='auto'&&A.running){A.running=false;showProg(false);}return;}
   if(m.t==='pick'){if(pickCb){var cb=pickCb;pickCb=null;cb(m);}return;}
   if(m.t==='quant'){
     busy=false;
@@ -2126,8 +2472,13 @@ function prepareImage(){
   $('empty').style.display='none';
   setSize('w',S.P.mm);
   sizeCanvases();fitView();drawLeft();clearResult();updateOv();
-  pendingApply=pendingApply||null;
-  requestQuant();
+  var ic=S.rgba.buffer.slice(0),ia=S.alpha?S.alpha.buffer.slice(0):null;
+  startAux();
+  for(var a=0;a<AUXW.length;a++)if(AUXW[a]){AUXQ[a]=[];AUXW[a].postMessage({t:'img',rgba:S.rgba.buffer.slice(0),alpha:S.alpha?S.alpha.buffer.slice(0):null,w:w,h:h});}
+  worker.postMessage({t:'img',rgba:ic,alpha:ia,w:w,h:h},ia?[ic,ia]:[ic]);
+  S.origCanvas=null;
+  if(document.body.dataset.mode==='auto'){autoImageLoaded();}
+  else{pendingApply=pendingApply||null;requestQuant();}
 }
 function sizeCanvases(){
   ['cL','cR','cM'].forEach(function(id){var c=$(id);c.width=S.W;c.height=S.H;});
@@ -2245,6 +2596,7 @@ function bindNum(id,key,min,max){
 bindNum('line','line',MINLINE,10);bindNum('spotA','spotA',0.1,100);bindNum('speck','speck',0,20);bindNum('hole','hole',0,20);
 function bindChk(id,key){$(id).addEventListener('change',function(){S.P[key]=this.checked;requestRender(60);});}
 bindChk('equal','equal');bindChk('spotOn','spotOn');
+$('textOn').addEventListener('change',function(){S.P.textMm=this.checked?3:0;requestRender(60);});
 /* se pueden combinar: primero se ensancha lo que se puede y después se tapa lo que siga siendo estrecho */
 function setGapOpt(k,on){S.P[k]=on;$(k).checked=on;}
 $('fillGaps').addEventListener('change',function(){setGapOpt('fillGaps',this.checked);requestRender(60);});
@@ -2260,7 +2612,7 @@ $('work').addEventListener('change',function(){S.work=+this.value;if(S.bmp){pend
 
 /* ---------- entrada de archivos ---------- */
 $('file').addEventListener('change',function(){if(this.files&&this.files[0])loadFile(this.files[0]);this.value='';});
-['drop0','drop1'].forEach(function(id){var d=$(id);
+['drop0','drop1','aDrop','aDrop2'].forEach(function(id){var d=$(id);
   d.addEventListener('dragover',function(e){e.preventDefault();d.classList.add('over');});
   d.addEventListener('dragleave',function(){d.classList.remove('over');});
   d.addEventListener('drop',function(e){e.preventDefault();d.classList.remove('over');var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f)loadFile(f);});
@@ -2413,19 +2765,38 @@ $('qrow').addEventListener('click',function(e){
   [].forEach.call(this.children,function(x){x.classList.toggle('sel',x.dataset.k===S.sel);});
   drawMarks();
 });
-function evaluate(){
-  var r=S.res,st=r.stats,P=S.P,W=S.W,H=S.H,N=W*H,s=P.mm/W,ev={};
+/* píxeles a r px o menos (en cuadrado) de un borde blanco/negro del mapa */
+function nearEdge(B,W,H,r){
+  var N=W*H,E=new Uint8Array(N),x,y,i,j,c;
+  for(y=0;y<H;y++)for(x=0;x<W;x++){i=y*W+x;var b=B[i];
+    if((x>0&&B[i-1]!==b)||(x<W-1&&B[i+1]!==b)||(y>0&&B[i-W]!==b)||(y<H-1&&B[i+W]!==b))E[i]=1;}
+  var T=new Uint8Array(N);
+  for(y=0;y<H;y++){c=0;var o=y*W;
+    for(x=0;x<Math.min(W,r);x++)c+=E[o+x];
+    for(x=0;x<W;x++){if(x+r<W)c+=E[o+x+r];T[o+x]=c>0?1:0;if(x-r>=0)c-=E[o+x-r];}}
+  var R=new Uint8Array(N);
+  for(x=0;x<W;x++){c=0;
+    for(y=0;y<Math.min(H,r);y++)c+=T[y*W+x];
+    for(y=0;y<H;y++){if(y+r<H)c+=T[(y+r)*W+x];R[y*W+x]=c>0?1:0;if(y-r>=0)c-=T[(y-r)*W+x];}}
+  return R;
+}
+function evaluate(r,P){
+  var st=r.stats,W=S.W,H=S.H,N=W*H,s=P.mm/W,ev={};
   /* fidelidad: rasterizar el SVG y comparar con el mapa */
   var c=document.createElement('canvas');c.width=W;c.height=H;
   var x=c.getContext('2d',{willReadFrequently:true});
   x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#000';
   x.fill(new Path2D(pathString(r,1,2)),'evenodd');
-  var d=x.getImageData(0,0,W,H).data,diff=0,inter=0,uni=0,i,B=r.B,bl,ev2=new Uint8Array(N);
-  for(i=0;i<N;i++){bl=d[i*4]<128?1:0;ev2[i]=bl;if(bl!==B[i])diff++;if(bl&&B[i])inter++;if(bl||B[i])uni++;}
-  /* fidelidad = coincidencia del negro (intersección / unión), no de toda la imagen:
-     el blanco es mayoría y haría que cualquier resultado pareciera casi perfecto */
-  var fid=uni?inter/uni*100:100;
-  ev.fid={v:fid,lvl:fid>=97?0:fid>=94?1:2,txt:fmt(fid,1)+' % del negro'};
+  var d=x.getImageData(0,0,W,H).data,diff=0,inter=0,uni=0,i,B=r.B,bl,ev2=new Uint8Array(N),nb=0,dev=0;
+  for(i=0;i<N;i++){bl=d[i*4]<128?1:0;ev2[i]=bl;if(bl!==B[i])diff++;if(bl&&B[i])inter++;if(bl||B[i])uni++;if(B[i])nb++;}
+  /* fidelidad: parte del negro del mapa B/N en la que el vector se aparta MÁS DE 0,1 mm.
+     Las diferencias pegadas al borde (suavizado de las curvas, medio píxel arriba o abajo) no cuentan:
+     con la intersección/unión, un dibujo de líneas finas salía «poco fiel» solo por tener mucho borde. */
+  var rt=Math.max(1,Math.min(6,Math.round(0.1/s))),near=nearEdge(B,W,H,rt);
+  for(i=0;i<N;i++)if(ev2[i]!==B[i]&&!near[i])dev++;
+  var fid=nb?Math.max(0,100-dev/nb*100):100;
+  ev.iou=uni?inter/uni*100:100;
+  ev.fid={v:fid,lvl:fid>=99?0:fid>=97?1:2,txt:fmt(fid,1)+' % del negro'};
   /* perfiles: con relleno par-impar y con relleno no nulo deben salir idénticos;
      si no, hay trazados que se cruzan o se solapan y Fusion no los separa en perfiles limpios */
   x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#000';
@@ -2444,9 +2815,10 @@ function evaluate(){
 }
 function showResult(){
   drawRight();
-  var ev=evaluate();S.ev=ev;setChips(ev);drawMarks();
+  var ev=evaluate(S.res,S.P);S.ev=ev;setChips(ev);drawMarks();
   var st=S.res.stats,m=[],P=S.P;
   if(st.widenN>0)m.push('<div class="qm">Se ensancharon <b>'+st.widenN+'</b> huecos blancos finos hasta 0,5 mm.</div>');
+  if(st.lost>=3)m.push('<div class="qm">A '+fmt(P.mm,0)+' mm <b>se pierden '+st.lost+' detalles pequeños</b> (letras, huecos finos): aumenta el tamaño o dales otro papel con «Clic en zona».</div>');
   if(st.thickN>0)m.push('<div class="qm">Se engrosaron <b>'+st.thickN+'</b> zonas más finas de 0,5 mm hasta ese mínimo.'+(st.thickN>40?' <b>Hay mucho detalle fino</b>: a este tamaño cambia de aspecto; puedes quitarlo con «Clic en zona» → Fondo.':'')+'</div>');
   if(st.decoN>0&&P.deco==='keep'){
     var dp=[];if(st.decoThick>0)dp.push(st.decoThick+' parte'+(st.decoThick>1?'s':'')+' más fina'+(st.decoThick>1?'s':'')+' de 0,5 mm (engrosada'+(st.decoThick>1?'s':'')+')');if(st.decoTiny>0)dp.push(st.decoTiny+' mota'+(st.decoTiny>1?'s':''));
@@ -2473,19 +2845,19 @@ $('qmsg').addEventListener('click',function(e){
 
 /* ---------- exportar ---------- */
 function setExports(on){['exSvg','exDxf','exPng'].forEach(function(id){$(id).disabled=!on;});}
-function baseName(){var n=(S.name||'imagen').replace(/\.[^.]+$/,'').replace(/[^\w\-áéíóúñÁÉÍÓÚÑ]+/g,'_');return n+'_linea_'+Math.round(S.P.mm)+'mm';}
+function baseName(mm){var n=(S.name||'imagen').replace(/\.[^.]+$/,'').replace(/[^\w\-áéíóúñÁÉÍÓÚÑ]+/g,'_');return n+'_linea_'+Math.round(mm==null?S.P.mm:mm)+'mm';}
 function dl(blob,name){
   var a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();
   setTimeout(function(){URL.revokeObjectURL(u);a.remove();},1500);
 }
 function mmStr(v){return String(Math.round(v*1000)/1000);}
-function buildSVG(){
-  var r=S.res,s=S.P.mm/S.W,wmm=S.W*s,hmm=S.H*s;
+function buildSVG(r,mm){
+  r=r||S.res;mm=mm||S.P.mm;var s=mm/S.W,wmm=S.W*s,hmm=S.H*s;
   var d=pathString(r,s,3);
   return '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="'+mmStr(wmm)+'mm" height="'+mmStr(hmm)+'mm" viewBox="0 0 '+mmStr(wmm)+' '+mmStr(hmm)+'">\n<path fill="#000000" fill-rule="evenodd" stroke="none" d="'+d+'"/>\n</svg>\n';
 }
-function buildDXF(){
-  var r=S.res,s=S.P.mm/S.W,hmm=S.H*s,pn=r.pn,tags=r.tags,pts=r.pts,o=0,i,j,out=[];
+function buildDXF(r,mm){
+  r=r||S.res;mm=mm||S.P.mm;var s=mm/S.W,hmm=S.H*s,pn=r.pn,tags=r.tags,pts=r.pts,o=0,i,j,out=[];
   function v(n){return (Math.round(n*1000)/1000).toString();}
   out.push('0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n9\n$INSBASE\n10\n0.0\n20\n0.0\n30\n0.0\n9\n$INSUNITS\n70\n4\n9\n$MEASUREMENT\n70\n1\n0\nENDSEC');
   out.push('0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLTYPE\n70\n1\n0\nLTYPE\n2\nCONTINUOUS\n70\n0\n3\nSolid line\n72\n65\n73\n0\n40\n0.0\n0\nENDTAB\n0\nTABLE\n2\nLAYER\n70\n1\n0\nLAYER\n2\n0\n70\n0\n62\n7\n6\nCONTINUOUS\n0\nENDTAB\n0\nENDSEC');
@@ -2526,7 +2898,7 @@ $('exPng').addEventListener('click',function(){
   x.putImageData(id,0,0);
   c.toBlob(function(b){if(b)dl(b,baseName()+'_mapa.png');},'image/png');
 });
-window.__LNexport={svg:buildSVG,dxf:buildDXF};
+window.__LNexport={svg:function(){var t=curExport();return buildSVG(t.res,t.mm);},dxf:function(){var t=curExport();return buildDXF(t.res,t.mm);}};
 
 /* ---------- ajustes guardados ---------- */
 var PK='dp3-linea-presets';
@@ -2539,7 +2911,7 @@ function refreshPresets(){
 }
 function currentSettings(){
   var P=S.P;
-  return {k:S.k,smooth:S.smooth,work:S.work,mm:P.mm,line:P.line,equal:P.equal,spotOn:P.spotOn,spotA:P.spotA,speck:P.speck,hole:P.hole,close:P.close,soft:P.soft,fillGaps:P.fillGaps,widenGaps:P.widenGaps,alpha:P.alpha,tol:P.tol,deco:P.deco,papers:S.papers.slice()};
+  return {k:S.k,smooth:S.smooth,work:S.work,mm:P.mm,line:P.line,equal:P.equal,spotOn:P.spotOn,spotA:P.spotA,speck:P.speck,hole:P.hole,close:P.close,soft:P.soft,fillGaps:P.fillGaps,widenGaps:P.widenGaps,alpha:P.alpha,tol:P.tol,deco:P.deco,textMm:P.textMm,papers:S.papers.slice()};
 }
 $('pSave').addEventListener('click',function(){
   var n=$('pName').value.trim();if(!n){toast('Escribe un nombre para el ajuste.');return;}
@@ -2555,7 +2927,7 @@ $('pLoad').addEventListener('click',function(){
   var oldK=S.k,oldSm=S.smooth,oldWork=S.work;
   S.k=num(c.k,6,3,10);S.smooth=num(c.smooth,40,0,100);S.work=[1000,1400,1600,2000].indexOf(+c.work)>=0?+c.work:1600;
   P.line=num(c.line,0.8,MINLINE,10);P.equal=!!c.equal;P.spotOn=c.spotOn!==false;P.spotA=num(c.spotA,3,0.1,100);P.speck=num(c.speck,0.15,0,20);P.hole=num(c.hole,0.3,0,20);
-  P.close=num(c.close,1,0,2);P.soft=num(c.soft,1,0,3);P.fillGaps=!!c.fillGaps;P.widenGaps=!!c.widenGaps;P.alpha=num(c.alpha,1,0,1.3);P.tol=num(c.tol,0.4,0.1,1.5);setDeco(c.deco);
+  P.close=num(c.close,1,0,2);P.soft=num(c.soft,1,0,3);P.fillGaps=!!c.fillGaps;P.widenGaps=!!c.widenGaps;P.alpha=num(c.alpha,1,0,1.3);P.tol=num(c.tol,0.4,0.1,1.5);P.textMm=num(c.textMm,0,0,10);$('textOn').checked=P.textMm>0;setDeco(c.deco);
   setVal('k',S.k);$('v-k').textContent=S.k;setVal('smooth',S.smooth);$('v-smooth').textContent=S.smooth;setVal('work',S.work);
   setVal('line',dnum(P.line));$('equal').checked=P.equal;$('spotOn').checked=P.spotOn;setVal('spotA',dnum(P.spotA));setVal('speck',dnum(P.speck));setVal('hole',dnum(P.hole));
   [].forEach.call($('closeSeg').children,function(x){x.classList.toggle('on',+x.dataset.v===P.close);});
@@ -2573,11 +2945,349 @@ $('pLoad').addEventListener('click',function(){
 });
 refreshPresets();
 
-/* ---------- ayuda ---------- */
-$('helpBtn').addEventListener('click',function(){$('helpBg').classList.add('on');});
-$('helpOk').addEventListener('click',function(){$('helpBg').classList.remove('on');});
-$('helpBg').addEventListener('click',function(e){if(e.target===this)this.classList.remove('on');});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')$('helpBg').classList.remove('on');});
+/* ===================== MODO AUTOMÁTICO ===================== */
+var VDEF=[
+ {id:'contornos',name:'Contornos',desc:'Dibujo de línea clásico: contornos negros con el interior vacío. Es el punto de partida más habitual para extruir.'},
+ {id:'macizo',name:'Relleno macizo',desc:'Rellena de negro los colores oscuros y medios, y deja los claros solo con borde. Piezas más gruesas y robustas.'},
+ {id:'detalle',name:'Más detalle',desc:'Separa más colores y usa un trazo algo más fino para conservar más detalles. Necesita un tamaño algo mayor.'}];
+var A={level:1,dim:'w',val:80,mm:80,vars:[],sel:-1,gen:0,recGen:0,running:false,queue:[],done:0,t0:0,view:'res',pickId:null,manual:null,st:null,tTotal:0};
+window.__LN.A=A;
+function vdef(id){for(var i=0;i<VDEF.length;i++)if(VDEF[i].id===id)return VDEF[i];return {id:id,name:'Tu ajuste a mano',desc:'El resultado de tus retoques en «Ajustar a mano».'};}
+function curV(){return A.sel>=0?A.vars[A.sel]:null;}
+function curExport(){var v=document.body.dataset.mode==='auto'?curV():null;return v?{res:v.res,mm:v.mm}:{res:S.res,mm:S.P.mm};}
+function mkCanvas(res){
+  var c=document.createElement('canvas');c.width=S.W;c.height=S.H;var x=c.getContext('2d');
+  var id=x.createImageData(S.W,S.H),d=id.data,B=res.B,N=S.W*S.H,v;
+  for(var i=0;i<N;i++){v=B[i]?0:255;d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255;}
+  x.putImageData(id,0,0);return c;
+}
+function setMode(m){
+  document.body.dataset.mode=m;
+  if(m==='adv')setTimeout(function(){if(S.fit)fitView();},40);
+  window.scrollTo(0,0);
+}
+/* resumen del semáforo en un único estado */
+function summarize(v){
+  var ev=v.ev,st=v.res.stats,R=[],lvl=0,mm=fmt(v.mm,0);
+  function add(l,t){R.push(t);if(l>lvl)lvl=l;}
+  if(ev.closed.lvl>0)add(2,'hay trazos que se solapan y Fusion no los separaría bien');
+  if(ev.line.lvl>0)add(2,'quedan líneas más finas de 0,5 mm');
+  if(ev.gap.lvl===2)add(2,'quedan rendijas blancas muy estrechas');else if(ev.gap.lvl===1)add(1,'quedan rendijas blancas algo estrechas');
+  if(ev.fid.lvl>=2)add(2,'el vector se aparta bastante del dibujo');else if(ev.fid.lvl===1)add(1,'el vector se aparta un poco del dibujo');
+  if(st.tiny>25)add(2,'hay '+st.tiny+' piezas negras diminutas que se perderían');else if(st.tiny>0)add(1,'hay '+st.tiny+' pieza'+(st.tiny>1?'s':'')+' negra'+(st.tiny>1?'s':'')+' diminuta'+(st.tiny>1?'s':'')+' que se perdería'+(st.tiny>1?'n':''));
+  var lo=st.lost||0;
+  if(st.chg>0.14||(lo>=6&&st.chg>0.08))add(2,'a '+mm+' mm el texto pequeño y los detalles finos no se leerán (se empastan)'+(lo?': se pierden '+lo+' letras o huecos pequeños':''));
+  else if(lo>=3)add(1,'a '+mm+' mm se pierden '+lo+' detalles pequeños (letras o huecos finos)');
+  else if(st.chg>0.06)add(1,'a '+mm+' mm algunos detalles finos se empastan un poco');
+  if(ev.nodes.lvl>1)add(1,'el archivo es muy pesado y Fusion puede ir lento');
+  if(st.ink<0.01)add(2,'casi no queda nada en negro');else if(st.ink>0.8)add(2,'casi todo queda en negro');
+  var title=lvl===0?'Listo para extruir':lvl===1?'Revisa: '+R.join('; ')+'.':'No apto a este tamaño: '+R.join('; ')+'.';
+  if(lvl>0)title=title.charAt(0)+title.slice(1);
+  return {lvl:lvl,title:title,reasons:R};
+}
+function scoreV(v){
+  var ev=v.ev,st=v.res.stats,sc=[100,60,20][v.sum.lvl];
+  sc-=Math.min(15,Math.max(0,99.5-ev.fid.v)*5); /* solo resta si el vector se aparta de verdad (más de 0,1 mm) */
+  sc-=Math.min(25,st.chg*100);
+  sc-=Math.min(15,(st.lost||0)*1.5);
+  if(st.nodes>3000)sc-=Math.min(10,(st.nodes-3000)/1000);
+  if(st.ink<0.02||st.ink>0.75)sc-=30;
+  sc+=v.id==='contornos'?6:v.id==='detalle'?1:0; /* a igualdad, la propuesta más fiel al dibujo de línea */
+  return sc;
+}
+function showProg(on,txt,f){
+  $('aProg').classList.toggle('on',!!on);if(txt)$('aProgT').textContent=txt;
+  if(f!=null)$('aProgB').style.width=Math.round(f*100)+'%';
+}
+function autoProg(msg){
+  if(!A.running)return;
+  showProg(true,'Propuesta '+Math.min(3,A.done+1)+' de 3 · '+msg,(A.done+0.4)/3);
+}
+function autoImageLoaded(){
+  var b=$('aBox');b.classList.remove('empty0');
+  var t=$('aThumb'),x=t.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,56,56);
+  var oc=origCanvas(),sc=Math.min(56/S.W,56/S.H);x.drawImage(oc,(56-S.W*sc)/2,(56-S.H*sc)/2,S.W*sc,S.H*sc);
+  $('aDrop').classList.add('has');$('aFile').textContent=S.name;$('aFileSub').textContent=S.bmp.naturalWidth+'×'+S.bmp.naturalHeight+' px · pulsa para cambiar de imagen';
+  A.pickId=null;A.manual=null;A.view='res';[].forEach.call($('aView').children,function(x){x.classList.toggle('on',x.dataset.v==='res');});
+  aSizeApply(true,true);
+}
+function origCanvas(){
+  if(S.origCanvas)return S.origCanvas;
+  var c=document.createElement('canvas');c.width=S.W;c.height=S.H;var x=c.getContext('2d');
+  var im=new ImageData(new Uint8ClampedArray(S.rgba),S.W,S.H);
+  if(S.alpha){var dd=im.data,W0=S.W;for(var q=0;q<S.alpha.length;q++)if(S.alpha[q]){var v=(((q%W0)>>4)+((q/W0|0)>>4))&1?200:235;dd[q*4]=dd[q*4+1]=dd[q*4+2]=v;}}
+  x.putImageData(im,0,0);S.origCanvas=c;return c;
+}
+function dimsOf(){var asp=S.W&&S.H?S.W/S.H:1;return {w:A.mm,h:A.mm/asp};}
+function updateDimTxt(){var d=dimsOf();$('aDimTxt').textContent='Tamaño final: '+fmt(d.w,1)+' × '+fmt(d.h,1)+' mm';}
+function aSizeApply(commit,now){
+  var v=pnum($('aSize').value);
+  if(!(v>=10&&v<=1000)){if(commit){$('aSize').value=dnum(A.val);}else return;v=A.val;}
+  var asp=S.W&&S.H?S.W/S.H:1,mm=A.dim==='w'?v:v*asp;
+  var same=Math.abs(mm-A.mm)<0.005;
+  A.val=v;A.mm=mm;S.P.mm=mm;updateDimTxt();
+  if(commit)$('aSize').value=dnum(Math.round(v*100)/100);
+  if(same&&!now)return;
+  if(!S.rgba)return;
+  clearTimeout(A.st);A.st=setTimeout(autoRun,now?0:(commit?0:700));
+}
+$('aSize').addEventListener('input',function(){aSizeApply(false,false);});
+$('aSize').addEventListener('change',function(){aSizeApply(true,false);});
+$('aSize').addEventListener('keydown',function(e){if(e.key==='Enter')aSizeApply(true,false);});
+$('aDim').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b||b.dataset.d===A.dim)return;
+  A.dim=b.dataset.d;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});
+  var d=dimsOf();A.val=Math.round((A.dim==='w'?d.w:d.h)*100)/100;$('aSize').value=dnum(A.val);
+});
+$('aLev').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b||+b.dataset.l===A.level)return;
+  A.level=+b.dataset.l;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});
+  A.pickId=null;if(S.rgba)autoRun();
+});
+$('aView').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;A.view=b.dataset.v;
+  [].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});drawBig();
+});
+function autoRun(){
+  if(!S.rgba||!worker)return;
+  A.gen++;A.recGen++;clearTimeout(A.st);
+  A.vars=[];A.sel=-1;A.done=0;A.running=true;A.queue=VDEF.map(function(v){return v.id;});A.t0=performance.now();
+  if(A.manual&&Math.abs(A.manual.mm-A.mm)>0.01)A.manual=null;
+  showProg(true,'Preparando las propuestas…',0.03);
+  renderThumbs();drawBig();setExports(false);updateSem();
+  A.wi={};
+  A.queue.forEach(function(id,j){A.wi[id]=postTo(engineFor(j),{t:'auto',gen:A.gen,id:id,name:vdef(id).name,level:A.level,mm:A.mm});});
+}
+function autoVariantIn(m){
+  if(m.gen!==A.gen)return;
+  var qi=A.queue.indexOf(m.id);if(qi<0)return;A.queue.splice(qi,1);
+  var v={id:m.id,name:vdef(m.id).name,res:m,mm:A.mm,ms:m.stats.ms};
+  v.ev=evaluate(m,{mm:A.mm,tiny:0.4});v.sum=summarize(v);v.score=scoreV(v);v.canvas=mkCanvas(m);v.rec=null;
+  A.vars.push(v);A.done++;
+  if(A.vars.length===1)A.sel=0;
+  showProg(true,'Propuesta '+A.done+' de 3 lista…',A.done/3);
+  renderThumbs();drawBig();updateSem();
+  if(!A.queue.length)autoFinish();
+}
+function autoFinish(){
+  if(A.manual)A.vars.push(A.manual);
+  var keep=A.pickId;
+  A.vars.sort(function(a,b){return b.score-a.score;});
+  A.sel=0;
+  if(keep)for(var i=0;i<A.vars.length;i++)if(A.vars[i].id===keep)A.sel=i;
+  A.running=false;A.tTotal=Math.round(performance.now()-A.t0);showProg(false);
+  renderThumbs();drawBig();updateSem();setExports(true);
+  window.__autoDone=A.gen;
+  recFor(curV());
+}
+function renderThumbs(){
+  var h='',i;
+  for(i=0;i<A.vars.length;i++){
+    var v=A.vars[i];
+    h+='<button class="ath" data-i="'+i+'" aria-pressed="'+(i===A.sel)+'" title="'+esc(vdef(v.id).desc)+'">'+(i===0&&!A.running&&A.vars.length>1&&v.id!=='manual'?'<span class="rb">Recomendada</span>':'')+'<canvas width="200" height="200"></canvas><span class="nm"><span class="qd '+LV[v.sum.lvl]+'"></span>'+esc(v.name)+'</span></button>';
+  }
+  if(A.running||!S.rgba){
+    for(var j=0;j<VDEF.length;j++){var got=false;for(i=0;i<A.vars.length;i++)if(A.vars[i].id===VDEF[j].id)got=true;
+      if(!got)h+='<div class="ath" aria-hidden="true"><div class="ph0">'+(S.rgba?'Calculando…':'—')+'</div><span class="nm">'+VDEF[j].name+'</span></div>';}
+  }
+  var el=$('aThumbs');el.innerHTML=h;
+  var cs=el.querySelectorAll('button.ath canvas');
+  for(i=0;i<cs.length;i++){
+    var v2=A.vars[i],x=cs[i].getContext('2d'),sc=Math.min(200/S.W,200/S.H);
+    x.fillStyle='#fff';x.fillRect(0,0,200,200);x.imageSmoothingQuality='high';
+    x.drawImage(v2.canvas,(200-S.W*sc)/2,(200-S.H*sc)/2,S.W*sc,S.H*sc);
+  }
+  var v3=curV();$('aDesc').textContent=v3?vdef(v3.id).desc:(S.rgba?'Calculando las propuestas…':'Sube una imagen para ver las propuestas.');
+}
+$('aThumbs').addEventListener('click',function(e){
+  var b=e.target.closest('button.ath');if(!b)return;
+  var i=+b.dataset.i;if(i===A.sel)return;
+  A.sel=i;A.pickId=A.vars[i].id;renderThumbs();drawBig();updateSem();recFor(curV());
+});
+function drawBig(){
+  var c=$('aCv'),v=curV();
+  if(!S.rgba){return;}
+  c.width=S.W;c.height=S.H;var x=c.getContext('2d');
+  if(A.view==='orig'||!v){x.drawImage(origCanvas(),0,0);}
+  else x.drawImage(v.canvas,0,0);
+  $('aTitle').textContent=(A.view==='orig'||!v)?'Imagen original':'Vista previa · '+v.name;
+}
+function updateSem(){
+  var v=curV(),dot=$('aSemDot'),btn=$('aSemBtn');btn.style.display='none';
+  if(!S.rgba){dot.className='qd';$('aSemT').textContent='Esperando imagen';$('aSemW').textContent='Sube una imagen y elige el tamaño.';return;}
+  if(!v){dot.className='qd';$('aSemT').textContent='Calculando…';$('aSemW').textContent='Un momento: se están preparando las propuestas.';return;}
+  var sm=v.sum;dot.className='qd '+LV[sm.lvl];
+  $('aSemT').textContent=sm.lvl===0?'Listo para extruir':sm.lvl===1?'Revisa':'No apto a este tamaño';
+  var why=sm.lvl===0?'Todas las líneas y huecos miden al menos 0,5 mm y no hay trazos que se crucen.':sm.reasons.join('; ')+'.';
+  why=why.charAt(0).toUpperCase()+why.slice(1);
+  if(sm.lvl>0&&v.rec&&v.rec>0){why+=' A '+fmt(v.rec,0)+' mm o más se vería bien.';btn.textContent='Usar '+fmt(v.rec,0)+' mm';btn.style.display='';btn.dataset.mm=v.rec;}
+  else if(sm.lvl>0&&v.rec===-1)why+=' Ni ampliando mucho se resuelve: prueba el nivel «Simple» u otra propuesta.';
+  else if(sm.lvl>0&&v.recPending)why+=' Calculando un tamaño recomendado…';
+  $('aSemW').textContent=why;
+}
+$('aSemBtn').addEventListener('click',function(){
+  var mm=+this.dataset.mm;if(!(mm>0))return;
+  A.dim='w';[].forEach.call($('aDim').children,function(x){x.classList.toggle('on',x.dataset.d==='w');});
+  A.val=mm;$('aSize').value=dnum(mm);aSizeApply(true,false);
+});
+/* tamaño mínimo recomendado: se vuelve a calcular el dibujo a tamaños mayores hasta que el detalle quepa */
+var REC_THR=0.04;
+function recFor(v){
+  if(!v||v.sum.lvl===0||v.id==='manual'||v.rec!==null||v.recPending||!v.res.P)return;
+  var gen=A.gen;A.recGen++;v.recPending=true;v.recList=[1.25,1.5,2,3,4].map(function(f){return Math.ceil(v.mm*f/5)*5;}).filter(function(m){return m<=400;});
+  v.recI=0;updateSem();recStep(v,gen);
+}
+function recStep(v,gen){
+  if(v.recI>=v.recList.length){v.recPending=false;v.rec=-1;if(curV()===v)updateSem();return;}
+  var P=JSON.parse(JSON.stringify(v.res.P));P.light=true;
+  /* al mismo motor que calculó la propuesta: ya tiene sus colores en caché */
+  postTo(A.wi&&A.wi[v.id]!=null?A.wi[v.id]:null,{t:'auto',light:true,gen:gen,rg:A.recGen,id:v.id,level:A.level,mm:v.recList[v.recI],P:P});
+}
+function autoRecIn(m){
+  if(m.gen!==A.gen||m.rg!==A.recGen)return;
+  var v=null;for(var i=0;i<A.vars.length;i++)if(A.vars[i].id===m.id)v=A.vars[i];
+  if(!v||!v.recPending)return;
+  if(m.stats.chg<=REC_THR&&(m.stats.lost||0)<=2){v.rec=v.recList[v.recI];v.recPending=false;if(curV()===v)updateSem();return;}
+  v.recI++;recStep(v,m.gen);
+}
+/* descargas del modo automático */
+function setExports2(on){['aSvg','aDxf','aPng'].forEach(function(id){$(id).disabled=!on;});}
+var setExports0=setExports;
+setExports=function(on){setExports0(on);setExports2(!!curV()&&!!on);};
+$('aSvg').addEventListener('click',function(){var t=curExport();if(!t.res)return;dl(new Blob([buildSVG(t.res,t.mm)],{type:'image/svg+xml'}),baseName(t.mm)+'.svg');});
+$('aDxf').addEventListener('click',function(){var t=curExport();if(!t.res)return;dl(new Blob([buildDXF(t.res,t.mm)],{type:'application/dxf'}),baseName(t.mm)+'.dxf');});
+$('aPng').addEventListener('click',function(){var v=curV();if(!v)return;v.canvas.toBlob(function(b){if(b)dl(b,baseName(v.mm)+'_mapa.png');},'image/png');});
+/* ---- paso a modo manual y vuelta ---- */
+function syncUI(){
+  var P=S.P;
+  setVal('k',S.k);$('v-k').textContent=S.k;setVal('smooth',S.smooth);$('v-smooth').textContent=S.smooth;setVal('work',S.work);
+  setVal('line',dnum(P.line));$('equal').checked=!!P.equal;$('spotOn').checked=!!P.spotOn;setVal('spotA',dnum(P.spotA));setVal('speck',dnum(P.speck));setVal('hole',dnum(P.hole));
+  [].forEach.call($('closeSeg').children,function(x){x.classList.toggle('on',+x.dataset.v===P.close);});
+  setVal('soft',P.soft);$('v-soft').textContent=P.soft;$('fillGaps').checked=!!P.fillGaps;$('widenGaps').checked=!!P.widenGaps;
+  setVal('alpha',P.alpha);$('v-alpha').textContent=fmt(P.alpha,2);setVal('tol',P.tol);$('v-tol').textContent=fmt(P.tol,2);
+  $('textOn').checked=P.textMm>0;setDeco(P.deco);setSize('w',P.mm);
+}
+function enterAdv(){
+  var v=curV();
+  setMode('adv');
+  if(!S.bmp)return;
+  if(v&&v.id!=='manual'){
+    var P=v.res.P,d=S.P;
+    ['line','equal','spotOn','spotA','speck','hole','close','soft','fillGaps','widenGaps','alpha','tol','tiny','deco','textMm'].forEach(function(k){d[k]=P[k];});
+    d.mm=v.mm;S.k=v.res.k;S.smooth=v.res.smooth;
+    syncUI();
+    pendingApply={papers:v.res.papers.slice()};
+    S.advSigPending=true;
+    requestQuant();
+  }else{
+    S.advSigPending=true;
+    if(!S.quantReady)requestQuant();else requestRender(0);
+  }
+}
+function advSig(){return JSON.stringify([S.k,S.smooth,renderParams()]);}
+function backToAuto(){
+  var changed=S.res&&S.advSig&&S.advSig!==advSig();
+  S.advSig=null;S.advSigPending=false;
+  setMode('auto');
+  if(changed&&S.res){
+    var v={id:'manual',name:'Tu ajuste a mano',res:S.res,ev:S.ev,mm:S.P.mm,ms:0,rec:null,canvas:mkCanvas(S.res)};
+    v.sum=summarize(v);v.score=0;A.manual=v;A.pickId='manual';
+    if(Math.abs(S.P.mm-A.mm)>0.01){
+      A.mm=S.P.mm;A.dim='w';A.val=S.P.mm;$('aSize').value=dnum(Math.round(A.val*100)/100);
+      [].forEach.call($('aDim').children,function(x){x.classList.toggle('on',x.dataset.d==='w');});updateDimTxt();
+      autoRun();return;
+    }
+    A.vars=A.vars.filter(function(x){return x.id!=='manual';});A.vars.push(v);A.sel=A.vars.length-1;
+    renderThumbs();drawBig();updateSem();setExports(true);
+  }
+}
+$('aManual').addEventListener('click',enterAdv);
+$('backAuto').addEventListener('click',backToAuto);
+$('aHelp2').addEventListener('click',openHelp);
+(function(){var o=showResult;showResult=function(){o();if(S.advSigPending){S.advSig=advSig();S.advSigPending=false;}};})();
+
+/* ===================== AYUDA, GUÍA Y TEXTOS «i» ===================== */
+var lastFocus=null;
+function openHelp(){lastFocus=document.activeElement;$('helpBg').classList.add('on');var md=$('helpBg').querySelector('.modal');md.scrollTop=0;try{$('helpX').focus({preventScroll:true});}catch(e){$('helpX').focus();}}
+function closeHelp(){$('helpBg').classList.remove('on');if(lastFocus&&lastFocus.focus)try{lastFocus.focus();}catch(e){}}
+$('helpBtn').addEventListener('click',openHelp);
+$('helpOk').addEventListener('click',closeHelp);$('helpX').addEventListener('click',closeHelp);
+$('helpBg').addEventListener('click',function(e){if(e.target===this)closeHelp();});
+var TOUR=[
+ {t:'1 · Sube tu imagen',p:'Elige una ilustración, un logo o un dibujo (JPG, PNG o WebP). Funciona mejor con fondo liso o transparente.',i:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>'},
+ {t:'2 · Elige el tamaño',p:'Escribe el ancho o el alto en milímetros. Si a ese tamaño hay detalles que no caben, te lo avisamos y te sugerimos una medida mejor.',i:'<path d="M4 8v8M20 8v8M4 12h16M7 9l-3 3 3 3M17 9l3 3-3 3"/>'},
+ {t:'3 · Elige un resultado',p:'Calculamos tres propuestas distintas. Pulsa la que más te guste: la «Recomendada» suele ser la mejor. El semáforo te dice si está lista.',i:'<rect x="3" y="4" width="5.5" height="16" rx="1.5"/><rect x="9.5" y="4" width="5.5" height="16" rx="1.5"/><rect x="16" y="4" width="5" height="16" rx="1.5"/>'},
+ {t:'4 · Descarga y extruye',p:'Pulsa «Descargar SVG para Fusion». Si algo no te convence, «Ajustar a mano» abre todas las herramientas. Tienes la ayuda completa en el botón «?».',i:'<path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 18v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1"/>'}];
+var tourI=0,TK='dp3-linea-guia';
+function tourShow(){
+  var s=TOUR[tourI];
+  $('tourT').textContent=s.t;$('tourP').textContent=s.p;
+  $('tourIc').innerHTML='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+s.i+'</svg>';
+  var d='';for(var i=0;i<TOUR.length;i++)d+='<i'+(i===tourI?' class="on"':'')+'></i>';$('tourDots').innerHTML=d;
+  $('tourNext').textContent=tourI===TOUR.length-1?'Empezar':'Siguiente';
+  $('tourSkip').style.visibility=tourI===TOUR.length-1?'hidden':'visible';
+}
+function openTour(){lastFocus=document.activeElement;tourI=0;tourShow();$('tourBg').classList.add('on');$('tourNext').focus();}
+function closeTour(){
+  $('tourBg').classList.remove('on');
+  try{localStorage.setItem(TK,'1');}catch(e){}
+  if(lastFocus&&lastFocus.focus)try{lastFocus.focus();}catch(e){}
+}
+$('tourNext').addEventListener('click',function(){if(tourI>=TOUR.length-1){closeTour();return;}tourI++;tourShow();});
+$('tourSkip').addEventListener('click',closeTour);
+$('helpTour').addEventListener('click',function(){closeHelp();openTour();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){if($('tourBg').classList.contains('on'))closeTour();else closeHelp();}});
+(function(){var seen=false;try{seen=localStorage.getItem(TK)==='1';}catch(e){}if(!seen)setTimeout(openTour,500);})();
+
+/* textos de ayuda en cada control del modo manual: botón «i» que se abre con clic, toque o Intro */
+var INFO=[
+ ['#outW','Tamaño final de la pieza en milímetros. Al cambiar el ancho, el alto se ajusta solo (y al revés).'],
+ ['#work','Resolución del mapa de trabajo. Más píxeles = más precisión, pero más lento.'],
+ ['#smooth','Quita el ruido y el degradado de la imagen sin difuminar los bordes. Más alto = formas más limpias, menos detalle fino.'],
+ ['#k','Cuántos colores distintos se separan en la imagen. Menos colores = dibujo más simple.'],
+ ['#autoPap','Vuelve a la propuesta de papeles que hace la app: lo más oscuro a Negro, el color del borde a Fondo y el resto a Contorno.'],
+ ['#textOn','Las letras o detalles claros muy finos sobre otro color no caben con un contorno alrededor: se pintan de negro.'],
+ ['#decoSeg','Motivos pequeños sobre el fondo (burbujas, ADN…). Conservar los dibuja como línea; Quitar los elimina.'],
+ ['#toolBtn','Activa este modo y pulsa sobre una zona de la imagen para cambiarle el papel solo a ella.'],
+ ['#toolPap','Papel que recibirá la zona clicada: Negro (relleno), Blanco (vacío), Contorno (vacío con borde) o Fondo (se elimina).'],
+ ['#toolScope','«Esta zona» cambia solo la región clicada. «Zonas parecidas» cambia todas las del mismo color con el mismo entorno.'],
+ ['#spotOn','Las manchas blancas o con contorno muy pequeñas se rellenan de negro para que no se pierdan.'],
+ ['#spotA','Área máxima de esas manchas, en milímetros cuadrados.'],
+ ['#line','Grosor de la línea que se dibuja alrededor de las zonas con papel Contorno. Mínimo 0,5 mm.'],
+ ['#equal','Hace que también las líneas que ya traía el dibujo tengan ese grosor.'],
+ ['#speck','Motas negras más pequeñas que esto se borran.'],
+ ['#hole','Agujeros blancos más pequeños que esto se rellenan.'],
+ ['#closeSeg','Cierra pequeñas grietas entre trazos negros. 1 píxel suele bastar; 2 cierra más.'],
+ ['#soft','Suaviza los dientes de sierra de los bordes antes de vectorizar.'],
+ ['#widenGaps','Abre hasta 0,5 mm las rendijas blancas muy finas (letras caladas en un fondo negro).'],
+ ['#fillGaps','Rellena de negro las rendijas blancas más estrechas de 0,5 mm que no se hayan podido abrir.'],
+ ['#alpha','Más bajo = esquinas marcadas; más alto = curvas suaves.'],
+ ['#tol','Más alto = menos nodos y archivo más ligero, pero se aparta algo más del dibujo.'],
+ ['#pName','Guarda todos estos ajustes (y los papeles actuales) en este navegador con un nombre.'],
+ ['#showMarks','Muestra sobre el resultado las líneas finas (rojo), huecos finos (naranja), piezas sueltas (violeta) y solapes (azul).']
+];
+var infoN=0;
+function addInfo(sel,text){
+  var el=document.querySelector(sel);if(!el)return;
+  var host=el.closest('.rng,.chk,.fld,.row,.tool-row')||el.parentNode;
+  var lab=host.querySelector('.rng-t span,.lbl')||host;
+  var id='ib'+(++infoN),btn=document.createElement('button');
+  btn.type='button';btn.className='ib';btn.textContent='i';btn.title=text;btn.setAttribute('aria-label','Qué hace: '+text);btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-controls',id);
+  if(host.classList.contains('chk')){btn.style.marginLeft='auto';host.appendChild(btn);}else lab.appendChild(btn);
+  var box=document.createElement('div');box.className='helpbox';box.id=id;box.hidden=true;box.textContent=text;
+  var after=(host.closest('.row,.tool-row')||host);after.parentNode.insertBefore(box,after.nextSibling);
+  btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=box.hidden;box.hidden=!o;btn.setAttribute('aria-expanded',String(o));});
+}
+INFO.forEach(function(p){addInfo(p[0],p[1]);});
+(function(){
+  var H=[['Imagen y tamaño','Carga la imagen y decide el tamaño final de la pieza en milímetros.'],['Colores','Separa la imagen en pocos colores planos. Aquí se decide cuánto detalle se conserva.'],['Papel de cada color','Cada color recibe un papel: Negro (relleno), Blanco (vacío), Contorno (vacío con borde negro) o Fondo (se elimina).'],['Retoque por zona','Para cambiar el papel de una región concreta sin tocar el resto de su color.'],['Línea','Grosor del borde dibujado alrededor de las zonas Contorno.'],['Limpieza','Quita motas, rellena agujeros y arregla las rendijas demasiado finas.'],['Vectorizado','Cómo se convierte el mapa en curvas (Potrace).'],['Ajustes guardados','Guarda y recupera combinaciones de ajustes en este navegador.']];
+  var hs=document.querySelectorAll('#panel .sec-h');
+  for(var i=0;i<hs.length&&i<H.length;i++){(function(h,t){
+    var id='ib'+(++infoN),b=document.createElement('button');b.type='button';b.className='ib';b.textContent='i';b.title=t;b.setAttribute('aria-label','Qué es esto: '+t);b.setAttribute('aria-expanded','false');b.setAttribute('aria-controls',id);h.appendChild(b);
+    var box=document.createElement('div');box.className='helpbox';box.id=id;box.hidden=true;box.textContent=t;h.parentNode.insertBefore(box,h.nextSibling);
+    b.addEventListener('click',function(){var o=box.hidden;box.hidden=!o;b.setAttribute('aria-expanded',String(o));});
+  })(hs[i],H[i][1]);}
+})();
 
 startWorker();
 updateSizeInfo();
