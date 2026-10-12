@@ -1,7 +1,7 @@
 /* ============================================================
    SILAB 3D · Galería de trabajos (Valoraciones › Nuestros trabajos)
    Lee de Supabase las fotos que se suben en el panel admin › Galería
-   y las muestra en un mosaico con visor a pantalla completa.
+   y las muestra en un carrusel continuo con visor a pantalla completa.
    Si aún no hay fotos, la caja se queda para Instagram/Elfsight
    (js/instagram.js y js/elfsight.js esperan a window.silabGaleria).
    ============================================================ */
@@ -17,38 +17,116 @@
   })
     .then(function (r) { return r.ok ? r.json() : []; })
     .then(function (rows) {
-      if (!Array.isArray(rows) || !rows.length) return false;
+      // Con menos de 3 fotos el carrusel no luce: la caja se queda para Instagram/Elfsight
+      if (!Array.isArray(rows) || rows.length < 3) return false;
       fotos = rows;
       caja.removeAttribute('data-elfsight-lazy');
       caja.removeAttribute('data-instagram');
       caja.className = 'galeria';
-      pintar();
-      var ultimo = columnas();
-      window.addEventListener('resize', function () { if (columnas() !== ultimo) { ultimo = columnas(); pintar(); } });
+      montar();
       return true;
     })
     .catch(function () { return false; });
 
-  /* Mosaico repartido por filas (1.ª foto arriba a la izquierda, 2.ª a su derecha…): el orden del panel se respeta */
-  function columnas() { return window.innerWidth <= 480 ? 2 : window.innerWidth <= 860 ? 2 : 3; }
-  function pintar() {
-    var n = columnas(), cols = [], altos = [];
-    for (var c = 0; c < n; c++) { cols.push([]); altos.push(0); }
-    fotos.forEach(function (f, i) {
-      // Cada foto va a la columna más baja, para que las columnas acaben parejas
-      var c = altos.indexOf(Math.min.apply(null, altos));
-      cols[c].push(foto(f, i));
-      altos[c] += f.ancho && f.alto ? f.alto / f.ancho : 1;
-    });
-    caja.innerHTML = cols.map(function (c) { return '<div class="galeria__col">' + c.join('') + '</div>'; }).join('');
-  }
-  function foto(f, i) {
+  function foto(f, i, copia) {
     var pie = [f.titulo, f.material].filter(Boolean).join(' · ');
-    return '<button type="button" class="galeria__foto" data-i="' + i + '" aria-label="Ver en grande' + (pie ? ': ' + esc(pie) : '') + '">' +
-          '<img src="' + esc(f.miniatura) + '" alt="' + esc(f.titulo || 'Trabajo impreso en 3D por SILAB 3D') + '"' +
-            (f.ancho && f.alto ? ' width="' + f.ancho + '" height="' + f.alto + '"' : '') + ' loading="lazy" decoding="async">' +
+    // Proporción de la foto, acotada para que ninguna quede como una tira
+    var r = f.ancho && f.alto ? Math.min(1.6, Math.max(0.65, f.ancho / f.alto)) : 1;
+    return '<button type="button" class="galeria__foto" data-i="' + i + '" style="--r:' + r.toFixed(3) + '"' +
+            (copia ? ' tabindex="-1" aria-hidden="true"' : ' aria-label="Ver en grande' + (pie ? ': ' + esc(pie) : '') + '"') + '>' +
+          '<img src="' + esc(f.miniatura) + '" alt="' + (copia ? '' : esc(f.titulo || 'Trabajo impreso en 3D por SILAB 3D')) + '" loading="lazy" decoding="async" draggable="false">' +
           (pie ? '<span class="galeria__pie">' + esc(pie) + '</span>' : '') +
         '</button>';
+  }
+
+  /* ---------- Carrusel continuo ----------
+     La tira de fotos se repite las veces necesarias y se desplaza sola, en bucle y sin saltos.
+     Se para con el ratón encima, al tocarla o con el foco dentro; también se puede arrastrar.
+     Con «reducir movimiento» no se mueve: queda una tira que se desliza a mano. */
+  var VEL = 38;                         // px por segundo
+  var pista, ancho = 0, anchoCaja = 0, x = 0, parado = 0, visible = true, ultimo = 0, quieto = false;
+  function montar() {
+    quieto = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    caja.innerHTML = '<div class="galeria__ventana"' + (quieto ? ' tabindex="0" aria-label="Nuestros trabajos"' : '') + '><div class="galeria__pista"></div></div>';
+    pista = caja.querySelector('.galeria__pista');
+    if (quieto) { caja.classList.add('is-quieto'); pista.innerHTML = fotos.map(function (f, i) { return foto(f, i); }).join(''); return; }
+    repetir();
+    // Solo se rehace si cambia el ancho (en móvil la barra del navegador dispara resize al hacer scroll)
+    window.addEventListener('resize', function () {
+      if (caja.clientWidth === anchoCaja) return;
+      var a = ancho; repetir(); x = a ? x / a * ancho : 0; ajustar(); pintar();
+    });
+    // El ancho de cada foto sale de su altura y su proporción (--r): no cambia cuando carga la imagen
+    var dentro = function () { parado |= 1; }, fuera = function () { parado &= ~1; };
+    caja.addEventListener('mouseenter', dentro);
+    caja.addEventListener('mouseleave', fuera);
+    // Solo para con foco de teclado: tras un clic o un toque el botón conserva el foco y no debe dejarlo parado
+    caja.addEventListener('focusin', function (e) {
+      var tecla = true; try { tecla = e.target.matches(':focus-visible'); } catch (_) {}
+      if (tecla) { parado |= 2; verFoco(e.target); }
+    });
+    caja.addEventListener('focusout', function (e) { if (!caja.contains(e.relatedTarget)) parado &= ~2; });
+    arrastre();
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { visible = e[0].isIntersecting; }).observe(caja);
+    requestAnimationFrame(paso);
+  }
+  // Una vuelta de fotos tiene que cubrir al menos el ancho de la ventana; luego se duplica para el bucle
+  function repetir() {
+    var una = fotos.map(function (f, i) { return foto(f, i, false); }).join('');
+    var otra = fotos.map(function (f, i) { return foto(f, i, true); }).join('');
+    pista.innerHTML = una;
+    var vuelta = pista.scrollWidth + gap(), ventana = caja.clientWidth, veces = Math.max(1, Math.ceil(ventana / vuelta));
+    // Solo la primera vuelta es accesible; el resto son copias ocultas al lector de pantalla y al tabulador
+    var html = una; for (var k = 1; k < veces * 2; k++) html += otra;
+    pista.innerHTML = html;
+    ancho = vuelta * veces;
+    anchoCaja = ventana;
+    pintar();
+  }
+  function gap() { return parseFloat(getComputedStyle(pista).columnGap) || 0; }
+  function pintar() { pista.style.transform = 'translate3d(' + (-x).toFixed(2) + 'px,0,0)'; }
+  function ajustar() { x = ((x % ancho) + ancho) % ancho; }
+  function paso(t) {
+    var dt = ultimo ? Math.min(t - ultimo, 64) : 0; ultimo = t;
+    if (!parado && visible && !document.hidden) { x += VEL * dt / 1000; ajustar(); pintar(); }
+    requestAnimationFrame(paso);
+  }
+  // Con el teclado, la foto enfocada se trae a la vista
+  function verFoco(el) {
+    var b = el.closest && el.closest('.galeria__foto'); if (!b) return;
+    var v = caja.getBoundingClientRect(), r = b.getBoundingClientRect();
+    if (r.left < v.left + 8) x -= v.left + 8 - r.left;
+    else if (r.right > v.right - 8) x += r.right - (v.right - 8);
+    else return;
+    ajustar(); pintar();
+  }
+  // Arrastrar con el ratón o el dedo; un arrastre no abre el visor
+  var arrastrado = false;
+  function arrastre() {
+    var x0 = null, y0 = 0, xIni = 0, id = null, horizontal = null;
+    caja.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      x0 = e.clientX; y0 = e.clientY; xIni = x; id = e.pointerId; horizontal = null; arrastrado = false; parado |= 4;
+    });
+    caja.addEventListener('pointermove', function (e) {
+      if (x0 == null || e.pointerId !== id) return;
+      var dx = e.clientX - x0, dy = e.clientY - y0;
+      if (horizontal == null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+        horizontal = Math.abs(dx) > Math.abs(dy);
+        if (horizontal) { arrastrado = true; caja.classList.add('is-arrastrando'); try { caja.setPointerCapture(id); } catch (_) {} }
+      }
+      if (horizontal) { x = xIni - dx; ajustar(); pintar(); }
+    });
+    function soltar(e) {
+      if (x0 == null || e.pointerId !== id) return;
+      x0 = null; caja.classList.remove('is-arrastrando');
+      // Tras tocar con el dedo, espera un poco antes de seguir solo
+      if (e.pointerType === 'mouse') parado &= ~4;
+      else setTimeout(function () { if (x0 == null) parado &= ~4; }, 1800);
+    }
+    caja.addEventListener('pointerup', soltar);
+    caja.addEventListener('pointercancel', soltar);
+    caja.addEventListener('click', function (e) { if (arrastrado) { e.stopImmediatePropagation(); e.preventDefault(); arrastrado = false; } }, true);
   }
 
   /* ---------- Visor ---------- */
