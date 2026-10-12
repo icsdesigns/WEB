@@ -195,9 +195,15 @@
 .ct-enviado__precio-rotulo { font-size: 13px; color: #CDBFC4; }
 .ct-enviado__precio-valor { font-size: 28px; font-weight: 700; line-height: 1.15; }
 .ct-enviado__precio-nota { font-size: 12px; line-height: 1.4; color: #CDBFC4; }
-/* Información legal bajo «Solicitar presupuesto» (art. 13 RGPD) */
+/* Línea legal bajo «Solicitar presupuesto»; los enlaces abren la ventana de legal-inline.js */
 .ct-legal { margin: 4px 0 0; max-width: 60ch; font-size: 12.5px; line-height: 1.5; color: #5A4750; text-align: center; }
 .ct-legal a { color: #8E3B50; text-decoration: underline; }
+/* Los resets «* { margin: 0 }» y «ul { list-style: none }» de configura.css quitan el
+   margin:auto que centra el <dialog> y las viñetas de las listas legales */
+.legal-dlg { margin: auto; }
+.legal-dlg__cuerpo ul { list-style: disc; }
+/* legal-inline.css pinta los enlaces en #BC556D (≈4:1 sobre blanco); a 12.5px hace falta 4.5:1 */
+.ct-solicitar .ct-legal a[data-legal] { color: #8E3B50; }
 .ct-enviado__texto { margin: 0; font-size: 15px; line-height: 1.5; color: #5A4750; max-width: 44ch; }
 
 /* Página 4: título de contacto centrado */
@@ -230,3 +236,13 @@
 .ct-copia__estado:empty { display: none; }
 .ct-copia__estado.ok { color: #0E7C68; }
 .ct-copia__estado.error { color: #B42318; }
+
+/* Tarjetas de material: el contenido va centrado también en vertical (la de «Indeterminado» no lleva etiquetas y quedaba arriba) */
+.color-material-card { justify-content: center; }
+
+/* «Apropiado para tu proyecto»: discreto, solo un texto pequeño y suave (sin cartel) */
+.card-recomendado {
+  margin-top: 2px; padding: 0; border-radius: 0; background: none;
+  color: var(--gray-text); font-size: .68rem; font-weight: 500; line-height: 1.3; text-align: center;
+}
+.card-recomendado::before { content: "✓ "; color: var(--primary); font-weight: 700; }

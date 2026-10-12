@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <script>
+  /* Respaldo de las direcciones de los visualizadores (/visualizador/<url>/): si la carpeta aún no se ha generado
+     (scripts/generar-visualizadores.mjs), se carga aquí la misma página, que lee la dirección de la ruta. */
+  (function () {
+    var m = /^(.*\/visualizador)\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/.exec(location.pathname);
+    if (!m || m[2] === 'pedido') return;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', m[1] + '/', false);
+    try { xhr.send(); } catch (e) { return; }
+    if (xhr.status !== 200 || !/data-visualizador/.test(xhr.responseText)) return;
+    document.open(); document.write(xhr.responseText); document.close();
+  })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Página no encontrada - SILAB 3D</title>

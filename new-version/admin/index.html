@@ -10,6 +10,14 @@
   <link rel="stylesheet" href="/new-version/css/fuentes.css">
   <link rel="stylesheet" href="/new-version/css/base.css">
   <link rel="stylesheet" href="/new-version/css/admin.css?v=20261006e">
+  <link rel="stylesheet" href="/new-version/css/visualizador.css?v=20261012">
+  <!-- three.js para la tasadora y el visualizador: la misma versión que «Configura tu proyecto» -->
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+  } }
+  </script>
 </head>
 <body>
 
@@ -63,6 +71,7 @@
       <button data-tab="productos">Productos</button>
       <button data-tab="trabajos">Trabajos</button>
       <button data-tab="galeria">Galería</button>
+      <button data-tab="visualizador">Visualizador</button>
       <button data-tab="tasadora">Tasadora</button>
       <button data-tab="notas">Notas</button>
       <button data-tab="analitica">Analítica</button>
@@ -212,6 +221,8 @@
           <div id="gal-lista"><p class="vacio">Cargando…</p></div>
         </div>
       </section>
+      <!-- VISUALIZADOR: opciones del visualizador 3D de la web, desde 3MF (js/admin-visualizador.js) -->
+      <section id="tab-visualizador" class="oculto"></section>
       <!-- TASADORA: la misma del formulario «Configura tu proyecto» + funciones extra (js/admin-tasadora.js monta la pestaña) -->
       <section id="tab-tasadora" class="oculto">
         <div data-tasadora><div class="panel"><p class="vacio">Cargando la tasadora…</p></div></div>
@@ -298,10 +309,13 @@
       btn.addEventListener('click', () => {
         document.querySelectorAll('nav.pestanas button').forEach((b) => b.classList.remove('activa'));
         btn.classList.add('activa');
-        ['resumen', 'notas', 'productos', 'filamentos', 'trabajos', 'galeria', 'tasadora', 'analitica'].forEach((t) => $('tab-' + t).classList.add('oculto'));
+        ['resumen', 'notas', 'productos', 'filamentos', 'trabajos', 'galeria', 'visualizador', 'tasadora', 'analitica'].forEach((t) => $('tab-' + t).classList.add('oculto'));
         $('tab-' + btn.dataset.tab).classList.remove('oculto');
         if (btn.dataset.tab === 'tasadora') abrirTasadora();
         if (btn.dataset.tab === 'galeria' && window.abrirGaleria) window.abrirGaleria();
+        if (btn.dataset.tab === 'visualizador') import('/new-version/js/admin-visualizador.js?v=20261012')
+          .then((m) => m.abrir({ sb, raiz: $('tab-visualizador') }))
+          .catch((err) => { $('tab-visualizador').innerHTML = `<div class="panel"><p class="vacio">No se pudo cargar el visualizador: ${esc(err.message)}</p></div>`; });
       });
     });
 
