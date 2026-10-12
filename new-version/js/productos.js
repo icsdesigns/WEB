@@ -115,9 +115,19 @@
     }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
   }
 
+  // Visualizadores vinculados a un producto (admin › Visualizador): el botón «Solicitar» de ese producto abre su visualizador
+  var visualizadores = api('visualizador_grupos?select=slug,producto&visible=eq.true&producto=not.is.null')
+    .then(function (g) { var m = {}; (Array.isArray(g) ? g : []).forEach(function (x) { if (x.producto && x.slug) m[x.producto] = x.slug; }); return m; })
+    .catch(function () { return {}; });
+
   api('productos?select=nombre,categoria,descripcion,imagen&visible=eq.true&order=nombre.asc')
     .then(function (productos) {
       if (!Array.isArray(productos) || !productos.length) return;
+      return visualizadores.then(function (vis) { return render(productos, vis); });
+    })
+    .catch(function () { /* sin conexión: se mantiene el catálogo estático */ });
+
+  function render(productos, vis) {
       return api('categorias?select=nombre&order=nombre.asc').catch(function () { return []; }).then(function (cats) {
         var used = productos.map(function (p) { return p.categoria; }).filter(Boolean)
           .filter(function (c, i, a) { return a.indexOf(c) === i; });
@@ -133,7 +143,7 @@
           var img = imgUrl(p.imagen);
           var btn = explorar
             ? '<button type="button" class="btn-explorar" id="btnExplorarBibliotecas">Explorar</button>'
-            : '<button type="button" class="btn-comprar" data-product="' + esc(p.nombre) + '" data-category="' + esc(p.categoria || '') + '">Solicitar</button>';
+            : '<button type="button" class="btn-comprar" data-product="' + esc(p.nombre) + '" data-category="' + esc(p.categoria || '') + '"' + (vis[p.nombre] ? ' data-config-url="/new-version/visualizador/' + esc(vis[p.nombre]) + '/"' : '') + '>Solicitar</button>';
           return '<div class="product-card" data-category="' + esc(p.categoria || '') + '">' +
             '<div class="product-image">' + (img ? '<img src="' + esc(img) + '" alt="' + esc(p.nombre) + '" width="240" height="240" loading="lazy" decoding="async">' : '') + '</div>' +
             '<h3>' + esc(p.nombre) + '</h3>' +
@@ -144,6 +154,5 @@
         applyFilter(filters.querySelector('[data-filter="' + current + '"]') ? current : 'all');
         markEnd();
       });
-    })
-    .catch(function () { /* sin conexión: se mantiene el catálogo estático */ });
+  }
 })();

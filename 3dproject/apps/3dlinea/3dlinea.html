@@ -1,0 +1,3688 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Conversor a línea — SILAB3D</title>
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@1&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{ --bg:#0A0B12; --panel:#0E1018; --glass:rgba(255,255,255,.04); --border:rgba(255,255,255,.09); --t1:#E8EBF4; --t2:#8A90A6; --t3:#5C6274; --ac:#A3E635; --ac2:#84CC16; --acr:163,230,53; --acfg:#1A2E05; --ok:#34D399; --warn:#F4B740; --bad:#FF6B6B; --view:#07080D; }
+[data-theme=light]{ --bg:#F5F6FA; --panel:#FFFFFF; --glass:rgba(0,0,0,.03); --border:rgba(0,0,0,.10); --t1:#1A1C24; --t2:#5A6172; --t3:#AEB4C2; --ac:#4D7C0F; --ac2:#3F6212; --acr:77,124,15; --ok:#0E8F63; --warn:#B7791F; --bad:#D63C3C; --view:#E4E7EE; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--t1)}
+button{font-family:inherit;cursor:pointer}
+input,select{font-family:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.appbar{position:fixed;top:0;left:0;right:0;height:52px;z-index:9500;display:flex;align-items:center;gap:9px;padding:0 14px;background:rgba(10,11,18,.82);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08)}
+[data-theme=light] .appbar{background:rgba(255,255,255,.86);border-bottom:1px solid rgba(0,0,0,.08)}
+.ab-app{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.ab-appic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(var(--acr),.14);border:1px solid rgba(var(--acr),.32)}
+.ab-name{font-weight:700;font-size:15px;letter-spacing:-.2px;white-space:nowrap}
+.ab-back{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 9px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--t1);font:500 12.5px 'Outfit',sans-serif;flex-shrink:0}
+.ab-back:hover{background:var(--glass)}
+.ab-sp{flex:1}
+.ab-theme{width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--t1);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.ab-theme:hover{background:var(--glass)}
+.ab-priv{font-size:11px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.layout{position:fixed;top:52px;left:0;right:0;bottom:0;display:flex}
+.panel{order:-1;width:352px;flex-shrink:0;border-right:1px solid var(--border);background:var(--panel);overflow-y:auto;padding:12px 14px 40px}
+.stage{flex:1;min-width:0;display:flex;flex-direction:column}
+.sec{border-bottom:1px solid var(--border);padding:12px 0 14px}
+.sec:last-child{border-bottom:none}
+.sec-h{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:var(--t2);margin-bottom:10px}
+.sec-h .n{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(var(--acr),.16);color:var(--ac);font-size:10.5px;letter-spacing:0}
+.row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.lbl{font-size:12px;color:var(--t2)}
+.fld{display:flex;flex-direction:column;gap:4px;flex:1;min-width:90px}
+.inp{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:7px 10px;font-size:13px;color:var(--t1);outline:none;height:34px}
+[data-theme=light] .inp{background:#fff}
+.inp:focus{border-color:var(--ac)}
+select.inp{padding-right:4px}
+option{background:#161922;color:#E8EBF4}
+[data-theme=light] option{background:#fff;color:#1A1C24}
+.btn{height:34px;padding:0 13px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--t1);font:600 12.5px 'Outfit',sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn:hover{background:var(--glass)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.pri{border:none;background:linear-gradient(120deg,var(--ac),var(--ac2));color:var(--acfg)}
+[data-theme=light] .btn.pri{color:#fff}
+.btn.pri:hover{filter:brightness(1.07)}
+.btn.sm{height:28px;padding:0 10px;font-size:11.5px}
+.btn.on{background:rgba(var(--acr),.16);border-color:rgba(var(--acr),.5);color:var(--ac)}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;flex-shrink:0}
+.seg button{border:none;background:transparent;height:28px;padding:0 9px;color:var(--t2);font:600 11.5px 'Outfit',sans-serif}
+.seg button.on{background:rgba(var(--acr),.16);color:var(--ac)}
+.seg button+button{border-left:1px solid var(--border)}
+.rng{margin-bottom:10px}
+.rng-t{display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:3px}
+.rng-t b{color:var(--t1);font-weight:700}
+input[type=range]{width:100%;accent-color:var(--ac);height:22px;background:transparent}
+.chk{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--t1);margin-bottom:8px;cursor:pointer;line-height:1.35}
+.chk input{accent-color:var(--ac);margin-top:2px;width:16px;height:16px;flex-shrink:0}
+.hint{font-size:11.5px;color:var(--t3);line-height:1.5}
+[data-theme=light] .hint{color:#656C79}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1.5px dashed var(--border);border-radius:12px;padding:16px 10px;text-align:center;color:var(--t2);font-size:12.5px;cursor:pointer;background:var(--glass);transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--ac);background:rgba(var(--acr),.08)}
+.fname{font-size:11.5px;color:var(--t2);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pal{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.pal-i{display:flex;align-items:center;gap:8px;padding:5px 6px;border:1px solid var(--border);border-radius:10px;background:var(--glass);flex-wrap:wrap}
+.sw{width:30px;height:30px;border-radius:8px;border:1px solid rgba(128,128,128,.4);flex-shrink:0}
+.sw.tr{background:repeating-conic-gradient(#bbb 0 25%,#fff 0 50%) 0 0/10px 10px}
+.pi-m{font-size:11.5px;color:var(--t2);width:50px;line-height:1.25;flex-shrink:0}
+.pi-m b{color:var(--t1);font-weight:700;display:block}
+.pal-i .seg{margin-left:auto}
+.pal-i .seg button{padding:0 7px;font-size:11px}
+.pap-N.on{background:#111;color:#fff}
+[data-theme=light] .pap-N.on{background:#111;color:#fff}
+.tool-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.cnt{font-size:11.5px;color:var(--t2)}
+
+.tbar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--panel);flex-wrap:wrap;min-height:48px}
+.tbar .grow{flex:1}
+.zv{font-size:12px;color:var(--t2);min-width:42px;text-align:center}
+.views{flex:1;display:flex;min-height:0;position:relative;background:var(--view)}
+.pw{flex:1;min-width:0;display:flex;flex-direction:column;border-right:1px solid var(--border)}
+.pw:last-child{border-right:none}
+.ph{display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--t2);border-bottom:1px solid var(--border);flex-shrink:0;background:var(--panel)}
+.ph .seg{margin-left:auto}
+.ph .seg button{height:24px;font-size:11px;text-transform:none;letter-spacing:0}
+.pane{flex:1;overflow:auto;position:relative;min-height:0}
+.pane.tool{cursor:crosshair}
+.cv{position:relative;margin:0 auto}
+.cv canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+.cv canvas.px{image-rendering:pixelated}
+.cv .ring{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border:3px solid var(--ac);border-radius:50%;pointer-events:none;animation:ring .7s ease-out forwards}
+@keyframes ring{from{opacity:1;transform:scale(.6)}to{opacity:0;transform:scale(1.7)}}
+.empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+.empty .drop{max-width:440px;width:100%;padding:34px 20px;font-size:14px;background:var(--panel)}
+.busy{position:absolute;left:0;right:0;top:0;height:3px;overflow:hidden;z-index:5;display:none}
+.busy.on{display:block}
+.busy::after{content:'';position:absolute;top:0;bottom:0;width:35%;background:var(--ac);animation:bz 1s ease-in-out infinite}
+@keyframes bz{from{left:-35%}to{left:100%}}
+.stxt{font-size:11.5px;color:var(--t2);white-space:nowrap}
+
+.qbar{border-top:1px solid var(--border);background:var(--panel);padding:10px 12px}
+.qrow{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+.qchip{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:var(--glass);color:var(--t1);text-align:left;min-width:0;flex:1 1 150px}
+.qchip:hover{background:rgba(128,128,128,.1)}
+.qchip.sel{border-color:var(--ac)}
+.qd{width:12px;height:12px;border-radius:50%;flex-shrink:0;background:var(--t3)}
+.qd.g{background:var(--ok);box-shadow:0 0 8px rgba(52,211,153,.5)}
+.qd.y{background:var(--warn);box-shadow:0 0 8px rgba(244,183,64,.5)}
+.qd.r{background:var(--bad);box-shadow:0 0 8px rgba(255,107,107,.5)}
+.qt{display:flex;flex-direction:column;min-width:0}
+.ql{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--t2)}
+.qv{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qmsg{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.qm{font-size:12px;color:var(--t2);line-height:1.5;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.qm b{color:var(--t1)}
+.exrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.exrow .grow{flex:1}
+.leg{display:inline-flex;gap:10px;font-size:11px;color:var(--t2);align-items:center;flex-wrap:wrap}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.toast{position:fixed;left:50%;top:62px;transform:translateX(-50%) translateY(-20px);background:var(--panel);color:var(--t1);border:1px solid var(--border);border-radius:11px;padding:10px 16px;font-size:13px;opacity:0;pointer-events:none;transition:all .25s;z-index:9999;max-width:90vw;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9800;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg.on{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:16px;max-width:560px;width:100%;max-height:86vh;overflow:auto;padding:20px 22px}
+.modal h2{font-size:17px;margin-bottom:10px}
+.modal ol,.modal ul{padding-left:20px;font-size:13px;color:var(--t2);line-height:1.6}
+.modal li{margin-bottom:4px}
+.modal li b{color:var(--t1)}
+@media(max-width:900px){
+  html,body{height:auto}
+  .layout{position:static;margin-top:52px;flex-direction:column}
+  .panel{width:100%;border-right:none;border-top:1px solid var(--border);overflow:visible}
+  .stage{order:-1}
+  .panel{order:0}
+  .views{flex-direction:column;flex:none}
+  .pw{border-right:none;border-bottom:1px solid var(--border)}
+  .pane{height:38vh;flex:none}
+  .tbar .stxt{flex:1 0 100%;white-space:normal;min-width:0}
+  .ab-name,.ab-bktx,.ab-priv{display:none}
+  .ab-back{padding:0 9px}
+}
+
+/* ===== modo automático, guía y ayuda ===== */
+body[data-mode=auto] #adv{display:none}
+body[data-mode=adv] #auto{display:none}
+body[data-mode=auto] #backAuto{display:none}
+.ab-mode{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:9px;border:1px solid rgba(var(--acr),.5);background:rgba(var(--acr),.12);color:var(--ac);font:600 12.5px 'Outfit',sans-serif;flex-shrink:0;white-space:nowrap}
+.ab-mode:hover{background:rgba(var(--acr),.2)}
+#auto{position:fixed;top:52px;left:0;right:0;bottom:0;overflow:auto;background:var(--bg)}
+.ag{display:grid;gap:14px;padding:16px;max-width:1280px;margin:0 auto;grid-template-columns:390px minmax(0,1fr);grid-template-areas:"s1 v" "s2 v" "s3 v";grid-template-rows:auto auto 1fr;align-items:start}
+.ag>*{min-width:0}
+.acard{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.as1{grid-area:s1}.as2{grid-area:s2}.as3{grid-area:s3}.as-view{grid-area:v;position:sticky;top:0}
+.ah{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700;margin-bottom:10px}
+.ah .n{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:rgba(var(--acr),.18);color:var(--ac);font-size:13px;flex-shrink:0}
+.adrop{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--border);border-radius:12px;padding:12px;background:var(--glass);cursor:pointer;color:var(--t2);font-size:13px;min-height:64px}
+.adrop:hover,.adrop.over{border-color:var(--ac);background:rgba(var(--acr),.08)}
+.adrop b{color:var(--t1)}
+.adrop .atxt{min-width:0}
+.adrop.has #aFile{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.adrop canvas{width:56px;height:56px;border-radius:8px;border:1px solid var(--border);background:#fff;object-fit:contain;flex-shrink:0;display:none}
+.adrop.has canvas{display:block}
+.adrop .ic{flex-shrink:0;color:var(--ac)}.adrop.has .ic{display:none}
+.atxt{min-width:0;display:flex;flex-direction:column;gap:2px}
+.atxt b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.atxt span{overflow-wrap:anywhere}
+.asize{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.asize .inp{width:96px;font-size:16px;font-weight:600;text-align:right}
+.asize .u{font-size:14px;color:var(--t2)}
+.adim{font-size:12.5px;color:var(--t2);margin-top:8px}
+.alev{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.alev .seg button{height:32px;padding:0 12px;font-size:12.5px}
+.athumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ath{position:relative;display:flex;flex-direction:column;gap:5px;padding:6px;border-radius:12px;border:2px solid var(--border);background:var(--glass);color:var(--t1);text-align:left;min-width:0}
+.ath:hover{background:rgba(128,128,128,.1)}
+.ath[aria-pressed=true]{border-color:var(--ac);background:rgba(var(--acr),.1)}
+.ath canvas{width:100%;aspect-ratio:1/1;object-fit:contain;background:#fff;border-radius:7px;display:block}
+.ath .ph0{width:100%;aspect-ratio:1/1;border-radius:7px;background:var(--glass);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--t3)}
+.ath .nm{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;line-height:1.2}
+.ath .qd{width:10px;height:10px}
+.ath .rb{position:absolute;top:10px;left:10px;background:var(--ac);color:var(--acfg);font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px}
+[data-theme=light] .ath .rb{color:#fff}
+.adesc{font-size:12px;color:var(--t2);margin:8px 0 0;line-height:1.45}
+.asem{margin-top:10px;display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--glass)}
+.asem .qd{width:16px;height:16px;margin-top:2px}
+.asem b{display:block;font-size:14.5px}
+.asem .why{font-size:12.5px;color:var(--t2);line-height:1.5;margin-top:2px}
+.asem .btn{margin-top:6px}
+.adl{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.adl .btn.pri{flex:1 1 100%;height:46px;font-size:14.5px}
+.adl .btn:not(.pri){flex:1 1 0}
+.alink{margin-top:12px;font-size:12.5px;color:var(--t2);line-height:1.5}
+.alink button{background:none;border:none;color:var(--ac);font:600 12.5px 'Outfit',sans-serif;text-decoration:underline;padding:0;cursor:pointer}
+.av-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.av-head .tt{font-weight:700;font-size:14px;flex:1;min-width:120px}
+.av-box{position:relative;height:min(calc(100vh - 52px - 32px - 120px),760px);min-height:280px;border-radius:12px;overflow:hidden;background:var(--view);border:1px solid var(--border)}
+.av-box canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.av-box.empty0 canvas{display:none}
+.av-empty{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:20px}
+.av-box.empty0 .av-empty{display:flex}
+.av-empty .adrop{flex-direction:column;text-align:center;max-width:420px;width:100%;padding:34px 20px;background:var(--panel);font-size:14px}
+.av-prog{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;background:rgba(10,11,18,.78);color:#E8EBF4;font-size:12.5px;display:none}
+.av-prog.on{display:block}
+.av-prog .bar{height:5px;border-radius:99px;background:rgba(255,255,255,.18);margin-top:6px;overflow:hidden}
+.av-prog .bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
+.av-note{font-size:11.5px;color:var(--t3);margin-top:8px}
+[data-theme=light] .av-note{color:#656C79}
+.ib{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:6px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--t2);font:700 11px 'Outfit',sans-serif;padding:0;vertical-align:middle;cursor:pointer;flex-shrink:0}
+.ib:hover,.ib[aria-expanded=true]{color:var(--ac);border-color:var(--ac)}
+.helpbox{flex:1 1 100%;font-size:11.5px;line-height:1.5;color:var(--t2);background:rgba(var(--acr),.08);border:1px solid rgba(var(--acr),.25);border-radius:9px;padding:7px 10px;margin:0 0 8px}
+.helpbox[hidden]{display:none}
+.sec-h .ib{margin-left:2px}
+.bigmodal{max-width:760px}
+.bigmodal h3{font-size:14px;margin:16px 0 6px;color:var(--t1)}
+.bigmodal p,.bigmodal li{font-size:13px;color:var(--t2);line-height:1.6}
+.bigmodal ol,.bigmodal ul{padding-left:20px}
+.bigmodal b{color:var(--t1)}
+.hx{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.hx h2{margin:0}
+.pgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:8px 0}
+.pg{border:1px solid var(--border);border-radius:10px;padding:8px;background:var(--glass);font-size:11.5px;color:var(--t2);line-height:1.4;text-align:center}
+.pg svg{display:block;margin:0 auto 6px;width:64px;height:44px}
+.pg b{display:block;color:var(--t1);font-size:12.5px}
+.sgrid{display:grid;gap:6px;margin:8px 0}
+.sg{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--t2);line-height:1.5}
+.sg .qd{margin-top:4px}
+.tour-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9900;display:none;align-items:center;justify-content:center;padding:16px}
+.tour-bg.on{display:flex}
+.tour{background:var(--panel);border:1px solid var(--border);border-radius:18px;max-width:420px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.tour .tic{width:64px;height:64px;border-radius:16px;background:rgba(var(--acr),.14);border:1px solid rgba(var(--acr),.32);display:flex;align-items:center;justify-content:center;color:var(--ac);margin-bottom:12px}
+.tour h2{font-size:18px;margin-bottom:6px}
+.tour p{font-size:14px;color:var(--t2);line-height:1.6;min-height:66px}
+.tdots{display:flex;gap:6px;margin:12px 0}
+.tdots i{width:8px;height:8px;border-radius:50%;background:var(--border)}
+.tdots i.on{background:var(--ac)}
+.trow{display:flex;gap:8px;align-items:center;justify-content:space-between}
+@media(max-width:900px){
+  #auto{position:static;margin-top:52px}
+  .ag{grid-template-columns:minmax(0,1fr);grid-template-areas:"s1" "s2" "v" "s3";padding:12px;gap:12px}
+  .as-view{position:static}
+  .av-box{height:min(96vw,520px);min-height:260px}
+  .ab-mode .mt{display:none}
+  .pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .athumbs{gap:6px}
+}
+</style>
+<link rel="stylesheet" href="../../css/light-theme.css?v=20260731">
+</head>
+<body data-mode="auto">
+<div class="appbar">
+  <span class="ab-app"><span class="ab-appic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A3E635" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" id="abIc"><path d="M4 17c3-9 6-9 8-4s5 3 8-6"/><circle cx="4" cy="17" r="1.4" fill="#A3E635"/><circle cx="20" cy="7" r="1.4" fill="#A3E635"/></svg></span><span class="ab-name">Conversor a línea</span></span>
+  <button class="ab-back" onclick="dpHome()" title="Volver a 3DProject"><svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M8 2.5L3.5 6.5L8 10.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> <span class="ab-bktx">3DProject</span></button>
+  <button class="ab-mode" id="backAuto" title="Volver al modo automático" aria-label="Volver al modo automático"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span><span class="mt">Volver al modo </span>automático</span></button>
+  <span class="ab-sp"></span>
+  <span class="ab-priv">La imagen se procesa en tu navegador y no se sube a ningún sitio</span>
+  <button class="ab-theme" id="helpBtn" title="Cómo se usa" aria-label="Cómo se usa (ayuda)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.3"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4"/><circle cx="12" cy="17.3" r=".6" fill="currentColor"/></svg></button>
+  <button class="ab-theme" id="dpThemeBtn" onclick="dpToggleTheme()" title="Cambiar tema" aria-label="Tema"></button>
+</div>
+
+<div id="auto">
+<div class="ag">
+  <section class="acard as1" aria-labelledby="h1"><div class="ah" id="h1"><span class="n">1</span>Sube tu imagen</div>
+    <label class="adrop" id="aDrop" for="file"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><canvas id="aThumb" width="56" height="56"></canvas><span class="atxt"><b id="aFile">Elegir imagen</b><span id="aFileSub">o arrástrala aquí · JPG, PNG o WebP</span></span></label>
+  </section>
+  <section class="acard as2" aria-labelledby="h2"><div class="ah" id="h2"><span class="n">2</span>Elige el tamaño</div>
+    <div class="asize"><div class="seg" id="aDim" role="group" aria-label="Medir por"><button data-d="w" class="on">Ancho</button><button data-d="h">Alto</button></div>
+      <input class="inp" type="text" inputmode="decimal" autocomplete="off" id="aSize" value="80" aria-label="Tamaño en milímetros"><span class="u">mm</span></div>
+    <div class="adim" id="aDimTxt">Tamaño final: 80 × 80 mm</div>
+    <div class="alev"><span class="lbl">Nivel de detalle</span><div class="seg" id="aLev" role="group" aria-label="Nivel de detalle"><button data-l="0">Simple</button><button data-l="1" class="on">Normal</button><button data-l="2">Detallado</button></div></div>
+  </section>
+  <section class="acard as3" aria-labelledby="h3"><div class="ah" id="h3"><span class="n">3</span>Elige un resultado y descarga</div>
+    <div class="athumbs" id="aThumbs"></div>
+    <p class="adesc" id="aDesc">Sube una imagen para ver las propuestas.</p>
+    <div class="asem" id="aSem" aria-live="polite"><span class="qd" id="aSemDot"></span><div><b id="aSemT">Esperando imagen</b><div class="why" id="aSemW"></div><button class="btn sm" id="aSemBtn" style="display:none"></button></div></div>
+    <div class="adl"><button class="btn pri" id="aSvg" disabled>Descargar SVG para Fusion</button><button class="btn" id="aDxf" disabled>DXF</button><button class="btn" id="aPng" disabled>PNG</button></div>
+    <div class="alink">¿No queda como quieres? <button id="aManual" type="button">Ajustar a mano</button> · <button id="aHelp2" type="button">Cómo se usa</button></div>
+  </section>
+  <section class="as-view acard" aria-label="Vista previa">
+    <div class="av-head"><span class="tt" id="aTitle">Vista previa</span><div class="seg" id="aView" role="group" aria-label="Qué ver"><button data-v="res" class="on">Resultado</button><button data-v="orig">Original</button></div></div>
+    <div class="av-box empty0" id="aBox"><canvas id="aCv" width="8" height="8" aria-label="Vista previa del resultado"></canvas>
+      <div class="av-empty"><label class="adrop" id="aDrop2" for="file"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><b>Arrastra aquí una ilustración</b><span>JPG, PNG o WebP · o pulsa para elegirla</span><span class="hint">Se procesa en tu navegador; la imagen no sale de tu equipo.</span></label></div>
+      <div class="av-prog" id="aProg" role="status"><span id="aProgT">Calculando…</span><div class="bar"><i id="aProgB"></i></div></div></div>
+    <div class="av-note">Blanco = hueco, negro = lo que se extruye. Las propuestas se calculan en tu navegador.</div>
+  </section>
+</div>
+</div>
+
+<div id="adv">
+<div class="layout">
+<main class="stage">
+  <div class="tbar">
+    <span class="stxt" id="sizeInfo">Sin imagen</span>
+    <span class="grow"></span>
+    <button class="btn sm" id="zOut" title="Alejar" aria-label="Alejar">−</button>
+    <span class="zv" id="zVal">—</span>
+    <button class="btn sm" id="zIn" title="Acercar" aria-label="Acercar">+</button>
+    <button class="btn sm" id="zFit" title="Ajustar a la ventana">Ajustar</button>
+    <button class="btn sm" id="z100" title="Tamaño real del mapa de trabajo">1:1</button>
+    <label class="chk" style="margin:0 0 0 6px;align-items:center"><input type="checkbox" id="showMarks" checked> Marcas</label>
+  </div>
+  <div class="views" id="views">
+    <div class="busy" id="busy"></div>
+    <div class="pw">
+      <div class="ph"><span>Original</span><div class="seg" id="segLeft"><button data-v="orig" class="on">Color</button><button data-v="quant">Colores</button></div></div>
+      <div class="pane" id="paneL"><div class="cv" id="cvL"><canvas id="cL"></canvas></div></div>
+    </div>
+    <div class="pw">
+      <div class="ph"><span>Resultado</span><span class="stxt" id="busyTxt"></span><div class="seg" id="segRight"><button data-v="map" class="on">Mapa B/N</button><button data-v="vec">Vectores</button></div></div>
+      <div class="pane" id="paneR"><div class="cv" id="cvR"><canvas id="cR"></canvas><canvas id="cM"></canvas></div></div>
+    </div>
+    <div class="empty" id="empty"><label class="drop" id="drop0" for="file"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><b>Arrastra aquí una ilustración</b><span>JPG, PNG o WebP · o pulsa para elegirla</span><span class="hint">Se procesa en tu navegador; la imagen no sale de tu equipo.</span></label></div>
+  </div>
+  <div class="qbar">
+    <div class="qrow" id="qrow">
+      <button class="qchip" data-k="fid"><span class="qd" id="qd-fid"></span><span class="qt"><span class="ql">Fidelidad</span><span class="qv" id="qv-fid">—</span></span></button>
+      <button class="qchip" data-k="line"><span class="qd" id="qd-line"></span><span class="qt"><span class="ql">Línea mínima</span><span class="qv" id="qv-line">—</span></span></button>
+      <button class="qchip" data-k="gap"><span class="qd" id="qd-gap"></span><span class="qt"><span class="ql">Hueco blanco</span><span class="qv" id="qv-gap">—</span></span></button>
+      <button class="qchip" data-k="tiny"><span class="qd" id="qd-tiny"></span><span class="qt"><span class="ql">Detalles sueltos</span><span class="qv" id="qv-tiny">—</span></span></button>
+      <button class="qchip" data-k="nodes"><span class="qd" id="qd-nodes"></span><span class="qt"><span class="ql">Complejidad</span><span class="qv" id="qv-nodes">—</span></span></button>
+      <button class="qchip" data-k="closed"><span class="qd" id="qd-closed"></span><span class="qt"><span class="ql">Perfiles cerrados</span><span class="qv" id="qv-closed">—</span></span></button>
+    </div>
+    <div class="qmsg" id="qmsg"></div>
+    <div class="exrow">
+      <span class="leg"><span><i style="background:#FF3B30"></i>línea fina</span><span><i style="background:#FF9500"></i>hueco fino</span><span><i style="background:#AF52DE"></i>pieza suelta</span><span><i style="background:#007AFF"></i>solape</span></span>
+      <span class="grow"></span>
+      <button class="btn pri" id="exSvg" disabled>SVG (mm)</button>
+      <button class="btn pri" id="exDxf" disabled>DXF (mm)</button>
+      <button class="btn" id="exPng" disabled>PNG mapa B/N</button>
+    </div>
+  </div>
+</main>
+
+<aside class="panel" id="panel">
+  <div class="sec">
+    <div class="sec-h"><span class="n">1</span>Imagen y tamaño</div>
+    <label class="drop" id="drop1" for="file"><span><b>Elegir imagen</b> o arrastrarla aquí</span><span class="hint">JPG, PNG o WebP · una imagen cada vez</span></label>
+    <input type="file" id="file" accept="image/jpeg,image/png,image/webp" hidden>
+    <div class="fname" id="fname"></div>
+    <div class="row" style="margin-top:10px">
+      <label class="fld"><span class="lbl">Ancho (mm)</span><input class="inp" type="text" inputmode="decimal" autocomplete="off" id="outW" value="80"></label>
+      <label class="fld"><span class="lbl">Alto (mm)</span><input class="inp" type="text" inputmode="decimal" autocomplete="off" id="outH" value="80"></label>
+      <label class="fld"><span class="lbl">Calidad</span><select class="inp" id="work"><option value="30">Normal · 30 px/mm</option><option value="40" selected>Alta · 40 px/mm</option></select></label>
+    </div>
+    <div class="hint" id="pxInfo">Cambia el ancho o el alto; el otro se ajusta. Las líneas finas se recalculan al cambiar el tamaño.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><span class="n">2</span>Colores</div>
+    <div class="rng"><div class="rng-t"><span>Suavizado (conserva bordes)</span><b id="v-smooth">40</b></div><input type="range" id="smooth" min="0" max="100" step="5" value="40"></div>
+    <div class="rng"><div class="rng-t"><span>Número de colores</span><b id="v-k">6</b></div><input type="range" id="k" min="3" max="10" step="1" value="6"></div>
+    <div class="hint">Cambiar el suavizado o el número de colores vuelve a proponer los papeles y borra los retoques por zona.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><span class="n">3</span>Papel de cada color</div>
+    <div class="pal" id="pal"><div class="hint">Carga una imagen para ver la paleta.</div></div>
+    <div class="hint"><b>Negro</b> macizo · <b>Blanco</b> · <b>Contorno</b> blanco con borde negro · <b>Fondo</b> se elimina (blanco sin borde).</div>
+    <label class="chk" style="margin-top:8px"><input type="checkbox" id="textOn"><span>Letras y detalles claros finos → Negro<br><span class="hint">Las zonas claras de menos de 3 mm de grosor sobre otro color (texto crema sobre verde…) pasan a Negro.</span></span></label>
+    <div class="row" style="margin-top:8px"><button class="btn sm" id="autoPap">Proponer papeles</button></div>
+    <div class="row" style="margin-top:4px"><span class="lbl">Decoración del fondo</span><div class="seg" id="decoSeg"><button data-v="keep" class="on" title="Las zonas pequeñas de color sobre el fondo se dibujan como línea">Conservar como línea</button><button data-v="remove" title="Las zonas pequeñas de color sobre el fondo pasan a Fondo">Quitar</button></div></div>
+    <div class="hint">Zonas pequeñas en Blanco o Contorno rodeadas por un color con papel Fondo (motivos de ADN, burbujas…). Un clic en zona manda sobre esta opción.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><span class="n">4</span>Retoque por zona</div>
+    <div class="tool-row">
+      <button class="btn" id="toolBtn" title="Activa el modo y pulsa sobre una zona de la imagen">Clic en zona</button>
+      <button class="btn sm" id="undoBtn" disabled>Deshacer</button>
+      <button class="btn sm" id="clrBtn" disabled>Quitar retoques</button>
+    </div>
+    <div class="row"><span class="lbl">Papel</span><div class="seg" id="toolPap"><button data-p="0" class="on">Negro</button><button data-p="1">Blanco</button><button data-p="2">Contorno</button><button data-p="3">Fondo</button></div></div>
+    <div class="row"><span class="lbl">Alcance</span><div class="seg" id="toolScope"><button data-s="comp" class="on" title="Solo la región conexa clicada">Esta zona</button><button data-s="similar" title="Todas las zonas del mismo color rodeadas por el mismo color">Zonas parecidas</button></div></div>
+    <div class="cnt" id="ovCnt">Sin retoques.</div>
+    <label class="chk" style="margin-top:10px"><input type="checkbox" id="spotOn" checked><span>Manchas pequeñas → negro<br><span class="hint">Zonas blancas o con contorno de menos de este área, que no toquen el borde.</span></span></label>
+    <div class="row"><label class="fld"><span class="lbl">Área máxima (mm²)</span><input class="inp" type="text" inputmode="decimal" autocomplete="off" id="spotA" value="3"></label></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><span class="n">5</span>Línea</div>
+    <div class="row"><label class="fld"><span class="lbl">Grosor del contorno (mm)</span><input class="inp" type="text" inputmode="decimal" autocomplete="off" id="line" value="0,8"></label></div>
+    <label class="chk"><input type="checkbox" id="equal"><span>Igualar también los contornos existentes<br><span class="hint">Las líneas finas del dibujo se adelgazan o engrosan hasta el grosor elegido.</span></span></label>
+    <div class="hint">Mínimo 0,5 mm en cualquier tamaño: nada negro queda más fino.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><span class="n">6</span>Limpieza</div>
+    <div class="row">
+      <label class="fld"><span class="lbl">Quitar motas negras &lt; mm²</span><input class="inp" type="text" inputmode="decimal" autocomplete="off" id="speck" value="0,15"></label>
+      <label class="fld"><span class="lbl">Rellenar huecos &lt; mm²</span><input class="inp" type="text" inputmode="decimal" autocomplete="off" id="hole" value="0,3"></label>
+    </div>
+    <div class="row"><span class="lbl">Cerrar huecos de</span><div class="seg" id="closeSeg"><button data-v="0">0</button><button data-v="1" class="on">1</button><button data-v="2">2</button></div></div>
+    <div class="rng"><div class="rng-t"><span>Suavizar dientes de sierra</span><b id="v-soft">1</b></div><input type="range" id="soft" min="0" max="3" step="1" value="1"></div>
+    <label class="chk"><input type="checkbox" id="widenGaps"><span>Ensanchar huecos blancos finos hasta 0,5 mm<br><span class="hint">Para texto o detalles calados en blanco sobre negro: abre las rendijas en vez de taparlas.</span></span></label>
+    <label class="chk"><input type="checkbox" id="fillGaps"><span>Cerrar huecos blancos finos (&lt; 0,5 mm)<br><span class="hint">Rellena de negro las rendijas blancas estrechas (si también ensanchas, solo las que no se hayan podido abrir).</span></span></label>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><span class="n">7</span>Vectorizado (Potrace)</div>
+    <div class="rng"><div class="rng-t"><span>Esquinas (0 = muchas, 1,3 = curvas)</span><b id="v-alpha">1,00</b></div><input type="range" id="alpha" min="0" max="1.3" step="0.05" value="1"></div>
+    <div class="rng"><div class="rng-t"><span>Tolerancia de simplificación</span><b id="v-tol">0,40</b></div><input type="range" id="tol" min="0.1" max="1.5" step="0.05" value="0.4"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><span class="n">8</span>Ajustes guardados</div>
+    <div class="row"><input class="inp" id="pName" placeholder="Nombre del ajuste" maxlength="40" style="flex:1"><button class="btn sm" id="pSave">Guardar</button></div>
+    <div class="row"><select class="inp" id="pSel" style="flex:1"></select><button class="btn sm" id="pLoad">Cargar</button><button class="btn sm" id="pDel">Borrar</button></div>
+    <div class="hint">Se guardan en este navegador, con los papeles de la paleta actual.</div>
+  </div>
+</aside>
+</div>
+</div>
+
+<div class="modal-bg" id="helpBg"><div class="modal bigmodal" role="dialog" aria-modal="true" aria-labelledby="helpT">
+  <div class="hx"><h2 id="helpT">Cómo se usa</h2><button class="btn sm" id="helpX" aria-label="Cerrar">Cerrar</button></div>
+  <p><b>Qué hace esta app:</b> convierte una ilustración en color en un dibujo de línea en blanco y negro, listo para extruir en Autodesk Fusion. Exporta SVG y DXF en milímetros, con un grosor mínimo de 0,5 mm en todas las líneas.</p>
+  <p style="margin-top:8px"><button class="btn sm" id="helpTour">Ver la guía rápida</button></p>
+  <h3>Modo automático: 3 pasos</h3>
+  <ol><li><b>Sube tu imagen</b> (JPG, PNG o WebP).</li><li><b>Elige el tamaño</b> en milímetros, por ancho o por alto. El «Nivel de detalle» (Simple, Normal, Detallado) decide cuántos colores se separan.</li><li><b>Elige un resultado</b> entre las tres propuestas (se ven en vista rápida; la elegida se recalcula en alta calidad, a 40 px/mm, y es la que mide el semáforo y la que se descarga) y pulsa <b>Descargar SVG para Fusion</b>. El DXF y el PNG están a su lado. La marcada como «Recomendada» es la que mejor puntúa.</li></ol>
+  <h3>Cuándo usar «Ajustar a mano»</h3>
+  <p>Si una propuesta se queda cerca pero no del todo (una letra que debería ser negra, un color que sobra, un fondo que se cuela), pulsa «Ajustar a mano». Se abre la herramienta completa con la propuesta elegida ya cargada. Cada color de la imagen tiene un <b>papel</b>:</p>
+  <div class="pgrid">
+    <div class="pg"><svg viewBox="0 0 64 44" aria-hidden="true"><rect x="6" y="4" width="52" height="36" rx="8" fill="#000"/></svg><b>Negro</b>Se rellena de negro: es lo que se extruye.</div>
+    <div class="pg"><svg viewBox="0 0 64 44" aria-hidden="true"><rect x="6" y="4" width="52" height="36" rx="8" fill="#fff" stroke="#9aa" stroke-width="1" stroke-dasharray="3 3"/></svg><b>Blanco</b>Queda vacío, sin borde.</div>
+    <div class="pg"><svg viewBox="0 0 64 44" aria-hidden="true"><rect x="6" y="4" width="52" height="36" rx="8" fill="#fff" stroke="#000" stroke-width="5"/></svg><b>Contorno</b>Interior vacío con un borde negro alrededor.</div>
+    <div class="pg"><svg viewBox="0 0 64 44" aria-hidden="true"><defs><pattern id="ck" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="#bbb"/><rect x="4" y="4" width="4" height="4" fill="#bbb"/><rect x="4" width="4" height="4" fill="#fff"/><rect y="4" width="4" height="4" fill="#fff"/></pattern></defs><rect x="6" y="4" width="52" height="36" rx="8" fill="url(#ck)" stroke="#889" stroke-width="1"/></svg><b>Fondo</b>Se elimina: ni relleno ni borde.</div>
+  </div>
+  <p>Con «Clic en zona» puedes dar un papel distinto a una región concreta (por ejemplo, las letras crema de un escudo).</p>
+  <h3>El semáforo</h3>
+  <div class="sgrid">
+    <div class="sg"><span class="qd g"></span><span><b>Listo para extruir.</b> Líneas y huecos de 0,5 mm o más, sin trazos que se crucen.</span></div>
+    <div class="sg"><span class="qd y"></span><span><b>Revisa.</b> Se puede usar, pero algo se ha simplificado (letras pequeñas que se pierden, detalles que se empastan…). Te lo explica con palabras y te sugiere un tamaño.</span></div>
+    <div class="sg"><span class="qd r"></span><span><b>No apto a este tamaño.</b> Hay demasiado detalle para esa medida. Prueba con un tamaño mayor (te sugiere uno) o con el nivel «Simple».</span></div>
+  </div>
+  <h3>Consejos</h3>
+  <ul><li>Las imágenes con <b>fondo liso</b> (o transparente) funcionan mejor.</li><li><b>Tamaño mínimo para texto:</b> las letras pequeñas necesitan que sus trazos midan al menos 0,5 mm. Si no se leen, aumenta el tamaño.</li><li>Las <b>fotos</b> solo dan una silueta con detalles sueltos: mejor ilustraciones, logos o dibujos planos.</li><li>Todo se procesa en tu navegador: la imagen no se sube a ningún sitio.</li></ul>
+  <h3>Importar en Fusion</h3>
+  <ul><li><b>SVG:</b> Insertar › Insertar SVG (en inglés, Insert › Insert SVG). Elige el plano y comprueba que la pieza mide lo que indica la app; si no, usa el DXF.</li><li><b>DXF:</b> Insertar › Insertar DXF (Insert › Insert DXF) y elige <b>milímetros</b> como unidad.</li><li><b>Al extruir</b>, selecciona los perfiles de las zonas negras. Los huecos (el centro de la O, los ojos…) son perfiles aparte: déjalos sin seleccionar o quedarán rellenos.</li></ul>
+  <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn pri" id="helpOk">Entendido</button></div>
+</div></div>
+<div class="tour-bg" id="tourBg"><div class="tour" role="dialog" aria-modal="true" aria-labelledby="tourT">
+  <div class="tic" id="tourIc"></div><h2 id="tourT"></h2><p id="tourP"></p><div class="tdots" id="tourDots"></div>
+  <div class="trow"><button class="btn" id="tourSkip">Saltar</button><button class="btn pri" id="tourNext">Siguiente</button></div>
+</div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script id="wk" type="text/plain">
+/* Potrace core: adaptado del port JavaScript de Potrace de kilobtye
+ * (Copyright (C) 2001-2013 Peter Selinger, licencia GPL; http://potrace.sourceforge.net)
+ * Se han quitado la carga de imágenes y la salida SVG; se usa sobre un mapa binario en un Worker. */
+var Potrace=(function(){
+  function Point(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+  
+  Point.prototype.copy = function(){
+    return new Point(this.x, this.y);
+  };
+
+  function Bitmap(w, h) {
+    this.w = w;
+    this.h = h;
+    this.size = w * h;
+    this.arraybuffer = new ArrayBuffer(this.size);
+    this.data = new Int8Array(this.arraybuffer);
+  }
+
+  Bitmap.prototype.at = function (x, y) {
+    return (x >= 0 && x < this.w && y >=0 && y < this.h) && 
+        this.data[this.w * y + x] === 1;
+  };
+
+  Bitmap.prototype.index = function(i) {
+    var point = new Point();
+    point.y = Math.floor(i / this.w);
+    point.x = i - point.y * this.w;
+    return point;
+  };
+
+  Bitmap.prototype.flip = function(x, y) {
+    if (this.at(x, y)) {
+      this.data[this.w * y + x] = 0;
+    } else {
+      this.data[this.w * y + x] = 1;
+    }
+  };
+    
+  Bitmap.prototype.copy = function() {
+    var bm = new Bitmap(this.w, this.h), i;
+    for (i = 0; i < this.size; i++) {
+      bm.data[i] = this.data[i];
+    }
+    return bm;
+  };
+
+  function Path() {
+    this.area = 0;
+    this.len = 0;
+    this.curve = {};
+    this.pt = [];
+    this.minX = 100000;
+    this.minY = 100000;
+    this.maxX= -1;
+    this.maxY = -1;
+  }
+
+  function Curve(n) {
+    this.n = n;
+    this.tag = new Array(n);
+    this.c = new Array(n * 3);
+    this.alphaCurve = 0;
+    this.vertex = new Array(n);
+    this.alpha = new Array(n);
+    this.alpha0 = new Array(n);
+    this.beta = new Array(n);
+  }
+
+  var bm=null,pathlist=[],info={turnpolicy:"minority",turdsize:2,optcurve:true,alphamax:1,opttolerance:0.2};
+  function bmToPathlist() {
+  
+    var bm1 = bm.copy(),
+      currentPoint = new Point(0, 0),
+      path;
+    
+    function findNext(point) {
+      var i = bm1.w * point.y + point.x;
+      while (i < bm1.size && bm1.data[i] !== 1) {
+        i++;
+      }
+      return i < bm1.size && bm1.index(i);
+    }
+    
+    function majority(x, y) {
+      var i, a, ct;
+      for (i = 2; i < 5; i++) {
+        ct = 0;
+        for (a = -i + 1; a <= i - 1; a++) {
+          ct += bm1.at(x + a, y + i - 1) ? 1 : -1;
+          ct += bm1.at(x + i - 1, y + a - 1) ? 1 : -1;
+          ct += bm1.at(x + a - 1, y - i) ? 1 : -1;
+          ct += bm1.at(x - i, y + a) ? 1 : -1;
+        }
+        if (ct > 0) {
+          return 1;
+        } else if (ct < 0) {
+          return 0;
+        }
+      }
+      return 0;
+    }
+    
+    function findPath(point) {
+      var path = new Path(),
+        x = point.x, y = point.y,
+        dirx = 0, diry = 1, tmp;
+      
+      path.sign = bm.at(point.x, point.y) ? "+" : "-";
+      
+      while (1) {
+        path.pt.push(new Point(x, y));
+        if (x > path.maxX)
+          path.maxX = x;
+        if (x < path.minX)
+          path.minX = x;
+        if (y > path.maxY)
+          path.maxY = y;
+        if (y < path.minY)
+          path.minY = y;
+        path.len++;
+        
+        x += dirx;
+        y += diry;
+        path.area -= x * diry;
+        
+        if (x === point.x && y === point.y)
+          break;
+        
+        var l = bm1.at(x + (dirx + diry - 1 ) / 2, y + (diry - dirx - 1) / 2);
+        var r = bm1.at(x + (dirx - diry - 1) / 2, y + (diry + dirx - 1) / 2);
+        
+        if (r && !l) {
+          if (info.turnpolicy === "right" ||
+          (info.turnpolicy === "black" && path.sign === '+') ||
+          (info.turnpolicy === "white" && path.sign === '-') ||
+          (info.turnpolicy === "majority" && majority(x, y)) ||
+          (info.turnpolicy === "minority" && !majority(x, y))) {
+            tmp = dirx;
+            dirx = -diry;
+            diry = tmp;
+          } else {
+            tmp = dirx;
+            dirx = diry;
+            diry = -tmp;
+          }
+        } else if (r) {
+          tmp = dirx;
+          dirx = -diry;
+          diry = tmp;
+        } else if (!l) {
+          tmp = dirx;
+          dirx = diry;
+          diry = -tmp;
+        }
+      }
+      return path;
+    }
+    
+    function xorPath(path){
+      var y1 = path.pt[0].y,
+        len = path.len,
+        x, y, maxX, minY, i, j;
+      for (i = 1; i < len; i++) {
+        x = path.pt[i].x;
+        y = path.pt[i].y;
+        
+        if (y !== y1) {
+          minY = y1 < y ? y1 : y;
+          maxX = path.maxX;
+          for (j = x; j < maxX; j++) {
+            bm1.flip(j, minY);
+          }
+          y1 = y;
+        }
+      }
+      
+    }
+    
+    while (currentPoint = findNext(currentPoint)) {
+
+      path = findPath(currentPoint);
+      
+      xorPath(path);
+      
+      if (path.area > info.turdsize) {
+        pathlist.push(path);
+      }
+    }
+    
+  }
+  
+
+  function processPath() {
+  
+    function Quad() {
+      this.data = [0,0,0,0,0,0,0,0,0];
+    }
+
+    Quad.prototype.at = function(x, y) {
+      return this.data[x * 3 + y];
+    };
+    
+    function Sum(x, y, xy, x2, y2) {
+      this.x = x;
+      this.y = y;
+      this.xy = xy;
+      this.x2 = x2;
+      this.y2 = y2;
+    }
+    
+    function mod(a, n) {
+        return a >= n ? a % n : a>=0 ? a : n-1-(-1-a) % n;
+    }
+  
+    function xprod(p1, p2) {
+      return p1.x * p2.y - p1.y * p2.x;
+    }
+    
+    function cyclic(a, b, c) {
+      if (a <= c) {
+        return (a <= b && b < c);
+      } else {
+        return (a <= b || b < c);
+      }
+    }
+      
+    function sign(i) {
+      return i > 0 ? 1 : i < 0 ? -1 : 0;
+    }
+    
+    function quadform(Q, w) {
+      var v = new Array(3), i, j, sum;
+    
+      v[0] = w.x;
+      v[1] = w.y;
+      v[2] = 1;
+      sum = 0.0;
+    
+      for (i=0; i<3; i++) {
+        for (j=0; j<3; j++) {
+          sum += v[i] * Q.at(i, j) * v[j];
+        }
+      }
+      return sum;
+    }
+  
+    function interval(lambda, a, b) {
+      var res = new Point();
+    
+      res.x = a.x + lambda * (b.x - a.x);
+      res.y = a.y + lambda * (b.y - a.y);
+      return res;
+    }
+    
+    function dorth_infty(p0, p2) {
+      var r = new Point();
+      
+      r.y = sign(p2.x - p0.x);
+      r.x = -sign(p2.y - p0.y);
+    
+      return r;
+    }
+    
+    function ddenom(p0, p2) {
+      var r = dorth_infty(p0, p2);
+    
+      return r.y * (p2.x - p0.x) - r.x * (p2.y - p0.y);
+    }
+    
+    function dpara(p0, p1, p2) {
+      var x1, y1, x2, y2;
+    
+      x1 = p1.x - p0.x;
+      y1 = p1.y - p0.y;
+      x2 = p2.x - p0.x;
+      y2 = p2.y - p0.y;
+    
+      return x1 * y2 - x2 * y1;
+    }
+    
+    function cprod(p0, p1, p2, p3) {
+      var x1, y1, x2, y2;
+    
+      x1 = p1.x - p0.x;
+      y1 = p1.y - p0.y;
+      x2 = p3.x - p2.x;
+      y2 = p3.y - p2.y;
+    
+      return x1 * y2 - x2 * y1;
+    }
+      
+    function iprod(p0, p1, p2) {
+      var x1, y1, x2, y2;
+    
+      x1 = p1.x - p0.x;
+      y1 = p1.y - p0.y;
+      x2 = p2.x - p0.x;
+      y2 = p2.y - p0.y;
+    
+      return x1*x2 + y1*y2;
+    }
+      
+    function iprod1(p0, p1, p2, p3) {
+      var x1, y1, x2, y2;
+    
+      x1 = p1.x - p0.x;
+      y1 = p1.y - p0.y;
+      x2 = p3.x - p2.x;
+      y2 = p3.y - p2.y;
+    
+      return x1 * x2 + y1 * y2;
+    }
+    
+    function ddist(p, q) {
+      return Math.sqrt((p.x - q.x) * (p.x - q.x) + (p.y - q.y) * (p.y - q.y));
+    }
+    
+    function bezier(t, p0, p1, p2, p3) {
+      var s = 1 - t, res = new Point();
+    
+      res.x = s*s*s*p0.x + 3*(s*s*t)*p1.x + 3*(t*t*s)*p2.x + t*t*t*p3.x;
+      res.y = s*s*s*p0.y + 3*(s*s*t)*p1.y + 3*(t*t*s)*p2.y + t*t*t*p3.y;
+    
+      return res;
+    }
+  
+    function tangent(p0, p1, p2, p3, q0, q1) {
+      var A, B, C, a, b, c, d, s, r1, r2;
+    
+      A = cprod(p0, p1, q0, q1);
+      B = cprod(p1, p2, q0, q1);
+      C = cprod(p2, p3, q0, q1);
+    
+      a = A - 2 * B + C;
+      b = -2 * A + 2 * B;
+      c = A;
+      
+      d = b * b - 4 * a * c;
+    
+      if (a===0 || d<0) {
+        return -1.0;
+      }
+    
+      s = Math.sqrt(d);
+    
+      r1 = (-b + s) / (2 * a);
+      r2 = (-b - s) / (2 * a);
+    
+      if (r1 >= 0 && r1 <= 1) {
+        return r1;
+      } else if (r2 >= 0 && r2 <= 1) {
+        return r2;
+      } else {
+        return -1.0;
+      }
+    }
+    
+    function calcSums(path) {
+      var i, x, y;
+      path.x0 = path.pt[0].x;
+      path.y0 = path.pt[0].y;
+      
+      path.sums = [];
+      var s = path.sums;
+      s.push(new Sum(0, 0, 0, 0, 0));
+      for(i = 0; i < path.len; i++){
+        x = path.pt[i].x - path.x0;
+        y = path.pt[i].y - path.y0;
+        s.push(new Sum(s[i].x + x, s[i].y + y, s[i].xy + x * y,
+            s[i].x2 + x * x, s[i].y2 + y * y));
+      }
+    }
+   
+    function calcLon(path) {
+      
+      var n = path.len, pt = path.pt, dir,
+        pivk = new Array(n),
+        nc = new Array(n),
+        ct = new Array(4);
+      path.lon = new Array(n);
+      
+      var constraint = [new Point(), new Point()],
+          cur = new Point(),
+          off = new Point(),
+          dk = new Point(),
+          foundk;
+      
+      var i, j, k1, a, b, c, d, k = 0;
+      for(i = n - 1; i >= 0; i--){
+        if (pt[i].x != pt[k].x && pt[i].y != pt[k].y) {
+          k = i + 1;
+        }
+        nc[i] = k;
+      }
+      
+      for (i = n - 1; i >= 0; i--) {
+        ct[0] = ct[1] = ct[2] = ct[3] = 0;
+        dir = (3 + 3 * (pt[mod(i + 1, n)].x - pt[i].x) + 
+            (pt[mod(i + 1, n)].y - pt[i].y)) / 2;
+        ct[dir]++;
+        
+        constraint[0].x = 0;
+        constraint[0].y = 0;
+        constraint[1].x = 0;
+        constraint[1].y = 0;
+        
+        k = nc[i];
+        k1 = i;
+        while (1) {
+          foundk = 0;
+          dir =  (3 + 3 * sign(pt[k].x - pt[k1].x) + 
+              sign(pt[k].y - pt[k1].y)) / 2;
+          ct[dir]++;
+          
+          if (ct[0] && ct[1] && ct[2] && ct[3]) {
+            pivk[i] = k1;
+            foundk = 1;
+            break;
+          }
+          
+          cur.x = pt[k].x - pt[i].x;
+          cur.y = pt[k].y - pt[i].y;
+          
+          if (xprod(constraint[0], cur) < 0 || xprod(constraint[1], cur) > 0) {
+            break;
+          }
+              
+          if (Math.abs(cur.x) <= 1 && Math.abs(cur.y) <= 1) {
+          
+          } else {
+            off.x = cur.x + ((cur.y >= 0 && (cur.y > 0 || cur.x < 0)) ? 1 : -1);
+            off.y = cur.y + ((cur.x <= 0 && (cur.x < 0 || cur.y < 0)) ? 1 : -1);
+            if (xprod(constraint[0], off) >= 0) {
+              constraint[0].x = off.x;
+              constraint[0].y = off.y;
+            }
+            off.x = cur.x + ((cur.y <= 0 && (cur.y < 0 || cur.x < 0)) ? 1 : -1);
+            off.y = cur.y + ((cur.x >= 0 && (cur.x > 0 || cur.y < 0)) ? 1 : -1);
+            if (xprod(constraint[1], off) <= 0) {
+              constraint[1].x = off.x;
+              constraint[1].y = off.y;
+            }
+          }
+          k1 = k;
+          k = nc[k1];
+          if (!cyclic(k, i, k1)) {
+            break;
+          }
+        }
+        if (foundk === 0) {
+          dk.x = sign(pt[k].x-pt[k1].x);
+          dk.y = sign(pt[k].y-pt[k1].y);
+          cur.x = pt[k1].x - pt[i].x;
+          cur.y = pt[k1].y - pt[i].y;
+  
+          a = xprod(constraint[0], cur);
+          b = xprod(constraint[0], dk);
+          c = xprod(constraint[1], cur);
+          d = xprod(constraint[1], dk);
+  
+          j = 10000000;
+          if (b < 0) {
+            j = Math.floor(a / -b);
+          }
+          if (d > 0) {
+            j = Math.min(j, Math.floor(-c / d));
+          }
+          pivk[i] = mod(k1+j,n);
+        }
+      }
+      
+      j=pivk[n-1];
+      path.lon[n-1]=j;
+      for (i=n-2; i>=0; i--) {
+        if (cyclic(i+1,pivk[i],j)) {
+          j=pivk[i];
+        }
+        path.lon[i]=j;
+      }
+  
+      for (i=n-1; cyclic(mod(i+1,n),j,path.lon[i]); i--) {
+        path.lon[i] = j;
+      }
+    }
+    
+    function bestPolygon(path) {
+      
+      function penalty3(path, i, j) {
+        
+        var n = path.len, pt = path.pt, sums = path.sums;
+        var x, y, xy, x2, y2,
+          k, a, b, c, s,
+          px, py, ex, ey,
+          r = 0;
+        if (j>=n) {
+          j -= n;
+          r = 1;
+        }
+        
+        if (r === 0) {
+          x = sums[j+1].x - sums[i].x;
+          y = sums[j+1].y - sums[i].y;
+          x2 = sums[j+1].x2 - sums[i].x2;
+          xy = sums[j+1].xy - sums[i].xy;
+          y2 = sums[j+1].y2 - sums[i].y2;
+          k = j+1 - i;
+        } else {
+          x = sums[j+1].x - sums[i].x + sums[n].x;
+          y = sums[j+1].y - sums[i].y + sums[n].y;
+          x2 = sums[j+1].x2 - sums[i].x2 + sums[n].x2;
+          xy = sums[j+1].xy - sums[i].xy + sums[n].xy;
+          y2 = sums[j+1].y2 - sums[i].y2 + sums[n].y2;
+          k = j+1 - i + n;
+        } 
+      
+        px = (pt[i].x + pt[j].x) / 2.0 - pt[0].x;
+        py = (pt[i].y + pt[j].y) / 2.0 - pt[0].y;
+        ey = (pt[j].x - pt[i].x);
+        ex = -(pt[j].y - pt[i].y);
+      
+        a = ((x2 - 2*x*px) / k + px*px);
+        b = ((xy - x*py - y*px) / k + px*py);
+        c = ((y2 - 2*y*py) / k + py*py);
+        
+        s = ex*ex*a + 2*ex*ey*b + ey*ey*c;
+      
+        return Math.sqrt(s);
+      }
+      
+      var i, j, m, k,    
+      n = path.len,
+      pen = new Array(n + 1),
+      prev = new Array(n + 1),
+      clip0 = new Array(n),
+      clip1 = new Array(n + 1),
+      seg0 = new Array (n + 1),
+      seg1 = new Array(n + 1),
+      thispen, best, c;
+      
+      for (i=0; i<n; i++) {
+        c = mod(path.lon[mod(i-1,n)]-1,n);
+        if (c == i) {
+          c = mod(i+1,n);
+        }
+        if (c < i) {
+          clip0[i] = n;
+        } else {
+          clip0[i] = c;
+        }
+      }
+      
+      j = 1;
+      for (i=0; i<n; i++) {
+        while (j <= clip0[i]) {
+          clip1[j] = i;
+          j++;
+        }
+      }
+      
+      i = 0;
+      for (j=0; i<n; j++) {
+        seg0[j] = i;
+        i = clip0[i];
+      }
+      seg0[j] = n;
+      m = j;
+    
+      i = n;
+      for (j=m; j>0; j--) {
+        seg1[j] = i;
+        i = clip1[i];
+      }
+      seg1[0] = 0;
+      
+      pen[0]=0;
+      for (j=1; j<=m; j++) {
+        for (i=seg1[j]; i<=seg0[j]; i++) {
+          best = -1;
+          for (k=seg0[j-1]; k>=clip1[i]; k--) {
+            thispen = penalty3(path, k, i) + pen[k];
+            if (best < 0 || thispen < best) {
+              prev[i] = k;
+              best = thispen;
+            }
+          }
+          pen[i] = best;
+        }
+      }
+      path.m = m;
+      path.po = new Array(m);
+    
+      for (i=n, j=m-1; i>0; j--) {
+        i = prev[i];
+        path.po[j] = i;
+      }
+    }
+    
+    function adjustVertices(path) {
+      
+      function pointslope(path, i, j, ctr, dir) {
+    
+        var n = path.len, sums = path.sums,
+          x, y, x2, xy, y2,
+          k, a, b, c, lambda2, l, r=0;
+      
+        while (j>=n) {
+          j-=n;
+          r+=1;
+        }
+        while (i>=n) {
+          i-=n;
+          r-=1;
+        }
+        while (j<0) {
+          j+=n;
+          r-=1;
+        }
+        while (i<0) {
+          i+=n;
+          r+=1;
+        }
+        
+        x = sums[j+1].x-sums[i].x+r*sums[n].x;
+        y = sums[j+1].y-sums[i].y+r*sums[n].y;
+        x2 = sums[j+1].x2-sums[i].x2+r*sums[n].x2;
+        xy = sums[j+1].xy-sums[i].xy+r*sums[n].xy;
+        y2 = sums[j+1].y2-sums[i].y2+r*sums[n].y2;
+        k = j+1-i+r*n;
+        
+        ctr.x = x/k;
+        ctr.y = y/k;
+      
+        a = (x2-x*x/k)/k;
+        b = (xy-x*y/k)/k;
+        c = (y2-y*y/k)/k;
+        
+        lambda2 = (a+c+Math.sqrt((a-c)*(a-c)+4*b*b))/2;
+      
+        a -= lambda2;
+        c -= lambda2;
+      
+        if (Math.abs(a) >= Math.abs(c)) {
+          l = Math.sqrt(a*a+b*b);
+          if (l!==0) {
+            dir.x = -b/l;
+            dir.y = a/l;
+          }
+        } else {
+          l = Math.sqrt(c*c+b*b);
+          if (l!==0) {
+            dir.x = -c/l;
+            dir.y = b/l;
+          }
+        }
+        if (l===0) {
+          dir.x = dir.y = 0; 
+        }
+      }
+      
+      var m = path.m, po = path.po, n = path.len, pt = path.pt,
+        x0 = path.x0, y0 = path.y0,
+        ctr = new Array(m), dir = new Array(m),
+        q = new Array(m),
+        v = new Array(3), d, i, j, k, l,
+        s = new Point();
+      
+      path.curve = new Curve(m);
+  
+      for (i=0; i<m; i++) {
+        j = po[mod(i+1,m)];
+        j = mod(j-po[i],n)+po[i];
+        ctr[i] = new Point();
+        dir[i] = new Point();
+        pointslope(path, po[i], j, ctr[i], dir[i]);
+      }
+    
+      for (i=0; i<m; i++) {
+        q[i] = new Quad();
+        d = dir[i].x * dir[i].x + dir[i].y * dir[i].y;
+        if (d === 0.0) {
+          for (j=0; j<3; j++) {
+            for (k=0; k<3; k++) {
+              q[i].data[j * 3 + k] = 0;
+            }
+          }
+        } else {
+          v[0] = dir[i].y;
+          v[1] = -dir[i].x;
+          v[2] = - v[1] * ctr[i].y - v[0] * ctr[i].x;
+          for (l=0; l<3; l++) {
+            for (k=0; k<3; k++) {
+              q[i].data[l * 3 + k] = v[l] * v[k] / d;
+            }
+          }
+        }
+      }
+     
+      var Q, w, dx, dy, det, min, cand, xmin, ymin, z;
+      for (i=0; i<m; i++) {
+        Q = new Quad();
+        w = new Point();
+    
+        s.x = pt[po[i]].x-x0;
+        s.y = pt[po[i]].y-y0;
+    
+        j = mod(i-1,m);
+        
+        for (l=0; l<3; l++) {
+          for (k=0; k<3; k++) {
+            Q.data[l * 3 + k] = q[j].at(l, k) + q[i].at(l, k);
+          }
+        }
+        
+        while(1) {
+          
+          det = Q.at(0, 0)*Q.at(1, 1) - Q.at(0, 1)*Q.at(1, 0);
+          if (det !== 0.0) {
+            w.x = (-Q.at(0, 2)*Q.at(1, 1) + Q.at(1, 2)*Q.at(0, 1)) / det;
+            w.y = ( Q.at(0, 2)*Q.at(1, 0) - Q.at(1, 2)*Q.at(0, 0)) / det;
+            break;
+          }
+    
+          if (Q.at(0, 0)>Q.at(1, 1)) {
+            v[0] = -Q.at(0, 1);
+            v[1] = Q.at(0, 0);
+          } else if (Q.at(1, 1)) {
+            v[0] = -Q.at(1, 1);
+            v[1] = Q.at(1, 0);
+          } else {
+            v[0] = 1;
+            v[1] = 0;
+          }
+          d = v[0] * v[0] + v[1] * v[1];
+          v[2] = - v[1] * s.y - v[0] * s.x;
+          for (l=0; l<3; l++) {
+            for (k=0; k<3; k++) {
+              Q.data[l * 3 + k] += v[l] * v[k] / d;
+            }
+          }
+        }
+        dx = Math.abs(w.x-s.x);
+        dy = Math.abs(w.y-s.y);
+        if (dx <= 0.5 && dy <= 0.5) {
+          path.curve.vertex[i] = new Point(w.x+x0, w.y+y0);
+          continue;
+        }
+    
+        min = quadform(Q, s);
+        xmin = s.x;
+        ymin = s.y;
+    
+        if (Q.at(0, 0) !== 0.0) {
+          for (z=0; z<2; z++) {
+            w.y = s.y-0.5+z;
+            w.x = - (Q.at(0, 1) * w.y + Q.at(0, 2)) / Q.at(0, 0);
+            dx = Math.abs(w.x-s.x);
+            cand = quadform(Q, w);
+            if (dx <= 0.5 && cand < min) {
+              min = cand;
+              xmin = w.x;
+              ymin = w.y;
+            }
+          }
+        }
+  
+        if (Q.at(1, 1) !== 0.0) {
+          for (z=0; z<2; z++) {
+            w.x = s.x-0.5+z;
+            w.y = - (Q.at(1, 0) * w.x + Q.at(1, 2)) / Q.at(1, 1);
+            dy = Math.abs(w.y-s.y);
+            cand = quadform(Q, w);
+            if (dy <= 0.5 && cand < min) {
+              min = cand;
+              xmin = w.x;
+              ymin = w.y;
+            }
+          }
+        }
+  
+        for (l=0; l<2; l++) {
+          for (k=0; k<2; k++) {
+            w.x = s.x-0.5+l;
+            w.y = s.y-0.5+k;
+            cand = quadform(Q, w);
+            if (cand < min) {
+              min = cand;
+              xmin = w.x;
+              ymin = w.y;
+            }
+          }
+        }
+    
+        path.curve.vertex[i] = new Point(xmin + x0, ymin + y0);
+      }
+    }
+    
+    function reverse(path) {
+      var curve = path.curve, m = curve.n, v = curve.vertex, i, j, tmp;
+    
+      for (i=0, j=m-1; i<j; i++, j--) {
+        tmp = v[i];
+        v[i] = v[j];
+        v[j] = tmp;
+      }
+    }
+    
+    function smooth(path) {
+      var m = path.curve.n, curve = path.curve;
+
+      var i, j, k, dd, denom, alpha,
+        p2, p3, p4;
+    
+      for (i=0; i<m; i++) {
+        j = mod(i+1, m);
+        k = mod(i+2, m);
+        p4 = interval(1/2.0, curve.vertex[k], curve.vertex[j]);
+    
+        denom = ddenom(curve.vertex[i], curve.vertex[k]);
+        if (denom !== 0.0) {
+          dd = dpara(curve.vertex[i], curve.vertex[j], curve.vertex[k]) / denom;
+          dd = Math.abs(dd);
+          alpha = dd>1 ? (1 - 1.0/dd) : 0;
+          alpha = alpha / 0.75;
+        } else {
+          alpha = 4/3.0;
+        }
+        curve.alpha0[j] = alpha;
+    
+        if (alpha >= info.alphamax) { 
+          curve.tag[j] = "CORNER";
+          curve.c[3 * j + 1] = curve.vertex[j];
+          curve.c[3 * j + 2] = p4;
+        } else {
+          if (alpha < 0.55) {
+            alpha = 0.55;
+          } else if (alpha > 1) {
+            alpha = 1;
+          }
+          p2 = interval(0.5+0.5*alpha, curve.vertex[i], curve.vertex[j]);
+          p3 = interval(0.5+0.5*alpha, curve.vertex[k], curve.vertex[j]);
+          curve.tag[j] = "CURVE";
+          curve.c[3 * j + 0] = p2;
+          curve.c[3 * j + 1] = p3;
+          curve.c[3 * j + 2] = p4;
+        }
+        curve.alpha[j] = alpha;  
+        curve.beta[j] = 0.5;
+      }
+      curve.alphacurve = 1;
+    }
+    
+    function optiCurve(path) {
+      function Opti(){
+        this.pen = 0;
+        this.c = [new Point(), new Point()];
+        this.t = 0;
+        this.s = 0;
+        this.alpha = 0;
+      }
+      
+      function opti_penalty(path, i, j, res, opttolerance, convc, areac) {
+        var m = path.curve.n, curve = path.curve, vertex = curve.vertex, 
+          k, k1, k2, conv, i1,
+          area, alpha, d, d1, d2,
+          p0, p1, p2, p3, pt,
+          A, R, A1, A2, A3, A4,
+          s, t;
+      
+        if (i==j) {
+          return 1;
+        }
+      
+        k = i;
+        i1 = mod(i+1, m);
+        k1 = mod(k+1, m);
+        conv = convc[k1];
+        if (conv === 0) {
+          return 1;
+        }
+        d = ddist(vertex[i], vertex[i1]);
+        for (k=k1; k!=j; k=k1) {
+          k1 = mod(k+1, m);
+          k2 = mod(k+2, m);
+          if (convc[k1] != conv) {
+            return 1;
+          }
+          if (sign(cprod(vertex[i], vertex[i1], vertex[k1], vertex[k2])) !=
+              conv) {
+            return 1;
+          }
+          if (iprod1(vertex[i], vertex[i1], vertex[k1], vertex[k2]) <
+              d * ddist(vertex[k1], vertex[k2]) * -0.999847695156) {
+            return 1;
+          }
+        }
+    
+        p0 = curve.c[mod(i,m) * 3 + 2].copy();
+        p1 = vertex[mod(i+1,m)].copy();
+        p2 = vertex[mod(j,m)].copy();
+        p3 = curve.c[mod(j,m) * 3 + 2].copy();
+      
+        area = areac[j] - areac[i];
+        area -= dpara(vertex[0], curve.c[i * 3 + 2], curve.c[j * 3 + 2])/2;
+        if (i>=j) {
+          area += areac[m];
+        }
+      
+        A1 = dpara(p0, p1, p2);
+        A2 = dpara(p0, p1, p3);
+        A3 = dpara(p0, p2, p3);
+  
+        A4 = A1+A3-A2;    
+        
+        if (A2 == A1) {
+          return 1;
+        }
+      
+        t = A3/(A3-A4);
+        s = A2/(A2-A1);
+        A = A2 * t / 2.0;
+        
+        if (A === 0.0) {
+          return 1;
+        }
+      
+        R = area / A;
+        alpha = 2 - Math.sqrt(4 - R / 0.3);
+      
+        res.c[0] = interval(t * alpha, p0, p1);
+        res.c[1] = interval(s * alpha, p3, p2);
+        res.alpha = alpha;
+        res.t = t;
+        res.s = s;
+      
+        p1 = res.c[0].copy();
+        p2 = res.c[1].copy(); 
+      
+        res.pen = 0;
+      
+        for (k=mod(i+1,m); k!=j; k=k1) {
+          k1 = mod(k+1,m);
+          t = tangent(p0, p1, p2, p3, vertex[k], vertex[k1]);
+          if (t<-0.5) {
+            return 1;
+          }
+          pt = bezier(t, p0, p1, p2, p3);
+          d = ddist(vertex[k], vertex[k1]);
+          if (d === 0.0) {
+            return 1;
+          }
+          d1 = dpara(vertex[k], vertex[k1], pt) / d;
+          if (Math.abs(d1) > opttolerance) {
+            return 1;
+          }
+          if (iprod(vertex[k], vertex[k1], pt) < 0 ||
+              iprod(vertex[k1], vertex[k], pt) < 0) {
+            return 1;
+          }
+          res.pen += d1 * d1;
+        }
+      
+        for (k=i; k!=j; k=k1) {
+          k1 = mod(k+1,m);
+          t = tangent(p0, p1, p2, p3, curve.c[k * 3 + 2], curve.c[k1 * 3 + 2]);
+          if (t<-0.5) {
+            return 1;
+          }
+          pt = bezier(t, p0, p1, p2, p3);
+          d = ddist(curve.c[k * 3 + 2], curve.c[k1 * 3 + 2]);
+          if (d === 0.0) {
+            return 1;
+          }
+          d1 = dpara(curve.c[k * 3 + 2], curve.c[k1 * 3 + 2], pt) / d;
+          d2 = dpara(curve.c[k * 3 + 2], curve.c[k1 * 3 + 2], vertex[k1]) / d;
+          d2 *= 0.75 * curve.alpha[k1];
+          if (d2 < 0) {
+            d1 = -d1;
+            d2 = -d2;
+          }
+          if (d1 < d2 - opttolerance) {
+            return 1;
+          }
+          if (d1 < d2) {
+            res.pen += (d1 - d2) * (d1 - d2);
+          }
+        }
+      
+        return 0;
+      }
+    
+      var curve = path.curve, m = curve.n, vert = curve.vertex, 
+        pt = new Array(m + 1),
+        pen = new Array(m + 1),
+        len = new Array(m + 1),
+        opt = new Array(m + 1),
+        om, i,j,r,
+        o = new Opti(), p0,
+        i1, area, alpha, ocurve,
+        s, t;
+      
+      var convc = new Array(m), areac = new Array(m + 1);
+      
+      for (i=0; i<m; i++) {
+        if (curve.tag[i] == "CURVE") {
+          convc[i] = sign(dpara(vert[mod(i-1,m)], vert[i], vert[mod(i+1,m)]));
+        } else {
+          convc[i] = 0;
+        }
+      }
+    
+      area = 0.0;
+      areac[0] = 0.0;
+      p0 = curve.vertex[0];
+      for (i=0; i<m; i++) {
+        i1 = mod(i+1, m);
+        if (curve.tag[i1] == "CURVE") {
+          alpha = curve.alpha[i1];
+          area += 0.3 * alpha * (4-alpha) *
+              dpara(curve.c[i * 3 + 2], vert[i1], curve.c[i1 * 3 + 2])/2;
+          area += dpara(p0, curve.c[i * 3 + 2], curve.c[i1 * 3 + 2])/2;
+        }
+        areac[i+1] = area;
+      }
+    
+      pt[0] = -1;
+      pen[0] = 0;
+      len[0] = 0;
+    
+    
+      for (j=1; j<=m; j++) {
+        pt[j] = j-1;
+        pen[j] = pen[j-1];
+        len[j] = len[j-1]+1;
+    
+        for (i=j-2; i>=0; i--) {
+          r = opti_penalty(path, i, mod(j,m), o, info.opttolerance, convc, 
+              areac);
+          if (r) {
+            break;
+          }
+            if (len[j] > len[i]+1 ||
+                (len[j] == len[i]+1 && pen[j] > pen[i] + o.pen)) {
+              pt[j] = i;
+              pen[j] = pen[i] + o.pen;
+              len[j] = len[i] + 1;
+              opt[j] = o;
+              o = new Opti();
+            }
+        }
+      }
+      om = len[m];
+      ocurve = new Curve(om);
+      s = new Array(om);
+      t = new Array(om);
+    
+      j = m;
+      for (i=om-1; i>=0; i--) {
+        if (pt[j]==j-1) {
+          ocurve.tag[i]     = curve.tag[mod(j,m)];
+          ocurve.c[i * 3 + 0]    = curve.c[mod(j,m) * 3 + 0];
+          ocurve.c[i * 3 + 1]    = curve.c[mod(j,m) * 3 + 1];
+          ocurve.c[i * 3 + 2]    = curve.c[mod(j,m) * 3 + 2];
+          ocurve.vertex[i]  = curve.vertex[mod(j,m)];
+          ocurve.alpha[i]   = curve.alpha[mod(j,m)];
+          ocurve.alpha0[i]  = curve.alpha0[mod(j,m)];
+          ocurve.beta[i]    = curve.beta[mod(j,m)];
+          s[i] = t[i] = 1.0;
+        } else {
+          ocurve.tag[i] = "CURVE";
+          ocurve.c[i * 3 + 0] = opt[j].c[0];
+          ocurve.c[i * 3 + 1] = opt[j].c[1];
+          ocurve.c[i * 3 + 2] = curve.c[mod(j,m) * 3 + 2];
+          ocurve.vertex[i] = interval(opt[j].s, curve.c[mod(j,m) * 3 + 2],
+                                       vert[mod(j,m)]);
+          ocurve.alpha[i] = opt[j].alpha;
+          ocurve.alpha0[i] = opt[j].alpha;
+          s[i] = opt[j].s;
+          t[i] = opt[j].t;
+        }
+        j = pt[j];
+      }
+    
+      for (i=0; i<om; i++) {
+        i1 = mod(i+1,om);
+        ocurve.beta[i] = s[i] / (s[i] + t[i1]);
+      }
+      ocurve.alphacurve = 1;
+      path.curve = ocurve;
+    }
+    
+    for (var i = 0; i < pathlist.length; i++) {
+      var path = pathlist[i];
+      calcSums(path);
+      calcLon(path);
+      bestPolygon(path);
+      adjustVertices(path);
+      
+      if (path.sign === "-") {
+        reverse(path);
+      }
+      
+      smooth(path);
+      
+      if (info.optcurve) {
+        optiCurve(path);
+      }
+    }
+  
+  }
+
+  function trace(data,w,h,opts){
+    bm=new Bitmap(w,h); bm.data.set(data); pathlist=[];
+    info.turnpolicy=opts.turnpolicy||'minority'; info.turdsize=opts.turdsize==null?2:opts.turdsize;
+    info.optcurve=opts.optcurve!==false; info.alphamax=opts.alphamax==null?1:opts.alphamax; info.opttolerance=opts.opttolerance==null?0.2:opts.opttolerance;
+    bmToPathlist(); processPath();
+    var r=pathlist; pathlist=[]; bm=null; return r;
+  }
+  return {trace:trace};
+})();
+
+/* ===== Motor de procesado (Web Worker) ===== */
+'use strict';
+var W=0,H=0,N=0,ST=null,_thickN=0,_thickMask=null,THIN_MERGE=1.5;
+function post(m,tr){self.postMessage(m,tr||[]);}
+function prog(s,f){post({t:'prog',msg:s,f:f});}
+
+/* ---------- utilidades ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+var LIN=new Float32Array(256);
+for(var _i=0;_i<256;_i++){var _c=_i/255;LIN[_i]=_c<=0.04045?_c/12.92:Math.pow((_c+0.055)/1.055,2.4);}
+function toLab(rgba,n){
+  var lab=new Float32Array(n*3),xn=0.95047,zn=1.08883,e=0.008856,i,j,r,g,b,fx,fy,fz,X,Y,Z;
+  function f(t){return t>e?Math.cbrt(t):7.787*t+16/116;}
+  for(i=0,j=0;i<n;i++,j+=4){
+    r=LIN[rgba[j]];g=LIN[rgba[j+1]];b=LIN[rgba[j+2]];
+    X=(0.4124564*r+0.3575761*g+0.1804375*b)/xn;Y=0.2126729*r+0.7151522*g+0.0721750*b;Z=(0.0193339*r+0.1191920*g+0.9503041*b)/zn;
+    fx=f(X);fy=f(Y);fz=f(Z);
+    lab[i*3]=116*fy-16;lab[i*3+1]=500*(fx-fy);lab[i*3+2]=200*(fy-fz);
+  }
+  return lab;
+}
+
+/* ---------- suavizado que conserva bordes (bilateral) ---------- */
+function bilateral(src,w,h,strength){
+  if(strength<=0)return src;
+  var R=3,ks=2*R+1,sr=(6+strength*0.55)*1.5,passes=strength>=60?2:1,ws=new Float32Array(ks*ks),rw=new Float32Array(766),dx,dy,d,p;
+  for(dy=-R;dy<=R;dy++)for(dx=-R;dx<=R;dx++)ws[(dy+R)*ks+dx+R]=Math.exp(-(dx*dx+dy*dy)/(2*2.2*2.2));
+  for(d=0;d<766;d++)rw[d]=Math.exp(-(d*d)/(2*sr*sr));
+  var cur=src;
+  for(p=0;p<passes;p++){
+    var dst=new Uint8ClampedArray(cur.length),x,y,i,r0,g0,b0,sw,s0,s1,s2,y0,y1,x0,x1,yy,xx,j,wrow,r,g,b,wt;
+    for(y=0;y<h;y++){
+      y0=y-R<0?0:y-R;y1=y+R>=h?h-1:y+R;
+      for(x=0;x<w;x++){
+        i=(y*w+x)*4;r0=cur[i];g0=cur[i+1];b0=cur[i+2];sw=0;s0=0;s1=0;s2=0;
+        x0=x-R<0?0:x-R;x1=x+R>=w?w-1:x+R;
+        for(yy=y0;yy<=y1;yy++){
+          wrow=(yy-y+R)*ks+R-x;j=(yy*w+x0)*4;
+          for(xx=x0;xx<=x1;xx++,j+=4){
+            r=cur[j];g=cur[j+1];b=cur[j+2];
+            d=(r>r0?r-r0:r0-r)+(g>g0?g-g0:g0-g)+(b>b0?b-b0:b0-b);
+            wt=ws[wrow+xx]*rw[d];sw+=wt;s0+=wt*r;s1+=wt*g;s2+=wt*b;
+          }
+        }
+        dst[i]=s0/sw;dst[i+1]=s1/sw;dst[i+2]=s2/sw;dst[i+3]=255;
+      }
+    }
+    cur=dst;
+  }
+  return cur;
+}
+
+/* ---------- k-means en Lab (semilla fija) ---------- */
+function kmeansLab(lab,n,k){
+  var rnd=mulberry32(12345),step=Math.max(1,Math.floor(n/100000)),ns=Math.floor(n/step),sm=new Float32Array(ns*3),i,c,j;
+  for(i=0;i<ns;i++){j=i*step*3;sm[i*3]=lab[j];sm[i*3+1]=lab[j+1];sm[i*3+2]=lab[j+2];}
+  var C=new Float32Array(k*3),d=new Float32Array(ns).fill(1e30),first=Math.floor(rnd()*ns);
+  C[0]=sm[first*3];C[1]=sm[first*3+1];C[2]=sm[first*3+2];
+  for(c=1;c<k;c++){
+    var sum=0,a=C[(c-1)*3],b=C[(c-1)*3+1],e=C[(c-1)*3+2],dd;
+    for(i=0;i<ns;i++){dd=(sm[i*3]-a)*(sm[i*3]-a)+(sm[i*3+1]-b)*(sm[i*3+1]-b)+(sm[i*3+2]-e)*(sm[i*3+2]-e);if(dd<d[i])d[i]=dd;sum+=d[i];}
+    var rr=rnd()*sum,acc=0,pick=ns-1;
+    for(i=0;i<ns;i++){acc+=d[i];if(acc>=rr){pick=i;break;}}
+    C[c*3]=sm[pick*3];C[c*3+1]=sm[pick*3+1];C[c*3+2]=sm[pick*3+2];
+  }
+  var asg=new Uint8Array(ns),it,ch,sums=new Float64Array(k*3),cnt=new Int32Array(k),best,bd;
+  for(it=0;it<40;it++){
+    ch=0;sums.fill(0);cnt.fill(0);
+    for(i=0;i<ns;i++){
+      best=0;bd=1e30;
+      for(c=0;c<k;c++){dd=(sm[i*3]-C[c*3])*(sm[i*3]-C[c*3])+(sm[i*3+1]-C[c*3+1])*(sm[i*3+1]-C[c*3+1])+(sm[i*3+2]-C[c*3+2])*(sm[i*3+2]-C[c*3+2]);if(dd<bd){bd=dd;best=c;}}
+      if(asg[i]!==best){asg[i]=best;ch++;}
+      cnt[best]++;sums[best*3]+=sm[i*3];sums[best*3+1]+=sm[i*3+1];sums[best*3+2]+=sm[i*3+2];
+    }
+    for(c=0;c<k;c++)if(cnt[c]>0){C[c*3]=sums[c*3]/cnt[c];C[c*3+1]=sums[c*3+1]/cnt[c];C[c*3+2]=sums[c*3+2]/cnt[c];}
+    if(ch===0&&it>0)break;
+  }
+  return C;
+}
+function assignAll(lab,n,C,k){
+  var L=new Uint8Array(n),i,c,best,bd,dd,l,a,b;
+  for(i=0;i<n;i++){
+    l=lab[i*3];a=lab[i*3+1];b=lab[i*3+2];best=0;bd=1e30;
+    for(c=0;c<k;c++){dd=(l-C[c*3])*(l-C[c*3])+(a-C[c*3+1])*(a-C[c*3+1])+(b-C[c*3+2])*(b-C[c*3+2]);if(dd<bd){bd=dd;best=c;}}
+    L[i]=best;
+  }
+  return L;
+}
+function modeFilter(L,w,h,k){
+  var out=L.slice(),cnt=new Uint8Array(k),x,y,dx,dy,xx,yy,p,best,bc,c;
+  for(y=0;y<h;y++)for(x=0;x<w;x++){
+    p=y*w+x;cnt.fill(0);
+    for(dy=-1;dy<=1;dy++){yy=y+dy;if(yy<0||yy>=h)continue;for(dx=-1;dx<=1;dx++){xx=x+dx;if(xx<0||xx>=w)continue;cnt[L[yy*w+xx]]++;}}
+    best=L[p];bc=cnt[best];
+    for(c=0;c<k;c++)if(cnt[c]>bc){bc=cnt[c];best=c;}
+    out[p]=best;
+  }
+  return out;
+}
+
+/* ---------- componentes conexas ---------- */
+function labelComps(L,w,h){ /* 4-conexas sobre mapa de etiquetas */
+  var n=w*h,id=new Int32Array(n).fill(-1),stack=new Int32Array(n),nc=0,lbl=[],area=[],tb=[],i,sp,p,x,y,l,a,t;
+  for(i=0;i<n;i++){
+    if(id[i]>=0)continue;
+    l=L[i];sp=0;stack[sp++]=i;id[i]=nc;a=0;t=0;
+    while(sp>0){
+      p=stack[--sp];a++;x=p%w;y=(p-x)/w;
+      if(x===0||y===0||x===w-1||y===h-1)t=1;
+      if(x>0&&id[p-1]<0&&L[p-1]===l){id[p-1]=nc;stack[sp++]=p-1;}
+      if(x<w-1&&id[p+1]<0&&L[p+1]===l){id[p+1]=nc;stack[sp++]=p+1;}
+      if(y>0&&id[p-w]<0&&L[p-w]===l){id[p-w]=nc;stack[sp++]=p-w;}
+      if(y<h-1&&id[p+w]<0&&L[p+w]===l){id[p+w]=nc;stack[sp++]=p+w;}
+    }
+    lbl.push(l);area.push(a);tb.push(t);nc++;
+  }
+  return {id:id,n:nc,lbl:lbl,area:area,tb:tb};
+}
+/* binario: conn8 true/false, val = valor a etiquetar */
+function labelBin(B,w,h,conn8,val){
+  var n=w*h,id=new Int32Array(n).fill(-1),stack=new Int32Array(n),nc=0,area=[],tb=[],i,sp,p,x,y,a,t,q,dx,dy,xx,yy;
+  for(i=0;i<n;i++){
+    if(B[i]!==val||id[i]>=0)continue;
+    sp=0;stack[sp++]=i;id[i]=nc;a=0;t=0;
+    while(sp>0){
+      p=stack[--sp];a++;x=p%w;y=(p-x)/w;
+      if(x===0||y===0||x===w-1||y===h-1)t=1;
+      for(dy=-1;dy<=1;dy++){yy=y+dy;if(yy<0||yy>=h)continue;
+        for(dx=-1;dx<=1;dx++){if(dx===0&&dy===0)continue;if(!conn8&&dx!==0&&dy!==0)continue;xx=x+dx;if(xx<0||xx>=w)continue;
+          q=yy*w+xx;if(id[q]<0&&B[q]===val){id[q]=nc;stack[sp++]=q;}}}
+    }
+    area.push(a);tb.push(t);nc++;
+  }
+  return {id:id,n:nc,area:area,tb:tb};
+}
+
+/* ---------- transformada de distancia exacta (cuadrada) ---------- */
+var _f=null,_v=null,_z=null,_d=null;
+function edtSq(feat,w,h,fv,edge){
+  var n=w*h,INF=1e9,g,i,x,y,m=Math.max(w,h);
+  if(edge){
+    /* edge: lo que hay fuera de la imagen cuenta como «fv» (una franja negra cortada por el borde también es fina):
+       se calcula con un marco de 1 px y se recorta */
+    var w2=w+2,h2=h+2,pf=new Uint8Array(w2*h2).fill(fv);
+    for(y=0;y<h;y++)for(x=0;x<w;x++)pf[(y+1)*w2+x+1]=feat[y*w+x];
+    var gp=edtSq(pf,w2,h2,fv,false);g=new Float32Array(n);
+    for(y=0;y<h;y++)for(x=0;x<w;x++)g[y*w+x]=gp[(y+1)*w2+x+1];
+    return g;
+  }
+  g=new Float32Array(n);
+  for(i=0;i<n;i++)g[i]=feat[i]===fv?0:INF;
+  if(!_f||_f.length<m+1){_f=new Float64Array(m+1);_v=new Int32Array(m+1);_z=new Float64Array(m+2);_d=new Float64Array(m+1);}
+  var f=_f,v=_v,z=_z,d=_d;
+  function dt(len){
+    var k=0,q,s,vk;
+    v[0]=0;z[0]=-1e30;z[1]=1e30;
+    for(q=1;q<len;q++){
+      vk=v[k];s=((f[q]+q*q)-(f[vk]+vk*vk))/(2*q-2*vk);
+      while(s<=z[k]){k--;vk=v[k];s=((f[q]+q*q)-(f[vk]+vk*vk))/(2*q-2*vk);}
+      k++;v[k]=q;z[k]=s;z[k+1]=1e30;
+    }
+    k=0;
+    for(q=0;q<len;q++){while(z[k+1]<q)k++;d[q]=(q-v[k])*(q-v[k])+f[v[k]];}
+  }
+  for(x=0;x<w;x++){for(y=0;y<h;y++)f[y]=g[y*w+x];dt(h);for(y=0;y<h;y++)g[y*w+x]=d[y];}
+  for(y=0;y<h;y++){var o=y*w;for(x=0;x<w;x++)f[x]=g[o+x];dt(w);for(x=0;x<w;x++)g[o+x]=d[x];}
+  return g;
+}
+function dilate(B,r){
+  var n=B.length,out=new Uint8Array(n),i,r2=r*r;
+  if(r<=0){out.set(B);return out;}
+  var d2=edtSq(B,W,H,1);
+  for(i=0;i<n;i++)out[i]=d2[i]<=r2?1:0;
+  return out;
+}
+function erode(B,r){
+  var n=B.length,out=new Uint8Array(n),i,r2=r*r;
+  if(r<=0){out.set(B);return out;}
+  var d2=edtSq(B,W,H,0);
+  for(i=0;i<n;i++)out[i]=(B[i]&&d2[i]>=r2)?1:0;
+  return out;
+}
+
+/* ---------- esqueleto (Zhang-Suen) ---------- */
+function skeleton(M){
+  var w=W,h=H,P=new Uint8Array(N),x,y,i,minx=w,maxx=-1,miny=h,maxy=-1;
+  for(y=1;y<h-1;y++)for(x=1;x<w-1;x++){i=y*w+x;if(M[i]){P[i]=1;if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y;}}
+  if(maxx<0)return P;
+  var ch=true,step=0,list=[],k,p2,p3,p4,p5,p6,p7,p8,p9,Bc,A;
+  while(ch){
+    ch=false;
+    for(step=0;step<2;step++){
+      list.length=0;
+      for(y=miny;y<=maxy;y++){
+        for(x=minx;x<=maxx;x++){
+          i=y*w+x;if(!P[i])continue;
+          p2=P[i-w];p3=P[i-w+1];p4=P[i+1];p5=P[i+w+1];p6=P[i+w];p7=P[i+w-1];p8=P[i-1];p9=P[i-w-1];
+          Bc=p2+p3+p4+p5+p6+p7+p8+p9;if(Bc<2||Bc>6)continue;
+          A=((!p2&&p3)?1:0)+((!p3&&p4)?1:0)+((!p4&&p5)?1:0)+((!p5&&p6)?1:0)+((!p6&&p7)?1:0)+((!p7&&p8)?1:0)+((!p8&&p9)?1:0)+((!p9&&p2)?1:0);
+          if(A!==1)continue;
+          if(step===0){if(p2*p4*p6!==0||p4*p6*p8!==0)continue;}
+          else{if(p2*p4*p8!==0||p2*p6*p8!==0)continue;}
+          list.push(i);
+        }
+      }
+      if(list.length){ch=true;for(k=0;k<list.length;k++)P[list[k]]=0;}
+    }
+  }
+  return P;
+}
+
+/* ---------- partes finas (apertura con disco) ---------- */
+/* Devuelve máscara de las zonas de B que no caben en un disco de radio R (componentes con área mínima),
+   la apertura, y la anchura mínima estimada (px). */
+function thinSplit(B,R,wantOpen,noEdge,aMin){
+  var n=N,i,r2=R*R,d2=edtSq(B,W,H,0,!noEdge),er=new Uint8Array(n);
+  for(i=0;i<n;i++)er[i]=(B[i]&&d2[i]>=r2)?1:0;
+  var d2e=edtSq(er,W,H,1),thin=new Uint8Array(n),opn=wantOpen?new Uint8Array(n):null;
+  for(i=0;i<n;i++){
+    if(d2e[i]<=r2){if(opn)opn[i]=1;}
+    else if(B[i])thin[i]=1;
+  }
+  var cc=labelBin(thin,W,H,true,1),mx=new Float32Array(cc.n),keep=new Uint8Array(cc.n),lineLike=new Uint8Array(cc.n);
+  for(i=0;i<n;i++){var c=cc.id[i];if(c>=0&&d2[i]>mx[c])mx[c]=d2[i];}
+  var out=new Uint8Array(n),outLine=new Uint8Array(n),count=0,minW=1e9,cntLine=0;
+  for(c=0;c<cc.n;c++){
+    var md=Math.sqrt(mx[c]);
+    if(cc.area[c]>=(aMin==null?0.5*R*R:aMin)){keep[c]=1;lineLike[c]=cc.area[c]>=6*md*md?1:0;count++;if(lineLike[c]){cntLine++;if(2*md<minW)minW=2*md;}}
+  }
+  var outEdge=new Uint8Array(n),anyEdge=false;
+  for(i=0;i<n;i++){var c2=cc.id[i];if(c2>=0&&keep[c2]){out[i]=1;if(lineLike[c2])outLine[i]=1;if(cc.tb[c2]){outEdge[i]=1;anyEdge=true;}}}
+  return {thin:out,thinLine:outLine,thinEdge:anyEdge?outEdge:null,open:opn,count:count,countLine:cntLine,minW:minW};
+}
+/* engrosa (modo 'union') o iguala (modo 'replace') las partes finas de B */
+function thicken(B,Rg,Rt,mode){
+  /* umbral de área algo menor que el de la medida, para que lo que mida el semáforo ya esté engrosado */
+  var sp=thinSplit(B,Rg,mode==='replace',false,0.3*Rg*Rg),n=N,i,out;_thickN=mode==='replace'?0:sp.count;if(mode!=='replace')_thickMask=sp.thin;
+  var src=mode==='replace'?sp.thinLine:sp.thin;
+  var any=false;for(i=0;i<n;i++)if(src[i]){any=true;break;}
+  if(!any)return mode==='replace'?B:B;
+  var sk=skeleton(src),d=dilate(sk,Rt);
+  out=new Uint8Array(n);
+  if(mode==='replace'){
+    for(i=0;i<n;i++)out[i]=(sp.open[i]||d[i]||(B[i]&&!src[i]))?1:0;
+  }else{
+    for(i=0;i<n;i++)out[i]=(B[i]||d[i])?1:0;
+    /* franjas finas cortadas por el borde de la imagen: el esqueleto queda pegado al borde y no basta; se engruesan hacia dentro */
+    if(sp.thinEdge){var de=dilate(sp.thinEdge,2*Rt);for(i=0;i<n;i++)if(de[i])out[i]=1;}
+  }
+  return out;
+}
+/* huecos blancos finos (alargados): devuelve máscara y recuento */
+function thinWhite(B,R){
+  var Wt=new Uint8Array(N),i;
+  for(i=0;i<N;i++)Wt[i]=B[i]?0:1;
+  var r2=R*R,d2=edtSq(Wt,W,H,0),er=new Uint8Array(N);
+  for(i=0;i<N;i++)er[i]=(Wt[i]&&d2[i]>=r2)?1:0;
+  var d2e=edtSq(er,W,H,1),thin=new Uint8Array(N);
+  for(i=0;i<N;i++)if(Wt[i]&&d2e[i]>r2)thin[i]=1;
+  var cc=labelBin(thin,W,H,true,1),mx=new Float32Array(cc.n),keep=new Uint8Array(cc.n),count=0,c,out=new Uint8Array(N);
+  for(i=0;i<N;i++){c=cc.id[i];if(c>=0&&d2[i]>mx[c])mx[c]=d2[i];}
+  for(c=0;c<cc.n;c++){var md=Math.sqrt(mx[c]);if(cc.area[c]>=0.5*R*R&&cc.area[c]>=3*R*md){keep[c]=1;count++;}}
+  for(i=0;i<N;i++){c=cc.id[i];if(c>=0&&keep[c])out[i]=1;}
+  return {mask:out,count:count};
+}
+function boxSmooth(B,rad){
+  if(rad<=0)return B;
+  var w=W,h=H,tmp=new Uint16Array(N),out=new Uint8Array(N),x,y,s,k,len=2*rad+1,half=(len*len)/2;
+  for(y=0;y<h;y++){
+    var o=y*w;s=0;
+    for(k=-rad;k<=rad;k++)s+=B[o+Math.min(w-1,Math.max(0,k))];
+    for(x=0;x<w;x++){
+      tmp[o+x]=s;
+      s+=B[o+Math.min(w-1,x+rad+1)]-B[o+Math.max(0,x-rad)];
+    }
+  }
+  for(x=0;x<w;x++){
+    s=0;
+    for(k=-rad;k<=rad;k++)s+=tmp[Math.min(h-1,Math.max(0,k))*w+x];
+    for(y=0;y<h;y++){
+      out[y*w+x]=s>half?1:0;
+      s+=tmp[Math.min(h-1,y+rad+1)*w+x]-tmp[Math.max(0,y-rad)*w+x];
+    }
+  }
+  return out;
+}
+
+/* ---------- etapa 1: color ---------- */
+function finalizeComps(L,k){
+  var cc=labelComps(L,W,H),pass,i,c,minPx=Math.max(8,Math.round(N/250000)),p,x,y,q;
+  /* zonas sin grosor propio (franjas de antialias y sombras finas entre dos colores) se funden con su vecino.
+     Antes crecía con la imagen (3,5 px a 1500 px) y se comía el texto fino de los logos grandes: ahora tope de 2,5 px. */
+  THIN_MERGE=Math.max(1.5,Math.min(2.5,2.5*Math.max(W,H)/1080));
+  for(pass=0;pass<2;pass++){
+    var bm=new Uint8Array(N);
+    for(i=0;i<N;i++){
+      x=i%W;y=(i-x)/W;c=cc.id[i];
+      if((x>0&&cc.id[i-1]!==c)||(x<W-1&&cc.id[i+1]!==c)||(y>0&&cc.id[i-W]!==c)||(y<H-1&&cc.id[i+W]!==c))bm[i]=1;
+    }
+    var d2=edtSq(bm,W,H,1),mx=new Float32Array(cc.n);
+    for(i=0;i<N;i++){c=cc.id[i];if(d2[i]>mx[c])mx[c]=d2[i];}
+    var small=new Int32Array(cc.n).fill(-1),ns=0;
+    for(c=0;c<cc.n;c++){if(cc.area[c]<minPx||Math.sqrt(mx[c])<THIN_MERGE)small[c]=ns++;}
+    if(!ns)break;
+    var votes=new Int32Array(ns*k);
+    for(i=0;i<N;i++){
+      c=cc.id[i];if(small[c]<0)continue;x=i%W;y=(i-x)/W;
+      if(x>0){q=cc.id[i-1];if(q!==c&&small[q]<0)votes[small[c]*k+cc.lbl[q]]++;}
+      if(x<W-1){q=cc.id[i+1];if(q!==c&&small[q]<0)votes[small[c]*k+cc.lbl[q]]++;}
+      if(y>0){q=cc.id[i-W];if(q!==c&&small[q]<0)votes[small[c]*k+cc.lbl[q]]++;}
+      if(y<H-1){q=cc.id[i+W];if(q!==c&&small[q]<0)votes[small[c]*k+cc.lbl[q]]++;}
+    }
+    var newl=new Int16Array(ns).fill(-1),j,bv;
+    for(c=0;c<cc.n;c++){
+      if(small[c]<0)continue;bv=0;
+      for(j=0;j<k;j++){if(votes[small[c]*k+j]>bv){bv=votes[small[c]*k+j];newl[small[c]]=j;}}
+    }
+    for(i=0;i<N;i++){c=cc.id[i];if(small[c]>=0&&newl[small[c]]>=0)L[i]=newl[small[c]];}
+    cc=labelComps(L,W,H);
+  }
+  /* propiedades finales */
+  var bm2=new Uint8Array(N);
+  for(i=0;i<N;i++){
+    x=i%W;y=(i-x)/W;c=cc.id[i];
+    if((x>0&&cc.id[i-1]!==c)||(x<W-1&&cc.id[i+1]!==c)||(y>0&&cc.id[i-W]!==c)||(y<H-1&&cc.id[i+W]!==c))bm2[i]=1;
+  }
+  var dd=edtSq(bm2,W,H,1),cmax=new Float32Array(cc.n),sv=new Uint32Array(cc.n*k),nb=new Map(),nn=cc.n;
+  function addNb(c,q){var key=c*nn+q;nb.set(key,(nb.get(key)||0)+1);}
+  for(i=0;i<N;i++){
+    c=cc.id[i];if(dd[i]>cmax[c])cmax[c]=dd[i];
+    if(bm2[i]){x=i%W;y=(i-x)/W;
+      if(x>0&&cc.id[i-1]!==c){sv[c*k+L[i-1]]++;addNb(c,cc.id[i-1]);}
+      if(x<W-1&&cc.id[i+1]!==c){sv[c*k+L[i+1]]++;addNb(c,cc.id[i+1]);}
+      if(y>0&&cc.id[i-W]!==c){sv[c*k+L[i-W]]++;addNb(c,cc.id[i-W]);}
+      if(y<H-1&&cc.id[i+W]!==c){sv[c*k+L[i+W]]++;addNb(c,cc.id[i+W]);}}
+  }
+  /* zona vecina con más contacto (para saber si algo está «sobre el fondo») */
+  /* pares de zonas vecinas y su longitud de contacto (para saber qué está «sobre el fondo») */
+  var nbA=new Int32Array(nb.size),nbB=new Int32Array(nb.size),nbV=new Int32Array(nb.size),ni=0;
+  nb.forEach(function(v,key){var a=Math.floor(key/nn);nbA[ni]=a;nbB[ni]=key-a*nn;nbV[ni]=v;ni++;});
+  nb=null;cc.nbA=nbA;cc.nbB=nbB;cc.nbV=nbV;
+  var sur=new Int8Array(cc.n),maxd=new Float32Array(cc.n);
+  for(c=0;c<cc.n;c++){
+    var bv2=0,bl=-1;
+    for(var jj=0;jj<k;jj++){if(sv[c*k+jj]>bv2){bv2=sv[c*k+jj];bl=jj;}}
+    sur[c]=bl;maxd[c]=Math.sqrt(cmax[c]);
+  }
+  cc.sur=sur;cc.maxd=maxd;
+  return cc;
+}
+/* imagen cargada y cachés: el motor guarda la imagen y las cuantizaciones para reutilizarlas entre variantes */
+var IMG=null,QC={},QCK=[],SMC={},SMK=[];
+function setImg(m){
+  IMG={rgba:new Uint8ClampedArray(m.rgba),alpha:m.alpha?new Uint8Array(m.alpha):null,w:m.w,h:m.h};
+  W=m.w;H=m.h;N=W*H;QC={};QCK=[];SMC={};SMK=[];ST=null;
+}
+function getSmooth(smooth){
+  if(SMC[smooth])return SMC[smooth];
+  prog('Suavizando bordes…');
+  var sm=bilateral(IMG.rgba,W,H,smooth);
+  var sc={sm:sm,lab:toLab(sm,N)};
+  SMC[smooth]=sc;SMK.push(smooth);
+  while(SMK.length>2){delete SMC[SMK.shift()];}
+  return sc;
+}
+function getQ(k,smooth,quiet){
+  var key=k+'|'+smooth;
+  if(QC[key])return QC[key];
+  W=IMG.w;H=IMG.h;N=W*H;
+  var rgba=IMG.rgba,i,c,j;
+  /* transparencia: los píxeles transparentes forman su propio grupo («Transparente», papel Fondo)
+     y no entran en el k-means, para que una figura blanca no se funda con un fondo transparente */
+  var tr=IMG.alpha,nT=0;
+  if(tr){for(i=0;i<N;i++)nT+=tr[i];if(!nT)tr=null;}
+  var sc=getSmooth(smooth),sm=sc.sm,lab=sc.lab,C,L;
+  prog('Agrupando colores…');
+  if(tr){
+    var nO=N-nT,lo=new Float32Array(nO*3);
+    for(i=0,j=0;i<N;i++)if(!tr[i]){lo[j*3]=lab[i*3];lo[j*3+1]=lab[i*3+1];lo[j*3+2]=lab[i*3+2];j++;}
+    C=kmeansLab(lo,nO,k);lo=null;
+  }else C=kmeansLab(lab,N,k);
+  L=assignAll(lab,N,C,k);
+  /* ordenar por luminosidad; el grupo transparente va el último */
+  var ord=[];for(c=0;c<k;c++)ord.push(c);
+  ord.sort(function(a,b){return C[a*3]-C[b*3]||a-b;});
+  var map=new Uint8Array(k);for(c=0;c<k;c++)map[ord[c]]=c;
+  var K=tr?k+1:k;
+  for(i=0;i<N;i++)L[i]=tr&&tr[i]?k:map[L[i]];
+  prog('Limpiando regiones…');
+  L=modeFilter(L,W,H,K);
+  var cc=finalizeComps(L,K);
+  /* quitar grupos vacíos (k-means con colores repetidos o grupos absorbidos al limpiar) */
+  var cnt0=new Int32Array(K);for(i=0;i<N;i++)cnt0[L[i]]++;
+  var rm=new Int16Array(K).fill(-1),Ls=[],nk=0,trL=-1;
+  for(c=0;c<K;c++)if(cnt0[c]>0){rm[c]=nk;Ls.push(c<k?C[ord[c]*3]:1e9);if(tr&&c===k)trL=nk;nk++;}
+  if(nk!==K){
+    for(i=0;i<N;i++)L[i]=rm[L[i]];
+    for(c=0;c<cc.n;c++){cc.lbl[c]=rm[cc.lbl[c]];if(cc.sur[c]>=0)cc.sur[c]=rm[cc.sur[c]];}
+  }
+  K=nk;
+  /* paleta */
+  var sr=new Float64Array(K),sg=new Float64Array(K),sb=new Float64Array(K),cnt=new Int32Array(K),bcnt=new Int32Array(K),x,y,btot=2*W+2*(H-2);
+  for(i=0;i<N;i++){c=L[i];cnt[c]++;sr[c]+=sm[i*4];sg[c]+=sm[i*4+1];sb[c]+=sm[i*4+2];}
+  for(x=0;x<W;x++){bcnt[L[x]]++;bcnt[L[(H-1)*W+x]]++;}
+  for(y=1;y<H-1;y++){bcnt[L[y*W]]++;bcnt[L[y*W+W-1]]++;}
+  var pal=[];
+  for(c=0;c<K;c++){
+    pal.push({rgb:c===trL?[255,255,255]:[Math.round(sr[c]/cnt[c]),Math.round(sg[c]/cnt[c]),Math.round(sb[c]/cnt[c])],pct:cnt[c]/N,border:bcnt[c],cnt:cnt[c],tr:c===trL});
+  }
+  /* Lab de cada color de la paleta y contacto entre colores (para las propuestas automáticas) */
+  var prgba=new Uint8ClampedArray(K*4);
+  for(c=0;c<K;c++){prgba[c*4]=pal[c].rgb[0];prgba[c*4+1]=pal[c].rgb[1];prgba[c*4+2]=pal[c].rgb[2];prgba[c*4+3]=255;}
+  var palLab=toLab(prgba,K),adj=new Float64Array(K*K);
+  for(i=0;i<cc.nbA.length;i++){var la=cc.lbl[cc.nbA[i]],lb=cc.lbl[cc.nbB[i]];if(la!==lb)adj[la*K+lb]+=cc.nbV[i];}
+  /* propuesta del modo manual: más oscuro → Negro; el que ocupa al menos un 25 % del borde (el que más) → Fondo; resto → Contorno.
+     Fondo oscuro (el color más oscuro llena la mitad del borde y un 35 % de la imagen): se invierte → oscuro a Fondo, resto a Negro.
+     Transparente → Fondo. */
+  var papers=[],dark=0;
+  while(dark===trL)dark++;
+  var fb=-1,fv=-1;
+  for(c=0;c<K;c++){if(c===trL||Ls[c]<=Ls[dark]+10)continue;if(bcnt[c]>fv){fv=bcnt[c];fb=c;}}
+  if(fv<0.25*btot)fb=-1;
+  var darkBg=false,bd=0;for(c=0;c<K;c++)if(c!==trL&&Ls[c]<=Ls[dark]+10)bd+=bcnt[c];
+  var cd=0;for(c=0;c<K;c++)if(c!==trL&&Ls[c]<=Ls[dark]+10)cd+=cnt[c];
+  if(K-(trL>=0?1:0)>1&&bd>=0.5*btot&&cd>=0.35*N)darkBg=true;
+  for(c=0;c<K;c++){
+    if(c===trL)papers.push(3);
+    else if(darkBg)papers.push(Ls[c]<=Ls[dark]+10?3:0);
+    else papers.push(Ls[c]<=Ls[dark]+10?0:(c===fb?3:2));
+  }
+  var ST2={labels:L,cc:cc,k:K,palLab:palLab,lab:lab,alpha:tr,trL:trL};
+  var Q={key:key,k:k,smooth:smooth,ST:ST2,pal:pal,papers:papers,darkBg:darkBg,K:K,trL:trL,btot:btot,palLab:palLab,adj:adj};
+  QC[key]=Q;QCK.push(key);
+  while(QCK.length>6){delete QC[QCK.shift()];}
+  return Q;
+}
+function postQuant(Q,papers){
+  post({t:'quant',labels:Q.ST.labels.slice(),palette:Q.pal,papers:papers||Q.papers,ncomp:Q.ST.cc.n,darkBg:Q.darkBg},[]);
+}
+function doQuant(m){
+  var Q=getQ(m.k,m.smooth);
+  ST=Q.ST;
+  postQuant(Q);
+}
+
+/* ---------- etapa 2: papeles → mapa B/N ---------- */
+function compPapers(P){
+  var cc=ST.cc,k=ST.k,cp=new Uint8Array(cc.n),forced=new Uint8Array(cc.n),c,i,j;
+  for(c=0;c<cc.n;c++)cp[c]=P.papers[cc.lbl[c]];
+  for(i=0;i<P.ov.length;i++){
+    var o=P.ov[i];if(o.c<0||o.c>=cc.n)continue;
+    if(o.scope==='similar'){
+      var l=cc.lbl[o.c],sp=P.papers[cc.sur[o.c]];
+      for(j=0;j<cc.n;j++)if(cc.lbl[j]===l&&P.papers[cc.sur[j]]===sp){cp[j]=o.paper;forced[j]=1;}
+    }else{cp[o.c]=o.paper;forced[o.c]=1;}
+  }
+  return {cp:cp,forced:forced};
+}
+
+/* ===== densidad de trabajo =====
+   Las propuestas y la vista del modo manual se calculan a PREV_DENS px/mm (rápido);
+   la versión final (la que se mide y se descarga) a P.dens (40 o 30 px/mm). */
+var PREV_DENS=14,FINAL_MAXN=12e6,FINAL_HARDN=20e6,FINAL_MIND=20,PREV_MAXN=2.5e6;
+function gridFor(P){
+  var asp=IMG.w/IMG.h,mm=P.mm,d,warn=0;
+  function nOf(dd){var w=Math.max(8,Math.round(mm*dd));return w*Math.max(8,Math.round(w/asp));}
+  if(P.final){
+    var want=P.dens||40;d=want;
+    while(nOf(d)>FINAL_MAXN&&d>FINAL_MIND)d-=1;
+    if(d<want)warn=1;
+    if(nOf(d)>FINAL_HARDN){d=Math.sqrt(FINAL_HARDN*asp)/mm;warn=2;}
+  }else{
+    d=Math.min(P.dens||PREV_DENS,Math.sqrt((P.maxN||PREV_MAXN)*asp)/mm);
+  }
+  var w=Math.max(8,Math.round(mm*d)),h=Math.max(8,Math.round(w*IMG.h/IMG.w));
+  return {w:w,h:h,d:w/mm,warn:warn};
+}
+
+/* ---------- campo continuo a alta resolución ---------- */
+function boxDownLab(lab,w,h,n){
+  var w2=Math.floor(w/n),h2=Math.floor(h/n),o=new Float32Array(w2*h2*3),x,y,dx,dy,c,s,inv=1/(n*n);
+  for(y=0;y<h2;y++)for(x=0;x<w2;x++)for(c=0;c<3;c++){
+    s=0;for(dy=0;dy<n;dy++)for(dx=0;dx<n;dx++)s+=lab[((y*n+dy)*w+x*n+dx)*3+c];
+    o[(y*w2+x)*3+c]=s*inv;
+  }
+  return {lab:o,w:w2,h:h2};
+}
+function cubicW(t,w){var t2=t*t,t3=t2*t;w[0]=-0.5*t3+t2-0.5*t;w[1]=1.5*t3-2.5*t2+1;w[2]=-1.5*t3+2*t2+0.5*t;w[3]=0.5*t3-0.5*t2;}
+function gaussBlurF(F,w,h,sg){
+  if(sg<0.45)return;
+  var R=Math.max(1,Math.ceil(3*sg)),ker=new Float32Array(2*R+1),i,s=0,x,y,k,acc,tmp=new Float32Array(w*h),o;
+  for(i=-R;i<=R;i++){ker[i+R]=Math.exp(-i*i/(2*sg*sg));s+=ker[i+R];}
+  for(i=0;i<ker.length;i++)ker[i]/=s;
+  for(y=0;y<h;y++){o=y*w;
+    for(x=0;x<w;x++){acc=0;for(k=-R;k<=R;k++){var xx=x+k;xx=xx<0?0:xx>=w?w-1:xx;acc+=ker[k+R]*F[o+xx];}tmp[o+x]=acc;}}
+  for(x=0;x<w;x++){
+    for(y=0;y<h;y++){acc=0;for(k=-R;k<=R;k++){var yy=y+k;yy=yy<0?0:yy>=h?h-1:yy;acc+=ker[k+R]*tmp[yy*w+x];}F[y*w+x]=acc;}}
+}
+/* Imagen suavizada (Lab, resolución de análisis) → ampliación bicúbica a Wh×Hh → para cada píxel:
+   F = «tinta» continua 0..1 = dN/(dB+dN) (distancia al centro más cercano que NO va a Negro entre la suma de distancias
+   al más cercano que va a Negro y al más cercano que no); Lh = etiqueta del centro más cercano. */
+function hiField(Wh,Hh,isBl,trL,sigma){
+  var src=ST.lab,sw=IMG.w,sh=IMG.h,pl=ST.palLab,K=ST.k,x,y,c,k,ratio=sw/Wh;
+  if(ratio>1.5){var bd=boxDownLab(src,sw,sh,Math.floor(ratio));src=bd.lab;sw=bd.w;sh=bd.h;}
+  var F=new Float32Array(Wh*Hh),Lh=new Uint8Array(Wh*Hh);
+  var xi=new Int32Array(Wh*4),xw=new Float32Array(Wh*4),wt=new Float32Array(4),wy=new Float32Array(4);
+  for(x=0;x<Wh;x++){
+    var sx=(x+0.5)*sw/Wh-0.5,i0=Math.floor(sx);cubicW(sx-i0,wt);
+    for(k=0;k<4;k++){var ii=i0-1+k;xi[x*4+k]=(ii<0?0:ii>=sw?sw-1:ii)*3;xw[x*4+k]=wt[k];}
+  }
+  var al=ST.alpha,axm=null;
+  if(al){axm=new Int32Array(Wh);for(x=0;x<Wh;x++)axm[x]=Math.min(IMG.w-1,Math.floor((x+0.5)*IMG.w/Wh));}
+  var list=[];for(c=0;c<K;c++)if(c!==trL)list.push(c);
+  var nl=list.length,pL=new Float32Array(nl),pA=new Float32Array(nl),pB=new Float32Array(nl),bl=new Uint8Array(nl),lab=new Uint8Array(nl);
+  for(c=0;c<nl;c++){var l=list[c];pL[c]=pl[l*3];pA[c]=pl[l*3+1];pB[c]=pl[l*3+2];bl[c]=isBl[l]?1:0;lab[c]=l;}
+  var cache={};
+  function hrow(jj){
+    var r=new Float32Array(3*Wh),b0,b1,b2,b3,v0,v1,v2,q;
+    for(var xx=0;xx<Wh;xx++){
+      q=xx*4;b0=xi[q];b1=xi[q+1];b2=xi[q+2];b3=xi[q+3];var w0=xw[q],w1=xw[q+1],w2=xw[q+2],w3=xw[q+3],rb=jj*sw*3;
+      r[xx*3]=w0*src[rb+b0]+w1*src[rb+b1]+w2*src[rb+b2]+w3*src[rb+b3];
+      r[xx*3+1]=w0*src[rb+b0+1]+w1*src[rb+b1+1]+w2*src[rb+b2+1]+w3*src[rb+b3+1];
+      r[xx*3+2]=w0*src[rb+b0+2]+w1*src[rb+b1+2]+w2*src[rb+b2+2]+w3*src[rb+b3+2];
+    }
+    return r;
+  }
+  var hasB=false,hasN=false;for(c=0;c<nl;c++){if(bl[c])hasB=true;else hasN=true;}
+  for(y=0;y<Hh;y++){
+    var sy=(y+0.5)*sh/Hh-0.5,j0=Math.floor(sy),r0,r1,r2,r3;cubicW(sy-j0,wy);
+    var ys=[0,0,0,0];
+    for(k=0;k<4;k++){var jj=j0-1+k;ys[k]=jj<0?0:jj>=sh?sh-1:jj;}
+    for(k=0;k<4;k++)if(!cache[ys[k]])cache[ys[k]]=hrow(ys[k]);
+    r0=cache[ys[0]];r1=cache[ys[1]];r2=cache[ys[2]];r3=cache[ys[3]];
+    for(var key in cache){var kk=+key;if(kk!==ys[0]&&kk!==ys[1]&&kk!==ys[2]&&kk!==ys[3])delete cache[key];}
+    var wy0=wy[0],wy1=wy[1],wy2=wy[2],wy3=wy[3],o=y*Wh,aro=al?Math.min(IMG.h-1,Math.floor((y+0.5)*IMG.h/Hh))*IMG.w:0;
+    for(x=0;x<Wh;x++){
+      if(al&&al[aro+axm[x]]){F[o+x]=0;Lh[o+x]=trL;continue;}
+      var i3=x*3,L=wy0*r0[i3]+wy1*r1[i3]+wy2*r2[i3]+wy3*r3[i3],a=wy0*r0[i3+1]+wy1*r1[i3+1]+wy2*r2[i3+1]+wy3*r3[i3+1],b=wy0*r0[i3+2]+wy1*r1[i3+2]+wy2*r2[i3+2]+wy3*r3[i3+2];
+      var bestD=1e30,best=0,dB=1e30,dN=1e30,d,dl,da,db;
+      for(c=0;c<nl;c++){
+        dl=L-pL[c];da=a-pA[c];db=b-pB[c];d=dl*dl+da*da+db*db;
+        if(d<bestD){bestD=d;best=c;}
+        if(bl[c]){if(d<dB)dB=d;}else if(d<dN)dN=d;
+      }
+      Lh[o+x]=lab[best];
+      F[o+x]=!hasB?0:!hasN?1:(Math.sqrt(dN)/(Math.sqrt(dB)+Math.sqrt(dN)+1e-6));
+    }
+  }
+  gaussBlurF(F,Wh,Hh,sigma);
+  return {F:F,Lh:Lh};
+}
+
+/* ---------- eje medio (medial axis) a partir de la distancia exacta ---------- */
+/* M: máscara (1 = rasgo). Devuelve la distancia D (px) de cada píxel del rasgo al fondo y las crestas de D (eje medio). */
+function axisRidge(M,edge,lim){
+  var d2=edtSq(M,W,H,0,edge),n=N,i,D=d2,x,y,w=W,h=H,R=new Uint8Array(n),a,b,d,o;
+  for(i=0;i<n;i++)D[i]=M[i]?Math.sqrt(d2[i]):0;
+  for(y=1;y<h-1;y++){o=y*w;
+    for(x=1;x<w-1;x++){
+      i=o+x;d=D[i];if(d<=0||d>=lim)continue;
+      /* cresta: ningún vecino sube casi 1 por píxel (en ese caso hay un disco mayor que contiene a este) */
+      if(D[i-1]-d<0.75&&D[i+1]-d<0.75&&D[i-w]-d<0.75&&D[i+w]-d<0.75&&D[i-w-1]-d<1.06&&D[i-w+1]-d<1.06&&D[i+w-1]-d<1.06&&D[i+w+1]-d<1.06)R[i]=1;
+    }
+  }
+  return {D:D,R:R};
+}
+/* tramos de eje con lo>D>hi... : D en (lo,hi) (rasgo más fino que 2·hi), longitud ≥ minLen y D casi constante (trazo, no punta de esquina) */
+function filterAxis(ax,lo,hi,minLen,slope){
+  var D=ax.D,R=ax.R,n=N,i,d,cand=new Uint8Array(n),any=false,c;
+  for(i=0;i<n;i++)if(R[i]){d=D[i];if(d>lo&&d<hi){cand[i]=1;any=true;}}
+  if(!any)return {keep:null,count:0,minD:0};
+  /* quitar las ramas en rampa (las que salen hacia las esquinas: la distancia crece o decrece más de 0,45 por píxel): no son trazo, son «huesos» */
+  var steep=[],ii,jx,jy,px0,py0,dd,dxx,dyy,ramp;
+  for(i=0;i<n;i++){
+    if(!cand[i])continue;
+    py0=(i/W)|0;px0=i-py0*W;if(px0<4||py0<4||px0>=W-4||py0>=H-4)continue;
+    ramp=0;
+    for(jy=-4;jy<=4;jy++)for(jx=-4;jx<=4;jx++){
+      dd=jx*jx+jy*jy;if(dd<9||dd>20)continue;ii=i+jy*W+jx;if(!cand[ii])continue;
+      dd=Math.abs(D[i]-D[ii])/Math.sqrt(jx*jx+jy*jy);if(dd>ramp)ramp=dd;
+    }
+    if(ramp>0.45)steep.push(i);
+  }
+  for(i=0;i<steep.length;i++)cand[steep[i]]=0;
+  /* los tramos se agrupan con una conexión holgada (el eje a veces se corta 1–2 px por la cuantización) */
+  var cand2=new Uint8Array(n),ci;
+  for(i=0;i<n;i++){if(!cand[i])continue;py0=(i/W)|0;px0=i-py0*W;
+    for(jy=-1;jy<=1;jy++){var qy=py0+jy;if(qy<0||qy>=H)continue;for(jx=-1;jx<=1;jx++){var qx=px0+jx;if(qx>=0&&qx<W)cand2[qy*W+qx]=1;}}}
+  var cc=labelBin(cand2,W,H,true,1),mn=new Float32Array(cc.n).fill(1e9),mx=new Float32Array(cc.n),carea=new Int32Array(cc.n),bx0=new Int32Array(cc.n).fill(1<<30),bx1=new Int32Array(cc.n).fill(-1),by0=new Int32Array(cc.n).fill(1<<30),by1=new Int32Array(cc.n).fill(-1),xx,yy;
+  for(i=0;i<n;i++)if(cand[i]){c=cc.id[i];carea[c]++;d=D[i];if(d<mn[c])mn[c]=d;if(d>mx[c])mx[c]=d;yy=(i/W)|0;xx=i-yy*W;if(xx<bx0[c])bx0[c]=xx;if(xx>bx1[c])bx1[c]=xx;if(yy<by0[c])by0[c]=yy;if(yy>by1[c])by1[c]=yy;}
+  var ok=new Uint8Array(cc.n),count=0,minD=1e9;
+  for(c=0;c<cc.n;c++){
+    /* longitud del tramo: diagonal de su caja (rampa recta) o, si es mayor, área/3 (curvas) */
+    var len=Math.max(Math.hypot(bx1[c]-bx0[c]+1,by1[c]-by0[c]+1),cc.area[c]/3);
+    if(len>=minLen&&(mx[c]-mn[c])<=slope*len){ok[c]=1;count++;if(mn[c]<minD)minD=mn[c];}
+  }
+  if(!count)return {keep:null,count:0,minD:0};
+  var keep=new Uint8Array(n);
+  for(i=0;i<n;i++)if(cand[i]&&ok[cc.id[i]])keep[i]=1;
+  return {keep:keep,count:count,minD:minD};
+}
+/* Apertura con un disco de 0,5 mm: lo negro que no cubre ningún disco de ese tamaño es demasiado fino.
+   En esas zonas se ponen discos de radio rB en el eje medio (engrosa cuellos, islas y puntas hasta 0,5 mm). */
+var _enfB=null;
+function enforceMin(B,rB,only){
+  var r0=rB-0.5,ax=axisRidge(B,true,rB),D=ax.D,R=ax.R,n=N,i,C=new Uint8Array(n),any=false;
+  for(i=0;i<n;i++)if(D[i]>=r0-0.05){C[i]=1;}
+  var dC=edtSq(C,W,H,1),lim=(r0-0.5)*(r0-0.5),res=new Uint8Array(n);C=null;
+  for(i=0;i<n;i++)if(B[i]&&dC[i]>lim){res[i]=1;any=true;}
+  dC=null;
+  if(!any){_enfB=B;return only?{count:0,mask:null,minD:0}:0;}
+  /* las esquinas convexas de 60° o más abiertas también dejan un resto, pero muy plano (D < 0,5·r): no se tocan */
+  var lr=labelBin(res,W,H,true,1),big=new Uint8Array(lr.n),cnt=0,c,mxD=new Float32Array(lr.n);
+  for(i=0;i<n;i++){c=lr.id[i];if(c>=0&&D[i]>mxD[c])mxD[c]=D[i];}
+  /* ...pero un trazo muy fino (pelo de 0,1–0,2 mm) también es plano: se distingue por ser alargado (área/D grande) */
+  /* (el escalonado de un borde diagonal de una zona gruesa también es alargado, pero va pegado a negro grueso
+     en toda su longitud y solo tiene 1 px de grueso; un pelo lo toca poco, o algo más si tiene ≥ 2 px de núcleo) */
+  var hair=new Uint8Array(lr.n),touch=new Int32Array(lr.n),x,y,q;
+  for(i=0;i<n;i++){c=lr.id[i];if(c<0)continue;x=i%W;y=(i-x)/W;
+    if((x>0&&B[q=i-1]&&!res[q])||(x<W-1&&B[q=i+1]&&!res[q])||(y>0&&B[q=i-W]&&!res[q])||(y<H-1&&B[q=i+W]&&!res[q]))touch[c]++;}
+  /* ...y un puente corto y fino entre dos huecos blancos (pinzamiento) también es plano y corto: se distingue porque
+     tiene blanco a los dos lados (dos tramos de borde blanco separados); una esquina solo tiene uno */
+  var E=new Uint8Array(n),dx,dy,xx,yy;
+  for(i=0;i<n;i++){if(!res[i])continue;x=i%W;y=(i-x)/W;
+    for(dy=-1;dy<=1;dy++){yy=y+dy;if(yy<0||yy>=H)continue;for(dx=-1;dx<=1;dx++){xx=x+dx;if(xx<0||xx>=W)continue;q=yy*W+xx;if(!B[q])E[q]=1;}}}
+  var le=labelBin(E,W,H,true,1),f1=new Int32Array(lr.n).fill(-1),two=new Uint8Array(lr.n),e;E=null;
+  for(i=0;i<n;i++){c=lr.id[i];if(c<0||two[c])continue;x=i%W;y=(i-x)/W;
+    for(dy=-1;dy<=1;dy++){yy=y+dy;if(yy<0||yy>=H)continue;for(dx=-1;dx<=1;dx++){xx=x+dx;if(xx<0||xx>=W)continue;e=le.id[yy*W+xx];
+      if(e<0)continue;if(f1[c]<0)f1[c]=e;else if(f1[c]!==e)two[c]=1;}}}
+  le=null;
+  for(c=0;c<lr.n;c++){
+    if(lr.area[c]<3)continue;
+    if(mxD[c]>=0.5*r0){big[c]=1;cnt++;}
+    else if((lr.area[c]/Math.max(1,mxD[c])>=3*r0&&(touch[c]<0.25*lr.area[c]||(mxD[c]>=2&&touch[c]<0.5*lr.area[c])))||two[c]){big[c]=1;hair[c]=1;cnt++;}
+  }
+  if(!cnt){_enfB=B;return only?{count:0,mask:null,minD:0}:0;}
+  for(i=0;i<n;i++){c=lr.id[i];res[i]=(c>=0&&big[c])?1:0;}
+  if(only){var mn=1e9;for(c=0;c<lr.n;c++)if(big[c]&&mxD[c]<mn)mn=mxD[c];return {count:cnt,mask:res,minD:mn};}
+  var near=dilate(res,1.5),keep=new Uint8Array(n),k=0;
+  /* solo el eje de la parte fina (D ≥ 0,5·r): las ramas que van a las esquinas harían «huesos» */
+  for(i=0;i<n;i++)if(near[i]&&B[i]&&R[i]&&D[i]>=0.5*r0){keep[i]=1;k++;}
+  /* en los pelos, todo su eje */
+  for(i=0;i<n;i++){c=lr.id[i];if(c>=0&&hair[c]&&R[i]&&!keep[i]){keep[i]=1;k++;}}
+  /* islas o puntas sin eje marcado: su píxel más interior hace de centro */
+  var mx=new Float32Array(lr.n),arg=new Int32Array(lr.n).fill(-1),has=new Uint8Array(lr.n);
+  for(i=0;i<n;i++){c=lr.id[i];if(c<0||!big[c])continue;if(keep[i])has[c]=1;if(D[i]>mx[c]){mx[c]=D[i];arg[c]=i;}}
+  for(c=0;c<lr.n;c++)if(big[c]&&!has[c]&&arg[c]>=0){keep[arg[c]]=1;k++;}
+  _enfB=k?growDiscs(B,keep,rB,1):B;
+  return cnt;
+}
+function quickMetrics(B,rB,sH,tinyMm){
+  var n=N,i,c,kB=enforceMin(B,rB,true);_enfB=null;
+  var Wt=new Uint8Array(n);for(i=0;i<n;i++)Wt[i]=B[i]?0:1;
+  var axG=axisRidge(Wt,false,rB+1),gmin=0.4/sH,mLo=0.3*rB;Wt=null;
+  var kG=filterAxis(axG,mLo,rB-1,gmin,0.3),gl=0;
+  if(kG.count>0){gl=1;var kG2=filterAxis(axG,mLo,0.15/sH-0.5,gmin,0.3);if(kG2.count>=40||kG.count>=80)gl=2;}
+  var cb=labelBin(B,W,H,true,1),tiny=0,tp=tinyMm/(sH*sH);for(c=0;c<cb.n;c++)if(cb.area[c]<tp)tiny++;
+  return {thin:kB.count,gapLevel:gl,gapCount:kG.count,tiny:tiny};
+}
+/* copia de M con discos de radio r (px) centrados en los píxeles marcados de keep puestos a val */
+function growDiscs(M,keep,r,val){
+  var out=M.slice(),w=W,h=H,n=N,R=Math.ceil(r),hw=new Int32Array(2*R+1),dy,i,x,y,r2=r*r,xa,xb,yy,o;
+  for(dy=-R;dy<=R;dy++)hw[dy+R]=dy*dy<=r2?Math.floor(Math.sqrt(r2-dy*dy)):-1;
+  for(i=0;i<n;i++){
+    if(!keep[i])continue;
+    y=(i/w)|0;x=i-y*w;
+    for(dy=-R;dy<=R;dy++){
+      yy=y+dy;if(yy<0||yy>=h||hw[dy+R]<0)continue;
+      xa=x-hw[dy+R];xb=x+hw[dy+R];if(xa<0)xa=0;if(xb>=w)xb=w-1;
+      o=yy*w;for(var xx=xa;xx<=xb;xx++)out[o+xx]=val;
+    }
+  }
+  return out;
+}
+
+/* ---------- renderizado ---------- */
+function renderCore(P){
+  var t0=Date.now(),sL=P.mm/W,cc=ST.cc,i,c,x,y,p;
+  var WL=W,HL=H,NL=N;
+  prog('Asignando papeles…',0.05);
+  var cps=compPapers(P),cp=cps.cp,forced=cps.forced;
+  /* decoración del fondo: zonas pequeñas Blanco/Contorno rodeadas por un color con papel Fondo */
+  var isDeco=new Uint8Array(cc.n),decoN=0,decoMax=0.015*N,bgT=new Float64Array(cc.n),allT=new Float64Array(cc.n);
+  for(i=0;i<cc.nbA.length;i++){var ca=cc.nbA[i],cq=cc.nbB[i];allT[ca]+=cc.nbV[i];if(cp[cq]===3&&cc.tb[cq])bgT[ca]+=cc.nbV[i];}
+  for(c=0;c<cc.n;c++){
+    if(forced[c])continue;
+    if((cp[c]===1||cp[c]===2)&&cc.area[c]<decoMax&&allT[c]>0&&bgT[c]>=0.35*allT[c]){isDeco[c]=1;decoN++;}
+  }
+  if(P.deco==='remove')for(c=0;c<cc.n;c++)if(isDeco[c])cp[c]=3;
+  /* letras y detalles claros finos sobre un color más oscuro (que no sea Negro ni Fondo): pasan a Negro */
+  var textN=0;
+  if(P.textMm>0){
+    var tmax=P.textMm/sL/2,pl0=ST.palLab;
+    for(c=0;c<cc.n;c++){
+      if(forced[c]||isDeco[c])continue;
+      if(cp[c]!==1&&cp[c]!==2)continue;
+      if(cc.maxd[c]>tmax)continue;
+      var sl=cc.sur[c];if(sl<0)continue;
+      var spp=P.papers[sl];if(spp===0||spp===3)continue;
+      if(pl0[cc.lbl[c]*3]-pl0[sl*3]<25)continue;
+      cp[c]=0;textN++;
+    }
+  }
+  /* regla de manchas pequeñas → negro */
+  var spotN=0;
+  if(P.spotOn){
+    var amax=P.spotA/(sL*sL);
+    for(c=0;c<cc.n;c++){
+      if(forced[c]||isDeco[c])continue;
+      if((cp[c]===1||cp[c]===2)&&!cc.tb[c]&&cc.area[c]<=amax&&cc.maxd[c]*sL>=0.2){cp[c]=0;spotN++;}
+    }
+  }
+  var G=gridFor(P),Wh=G.w,Hh=G.h,Nh=Wh*Hh,sH=P.mm/Wh,tm={},tt=Date.now();
+  function lap(k){var n=Date.now();tm[k]=n-tt;tt=n;}
+  var res;
+  W=Wh;H=Hh;N=Nh;
+  try{res=renderHi(P,{cp:cp,cc:cc,isDeco:isDeco,decoN:decoN,textN:textN,spotN:spotN,G:G,sL:sL,sH:sH,WL:WL,HL:HL,NL:NL,lap:lap,t0:t0,tm:tm});}
+  finally{W=WL;H=HL;N=NL;}
+  return res;
+}
+function renderHi(P,X){
+  var cp=X.cp,cc=X.cc,isDeco=X.isDeco,decoN=X.decoN,textN=X.textN,spotN=X.spotN,G=X.G,sL=X.sL,sH=X.sH,WL=X.WL,HL=X.HL,NL=X.NL,lap=X.lap,tm=X.tm,t0=X.t0;
+  var Wh=W,Hh=H,Nh=N,i,c,x,y,p,fin=!!P.final,cid=cc.id,K=ST.k;
+  prog('Clasificando colores a '+Math.round(G.d)+' px/mm…',fin?0.12:0.1);
+  var isBl=new Uint8Array(K);for(c=0;c<K;c++)isBl[c]=P.papers[c]===0?1:0;
+  var hf=hiField(Wh,Hh,isBl,ST.trL==null?-1:ST.trL,0.04/sH),F=hf.F,Lh=hf.Lh,B=new Uint8Array(Nh),thr=P.inkThr||0.5;
+  for(i=0;i<Nh;i++)B[i]=F[i]>thr?1:0;
+  F=null;lap('campo');
+  /* zonas con papel distinto del que les toca por su color (retoques, reglas): se proyectan al mapa fino */
+  var fz=new Uint8Array(cc.n),anyZ=false;
+  for(c=0;c<cc.n;c++){var dfl=P.papers[cc.lbl[c]];if(dfl===0&&cp[c]!==0){fz[c]=1;anyZ=true;}else if(dfl!==0&&cp[c]===0){fz[c]=2;anyZ=true;}}
+  if(anyZ){
+    var zn=new Uint8Array(NL),zb=new Uint8Array(NL),dx,dy,q,xx,yy;
+    for(y=0;y<HL;y++)for(x=0;x<WL;x++){
+      p=y*WL+x;c=cid[p];if(!fz[c])continue;
+      for(dy=-1;dy<=1;dy++){yy=y+dy;if(yy<0||yy>=HL)continue;for(dx=-1;dx<=1;dx++){xx=x+dx;if(xx<0||xx>=WL)continue;q=yy*WL+xx;
+        if(fz[c]===1)zn[q]=1;else if(!zb[q]||(dx===0&&dy===0))zb[q]=cc.lbl[c]+1;}}
+    }
+    var qx=new Int32Array(Wh);for(x=0;x<Wh;x++)qx[x]=Math.min(WL-1,Math.floor((x+0.5)*WL/Wh));
+    for(y=0;y<Hh;y++){
+      var qo=Math.min(HL-1,Math.floor((y+0.5)*HL/Hh))*WL,o=y*Wh;
+      for(x=0;x<Wh;x++){q=qo+qx[x];if(zn[q])B[o+x]=0;}
+      for(x=0;x<Wh;x++){q=qo+qx[x];if(zb[q]&&Lh[o+x]===zb[q]-1)B[o+x]=1;}
+    }
+    zn=null;zb=null;
+  }
+  Lh=null;
+  /* contornos: líneas centradas en la frontera entre zonas (una de ellas con papel Contorno), con grosor exacto en mm.
+     La frontera se toma de un voto suavizado de las zonas vecinas (no escalonada); luego distancia exacta. */
+  var tpx=Math.max(P.line,0.5)/sH,hasS=false;
+  var band=new Uint8Array(NL);
+  for(y=0;y<HL;y++)for(x=0;x<WL;x++){
+    p=y*WL+x;var a=cid[p],pa=cp[a],b,pb;
+    if(x<WL-1){b=cid[p+1];if(b!==a){pb=cp[b];if((pa===2||pb===2)&&pa!==0&&pb!==0){band[p]=1;band[p+1]=1;hasS=true;}}}
+    if(y<HL-1){b=cid[p+WL];if(b!==a){pb=cp[b];if((pa===2||pb===2)&&pa!==0&&pb!==0){band[p]=1;band[p+WL]=1;hasS=true;}}}
+  }
+  if(hasS){
+    prog('Dibujando contornos…',fin?0.2:0.2);
+    /* ensanchar la banda 2 px */
+    var bd2=new Uint8Array(NL);
+    for(y=0;y<HL;y++)for(x=0;x<WL;x++){if(!band[y*WL+x])continue;
+      for(var dy2=-2;dy2<=2;dy2++){var y2=y+dy2;if(y2<0||y2>=HL)continue;for(var dx2=-2;dx2<=2;dx2++){var x2=x+dx2;if(x2>=0&&x2<WL)bd2[y2*WL+x2]=1;}}}
+    band=bd2;
+    var Cid=new Int32Array(Nh).fill(-1),ids=[0,0,0,0,0,0,0,0,0],ws=[0,0,0,0,0,0,0,0,0],kx=WL/Wh,ky=HL/Hh,inv=1/(2*0.62*0.62);
+    for(y=0;y<Hh;y++){
+      var fy=(y+0.5)*ky-0.5,cy=Math.round(fy),qy=Math.min(HL-1,Math.max(0,Math.floor((y+0.5)*ky)));
+      for(x=0;x<Wh;x++){
+        var fx=(x+0.5)*kx-0.5,qx2=Math.min(WL-1,Math.max(0,Math.floor((x+0.5)*kx)));
+        if(!band[qy*WL+qx2])continue;
+        var cx=Math.round(fx),nn=0,ddy,ddx;
+        for(ddy=-1;ddy<=1;ddy++){var py=cy+ddy;if(py<0||py>=HL)continue;
+          for(ddx=-1;ddx<=1;ddx++){var px2=cx+ddx;if(px2<0||px2>=WL)continue;
+            var id2=cid[py*WL+px2],wgt=Math.exp(-((px2-fx)*(px2-fx)+(py-fy)*(py-fy))*inv),k2;
+            for(k2=0;k2<nn;k2++)if(ids[k2]===id2){ws[k2]+=wgt;break;}
+            if(k2===nn){ids[nn]=id2;ws[nn]=wgt;nn++;}
+          }}
+        var bi=0,bw=-1;for(var k3=0;k3<nn;k3++)if(ws[k3]>bw){bw=ws[k3];bi=ids[k3];}
+        Cid[y*Wh+x]=bi;
+      }
+    }
+    band=null;
+    var E=new Uint8Array(Nh),anyE=false;
+    for(y=0;y<Hh;y++)for(x=0;x<Wh;x++){
+      p=y*Wh+x;var a2=Cid[p];if(a2<0)continue;var pa2=cp[a2],b2,pb2;
+      if(x<Wh-1){b2=Cid[p+1];if(b2>=0&&b2!==a2){pb2=cp[b2];if((pa2===2||pb2===2)&&pa2!==0&&pb2!==0){E[p]=1;E[p+1]=1;anyE=true;}}}
+      if(y<Hh-1){b2=Cid[p+Wh];if(b2>=0&&b2!==a2){pb2=cp[b2];if((pa2===2||pb2===2)&&pa2!==0&&pb2!==0){E[p]=1;E[p+Wh]=1;anyE=true;}}}
+    }
+    Cid=null;
+    if(anyE){var lines=dilate(E,Math.max(0,(tpx-2)/2));for(i=0;i<Nh;i++)if(lines[i])B[i]=1;lines=null;}
+    E=null;
+  }
+  band=null;
+  lap('contornos');
+  if(P.equal){prog('Igualando líneas…',0.3);B=thicken(B,0.75*tpx,tpx/2,'replace');}
+  prog('Limpiando…',fin?0.35:0.3);
+  var closePx=Math.round(P.close*sL/sH);
+  if(closePx>0){B=erode(dilate(B,closePx),closePx);}
+  var softPx=Math.round(P.soft*sL/sH*0.5);
+  if(P.soft>0&&softPx>0)B=boxSmooth(B,softPx);
+  var specPx=P.speck/(sH*sH),holePx=P.hole/(sH*sH);
+  var cb=labelBin(B,W,H,true,1);
+  for(i=0;i<Nh;i++){c=cb.id[i];if(c>=0&&cb.area[c]<specPx)B[i]=0;}
+  var cw=labelBin(B,W,H,false,0);
+  for(i=0;i<Nh;i++){c=cw.id[i];if(c>=0&&!cw.tb[c]&&cw.area[c]<holePx)B[i]=1;}
+  cb=null;cw=null;
+  lap('limpieza');
+  var Bpre=B.slice(),widenN=0,thickN=0,thickMask=null;
+  /* ancho mínimo: 0,5 mm = 2·rB − 1 px (rB = 0,25 mm + medio píxel de margen para que Potrace no lo adelgace) */
+  var rB=0.25/sH+0.5;
+  function fixBlack(){
+    var ax=axisRidge(B,true,rB+1),k=filterAxis(ax,0.3*rB,rB,rB,0.3);
+    if(k.count){B=growDiscs(B,k.keep,rB,1);}
+    return k;
+  }
+  /* orden: primero se ensanchan los huecos blancos finos y después se engrosa el negro fino (como el prototipo);
+     el núcleo de los trazos negros finos se protege para que el ensanchado no los rompa */
+  var k0=null;
+  if(P.widenGaps){
+    prog('Ensanchando huecos finos…',fin?0.45:0.4);
+    var ax0=axisRidge(B,true,rB+1);k0=filterAxis(ax0,0.3*rB,rB,rB,0.3);ax0=null;
+    var Wt=new Uint8Array(Nh);for(i=0;i<Nh;i++)Wt[i]=B[i]?0:1;
+    var axW=axisRidge(Wt,false,rB+1),kW=filterAxis(axW,0.3*rB,rB,rB,0.3);widenN=kW.count;
+    axW=null;
+    if(kW.count){
+      var Wg=growDiscs(Wt,kW.keep,rB,1);
+      var pr=k0.keep?growDiscs(new Uint8Array(Nh),k0.keep,0.5*rB,1):null;
+      for(i=0;i<Nh;i++)if(Wg[i]&&!Wt[i]&&!(pr&&pr[i]))B[i]=0;
+      pr=null;Wg=null;
+    }
+    Wt=null;k0=null;
+  }
+  prog('Engrosando líneas finas (eje medio)…',fin?0.52:0.45);
+  var k1=fixBlack();thickN=k1.count;thickMask=k1.keep;if(k1.count)fixBlack();  /* segunda pasada: lo recién engrosado puede dejar otro estrechamiento al unirse con vecinos */
+  lap('ancho minimo');
+  /* el engrosado puede cerrar agujeros diminutos: se rellenan con el mismo umbral */
+  var cw2=labelBin(B,W,H,false,0);
+  for(i=0;i<Nh;i++){c=cw2.id[i];if(c>=0&&!cw2.tb[c]&&cw2.area[c]<holePx)B[i]=1;}
+  cw2=null;
+  var RW=0.25/sH-0.75;
+  if(P.fillGaps){
+    prog('Cerrando huecos finos…',fin?0.62:0.55);
+    var tw=thinWhite(B,RW);
+    for(i=0;i<Nh;i++)if(tw.mask[i])B[i]=1;
+    if(tw.count){fixBlack();}
+  }
+  if(P.widenGaps||P.fillGaps){
+    var cb3=labelBin(B,W,H,true,1);for(i=0;i<Nh;i++){c=cb3.id[i];if(c>=0&&cb3.area[c]<specPx)B[i]=0;}
+    var cw3=labelBin(B,W,H,false,0);for(i=0;i<Nh;i++){c=cw3.id[i];if(c>=0&&!cw3.tb[c]&&cw3.area[c]<holePx)B[i]=1;}
+    cb3=cw3=null;
+  }
+  /* garantía final: nada negro más fino de 0,5 mm (cuellos cortos, islas pequeñas, puntas agudas),
+     sin los filtros de longitud y pendiente del paso anterior */
+  var enfN=enforceMin(B,rB);B=_enfB;_enfB=null;
+  /* los discos pueden dejar un cuello cóncavo junto a ellos: más pasadas hasta que no quede nada (como mucho 3) */
+  if(enfN){fixBlack();for(var ep=0;ep<3;ep++){var e2=enforceMin(B,rB);B=_enfB;_enfB=null;enfN+=e2;if(!e2)break;}}
+  thickN+=enfN;
+  lap('huecos');
+  var chgPx=0,inkPre=0,blackPx0=0;
+  for(i=0;i<Nh;i++){if(Bpre[i])inkPre++;if(B[i]!==Bpre[i])chgPx++;if(B[i])blackPx0++;}
+  var chg=chgPx/Math.max(1,inkPre),ink=blackPx0/Nh;
+  var lost=lostDetails(Bpre,B,0.1/(sH*sH));Bpre=null;
+  lap('perdidas');
+  if(P.light){
+    /* para el tamaño recomendado: las mismas medidas que el semáforo (sin vectorizar) */
+    var lq=quickMetrics(B,rB,sH,P.tiny);
+    return {t:'render',W:Wh,H:Hh,dens:G.d,warn:G.warn,final:fin,stats:{chg:chg,ink:ink,lost:lost,widenN:widenN,thickN:thickN,textN:textN,thinCount:lq.thin,gapLevel:lq.gapLevel,gapCount:lq.gapCount,tiny:lq.tiny,ms:Date.now()-t0}};
+  }
+  /* ---- vectorizar ---- */
+  prog('Vectorizando…',fin?0.72:0.7);
+  var tolH=P.tol*Math.max(1,sL/sH*(P.tolK||0.5));
+  var pl=Potrace.trace(B,W,H,{turdsize:1,alphamax:P.alpha,opttolerance:tolH,optcurve:true});
+  var np=pl.length,pn=new Int32Array(np),tot=0,j;
+  for(i=0;i<np;i++){pn[i]=pl[i].curve.n;tot+=pn[i];}
+  var tags=new Uint8Array(tot),pts=new Float32Array(tot*6),o2=0;
+  for(i=0;i<np;i++){
+    var cv=pl[i].curve;
+    for(j=0;j<cv.n;j++){
+      tags[o2]=cv.tag[j]==='CURVE'?1:0;
+      for(var q2=0;q2<3;q2++){var pt=cv.c[j*3+q2]||cv.c[j*3+1];pts[o2*6+q2*2]=pt.x;pts[o2*6+q2*2+1]=pt.y;}
+      o2++;
+    }
+  }
+  pl=null;
+  lap('potrace');
+  /* ---- métricas (con el mismo método de eje medio con el que se corrige) ---- */
+  prog('Midiendo calidad…',fin?0.85:0.85);
+  var marks=new Uint8Array(Nh),mHi=rB-1.0,mLo=0.3*rB;
+  /* línea fina: el mismo criterio que la garantía final (apertura con un disco de 0,5 mm) */
+  var kB=enforceMin(B,rB,true);_enfB=null;
+  if(kB.mask){for(i=0;i<Nh;i++)if(kB.mask[i])marks[i]|=1;}
+  var Wt2=new Uint8Array(Nh);for(i=0;i<Nh;i++)Wt2[i]=B[i]?0:1;
+  var axG=axisRidge(Wt2,false,rB+1),gmin=0.4/sH;
+  var kG=filterAxis(axG,mLo,mHi,gmin,0.3),gapLevel=0,gapCount=kG.count;
+  if(gapCount>0){
+    for(i=0;i<Nh;i++)if(kG.keep[i])marks[i]|=2;
+    gapLevel=1;
+    var kG2=filterAxis(axG,mLo,0.15/sH-0.5,gmin,0.3);if(kG2.count>=40||gapCount>=80)gapLevel=2;
+  }
+  axG=null;Wt2=null;
+  var cb2=labelBin(B,W,H,true,1),tiny=0,tinyPx=P.tiny/(sH*sH),blackPx=0;
+  var isTiny=new Uint8Array(cb2.n);
+  for(c=0;c<cb2.n;c++){if(cb2.area[c]<tinyPx){isTiny[c]=1;tiny++;}}
+  for(i=0;i<Nh;i++){if(B[i])blackPx++;c=cb2.id[i];if(c>=0&&isTiny[c])marks[i]|=4;}
+  var decoPieces=0,decoTiny=0,decoThick=0;
+  if(decoN>0&&P.deco!=='remove'){
+    var dm=new Uint8Array(Nh),qx3=new Int32Array(Wh);for(x=0;x<Wh;x++)qx3[x]=Math.min(WL-1,Math.floor((x+0.5)*WL/Wh));
+    for(y=0;y<Hh;y++){var qo3=Math.min(HL-1,Math.floor((y+0.5)*HL/Hh))*WL;for(x=0;x<Wh;x++)if(isDeco[cid[qo3+qx3[x]]])dm[y*Wh+x]=1;}
+    dm=dilate(dm,tpx+1);
+    var seenP=new Uint8Array(cb2.n),inD=new Int32Array(cb2.n),tot2=new Int32Array(cb2.n);
+    for(i=0;i<Nh;i++){c=cb2.id[i];if(c<0)continue;tot2[c]++;if(dm[i])inD[c]++;}
+    for(c=0;c<cb2.n;c++)if(inD[c]>0.5*tot2[c]){decoPieces++;if(isTiny[c])decoTiny++;}
+    if(thickMask){var tc=labelBin(thickMask,W,H,true,1),hit=new Uint8Array(tc.n);for(i=0;i<Nh;i++){c=tc.id[i];if(c>=0&&dm[i])hit[c]=1;}for(c=0;c<tc.n;c++)if(hit[c])decoThick++;}
+  }
+  lap('medidas');
+  var out={t:'render',B:B,marks:marks,np:np,pn:pn,tags:tags,pts:pts,W:Wh,H:Hh,dens:G.d,warn:G.warn,final:fin,
+    stats:{chg:chg,ink:ink,lost:lost,textN:textN,nodes:tot,paths:np,thinCount:kB.count,thinMinW:kB.count?2*kB.minD*sH:null,thickN:thickN,gapCount:gapCount,gapLevel:gapLevel,tiny:tiny,blackPx:blackPx,spots:spotN,pieces:cb2.n,decoN:decoN,decoPieces:decoPieces,decoTiny:decoTiny,decoThick:decoThick,widenN:widenN,ms:Date.now()-t0,tm:tm}};
+  return out;
+}
+function lostDetails(Bp,B,amin){
+  var n=0,i,c,cw=labelBin(Bp,W,H,false,0),k=new Int32Array(cw.n);
+  for(i=0;i<N;i++){c=cw.id[i];if(c>=0&&B[i])k[c]++;}
+  for(c=0;c<cw.n;c++)if(!cw.tb[c]&&cw.area[c]>=amin&&k[c]>0.5*cw.area[c])n++;
+  var cb=labelBin(Bp,W,H,true,1);k=new Int32Array(cb.n);
+  for(i=0;i<N;i++){c=cb.id[i];if(c>=0&&B[i])k[c]++;}
+  for(c=0;c<cb.n;c++)if(cb.area[c]>=amin&&k[c]<0.5*cb.area[c])n++;
+  return n;
+}
+function postRes(r){
+  var tr=[];if(r.B){tr.push(r.B.buffer,r.marks.buffer,r.pn.buffer,r.tags.buffer,r.pts.buffer);}
+  post(r,tr);
+}
+function doRender(P){var r=renderCore(P);postRes(r);}
+
+
+/* ---------- etapa 3: selección de zona ---------- */
+function doPick(m){
+  var cc=ST.cc,c=cc.id[m.y*W+m.x],l=cc.lbl[c],sp=m.papers[cc.sur[c]],similar=0,j;
+  for(j=0;j<cc.n;j++)if(cc.lbl[j]===l&&m.papers[cc.sur[j]]===sp)similar++;
+  post({t:'pick',comp:c,label:l,area:cc.area[c],similar:similar,x:m.x,y:m.y});
+}
+
+/* ---------- modo automático: propuestas ---------- */
+/* nivel de detalle: suavizado y número de colores. Las tres variantes de un nivel comparten el suavizado (se calcula una vez). */
+var LEVELS=[{smooth:60,k:4,kD:6,cl:2.2},{smooth:40,k:6,kD:8,cl:1},{smooth:25,k:8,kD:10,cl:0.6}];
+var VARIANTS=['contornos','macizo','detalle'];
+function r2(v,d){var p=Math.pow(10,d);return Math.round(v*p)/p;}
+function variantQ(vid,level){
+  var lv=LEVELS[level];
+  return {k:vid==='detalle'?lv.kD:lv.k,smooth:lv.smooth};
+}
+/* decide papeles y ajustes de una variante a partir de los colores (reparto, contacto con el borde y entre sí) */
+function planAuto(Q,vid,mm,level){
+  var K=Q.K,pal=Q.pal,lab=Q.palLab,adj=Q.adj,trL=Q.trL,btot=Q.btot,c,o,lv=LEVELS[level];
+  function L(c){return lab[c*3];}
+  function dE(a,b){var x=lab[a*3]-lab[b*3],y=lab[a*3+1]-lab[b*3+1],z=lab[a*3+2]-lab[b*3+2];return Math.sqrt(x*x+y*y+z*z);}
+  var valid=[];for(c=0;c<K;c++)if(c!==trL)valid.push(c);
+  var info={darkBg:false,bg:[],notes:[]};
+  var papers=[];for(c=0;c<K;c++)papers.push(2);
+  if(trL>=0)papers[trL]=3;
+  if(valid.length>1){
+    var dark=valid[0];for(c=0;c<valid.length;c++)if(L(valid[c])<L(dark))dark=valid[c];
+    var isD=function(c){return L(c)<=L(dark)+10;};
+    var bg=new Uint8Array(K);if(trL>=0)bg[trL]=1;
+    var dsh=0,dpct=0;valid.forEach(function(c){if(isD(c)){dsh+=pal[c].border;dpct+=pal[c].pct;}});dsh/=btot;
+    var darkBg=(dsh>=0.5&&dpct>=0.35)||(dsh>=0.85&&L(dark)<35);
+    if(darkBg)valid.forEach(function(c){if(isD(c))bg[c]=1;});
+    else{
+      var fb=-1,fv=0;valid.forEach(function(c){if(!isD(c)&&pal[c].border>fv){fv=pal[c].border;fb=c;}});
+      if(fb>=0&&fv>=0.25*btot){
+        bg[fb]=1;
+        /* otros tonos casi iguales que también tocan el borde (degradados del fondo) */
+        valid.forEach(function(c){if(!isD(c)&&c!==fb&&pal[c].border>=0.06*btot&&dE(c,fb)<=14)bg[c]=1;});
+      }
+    }
+    info.darkBg=darkBg;
+    var nb=valid.filter(function(c){return !bg[c];});
+    for(c=0;c<K;c++)if(bg[c])papers[c]=3;
+    if(nb.length){
+      var nbSet={};nb.forEach(function(c){nbSet[c]=1;});
+      if(!darkBg){
+        if(vid==='macizo'){
+          /* oscuros y medios → Negro; claros → Contorno. El corte baja si el negro ocuparía más de la mitad del dibujo */
+          var Lmax=-1,tot=0;nb.forEach(function(c){if(L(c)>Lmax)Lmax=L(c);tot+=pal[c].pct;});
+          var cut=L(dark)+0.45*(Lmax-L(dark)),cov;
+          for(;;){
+            cov=0;nb.forEach(function(c){if(isD(c)||L(c)<=cut)cov+=pal[c].pct;});
+            if(cov<=0.55*tot||cut<=L(dark)+10)break;
+            cut-=5;
+          }
+          nb.forEach(function(c){papers[c]=(isD(c)||L(c)<=cut)?0:2;});
+        }else nb.forEach(function(c){papers[c]=isD(c)?0:2;});
+      }else{
+        nb.forEach(function(c){
+          papers[c]=0;
+          var cbg=0,cot=0,best=-1,bv=0;
+          for(o=0;o<K;o++){
+            if(o===c)continue;var v=adj[c*K+o];
+            if(bg[o])cbg+=v;else{cot+=v;if(v>bv){bv=v;best=o;}}
+          }
+          var f=cot/Math.max(1,cbg+cot);
+          /* color claro que está sobre otros colores (no sobre el fondo): se queda como zona con contorno / blanca */
+          if(f>0.6&&best>=0&&L(c)-L(best)>=30)papers[c]=vid==='macizo'?1:2;
+        });
+      }
+      /* colores minoritarios (restos de antialias): toman el papel de su vecino más parecido */
+      var minor=nb.filter(function(c){return pal[c].pct<0.005;}).sort(function(a,b){return pal[a].pct-pal[b].pct;});
+      minor.forEach(function(c){
+        var best=-1,bd=1e9;
+        for(o=0;o<K;o++){if(o===c||adj[c*K+o]<=0)continue;var d=dE(c,o);if(d<bd){bd=d;best=o;}}
+        if(best>=0)papers[c]=papers[best];
+      });
+    }
+  }
+  /* ajustes según la variante y el nivel */
+  var base=Math.min(1.6,Math.max(0.6,mm*0.011)),P;
+  if(vid==='macizo')P={line:base*1.2,spotA:5,speck:0.15*lv.cl,hole:0.12*lv.cl,deco:'remove',textMm:3};
+  else if(vid==='detalle')P={line:Math.max(0.5,base*0.75),spotA:1.5,speck:0.05*lv.cl,hole:0.06*lv.cl,deco:(mm>=70&&level>=1)?'keep':'remove',textMm:2.2};
+  else P={line:base,spotA:3,speck:0.1*lv.cl,hole:0.1*lv.cl,deco:(mm>=70&&level>=1)?'keep':'remove',textMm:3};
+  P.line=r2(Math.max(0.5,P.line),2);P.speck=r2(P.speck,2);P.hole=r2(P.hole,2);
+  P.mm=mm;P.equal=false;P.spotOn=true;P.close=1;P.soft=1;P.fillGaps=false;P.widenGaps=true;P.alpha=1;P.tol=0.4;P.tiny=0.4;
+  P.papers=papers;P.ov=[];
+  return {papers:papers,P:P,info:info};
+}
+function autoVariant(m){
+  var vq=variantQ(m.id,m.level);
+  var Q=getQ(vq.k,vq.smooth);
+  var pl=planAuto(Q,m.id,m.mm,m.level);
+  ST=Q.ST;
+  if(m.light){
+    var P0=m.P||pl.P;P0.light=true;P0.final=!!m.confirm;P0.mm=m.mm;P0.dens=m.confirm?(m.dens||40):PREV_DENS;P0.maxN=8e6; /* la búsqueda no puede bajar mucho de 14 px/mm o las medidas dejan de valer */
+    var r0=renderCore(P0);r0.t='arec';r0.id=m.id;r0.gen=m.gen;r0.rg=m.rg;r0.mm=m.mm;r0.confirm=!!m.confirm;post(r0,[]);return;
+  }
+  var P=pl.P;P.light=false;P.final=!!m.final;P.dens=m.final?(m.dens||40):PREV_DENS;
+  if(!m.final)prog('Dibujando «'+m.name+'»…',0.05);
+  var r=renderCore(P);
+  r.t=m.final?'afinal':'variant';r.id=m.id;r.gen=m.gen;r.papers=pl.papers;r.P=P;r.k=vq.k;r.smooth=vq.smooth;r.info=pl.info;
+  r.pal=Q.pal;
+  postRes(r);
+}
+/* el motor vuelve a poner activa la cuantización pedida y la envía al modo manual (sin recalcular si ya está) */
+function useQuant(m){
+  var Q=getQ(m.k,m.smooth);ST=Q.ST;postQuant(Q,m.papers);
+}
+
+self.onmessage=function(e){
+  var m=e.data;
+  try{
+    if(m.t==='img'){setImg(m);post({t:'imgok'});}
+    else if(m.t==='auto')autoVariant(m);
+    else if(m.t==='quant')doQuant(m);
+    else if(m.t==='render')doRender(m.P);
+    else if(m.t==='pick')doPick(m);
+  }catch(err){post({t:'error',msg:String(err&&err.stack||err),for:m.t});}
+};
+
+</script>
+
+<script>
+/* ===== tema + shell ===== */
+function tic(t){return t==='dark'
+ ?'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.3"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/></svg>'
+ :'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';}
+function applyTheme(t){t=(t==='light')?'light':'dark';document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('dp3-theme',t);}catch(e){}var b=document.getElementById('dpThemeBtn');if(b)b.innerHTML=tic(t);var ic=document.getElementById('abIc');if(ic){var c=t==='light'?'#4D7C0F':'#A3E635';ic.setAttribute('stroke',c);var cs=ic.querySelectorAll('circle');for(var i=0;i<cs.length;i++)cs[i].setAttribute('fill',c);}if(window.self!==window.top){try{window.parent.postMessage({__dp3:true,type:'theme',theme:t},'*');}catch(e){}}}
+window.dpToggleTheme=function(){applyTheme((document.documentElement.getAttribute('data-theme')||'dark')==='dark'?'light':'dark');};
+window.dpHome=function(){if(window.self!==window.top){try{window.parent.postMessage({__dp3:true,type:'home'},'*');}catch(e){}}else{window.location.href='../../index.html';}};
+window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type==='theme'&&d.theme){applyTheme(d.theme);}});
+(function(){var p=null;try{p=new URLSearchParams(location.search).get('dptheme');}catch(e){}var s=null;try{s=localStorage.getItem('dp3-theme');}catch(e){}applyTheme(p||s||'dark');})();
+
+/* ===== app ===== */
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id);};
+var PAPN=['Negro','Blanco','Contorno','Fondo'];
+var MINLINE=0.5,PREV=14;
+function pnum(s){return parseFloat(String(s==null?'':s).replace(',','.'));}
+function dnum(v){return String(v).replace('.',',');}
+function fmt(n,d){return Number(n).toLocaleString('es-ES',{minimumFractionDigits:d==null?0:d,maximumFractionDigits:d==null?0:d});}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('on');},2600);}
+
+/* ---------- estado ---------- */
+var S={
+  bmp:null,name:'',W:0,H:0,rgba:null,
+  work:1600,qual:40,smooth:40,k:6,
+  palette:[],papers:[],ov:[],labels:null,
+  P:{mm:80,line:0.8,equal:false,spotOn:true,spotA:3,speck:0.15,hole:0.3,close:1,soft:1,fillGaps:false,widenGaps:false,alpha:1,tol:0.4,tiny:0.4,deco:'keep',textMm:0},
+  res:null,ev:null,
+  tool:false,toolPap:0,toolScope:'comp',
+  undo:[],leftView:'orig',rightView:'map',
+  Z:1,fit:true,sel:null,
+  quantReady:false
+};
+window.__LN=S;
+
+/* ---------- worker ---------- */
+var worker=null,busy=false,wantQuant=false,wantRender=false,wantFinal=false,qgen=0,rgen=0,jobGen=0,jobKind='',pickCb=null,pendingApply=null;
+function startWorker(){
+  var src=$('wk').textContent;
+  worker=new Worker(URL.createObjectURL(new Blob([src],{type:'text/javascript'})));
+  worker.onmessage=onWorker;
+  worker.onerror=function(e){setBusy(false,'');toast('Error en el motor de procesado');console.error(e.message||e);};
+}
+/* modo automático: hasta dos motores más para calcular las tres propuestas a la vez (mismo código, mismos resultados) */
+var AUXW=[],AUXQ=[];
+function auxCount(){var hc=navigator.hardwareConcurrency||2,dm=navigator.deviceMemory;if(dm&&dm<4)return 0;return Math.max(0,Math.min(2,hc-2));}
+function startAux(){
+  var n=auxCount(),src=$('wk').textContent;
+  for(var i=AUXW.length;i<n;i++)(function(wi){
+    try{var w=new Worker(URL.createObjectURL(new Blob([src],{type:'text/javascript'})));}catch(e){return;}
+    w.onmessage=function(e){
+      var m=e.data;
+      if(m.t==='error'){console.warn('Motor auxiliar: '+m.msg);auxFail(wi);return;}
+      if(m.t==='variant'||m.t==='arec'){var q=AUXQ[wi];if(q){var k=q.indexOf(m.id);if(k>=0)q.splice(k,1);}}
+      onWorker(e);
+    };
+    w.onerror=function(e){console.warn('Motor auxiliar: '+(e.message||e));auxFail(wi);};
+    AUXW[wi]=w;AUXQ[wi]=[];
+  })(i);
+}
+/* si un motor auxiliar falla, sus propuestas pendientes las calcula el principal */
+function auxFail(wi){
+  var q=AUXQ[wi]||[];AUXW[wi]=null;AUXQ[wi]=[];
+  q.forEach(function(id){if(A.running&&A.queue.indexOf(id)>=0)worker.postMessage({t:'auto',gen:A.gen,id:id,name:vdef(id).name,level:A.level,mm:A.mm});});
+}
+function engineFor(j){var ws=[null];for(var i=0;i<AUXW.length;i++)if(AUXW[i])ws.push(i);return ws[j%ws.length];}
+function postTo(wi,msg){if(wi===null||!AUXW[wi]){worker.postMessage(msg);return null;}AUXQ[wi].push(msg.id);AUXW[wi].postMessage(msg);return wi;}
+function setBusy(on,txt){$('busy').classList.toggle('on',!!on);$('busyTxt').textContent=on?(txt||'Procesando…'):'';}
+function pump(){
+  if(busy||!S.rgba)return;
+  if(wantQuant){
+    wantQuant=false;busy=true;jobKind='quant';jobGen=qgen;
+    setBusy(true,'Procesando colores…');
+    worker.postMessage({t:'quant',smooth:S.smooth,k:S.k});
+  }else if(wantRender&&S.quantReady){
+    var fin=wantFinal;wantRender=false;wantFinal=false;busy=true;jobKind='render';jobGen=rgen;
+    setBusy(true,fin?'Calculando la versión final a '+S.qual+' px/mm…':'Procesando…');
+    worker.postMessage({t:'render',P:renderParams(fin)});
+  }
+}
+function renderParams(fin){
+  var P=S.P,o=[];
+  for(var i=0;i<S.ov.length;i++)o.push({c:S.ov[i].c,paper:S.ov[i].paper,scope:S.ov[i].scope});
+  return {papers:S.papers.slice(),ov:o,mm:P.mm,line:Math.max(MINLINE,P.line),equal:P.equal,spotOn:P.spotOn,spotA:P.spotA,speck:P.speck,hole:P.hole,close:P.close,soft:P.soft,fillGaps:P.fillGaps,widenGaps:P.widenGaps,alpha:P.alpha,tol:P.tol,tiny:P.tiny,deco:P.deco,textMm:P.textMm,final:!!fin,dens:fin?S.qual:PREV};
+}
+function onWorker(e){
+  var m=e.data;
+  if(m.t==='prog'){$('busyTxt').textContent=m.msg;autoProg(m.msg,m.f);return;}
+  if(m.t==='variant'){autoVariantIn(m);return;}
+  if(m.t==='afinal'){autoFinalIn(m);return;}
+  if(m.t==='arec'){autoRecIn(m);return;}
+  if(m.t==='imgok')return;
+  if(m.t==='error'){busy=false;setBusy(false);console.error(m.msg);toast('No se pudo procesar la imagen');if(m.for==='auto'&&A.running){A.running=false;showProg(false);}return;}
+  if(m.t==='pick'){if(pickCb){var cb=pickCb;pickCb=null;cb(m);}return;}
+  if(m.t==='quant'){
+    busy=false;
+    if(jobGen!==qgen||wantQuant){setBusy(wantQuant||wantRender);pump();return;}
+    S.labels=new Uint8Array(m.labels);S.palette=m.palette;S.quantReady=true;S.autoPapers=m.papers.slice();
+    if(m.darkBg&&!pendingApply)toast('Fondo oscuro: se propone invertir (el fondo fuera y lo claro en negro).');
+    S.papers=pendingApply&&pendingApply.papers&&pendingApply.papers.length===m.papers.length?pendingApply.papers.slice():m.papers.slice();
+    pendingApply=null;
+    S.ov=[];S.undo=[];
+    buildPalette();updateOv();drawLeft();
+    wantRender=true;pump();return;
+  }
+  if(m.t==='render'){
+    busy=false;
+    if(jobGen!==rgen||wantQuant||wantRender){if(S.finalCb&&m.final)wantFinal=true;setBusy(true,'Procesando…');pump();return;}
+    setBusy(false);
+    S.res=m;showResult();
+    if(m.final&&S.finalCb){var cb=S.finalCb;S.finalCb=null;cb();}
+    pump();
+  }
+}
+function requestQuant(){qgen++;rgen++;wantQuant=true;S.quantReady=false;wantRender=false;pump();}
+var rT=null;
+function requestRender(delay){
+  if(!S.quantReady)return;
+  rgen++;wantRender=true;clearTimeout(rT);
+  if(delay){wantRender=false;rT=setTimeout(function(){wantRender=true;pump();},delay);}
+  else pump();
+}
+/* descargar siempre usa la versión final (alta densidad): si lo que se ve es la vista rápida, se calcula antes */
+function withFinal(cb){
+  if(S.res&&S.res.final){cb();return;}
+  if(!S.quantReady)return;
+  S.finalCb=cb;rgen++;clearTimeout(rT);wantRender=true;wantFinal=true;pump();
+}
+var qT=null;
+function requestQuantDebounced(){clearTimeout(qT);qT=setTimeout(function(){pendingApply=null;requestQuant();},400);}
+
+/* ---------- carga de imagen ---------- */
+function loadFile(f){
+  if(!f)return;
+  if(!/^image\/(jpeg|png|webp)$/.test(f.type)&&!/\.(jpe?g|png|webp)$/i.test(f.name)){toast('Formato no admitido. Usa JPG, PNG o WebP.');return;}
+  var url=URL.createObjectURL(f),img=new Image();
+  img.onload=function(){
+    S.bmp=img;S.name=f.name;URL.revokeObjectURL(url);
+    $('fname').textContent=f.name+' · '+img.naturalWidth+'×'+img.naturalHeight+' px';
+    prepareImage();
+  };
+  img.onerror=function(){URL.revokeObjectURL(url);toast('No se pudo leer la imagen.');};
+  img.src=url;
+}
+function prepareImage(){
+  var img=S.bmp,nw=img.naturalWidth,nh=img.naturalHeight,sc=Math.min(1,S.work/Math.max(nw,nh));
+  var w=Math.max(8,Math.round(nw*sc)),h=Math.max(8,Math.round(nh*sc));
+  var c=document.createElement('canvas');c.width=w;c.height=h;
+  var x=c.getContext('2d',{willReadFrequently:true});
+  /* primero sin fondo para leer la transparencia; luego sobre blanco */
+  x.imageSmoothingQuality='high';x.drawImage(img,0,0,w,h);
+  var ad=x.getImageData(0,0,w,h).data,al=new Uint8Array(w*h),nt=0;
+  for(var i=0;i<w*h;i++){if(ad[i*4+3]<128){al[i]=1;nt++;}}
+  x.globalCompositeOperation='destination-over';x.fillStyle='#fff';x.fillRect(0,0,w,h);x.globalCompositeOperation='source-over';
+  var id=x.getImageData(0,0,w,h);
+  S.alpha=nt?al:null;
+  S.W=w;S.H=h;S.rgba=id.data;S.res=null;S.ev=null;S.palette=[];S.papers=[];S.ov=[];S.undo=[];S.quantReady=false;
+  $('empty').style.display='none';
+  setSize('w',S.P.mm);
+  sizeCanvases();fitView();drawLeft();clearResult();updateOv();
+  var ic=S.rgba.buffer.slice(0),ia=S.alpha?S.alpha.buffer.slice(0):null;
+  startAux();
+  for(var a=0;a<AUXW.length;a++)if(AUXW[a]){AUXQ[a]=[];AUXW[a].postMessage({t:'img',rgba:S.rgba.buffer.slice(0),alpha:S.alpha?S.alpha.buffer.slice(0):null,w:w,h:h});}
+  worker.postMessage({t:'img',rgba:ic,alpha:ia,w:w,h:h},ia?[ic,ia]:[ic]);
+  S.origCanvas=null;
+  if(document.body.dataset.mode==='auto'){autoImageLoaded();}
+  else{pendingApply=pendingApply||null;requestQuant();}
+}
+function sizeCanvases(){
+  ['cL','cR','cM'].forEach(function(id){var c=$(id);c.width=S.W;c.height=S.H;});
+}
+
+/* ---------- tamaño ---------- */
+function setSize(which,v){
+  v=Number(v);if(!(v>0))return;
+  var asp=S.W&&S.H?S.W/S.H:1,w,h;
+  if(which==='w'){w=v;h=v/asp;}else{h=v;w=v*asp;}
+  S.P.mm=w;
+  $('outW').value=dnum(Math.round(w*100)/100);$('outH').value=dnum(Math.round(h*100)/100);
+  updateSizeInfo();
+}
+function updateSizeInfo(){
+  if(!S.W){$('sizeInfo').textContent='Sin imagen';return;}
+  var s=S.P.mm/S.W,h=S.P.mm*S.H/S.W;
+  var fw=Math.round(S.P.mm*S.qual),fh=Math.round(S.P.mm*S.qual*S.H/S.W);
+  $('sizeInfo').textContent='Salida '+fmt(S.P.mm,1)+' × '+fmt(h,1)+' mm · vista rápida a '+PREV+' px/mm · versión final a '+S.qual+' px/mm ('+fmt(fw)+'×'+fmt(fh)+' px)';
+  $('pxInfo').textContent='La vista rápida se calcula al momento; la versión final (alta densidad) se calcula al descargar o al elegir una propuesta. Línea mínima: 0,5 mm.';
+}
+
+/* ---------- paleta ---------- */
+function buildPalette(){
+  var h='';
+  S.palette.forEach(function(p,i){
+    var b='';
+    for(var q=0;q<4;q++)b+='<button class="pap-'+'NBCF'.charAt(q)+(S.papers[i]===q?' on':'')+'" data-i="'+i+'" data-p="'+q+'">'+PAPN[q]+'</button>';
+    h+='<div class="pal-i"><span class="sw'+(p.tr?' tr':'')+'" style="'+(p.tr?'':'background:rgb('+p.rgb.join(',')+')')+'" title="'+(p.tr?'Zona transparente de la imagen':'rgb('+p.rgb.join(', ')+')')+'"></span><span class="pi-m"><b>'+(p.tr?'Transp.':'Color '+(i+1))+'</b>'+fmt(p.pct*100,1)+' %</span><div class="seg">'+b+'</div></div>';
+  });
+  $('pal').innerHTML=h||'<div class="hint">Carga una imagen para ver la paleta.</div>';
+}
+function snapshot(){S.undo.push(JSON.stringify({p:S.papers,o:S.ov}));if(S.undo.length>40)S.undo.shift();updateOv();}
+$('pal').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-i]');if(!b)return;
+  var i=+b.dataset.i,p=+b.dataset.p;if(S.papers[i]===p)return;
+  snapshot();S.papers[i]=p;buildPalette();requestRender(120);
+});
+$('autoPap').addEventListener('click',function(){
+  if(!S.quantReady)return;
+  snapshot();
+  pendingApply=null;
+  /* vuelve a la propuesta que hizo el motor al agrupar los colores (más oscuro → Negro, el que más toca el borde → Fondo, resto → Contorno) */
+  S.papers=(S.autoPapers||S.papers).slice();S.ov=[];buildPalette();updateOv();requestRender(60);
+});
+
+/* ---------- retoque ---------- */
+function updateOv(){
+  var n=S.ov.length;
+  $('ovCnt').textContent=n?(n+' retoque'+(n>1?'s':'')+' por zona.'):'Sin retoques.';
+  $('undoBtn').disabled=!S.undo.length;$('clrBtn').disabled=!n;
+}
+$('toolBtn').addEventListener('click',function(){setTool(!S.tool);});
+function setTool(on){
+  S.tool=on;$('toolBtn').classList.toggle('on',on);
+  $('toolBtn').textContent=on?'Clic en zona: activo':'Clic en zona';
+  $('paneL').classList.toggle('tool',on);$('paneR').classList.toggle('tool',on);
+  if(on)toast('Pulsa sobre una zona de la imagen para darle el papel «'+PAPN[S.toolPap]+'».');
+}
+$('toolPap').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;S.toolPap=+b.dataset.p;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});});
+$('toolScope').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;S.toolScope=b.dataset.s;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});});
+$('undoBtn').addEventListener('click',undo);
+function undo(){
+  if(!S.undo.length)return;
+  var o=JSON.parse(S.undo.pop());S.papers=o.p;S.ov=o.o;buildPalette();updateOv();requestRender(60);
+}
+document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!/INPUT|SELECT|TEXTAREA/.test((e.target&&e.target.tagName)||'')){e.preventDefault();undo();}});
+$('clrBtn').addEventListener('click',function(){if(!S.ov.length)return;snapshot();S.ov=[];updateOv();requestRender(60);});
+function pickAt(fx,fy){
+  if(!S.quantReady||pickCb)return;
+  var x=Math.min(S.W-1,Math.max(0,Math.floor(fx*S.W))),y=Math.min(S.H-1,Math.max(0,Math.floor(fy*S.H)));
+  pickCb=function(m){
+    snapshot();
+    var paper=S.toolPap,scope=S.toolScope,found=false;
+    for(var i=0;i<S.ov.length;i++)if(S.ov[i].c===m.comp){S.ov[i].paper=paper;S.ov[i].scope=scope;found=true;}
+    if(!found)S.ov.push({c:m.comp,paper:paper,scope:scope,label:m.label});
+    updateOv();ring(x,y);
+    toast('Zona del color '+(m.label+1)+' → '+PAPN[paper]+(scope==='similar'?' ('+m.similar+' zonas parecidas)':''));
+    requestRender(0);
+  };
+  worker.postMessage({t:'pick',x:x,y:y,papers:S.papers.slice()});
+}
+function ring(x,y){
+  ['cvL','cvR'].forEach(function(id){
+    var r=document.createElement('div');r.className='ring';r.style.left=(x/S.W*100)+'%';r.style.top=(y/S.H*100)+'%';
+    $(id).appendChild(r);setTimeout(function(){if(r.parentNode)r.parentNode.removeChild(r);},800);
+  });
+}
+
+/* ---------- ajustes numéricos ---------- */
+function bindRange(id,key,target,fmtFn,onQuant){
+  var el=$(id);
+  el.addEventListener('input',function(){
+    var v=parseFloat(el.value);if(isNaN(v))return;
+    target[key]=v;$('v-'+id).textContent=fmtFn(v);
+    if(onQuant)requestQuantDebounced();else requestRender(250);
+  });
+}
+bindRange('smooth','smooth',S,function(v){return String(v);},true);
+bindRange('k','k',S,function(v){return String(v);},true);
+bindRange('soft','soft',S.P,function(v){return String(v);});
+bindRange('alpha','alpha',S.P,function(v){return fmt(v,2);});
+bindRange('tol','tol',S.P,function(v){return fmt(v,2);});
+function bindNum(id,key,min,max){
+  var el=$(id);
+  el.addEventListener('input',function(){
+    var v=pnum(el.value);if(isNaN(v))return;
+    if(v<min||v>max)return;
+    S.P[key]=v;requestRender(300);
+  });
+  el.addEventListener('change',function(){
+    var v=pnum(el.value);if(isNaN(v))v=S.P[key];
+    v=Math.min(max,Math.max(min,v));S.P[key]=v;el.value=dnum(v);requestRender(0);
+  });
+}
+bindNum('line','line',MINLINE,10);bindNum('spotA','spotA',0.1,100);bindNum('speck','speck',0,20);bindNum('hole','hole',0,20);
+function bindChk(id,key){$(id).addEventListener('change',function(){S.P[key]=this.checked;requestRender(60);});}
+bindChk('equal','equal');bindChk('spotOn','spotOn');
+$('textOn').addEventListener('change',function(){S.P.textMm=this.checked?3:0;requestRender(60);});
+/* se pueden combinar: primero se ensancha lo que se puede y después se tapa lo que siga siendo estrecho */
+function setGapOpt(k,on){S.P[k]=on;$(k).checked=on;}
+$('fillGaps').addEventListener('change',function(){setGapOpt('fillGaps',this.checked);requestRender(60);});
+$('widenGaps').addEventListener('change',function(){setGapOpt('widenGaps',this.checked);requestRender(60);});
+function setDeco(v){S.P.deco=v==='remove'?'remove':'keep';[].forEach.call($('decoSeg').children,function(x){x.classList.toggle('on',x.dataset.v===S.P.deco);});}
+$('decoSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;setDeco(b.dataset.v);requestRender(60);});
+$('closeSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;S.P.close=+b.dataset.v;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});requestRender(60);});
+$('outW').addEventListener('input',function(){var v=pnum(this.value);if(v>=5&&v<=1000&&S.W){S.P.mm=v;var h=v*S.H/S.W;$('outH').value=dnum(Math.round(h*100)/100);updateSizeInfo();requestRender(350);}});
+$('outH').addEventListener('input',function(){var v=pnum(this.value);if(v>=5&&v<=1000&&S.W){var w=v*S.W/S.H;S.P.mm=w;$('outW').value=dnum(Math.round(w*100)/100);updateSizeInfo();requestRender(350);}});
+$('outW').addEventListener('change',function(){var v=pnum(this.value);if(!(v>=5))v=5;if(v>1000)v=1000;if(!S.W){S.P.mm=v;this.value=dnum(v);return;}setSize('w',v);requestRender(0);});
+$('outH').addEventListener('change',function(){var v=pnum(this.value);if(!(v>=5))v=5;if(v>1000)v=1000;if(!S.W)return;setSize('h',v);requestRender(0);});
+$('work').addEventListener('change',function(){S.qual=(+this.value===30)?30:40;updateSizeInfo();if(S.res&&S.res.final)requestRender(0);});
+
+/* ---------- entrada de archivos ---------- */
+$('file').addEventListener('change',function(){if(this.files&&this.files[0])loadFile(this.files[0]);this.value='';});
+['drop0','drop1','aDrop','aDrop2'].forEach(function(id){var d=$(id);
+  d.addEventListener('dragover',function(e){e.preventDefault();d.classList.add('over');});
+  d.addEventListener('dragleave',function(){d.classList.remove('over');});
+  d.addEventListener('drop',function(e){e.preventDefault();d.classList.remove('over');var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f)loadFile(f);});
+});
+['dragover','drop'].forEach(function(ev){document.addEventListener(ev,function(e){e.preventDefault();if(ev==='drop'&&e.target.closest&&!e.target.closest('.drop')){var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f)loadFile(f);}});});
+
+/* ---------- dibujo ---------- */
+var resImg=null;
+function drawLeft(){
+  if(!S.rgba)return;
+  var c=$('cL'),x=c.getContext('2d');
+  if(S.leftView==='quant'&&S.labels){
+    var id=x.createImageData(S.W,S.H),d=id.data,pal=S.palette,N=S.W*S.H,i,col,TRC=[220,220,226];
+    for(i=0;i<N;i++){col=pal[S.labels[i]].tr?TRC:pal[S.labels[i]].rgb;d[i*4]=col[0];d[i*4+1]=col[1];d[i*4+2]=col[2];d[i*4+3]=255;}
+    x.putImageData(id,0,0);
+  }else{
+    var im=new ImageData(new Uint8ClampedArray(S.rgba),S.W,S.H);
+    if(S.alpha){var dd=im.data,W0=S.W;for(var q=0;q<S.alpha.length;q++)if(S.alpha[q]){var v=(((q%W0)>>3)+((q/W0|0)>>3))&1?200:235;dd[q*4]=dd[q*4+1]=dd[q*4+2]=v;}}
+    x.putImageData(im,0,0);
+  }
+}
+$('segLeft').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;S.leftView=b.dataset.v;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});drawLeft();});
+$('segRight').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;S.rightView=b.dataset.v;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});drawRight();});
+function clearResult(){
+  var c=$('cR'),x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);
+  $('cM').getContext('2d').clearRect(0,0,c.width,c.height);
+  setChips(null);$('qmsg').innerHTML='';setExports(false);
+}
+function pathString(res,k,dec){
+  var pn=res.pn,tags=res.tags,pts=res.pts,np=res.np,o=0,i,j,n,parts=[];
+  function f(v){return (v*k).toFixed(dec).replace(/\.?0+$/,'')||'0';}
+  for(i=0;i<np;i++){
+    n=pn[i];
+    var last=(o+n-1)*6+4;
+    var s='M'+f(pts[last])+' '+f(pts[last+1]);
+    for(j=0;j<n;j++){
+      var b=(o+j)*6;
+      if(tags[o+j]===1)s+='C'+f(pts[b])+' '+f(pts[b+1])+' '+f(pts[b+2])+' '+f(pts[b+3])+' '+f(pts[b+4])+' '+f(pts[b+5]);
+      else s+='L'+f(pts[b+2])+' '+f(pts[b+3])+' '+f(pts[b+4])+' '+f(pts[b+5]);
+    }
+    parts.push(s+'Z');o+=n;
+  }
+  return parts.join('');
+}
+function drawRight(){
+  if(!S.res)return;
+  var c=$('cR'),x=c.getContext('2d'),RW=S.res.W,RH=S.res.H;
+  if(c.width!==RW||c.height!==RH){c.width=RW;c.height=RH;}
+  if(S.rightView==='vec'){
+    x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.fillStyle='#000';
+    x.fill(new Path2D(pathString(S.res,1,2)),'evenodd');
+  }else{
+    var B=S.res.B,N=RW*RH,id=x.createImageData(RW,RH),d=id.data,v;
+    for(var i=0;i<N;i++){v=B[i]?0:255;d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255;}
+    x.putImageData(id,0,0);
+  }
+  drawMarks();
+}
+var MCOL={1:[255,59,48],2:[255,149,0],4:[175,82,222],8:[0,122,255]};
+function drawMarks(){
+  var c=$('cM'),x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);
+  if(!S.res||!$('showMarks').checked)return;
+  if(c.width!==S.res.W||c.height!==S.res.H){c.width=S.res.W;c.height=S.res.H;}
+  var m=S.res.marks,N=S.res.W*S.res.H,id=x.createImageData(S.res.W,S.res.H),d=id.data,any=false,sel=S.sel,i,v,col;
+  var selBit=sel==='line'?1:sel==='gap'?2:sel==='tiny'?4:sel==='closed'?8:0;
+  if(sel&&!selBit){return;}
+  /* ampliar marcas 3 px para que se vean con el zoom de ajuste */
+  var W=S.res.W,H=S.res.H,rad=Math.max(2,Math.round(Math.max(W,H)/500));
+  var big=new Uint8Array(N);
+  for(i=0;i<N;i++){v=m[i];if(selBit)v&=selBit;if(v){
+    var px=i%W,py=(i-px)/W;
+    for(var dy=-rad;dy<=rad;dy++){var yy=py+dy;if(yy<0||yy>=H)continue;for(var dx=-rad;dx<=rad;dx++){var xx=px+dx;if(xx<0||xx>=W)continue;if(dx*dx+dy*dy>rad*rad)continue;big[yy*W+xx]|=v;}}
+  }}
+  for(i=0;i<N;i++){v=big[i];if(!v)continue;any=true;
+    col=(v&8)?MCOL[8]:(v&1)?MCOL[1]:(v&2)?MCOL[2]:MCOL[4];
+    d[i*4]=col[0];d[i*4+1]=col[1];d[i*4+2]=col[2];d[i*4+3]=170;}
+  if(any)x.putImageData(id,0,0);
+}
+$('showMarks').addEventListener('change',drawMarks);
+
+/* ---------- zoom y paneles ---------- */
+var pL=$('paneL'),pR=$('paneR');
+function paneAvail(){var r=pL.getBoundingClientRect();return {w:Math.max(50,r.width-2),h:Math.max(50,r.height-2)};}
+function applyZoom(){
+  if(!S.W)return;
+  var w=Math.round(S.W*S.Z),h=Math.round(S.H*S.Z);
+  ['cvL','cvR'].forEach(function(id){var e=$(id);e.style.width=w+'px';e.style.height=h+'px';});
+  var px=S.Z>=2;['cL','cR','cM'].forEach(function(id){$(id).classList.toggle('px',px);});
+  $('zVal').textContent=Math.round(S.Z*100)+' %';
+}
+function fitView(){
+  if(!S.W)return;
+  var a=paneAvail();S.Z=Math.min(a.w/S.W,a.h/S.H);S.fit=true;applyZoom();
+}
+function zoomBy(f,cx,cy){
+  if(!S.W)return;
+  var a=paneAvail(),nz=Math.min(8,Math.max(0.05,S.Z*f));
+  if(cx==null){cx=a.w/2;cy=a.h/2;}
+  var ux=(pL.scrollLeft+cx-$('cvL').offsetLeft)/S.Z,uy=(pL.scrollTop+cy-$('cvL').offsetTop)/S.Z;
+  S.Z=nz;S.fit=false;applyZoom();
+  var nl=ux*S.Z-cx+$('cvL').offsetLeft,nt=uy*S.Z-cy+$('cvL').offsetTop;
+  pL.scrollLeft=nl;pL.scrollTop=nt;
+}
+$('zIn').addEventListener('click',function(){zoomBy(1.4);});
+$('zOut').addEventListener('click',function(){zoomBy(1/1.4);});
+$('zFit').addEventListener('click',fitView);
+$('z100').addEventListener('click',function(){S.Z=1;S.fit=false;applyZoom();});
+window.addEventListener('resize',function(){if(S.fit)fitView();});
+[pL,pR].forEach(function(p){
+  var other=p===pL?pR:pL;
+  p.addEventListener('scroll',function(){
+    if(p._skip){p._skip=false;return;}
+    if(other.scrollLeft!==p.scrollLeft||other.scrollTop!==p.scrollTop){other._skip=true;other.scrollLeft=p.scrollLeft;other.scrollTop=p.scrollTop;}
+  });
+  p.addEventListener('wheel',function(e){
+    if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();
+    var r=p.getBoundingClientRect();zoomBy(e.deltaY<0?1.15:1/1.15,e.clientX-r.left,e.clientY-r.top);
+  },{passive:false});
+  var st=null;
+  p.addEventListener('pointerdown',function(e){if(e.button!==0)return;st={x:e.clientX,y:e.clientY,sl:p.scrollLeft,stp:p.scrollTop,drag:false,type:e.pointerType};});
+  p.addEventListener('pointermove',function(e){
+    if(!st||st.type!=='mouse')return;
+    var dx=e.clientX-st.x,dy=e.clientY-st.y;
+    if(!st.drag&&Math.abs(dx)+Math.abs(dy)>5){st.drag=true;p.style.cursor='grabbing';}
+    if(st.drag){p.scrollLeft=st.sl-dx;p.scrollTop=st.stp-dy;}
+  });
+  function up(e){
+    if(!st)return;var s=st;st=null;p.style.cursor='';
+    if(s.drag)return;
+    if(Math.abs(e.clientX-s.x)+Math.abs(e.clientY-s.y)>8)return;
+    if(!S.tool)return;
+    var cv=p===pL?$('cvL'):$('cvR'),r=cv.getBoundingClientRect();
+    var fx=(e.clientX-r.left)/r.width,fy=(e.clientY-r.top)/r.height;
+    if(fx<0||fy<0||fx>1||fy>1)return;
+    pickAt(fx,fy);
+  }
+  p.addEventListener('pointerup',up);
+  p.addEventListener('pointercancel',function(){st=null;p.style.cursor='';});
+});
+
+/* ---------- calidad ---------- */
+var LV=['g','y','r'];
+function setChip(k,lvl,txt){var d=$('qd-'+k);d.className='qd'+(lvl==null?'':' '+LV[lvl]);$('qv-'+k).textContent=txt;}
+function setChips(ev){
+  var ks=['fid','line','gap','tiny','nodes','closed'];
+  if(!ev){ks.forEach(function(k){setChip(k,null,'—');});return;}
+  ks.forEach(function(k){setChip(k,ev[k].lvl,ev[k].txt);});
+}
+$('qrow').addEventListener('click',function(e){
+  var b=e.target.closest('.qchip');if(!b)return;
+  var k=b.dataset.k;S.sel=(S.sel===k)?null:k;
+  [].forEach.call(this.children,function(x){x.classList.toggle('sel',x.dataset.k===S.sel);});
+  drawMarks();
+});
+/* píxeles a r px o menos (en cuadrado) de un borde blanco/negro del mapa */
+function nearEdge(B,W,H,r){
+  var N=W*H,E=new Uint8Array(N),x,y,i,j,c;
+  for(y=0;y<H;y++)for(x=0;x<W;x++){i=y*W+x;var b=B[i];
+    if((x>0&&B[i-1]!==b)||(x<W-1&&B[i+1]!==b)||(y>0&&B[i-W]!==b)||(y<H-1&&B[i+W]!==b))E[i]=1;}
+  var T=new Uint8Array(N);
+  for(y=0;y<H;y++){c=0;var o=y*W;
+    for(x=0;x<Math.min(W,r);x++)c+=E[o+x];
+    for(x=0;x<W;x++){if(x+r<W)c+=E[o+x+r];T[o+x]=c>0?1:0;if(x-r>=0)c-=E[o+x-r];}}
+  var R=new Uint8Array(N);
+  for(x=0;x<W;x++){c=0;
+    for(y=0;y<Math.min(H,r);y++)c+=T[y*W+x];
+    for(y=0;y<H;y++){if(y+r<H)c+=T[(y+r)*W+x];R[y*W+x]=c>0?1:0;if(y-r>=0)c-=T[(y-r)*W+x];}}
+  return R;
+}
+function evaluate(r,P){
+  var st=r.stats,W=r.W,H=r.H,N=W*H,s=P.mm/W,ev={};
+  /* fidelidad: rasterizar el SVG y comparar con el mapa */
+  var c=document.createElement('canvas');c.width=W;c.height=H;
+  var x=c.getContext('2d',{willReadFrequently:true});
+  x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#000';
+  x.fill(new Path2D(pathString(r,1,2)),'evenodd');
+  var d=x.getImageData(0,0,W,H).data,diff=0,inter=0,uni=0,i,B=r.B,bl,ev2=new Uint8Array(N),nb=0,dev=0;
+  for(i=0;i<N;i++){bl=d[i*4]<128?1:0;ev2[i]=bl;if(bl!==B[i])diff++;if(bl&&B[i])inter++;if(bl||B[i])uni++;if(B[i])nb++;}
+  /* fidelidad: parte del negro del mapa B/N en la que el vector se aparta MÁS DE 0,1 mm.
+     Las diferencias pegadas al borde (suavizado de las curvas, medio píxel arriba o abajo) no cuentan:
+     con la intersección/unión, un dibujo de líneas finas salía «poco fiel» solo por tener mucho borde. */
+  var rt=Math.max(1,Math.min(6,Math.round(0.1/s))),near=nearEdge(B,W,H,rt);
+  for(i=0;i<N;i++)if(ev2[i]!==B[i]&&!near[i])dev++;
+  var fid=nb?Math.max(0,100-dev/nb*100):100;
+  ev.iou=uni?inter/uni*100:100;
+  ev.fid={v:fid,lvl:fid>=99?0:fid>=97?1:2,txt:fmt(fid,1)+' % del negro'};
+  /* perfiles: con relleno par-impar y con relleno no nulo deben salir idénticos;
+     si no, hay trazados que se cruzan o se solapan y Fusion no los separa en perfiles limpios */
+  x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#000';
+  x.fill(new Path2D(pathString(r,1,2)),'nonzero');
+  d=x.getImageData(0,0,W,H).data;var ovl=0;
+  for(i=0;i<N;i++){bl=d[i*4]<128?1:0;if(bl!==ev2[i]){ovl++;r.marks[i]|=8;}}
+  ev.line=st.thinCount===0?{lvl:0,txt:'≥ 0,50 mm'}:{lvl:2,txt:'< 0,50 mm · '+st.thinCount+' zonas'};
+  ev.gap=st.gapLevel===0?{lvl:0,txt:'≥ 0,5 mm'}:st.gapLevel===1?{lvl:1,txt:'0,3–0,5 mm · '+st.gapCount+' sitios'}:{lvl:2,txt:'< 0,3 mm · '+st.gapCount+' sitios'};
+  ev.tiny=st.tiny===0?{lvl:0,txt:'Ninguno'}:{lvl:st.tiny>25?2:1,txt:st.tiny+' pieza'+(st.tiny>1?'s':'')+' < '+fmt(P.tiny,1)+' mm²'};
+  ev.nodes={lvl:st.nodes<3000?0:st.nodes<=10000?1:2,txt:fmt(st.nodes)+' nodos'};
+  /* todos los trazados se cierran con Z; además se exige que no sean degenerados ni se solapen */
+  var degen=0;for(i=0;i<r.np;i++){if(r.pn[i]<2)degen++;}
+  ev.closed={lvl:(degen===0&&ovl===0)?0:2,txt:(degen===0&&ovl===0)?('Todos ('+fmt(r.np)+'), sin cruces'):((degen?degen+' degenerados ':'')+(ovl?fmt(ovl)+' px solapados':''))};
+  ev.diff=diff;ev.s=s;
+  return ev;
+}
+function showResult(){
+  drawRight();
+  var ev=evaluate(S.res,S.P);S.ev=ev;setChips(ev);drawMarks();
+  var st=S.res.stats,m=[],P=S.P;
+  if(!S.res.final)m.push('<div class="qm">Vista rápida ('+fmt(S.res.dens,0)+' px/mm). Al descargar se calcula la versión final a '+S.qual+' px/mm; <button class="btn sm" data-a="final">Calcular la versión final ahora</button></div>');
+  else if(S.res.warn)m.push('<div class="qm"><b>Tamaño grande:</b> para no agotar la memoria la versión final se ha calculado a '+fmt(S.res.dens,0)+' px/mm en vez de '+S.qual+' px/mm'+(S.res.dens<20?' (menos de 20 px/mm: los detalles finos pueden perder precisión)':'')+'.</div>');
+  if(st.widenN>0)m.push('<div class="qm">Se ensancharon <b>'+st.widenN+'</b> huecos blancos finos hasta 0,5 mm.</div>');
+  if(st.lost>=3)m.push('<div class="qm">A '+fmt(P.mm,0)+' mm <b>se pierden '+st.lost+' detalles pequeños</b> (letras, huecos finos): aumenta el tamaño o dales otro papel con «Clic en zona».</div>');
+  if(st.thickN>0)m.push('<div class="qm">Se engrosaron <b>'+st.thickN+'</b> zonas más finas de 0,5 mm hasta ese mínimo.'+(st.thickN>40?' <b>Hay mucho detalle fino</b>: a este tamaño cambia de aspecto; puedes quitarlo con «Clic en zona» → Fondo.':'')+'</div>');
+  if(st.decoN>0&&P.deco==='keep'){
+    var dp=[];if(st.decoThick>0)dp.push(st.decoThick+' parte'+(st.decoThick>1?'s':'')+' más fina'+(st.decoThick>1?'s':'')+' de 0,5 mm (engrosada'+(st.decoThick>1?'s':'')+')');if(st.decoTiny>0)dp.push(st.decoTiny+' mota'+(st.decoTiny>1?'s':''));
+    m.push('<div class="qm">Decoración del fondo conservada como línea ('+st.decoN+' zona'+(st.decoN>1?'s':'')+').'+(dp.length?' <b>A '+fmt(P.mm,0)+' mm tiene '+dp.join(' y ')+'.</b>':'')+' <button class="btn sm" data-a="decoOff">Quitar decoración</button></div>');
+  }else if(st.decoN>0)m.push('<div class="qm">Decoración del fondo quitada ('+st.decoN+' zona'+(st.decoN>1?'s':'')+'). <button class="btn sm" data-a="decoOn">Conservarla como línea</button></div>');
+  if(ev.closed.lvl>0)m.push('<div class="qm">Hay trazados que se solapan (azul): baja la tolerancia de simplificación o sube el tamaño.</div>');
+  if(ev.gap.lvl>0)m.push('<div class="qm">Hay huecos blancos estrechos (naranja). <button class="btn sm" data-a="widen">Ensanchar a 0,5 mm</button><button class="btn sm" data-a="gaps">Cerrar huecos finos</button><button class="btn sm" data-a="deco">Quitar decoración con clic</button></div>');
+  if(st.tiny>0)m.push('<div class="qm">Hay piezas negras minúsculas (violeta), que se perderían al imprimir. <button class="btn sm" data-a="tiny">Quitarlas</button><button class="btn sm" data-a="deco">Quitar decoración con clic</button></div>');
+  if(ev.fid.lvl>0)m.push('<div class="qm">El vector se aparta del mapa B/N: baja la tolerancia de simplificación o el valor de «Esquinas».</div>');
+  if(ev.nodes.lvl>0)m.push('<div class="qm">Muchos nodos: sube la tolerancia de simplificación o quita decoración para aligerar el archivo en Fusion.</div>');
+  $('qmsg').innerHTML=m.join('');
+  setExports(true);
+  window.__lastEval=ev;
+}
+$('qmsg').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-a]');if(!b)return;
+  var a=b.dataset.a;
+  if(a==='gaps'){setGapOpt('fillGaps',true);requestRender(0);}
+  else if(a==='widen'){setGapOpt('widenGaps',true);requestRender(0);}
+  else if(a==='tiny'){S.P.speck=Math.max(S.P.speck,S.P.tiny);$('speck').value=dnum(S.P.speck);requestRender(0);}
+  else if(a==='decoOff'||a==='decoOn'){setDeco(a==='decoOff'?'remove':'keep');requestRender(0);}
+  else if(a==='final'){withFinal(function(){toast('Versión final calculada.');});}
+  else if(a==='deco'){S.toolPap=3;[].forEach.call($('toolPap').children,function(x){x.classList.toggle('on',x.dataset.p==='3');});setTool(true);}
+});
+
+/* ---------- exportar ---------- */
+function setExports(on){['exSvg','exDxf','exPng'].forEach(function(id){$(id).disabled=!on;});}
+function baseName(mm){var n=(S.name||'imagen').replace(/\.[^.]+$/,'').replace(/[^\w\-áéíóúñÁÉÍÓÚÑ]+/g,'_');return n+'_linea_'+Math.round(mm==null?S.P.mm:mm)+'mm';}
+function dl(blob,name){
+  var a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(u);a.remove();},1500);
+}
+function mmStr(v){return String(Math.round(v*1000)/1000);}
+function buildSVG(r,mm){
+  r=r||S.res;mm=mm||S.P.mm;var s=mm/r.W,wmm=r.W*s,hmm=r.H*s;
+  var d=pathString(r,s,3);
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="'+mmStr(wmm)+'mm" height="'+mmStr(hmm)+'mm" viewBox="0 0 '+mmStr(wmm)+' '+mmStr(hmm)+'">\n<path fill="#000000" fill-rule="evenodd" stroke="none" d="'+d+'"/>\n</svg>\n';
+}
+function buildDXF(r,mm){
+  r=r||S.res;mm=mm||S.P.mm;var s=mm/r.W,hmm=r.H*s,pn=r.pn,tags=r.tags,pts=r.pts,o=0,i,j,out=[];
+  function v(n){return (Math.round(n*1000)/1000).toString();}
+  out.push('0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n9\n$INSBASE\n10\n0.0\n20\n0.0\n30\n0.0\n9\n$INSUNITS\n70\n4\n9\n$MEASUREMENT\n70\n1\n0\nENDSEC');
+  out.push('0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLTYPE\n70\n1\n0\nLTYPE\n2\nCONTINUOUS\n70\n0\n3\nSolid line\n72\n65\n73\n0\n40\n0.0\n0\nENDTAB\n0\nTABLE\n2\nLAYER\n70\n1\n0\nLAYER\n2\n0\n70\n0\n62\n7\n6\nCONTINUOUS\n0\nENDTAB\n0\nENDSEC');
+  out.push('0\nSECTION\n2\nENTITIES');
+  for(i=0;i<r.np;i++){
+    var n=pn[i],last=(o+n-1)*6+4,px=pts[last]*s,py=pts[last+1]*s,poly=[[px,hmm-py]];
+    for(j=0;j<n;j++){
+      var b=(o+j)*6,x1=pts[b]*s,y1=pts[b+1]*s,x2=pts[b+2]*s,y2=pts[b+3]*s,x3=pts[b+4]*s,y3=pts[b+5]*s;
+      if(tags[o+j]===1){
+        var len=Math.hypot(x1-px,y1-py)+Math.hypot(x2-x1,y2-y1)+Math.hypot(x3-x2,y3-y2),m=Math.max(2,Math.min(64,Math.ceil(len/0.15)));
+        for(var t=1;t<=m;t++){
+          var u=t/m,a=(1-u)*(1-u)*(1-u),b2=3*u*(1-u)*(1-u),c2=3*u*u*(1-u),d2=u*u*u;
+          poly.push([a*px+b2*x1+c2*x2+d2*x3,hmm-(a*py+b2*y1+c2*y2+d2*y3)]);
+        }
+      }else{
+        poly.push([x2,hmm-y2]);poly.push([x3,hmm-y3]);
+      }
+      px=x3;py=y3;
+    }
+    o+=n;
+    poly.pop(); /* el último punto repite el primero */
+    if(poly.length<3)continue;
+    var e='0\nPOLYLINE\n8\n0\n66\n1\n70\n1\n';
+    for(j=0;j<poly.length;j++)e+='0\nVERTEX\n8\n0\n10\n'+v(poly[j][0])+'\n20\n'+v(poly[j][1])+'\n30\n0.0\n';
+    e+='0\nSEQEND\n8\n0';
+    out.push(e);
+  }
+  out.push('0\nENDSEC\n0\nEOF');
+  return out.join('\n')+'\n';
+}
+$('exSvg').addEventListener('click',function(){if(!S.res)return;withFinal(function(){dl(new Blob([buildSVG()],{type:'image/svg+xml'}),baseName()+'.svg');});});
+$('exDxf').addEventListener('click',function(){if(!S.res)return;withFinal(function(){dl(new Blob([buildDXF()],{type:'application/dxf'}),baseName()+'.dxf');});});
+$('exPng').addEventListener('click',function(){
+  if(!S.res)return;
+  withFinal(function(){
+    var r=S.res,c=document.createElement('canvas');c.width=r.W;c.height=r.H;var x=c.getContext('2d');
+    var id=x.createImageData(r.W,r.H),d=id.data,B=r.B,N=r.W*r.H,v;
+    for(var i=0;i<N;i++){v=B[i]?0:255;d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255;}
+    x.putImageData(id,0,0);
+    c.toBlob(function(b){if(b)dl(b,baseName()+'_mapa.png');},'image/png');
+  });
+});
+window.__LNexport={svg:function(){var t=curExport();return buildSVG(t.res,t.mm);},dxf:function(){var t=curExport();return buildDXF(t.res,t.mm);}};
+
+/* ---------- ajustes guardados ---------- */
+var PK='dp3-linea-presets';
+function loadPresets(){try{var o=JSON.parse(localStorage.getItem(PK)||'{}');return o&&typeof o==='object'?o:{};}catch(e){return {};}}
+function savePresets(o){try{localStorage.setItem(PK,JSON.stringify(o));return true;}catch(e){toast('No se pudo guardar en este navegador.');return false;}}
+function refreshPresets(){
+  var o=loadPresets(),ks=Object.keys(o).sort(),h='';
+  ks.forEach(function(k){h+='<option value="'+esc(k)+'">'+esc(k)+'</option>';});
+  $('pSel').innerHTML=h||'<option value="">(ninguno guardado)</option>';
+}
+function currentSettings(){
+  var P=S.P;
+  return {k:S.k,smooth:S.smooth,qual:S.qual,mm:P.mm,line:P.line,equal:P.equal,spotOn:P.spotOn,spotA:P.spotA,speck:P.speck,hole:P.hole,close:P.close,soft:P.soft,fillGaps:P.fillGaps,widenGaps:P.widenGaps,alpha:P.alpha,tol:P.tol,deco:P.deco,textMm:P.textMm,papers:S.papers.slice()};
+}
+$('pSave').addEventListener('click',function(){
+  var n=$('pName').value.trim();if(!n){toast('Escribe un nombre para el ajuste.');return;}
+  var o=loadPresets();o[n]=currentSettings();if(savePresets(o)){refreshPresets();$('pSel').value=n;toast('Ajuste «'+n+'» guardado.');}
+});
+$('pDel').addEventListener('click',function(){
+  var n=$('pSel').value;if(!n)return;var o=loadPresets();delete o[n];if(savePresets(o)){refreshPresets();toast('Ajuste borrado.');}
+});
+function setVal(id,v){var e=$(id);if(e)e.value=String(v);}
+$('pLoad').addEventListener('click',function(){
+  var n=$('pSel').value,o=loadPresets(),c=o[n];if(!c){toast('No hay ajuste seleccionado.');return;}
+  var P=S.P,num=function(v,d,mn,mx){v=Number(v);return isNaN(v)?d:Math.min(mx,Math.max(mn,v));};
+  var oldK=S.k,oldSm=S.smooth;
+  S.k=num(c.k,6,3,10);S.smooth=num(c.smooth,40,0,100);S.qual=(+c.qual===30)?30:40;
+  P.line=num(c.line,0.8,MINLINE,10);P.equal=!!c.equal;P.spotOn=c.spotOn!==false;P.spotA=num(c.spotA,3,0.1,100);P.speck=num(c.speck,0.15,0,20);P.hole=num(c.hole,0.3,0,20);
+  P.close=num(c.close,1,0,2);P.soft=num(c.soft,1,0,3);P.fillGaps=!!c.fillGaps;P.widenGaps=!!c.widenGaps;P.alpha=num(c.alpha,1,0,1.3);P.tol=num(c.tol,0.4,0.1,1.5);P.textMm=num(c.textMm,0,0,10);$('textOn').checked=P.textMm>0;setDeco(c.deco);
+  setVal('k',S.k);$('v-k').textContent=S.k;setVal('smooth',S.smooth);$('v-smooth').textContent=S.smooth;setVal('work',S.qual);
+  setVal('line',dnum(P.line));$('equal').checked=P.equal;$('spotOn').checked=P.spotOn;setVal('spotA',dnum(P.spotA));setVal('speck',dnum(P.speck));setVal('hole',dnum(P.hole));
+  [].forEach.call($('closeSeg').children,function(x){x.classList.toggle('on',+x.dataset.v===P.close);});
+  setVal('soft',P.soft);$('v-soft').textContent=P.soft;$('fillGaps').checked=P.fillGaps;$('widenGaps').checked=P.widenGaps;
+  setVal('alpha',P.alpha);$('v-alpha').textContent=fmt(P.alpha,2);setVal('tol',P.tol);$('v-tol').textContent=fmt(P.tol,2);
+  if(c.mm>=5){if(S.W)setSize('w',c.mm);else{P.mm=+c.mm;$('outW').value=dnum(P.mm);}}
+  if(!S.bmp){toast('Ajuste «'+n+'» cargado.');return;}
+  if(S.k!==oldK||S.smooth!==oldSm||!S.quantReady){pendingApply={papers:c.papers};requestQuant();}
+  else{
+    if(Array.isArray(c.papers)&&c.papers.length===S.papers.length){snapshot();S.papers=c.papers.slice();buildPalette();}
+    requestRender(0);
+  }
+  toast('Ajuste «'+n+'» cargado.');
+});
+refreshPresets();
+
+/* ===================== MODO AUTOMÁTICO ===================== */
+var VDEF=[
+ {id:'contornos',name:'Contornos',desc:'Dibujo de línea clásico: contornos negros con el interior vacío. Es el punto de partida más habitual para extruir.'},
+ {id:'macizo',name:'Relleno macizo',desc:'Rellena de negro los colores oscuros y medios, y deja los claros solo con borde. Piezas más gruesas y robustas.'},
+ {id:'detalle',name:'Más detalle',desc:'Separa más colores y usa un trazo algo más fino para conservar más detalles. Necesita un tamaño algo mayor.'}];
+var A={level:1,dim:'w',val:80,mm:80,vars:[],sel:-1,gen:0,recGen:0,running:false,queue:[],done:0,t0:0,view:'res',pickId:null,manual:null,st:null,tTotal:0};
+window.__LN.A=A;
+function vdef(id){for(var i=0;i<VDEF.length;i++)if(VDEF[i].id===id)return VDEF[i];return {id:id,name:'Tu ajuste a mano',desc:'El resultado de tus retoques en «Ajustar a mano».'};}
+function curV(){return A.sel>=0?A.vars[A.sel]:null;}
+function curExport(){var v=document.body.dataset.mode==='auto'?curV():null;return v?{res:v.res,mm:v.mm}:{res:S.res,mm:S.P.mm};}
+function mkCanvas(res){
+  var RW=res.W,RH=res.H,c=document.createElement('canvas');c.width=RW;c.height=RH;var x=c.getContext('2d');
+  var id=x.createImageData(RW,RH),d=id.data,B=res.B,N=RW*RH,v;
+  for(var i=0;i<N;i++){v=B[i]?0:255;d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255;}
+  x.putImageData(id,0,0);
+  /* vista: como mucho 1800 px de lado, reducido con suavizado */
+  var f=Math.min(1,1800/Math.max(RW,RH));
+  if(f<1){var c2=document.createElement('canvas');c2.width=Math.round(RW*f);c2.height=Math.round(RH*f);var x2=c2.getContext('2d');x2.imageSmoothingQuality='high';x2.drawImage(c,0,0,c2.width,c2.height);c.width=1;c.height=1;return c2;}
+  return c;
+}
+function setMode(m){
+  document.body.dataset.mode=m;
+  if(m==='adv')setTimeout(function(){if(S.fit)fitView();},40);
+  window.scrollTo(0,0);
+}
+/* resumen del semáforo en un único estado */
+function summarize(v){
+  var ev=v.ev,st=v.res.stats,R=[],lvl=0,mm=fmt(v.mm,0);
+  function add(l,t){R.push(t);if(l>lvl)lvl=l;}
+  /* en vista rápida (14 px/mm) los cuellos, las rendijas y las piezas diminutas no se miden bien:
+     para ordenar las propuestas solo cuenta lo que no depende de la densidad */
+  var pv=v.final===false;
+  if(!pv&&ev.closed.lvl>0)add(2,'hay trazos que se solapan y Fusion no los separaría bien');
+  if(!pv&&ev.line.lvl>0)add(2,'quedan líneas más finas de 0,5 mm');
+  if(pv){}else if(ev.gap.lvl===2)add(2,'quedan rendijas blancas muy estrechas');else if(ev.gap.lvl===1)add(1,'quedan rendijas blancas algo estrechas');
+  if(ev.fid.lvl>=2)add(2,'el vector se aparta bastante del dibujo');else if(ev.fid.lvl===1)add(1,'el vector se aparta un poco del dibujo');
+  if(pv){}else if(st.tiny>25)add(2,'hay '+st.tiny+' piezas negras diminutas que se perderían');else if(st.tiny>0)add(1,'hay '+st.tiny+' pieza'+(st.tiny>1?'s':'')+' negra'+(st.tiny>1?'s':'')+' diminuta'+(st.tiny>1?'s':'')+' que se perdería'+(st.tiny>1?'n':''));
+  var lo=st.lost||0;
+  if(st.chg>0.14||(lo>=6&&st.chg>0.08))add(2,'a '+mm+' mm el texto pequeño y los detalles finos no se leerán (se empastan)'+(lo?': se pierden '+lo+' letras o huecos pequeños':''));
+  else if(lo>=3)add(1,'a '+mm+' mm se pierden '+lo+' detalles pequeños (letras o huecos finos)');
+  else if(st.chg>0.06)add(1,'a '+mm+' mm algunos detalles finos se empastan un poco');
+  if(ev.nodes.lvl>1)add(1,'el archivo es muy pesado y Fusion puede ir lento');
+  if(st.ink<0.01)add(2,'casi no queda nada en negro');else if(st.ink>0.8)add(2,'casi todo queda en negro');
+  var title=lvl===0?'Listo para extruir':lvl===1?'Revisa: '+R.join('; ')+'.':'No apto a este tamaño: '+R.join('; ')+'.';
+  if(lvl>0)title=title.charAt(0)+title.slice(1);
+  return {lvl:lvl,title:title,reasons:R};
+}
+function scoreV(v){
+  var ev=v.ev,st=v.res.stats,sc=[100,60,20][v.sum.lvl];
+  sc-=Math.min(15,Math.max(0,99.5-ev.fid.v)*5); /* solo resta si el vector se aparta de verdad (más de 0,1 mm) */
+  sc-=Math.min(25,st.chg*100);
+  sc-=Math.min(15,(st.lost||0)*1.5);
+  if(st.nodes>3000)sc-=Math.min(10,(st.nodes-3000)/1000);
+  if(st.ink<0.02||st.ink>0.75)sc-=30;
+  sc+=v.id==='contornos'?6:v.id==='detalle'?1:0; /* a igualdad, la propuesta más fiel al dibujo de línea */
+  return sc;
+}
+function showProg(on,txt,f){
+  $('aProg').classList.toggle('on',!!on);if(txt)$('aProgT').textContent=txt;
+  if(f!=null)$('aProgB').style.width=Math.round(f*100)+'%';
+}
+function autoProg(msg,f){
+  if(A.running){showProg(true,'Propuesta '+Math.min(3,A.done+1)+' de 3 · '+msg,(A.done+(f==null?0.4:Math.min(0.95,f)))/3);return;}
+  if(A.finalPend&&document.body.dataset.mode==='auto')showProg(true,'Versión final · '+msg,f==null?0.5:f);
+}
+function autoImageLoaded(){
+  var b=$('aBox');b.classList.remove('empty0');
+  var t=$('aThumb'),x=t.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,56,56);
+  var oc=origCanvas(),sc=Math.min(56/S.W,56/S.H);x.drawImage(oc,(56-S.W*sc)/2,(56-S.H*sc)/2,S.W*sc,S.H*sc);
+  $('aDrop').classList.add('has');$('aFile').textContent=S.name;$('aFileSub').textContent=S.bmp.naturalWidth+'×'+S.bmp.naturalHeight+' px · pulsa para cambiar de imagen';
+  A.pickId=null;A.manual=null;A.view='res';[].forEach.call($('aView').children,function(x){x.classList.toggle('on',x.dataset.v==='res');});
+  aSizeApply(true,true);
+}
+function origCanvas(){
+  if(S.origCanvas)return S.origCanvas;
+  var c=document.createElement('canvas');c.width=S.W;c.height=S.H;var x=c.getContext('2d');
+  var im=new ImageData(new Uint8ClampedArray(S.rgba),S.W,S.H);
+  if(S.alpha){var dd=im.data,W0=S.W;for(var q=0;q<S.alpha.length;q++)if(S.alpha[q]){var v=(((q%W0)>>4)+((q/W0|0)>>4))&1?200:235;dd[q*4]=dd[q*4+1]=dd[q*4+2]=v;}}
+  x.putImageData(im,0,0);S.origCanvas=c;return c;
+}
+function dimsOf(){var asp=S.W&&S.H?S.W/S.H:1;return {w:A.mm,h:A.mm/asp};}
+function updateDimTxt(){var d=dimsOf();$('aDimTxt').textContent='Tamaño final: '+fmt(d.w,1)+' × '+fmt(d.h,1)+' mm';}
+function aSizeApply(commit,now){
+  var v=pnum($('aSize').value);
+  if(!(v>=10&&v<=1000)){if(commit){$('aSize').value=dnum(A.val);}else return;v=A.val;}
+  var asp=S.W&&S.H?S.W/S.H:1,mm=A.dim==='w'?v:v*asp;
+  var same=Math.abs(mm-A.mm)<0.005;
+  A.val=v;A.mm=mm;S.P.mm=mm;updateDimTxt();
+  if(commit)$('aSize').value=dnum(Math.round(v*100)/100);
+  if(same&&!now)return;
+  if(!S.rgba)return;
+  clearTimeout(A.st);A.st=setTimeout(autoRun,now?0:(commit?0:700));
+}
+$('aSize').addEventListener('input',function(){aSizeApply(false,false);});
+$('aSize').addEventListener('change',function(){aSizeApply(true,false);});
+$('aSize').addEventListener('keydown',function(e){if(e.key==='Enter')aSizeApply(true,false);});
+$('aDim').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b||b.dataset.d===A.dim)return;
+  A.dim=b.dataset.d;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});
+  var d=dimsOf();A.val=Math.round((A.dim==='w'?d.w:d.h)*100)/100;$('aSize').value=dnum(A.val);
+});
+$('aLev').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b||+b.dataset.l===A.level)return;
+  A.level=+b.dataset.l;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});
+  A.pickId=null;if(S.rgba)autoRun();
+});
+$('aView').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;A.view=b.dataset.v;
+  [].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});drawBig();
+});
+function autoRun(){
+  if(!S.rgba||!worker)return;
+  A.gen++;A.recGen++;clearTimeout(A.st);
+  A.vars=[];A.sel=-1;A.done=0;A.running=true;A.finalPend=false;A.queue=VDEF.map(function(v){return v.id;});A.t0=performance.now();
+  if(A.manual&&Math.abs(A.manual.mm-A.mm)>0.01)A.manual=null;
+  showProg(true,'Preparando las propuestas…',0.03);
+  renderThumbs();drawBig();setExports(false);updateSem();
+  A.wi={};
+  A.queue.forEach(function(id,j){A.wi[id]=postTo(engineFor(j),{t:'auto',gen:A.gen,id:id,name:vdef(id).name,level:A.level,mm:A.mm});});
+}
+function autoVariantIn(m){
+  if(m.gen!==A.gen)return;
+  var qi=A.queue.indexOf(m.id);if(qi<0)return;A.queue.splice(qi,1);
+  var v={id:m.id,name:vdef(m.id).name,res:m,mm:A.mm,ms:m.stats.ms};
+  v.final=false;v.ev=evaluate(m,{mm:A.mm,tiny:0.4});v.sum=summarize(v);v.score=scoreV(v);v.canvas=mkCanvas(m);v.rec=null;m.B=null;m.marks=null;
+  A.vars.push(v);A.done++;
+  if(A.vars.length===1)A.sel=0;
+  showProg(true,'Propuesta '+A.done+' de 3 lista…',A.done/3);
+  renderThumbs();drawBig();updateSem();
+  if(!A.queue.length)autoFinish();
+}
+function autoFinish(){
+  if(A.manual)A.vars.push(A.manual);
+  var keep=A.pickId;
+  A.vars.sort(function(a,b){return b.score-a.score;});
+  A.sel=0;
+  if(keep)for(var i=0;i<A.vars.length;i++)if(A.vars[i].id===keep)A.sel=i;
+  A.running=false;A.tTotal=Math.round(performance.now()-A.t0);showProg(false);
+  renderThumbs();drawBig();updateSem();updateExports();
+  window.__autoDone=A.gen;
+  requestFinal(curV());
+  /* La «Recomendada» no puede salir solo de la vista rápida (a 14 px/mm las rendijas y los cuellos se miden mal):
+     si hay motores libres y memoria, las otras dos versiones finales se calculan a la vez y al terminar se reordena. */
+  var live=1;for(var a=0;a<AUXW.length;a++)if(AUXW[a])live++;
+  var fw=Math.round(A.mm*S.qual),fh=Math.round(fw*S.H/S.W);
+  A.allFinal=live>=3&&fw*fh<=10.5e6;
+  if(A.allFinal)A.vars.forEach(function(v){if(v!==curV())requestFinal(v);});
+}
+/* versión final (alta densidad) de la propuesta elegida: la calcula el motor que ya tiene sus colores en caché */
+function requestFinal(v){
+  if(!v||v.final||v.finalPend||v.id==='manual')return;
+  v.finalPend=true;A.finalPend=true;
+  showProg(true,'Versión final a '+S.qual+' px/mm…',0.05);
+  updateSem();updateExports();
+  var wi=A.wi&&A.wi[v.id]!=null?A.wi[v.id]:null;
+  postTo(wi,{t:'auto',final:true,dens:S.qual,gen:A.gen,id:v.id,name:v.name,level:A.level,mm:v.mm});
+}
+function autoFinalIn(m){
+  if(m.gen!==A.gen)return;
+  var v=null;for(var i=0;i<A.vars.length;i++)if(A.vars[i].id===m.id)v=A.vars[i];
+  if(!v)return;
+  v.res=m;v.final=true;v.finalPend=false;v.canvas=mkCanvas(m);v.ev=evaluate(m,{mm:v.mm,tiny:0.4});v.sum=summarize(v);v.score=scoreV(v);v.rec=null;v.recPending=false;
+  A.finalPend=false;for(var j=0;j<A.vars.length;j++)if(A.vars[j].finalPend)A.finalPend=true;
+  if(!A.finalPend)showProg(false);
+  var allIn=A.vars.every(function(x){return x.final||x.id==='manual';});
+  if(allIn&&A.allFinal&&!A.pickId){
+    /* todas en versión final: la recomendada se decide con las medidas reales */
+    A.vars.sort(function(a,b){return (b.id==='manual'?-1e9:b.score)-(a.id==='manual'?-1e9:a.score);});
+    A.sel=0;
+  }
+  renderThumbs();drawBig();updateSem();updateExports();
+  if(curV()&&curV().final)recFor(curV());
+  window.__finalDone=(window.__finalDone||0)+1;
+  if(allIn||!A.allFinal)window.__finalsDone=A.gen;
+}
+function updateExports(){var v=curV(),on=!!v&&!!v.final&&!A.running&&!v.finalPend;setExports2(on);}
+function renderThumbs(){
+  var h='',i;
+  for(i=0;i<A.vars.length;i++){
+    var v=A.vars[i];
+    h+='<button class="ath" data-i="'+i+'" aria-pressed="'+(i===A.sel)+'" title="'+esc(vdef(v.id).desc)+'">'+(i===0&&!A.running&&A.vars.length>1&&v.id!=='manual'?'<span class="rb">Recomendada</span>':'')+'<canvas width="200" height="200"></canvas><span class="nm"><span class="qd '+(v.final?LV[v.sum.lvl]:'')+'"></span>'+esc(v.name)+'</span></button>';
+  }
+  if(A.running||!S.rgba){
+    for(var j=0;j<VDEF.length;j++){var got=false;for(i=0;i<A.vars.length;i++)if(A.vars[i].id===VDEF[j].id)got=true;
+      if(!got)h+='<div class="ath" aria-hidden="true"><div class="ph0">'+(S.rgba?'Calculando…':'—')+'</div><span class="nm">'+VDEF[j].name+'</span></div>';}
+  }
+  var el=$('aThumbs');el.innerHTML=h;
+  var cs=el.querySelectorAll('button.ath canvas');
+  for(i=0;i<cs.length;i++){
+    var v2=A.vars[i],x=cs[i].getContext('2d'),sc=Math.min(200/S.W,200/S.H);
+    x.fillStyle='#fff';x.fillRect(0,0,200,200);x.imageSmoothingQuality='high';
+    x.drawImage(v2.canvas,(200-S.W*sc)/2,(200-S.H*sc)/2,S.W*sc,S.H*sc);
+  }
+  var v3=curV();$('aDesc').textContent=v3?vdef(v3.id).desc:(S.rgba?'Calculando las propuestas…':'Sube una imagen para ver las propuestas.');
+}
+$('aThumbs').addEventListener('click',function(e){
+  var b=e.target.closest('button.ath');if(!b)return;
+  var i=+b.dataset.i;if(i===A.sel)return;
+  A.sel=i;A.pickId=A.vars[i].id;renderThumbs();drawBig();updateSem();updateExports();
+  if(curV().final)recFor(curV());else requestFinal(curV());
+});
+function drawBig(){
+  var c=$('aCv'),v=curV();
+  if(!S.rgba){return;}
+  var vv=(A.view==='orig'||!v)?null:v;
+  c.width=vv?vv.canvas.width:S.W;c.height=vv?vv.canvas.height:S.H;var x=c.getContext('2d');
+  x.imageSmoothingQuality='high';x.drawImage(vv?vv.canvas:origCanvas(),0,0,c.width,c.height);
+  $('aTitle').textContent=(A.view==='orig'||!v)?'Imagen original':'Vista previa · '+v.name;
+}
+function updateSem(){
+  var v=curV(),dot=$('aSemDot'),btn=$('aSemBtn');btn.style.display='none';
+  if(!S.rgba){dot.className='qd';$('aSemT').textContent='Esperando imagen';$('aSemW').textContent='Sube una imagen y elige el tamaño.';return;}
+  if(!v){dot.className='qd';$('aSemT').textContent='Calculando…';$('aSemW').textContent='Un momento: se están preparando las propuestas.';return;}
+  if(!v.final){dot.className='qd';$('aSemT').textContent='Calculando la versión final…';$('aSemW').textContent='Las propuestas se ven en vista rápida. La medida del semáforo y la descarga usan la versión final a '+S.qual+' px/mm.';return;}
+  var sm=v.sum;dot.className='qd '+LV[sm.lvl];
+  $('aSemT').textContent=sm.lvl===0?'Listo para extruir':sm.lvl===1?'Revisa':'No apto a este tamaño';
+  var why=sm.lvl===0?'Todas las líneas y huecos miden al menos 0,5 mm y no hay trazos que se crucen.':sm.reasons.join('; ')+'.';
+  why=why.charAt(0).toUpperCase()+why.slice(1);
+  var gapNote=' Las rendijas estrechas son puntos concretos: se ven en naranja en «Ajustar a mano» y se pueden dejar así o retocar.';
+  if(sm.lvl>0&&v.rec&&v.rec>0){why+=' A '+fmt(v.rec,0)+' mm o más se resolvería'+(v.recGap?' (salvo las rendijas estrechas)':'')+'.';btn.textContent='Usar '+fmt(v.rec,0)+' mm';btn.style.display='';btn.dataset.mm=v.rec;}
+  else if(sm.lvl>0&&v.rec===-2)why+=gapNote;
+  else if(sm.lvl>0&&v.rec===-1)why+=' Ni al triple de tamaño se resuelve del todo: prueba el nivel «Simple», otra propuesta o «Ajustar a mano».';
+  else if(sm.lvl>0&&v.recPending)why+=' Calculando un tamaño recomendado…';
+  $('aSemW').textContent=why;
+}
+$('aSemBtn').addEventListener('click',function(){
+  var mm=+this.dataset.mm;if(!(mm>0))return;
+  A.dim='w';[].forEach.call($('aDim').children,function(x){x.classList.toggle('on',x.dataset.d==='w');});
+  A.val=mm;$('aSize').value=dnum(mm);aSizeApply(true,false);
+});
+/* tamaño mínimo recomendado: se vuelve a calcular el dibujo a tamaños mayores hasta que el detalle quepa */
+var REC_THR=0.04;
+function recFor(v){
+  if(!v||v.sum.lvl===0||v.id==='manual'||v.rec!==null||v.recPending||!v.res.P)return;
+  /* solo se busca tamaño para lo que se arregla ampliando (letras, empaste, líneas finas, piezas diminutas).
+     Las rendijas blancas estrechas no: al ampliar aparecen otras nuevas (detalles que a este tamaño se limpian) */
+  var st=v.res.stats;v.recNeed={chg:st.chg>0.06,lost:(st.lost||0)>=3,thin:v.ev.line.lvl>0,tiny:st.tiny>0};
+  v.recGap=v.ev.gap.lvl>0;
+  if(!v.recNeed.chg&&!v.recNeed.lost&&!v.recNeed.thin&&!v.recNeed.tiny){v.rec=-2;updateSem();return;}
+  var gen=A.gen;v.rg=++A.recGen;v.recPending=true;v.recList=[1.25,1.5,2,3].map(function(f){return Math.ceil(v.mm*f/5)*5;}).filter(function(m){return m<=400;});
+  v.recI=0;updateSem();recStep(v,gen,true);
+}
+/* el tamaño recomendado debe dejar el semáforo en verde con las mismas medidas y a la misma densidad que la versión final
+   (a 14 px/mm las rendijas y los cuellos no se miden bien): se prueba 1,25×, 1,5×, 2× y 3× sin vectorizar */
+function recStep(v,gen,confirm){
+  if(v.recI>=v.recList.length){v.recPending=false;v.rec=-1;if(curV()===v)updateSem();return;}
+  var P=JSON.parse(JSON.stringify(v.res.P));P.light=true;
+  /* al mismo motor que calculó la propuesta: ya tiene sus colores en caché */
+  postTo(A.wi&&A.wi[v.id]!=null?A.wi[v.id]:null,{t:'auto',light:true,confirm:!!confirm,dens:S.qual,gen:gen,rg:v.rg,id:v.id,level:A.level,mm:v.recList[v.recI],P:P});
+}
+function recOk(st,nd){return (!nd.chg||st.chg<=REC_THR)&&(!nd.lost||(st.lost||0)<=2)&&(!nd.thin||!st.thinCount)&&(!nd.tiny||!st.tiny);}
+function autoRecIn(m){
+  if(m.gen!==A.gen)return;
+  var v=null;for(var i=0;i<A.vars.length;i++)if(A.vars[i].id===m.id)v=A.vars[i];
+  if(!v||!v.recPending||m.rg!==v.rg)return;
+  (window.__recLog=window.__recLog||[]).push({id:m.id,mm:m.mm,dens:m.dens,st:m.stats});
+  if(recOk(m.stats,v.recNeed)){v.rec=v.recList[v.recI];v.recPending=false;if(curV()===v)updateSem();return;}
+  v.recI++;recStep(v,m.gen,true);
+}
+/* descargas del modo automático */
+function setExports2(on){['aSvg','aDxf','aPng'].forEach(function(id){$(id).disabled=!on;});}
+var setExports0=setExports;
+setExports=function(on){setExports0(on);if(!on)setExports2(false);else updateExports();};
+$('aSvg').addEventListener('click',function(){var t=curExport();if(!t.res)return;dl(new Blob([buildSVG(t.res,t.mm)],{type:'image/svg+xml'}),baseName(t.mm)+'.svg');});
+$('aDxf').addEventListener('click',function(){var t=curExport();if(!t.res)return;dl(new Blob([buildDXF(t.res,t.mm)],{type:'application/dxf'}),baseName(t.mm)+'.dxf');});
+$('aPng').addEventListener('click',function(){
+  /* a la densidad final, no la vista reducida de pantalla */
+  var v=curV();if(!v||!v.final||!v.res.B)return;var r=v.res,c=document.createElement('canvas');c.width=r.W;c.height=r.H;var x=c.getContext('2d');
+  var id=x.createImageData(r.W,r.H),d=id.data,B=r.B,N=r.W*r.H,q;
+  for(var i=0;i<N;i++){q=B[i]?0:255;d[i*4]=q;d[i*4+1]=q;d[i*4+2]=q;d[i*4+3]=255;}
+  x.putImageData(id,0,0);c.toBlob(function(b){if(b)dl(b,baseName(v.mm)+'_mapa.png');},'image/png');
+});
+/* ---- paso a modo manual y vuelta ---- */
+function syncUI(){
+  var P=S.P;
+  setVal('k',S.k);$('v-k').textContent=S.k;setVal('smooth',S.smooth);$('v-smooth').textContent=S.smooth;setVal('work',S.qual);
+  setVal('line',dnum(P.line));$('equal').checked=!!P.equal;$('spotOn').checked=!!P.spotOn;setVal('spotA',dnum(P.spotA));setVal('speck',dnum(P.speck));setVal('hole',dnum(P.hole));
+  [].forEach.call($('closeSeg').children,function(x){x.classList.toggle('on',+x.dataset.v===P.close);});
+  setVal('soft',P.soft);$('v-soft').textContent=P.soft;$('fillGaps').checked=!!P.fillGaps;$('widenGaps').checked=!!P.widenGaps;
+  setVal('alpha',P.alpha);$('v-alpha').textContent=fmt(P.alpha,2);setVal('tol',P.tol);$('v-tol').textContent=fmt(P.tol,2);
+  $('textOn').checked=P.textMm>0;setDeco(P.deco);setSize('w',P.mm);
+}
+function enterAdv(){
+  var v=curV();
+  setMode('adv');
+  if(!S.bmp)return;
+  if(v&&v.id!=='manual'){
+    var P=v.res.P,d=S.P;
+    ['line','equal','spotOn','spotA','speck','hole','close','soft','fillGaps','widenGaps','alpha','tol','tiny','deco','textMm'].forEach(function(k){d[k]=P[k];});
+    d.mm=v.mm;S.k=v.res.k;S.smooth=v.res.smooth;
+    syncUI();
+    pendingApply={papers:v.res.papers.slice()};
+    S.advSigPending=true;
+    requestQuant();
+  }else{
+    S.advSigPending=true;
+    if(!S.quantReady)requestQuant();else requestRender(0);
+  }
+}
+function advSig(){return JSON.stringify([S.k,S.smooth,renderParams()]);}
+function backToAuto(){
+  var changed=S.res&&S.advSig&&S.advSig!==advSig();
+  S.advSig=null;S.advSigPending=false;
+  setMode('auto');
+  if(changed&&S.res){
+    var go=function(){
+      var v={id:'manual',name:'Tu ajuste a mano',res:S.res,ev:S.ev,mm:S.P.mm,ms:0,rec:null,canvas:mkCanvas(S.res),final:true};
+      v.sum=summarize(v);v.score=0;A.manual=v;A.pickId='manual';
+      if(Math.abs(S.P.mm-A.mm)>0.01){
+        A.mm=S.P.mm;A.dim='w';A.val=S.P.mm;$('aSize').value=dnum(Math.round(A.val*100)/100);
+        [].forEach.call($('aDim').children,function(x){x.classList.toggle('on',x.dataset.d==='w');});updateDimTxt();
+        autoRun();return;
+      }
+      A.vars=A.vars.filter(function(x){return x.id!=='manual';});A.vars.push(v);A.sel=A.vars.length-1;
+      renderThumbs();drawBig();updateSem();updateExports();
+    };
+    /* el ajuste a mano se guarda con la versión final (la vista rápida no se puede descargar) */
+    if(S.res.final)go();else withFinal(go);
+  }
+}
+$('aManual').addEventListener('click',enterAdv);
+$('backAuto').addEventListener('click',backToAuto);
+$('aHelp2').addEventListener('click',openHelp);
+(function(){var o=showResult;showResult=function(){o();if(S.advSigPending){S.advSig=advSig();S.advSigPending=false;}};})();
+
+/* ===================== AYUDA, GUÍA Y TEXTOS «i» ===================== */
+var lastFocus=null;
+function openHelp(){lastFocus=document.activeElement;$('helpBg').classList.add('on');var md=$('helpBg').querySelector('.modal');md.scrollTop=0;try{$('helpX').focus({preventScroll:true});}catch(e){$('helpX').focus();}}
+function closeHelp(){$('helpBg').classList.remove('on');if(lastFocus&&lastFocus.focus)try{lastFocus.focus();}catch(e){}}
+$('helpBtn').addEventListener('click',openHelp);
+$('helpOk').addEventListener('click',closeHelp);$('helpX').addEventListener('click',closeHelp);
+$('helpBg').addEventListener('click',function(e){if(e.target===this)closeHelp();});
+var TOUR=[
+ {t:'1 · Sube tu imagen',p:'Elige una ilustración, un logo o un dibujo (JPG, PNG o WebP). Funciona mejor con fondo liso o transparente.',i:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>'},
+ {t:'2 · Elige el tamaño',p:'Escribe el ancho o el alto en milímetros. Si a ese tamaño hay detalles que no caben, te lo avisamos y te sugerimos una medida mejor.',i:'<path d="M4 8v8M20 8v8M4 12h16M7 9l-3 3 3 3M17 9l3 3-3 3"/>'},
+ {t:'3 · Elige un resultado',p:'Calculamos tres propuestas distintas. Pulsa la que más te guste: la «Recomendada» suele ser la mejor. El semáforo te dice si está lista.',i:'<rect x="3" y="4" width="5.5" height="16" rx="1.5"/><rect x="9.5" y="4" width="5.5" height="16" rx="1.5"/><rect x="16" y="4" width="5" height="16" rx="1.5"/>'},
+ {t:'4 · Descarga y extruye',p:'Pulsa «Descargar SVG para Fusion». Si algo no te convence, «Ajustar a mano» abre todas las herramientas. Tienes la ayuda completa en el botón «?».',i:'<path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 18v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1"/>'}];
+var tourI=0,TK='dp3-linea-guia';
+function tourShow(){
+  var s=TOUR[tourI];
+  $('tourT').textContent=s.t;$('tourP').textContent=s.p;
+  $('tourIc').innerHTML='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+s.i+'</svg>';
+  var d='';for(var i=0;i<TOUR.length;i++)d+='<i'+(i===tourI?' class="on"':'')+'></i>';$('tourDots').innerHTML=d;
+  $('tourNext').textContent=tourI===TOUR.length-1?'Empezar':'Siguiente';
+  $('tourSkip').style.visibility=tourI===TOUR.length-1?'hidden':'visible';
+}
+function openTour(){lastFocus=document.activeElement;tourI=0;tourShow();$('tourBg').classList.add('on');$('tourNext').focus();}
+function closeTour(){
+  $('tourBg').classList.remove('on');
+  try{localStorage.setItem(TK,'1');}catch(e){}
+  if(lastFocus&&lastFocus.focus)try{lastFocus.focus();}catch(e){}
+}
+$('tourNext').addEventListener('click',function(){if(tourI>=TOUR.length-1){closeTour();return;}tourI++;tourShow();});
+$('tourSkip').addEventListener('click',closeTour);
+$('helpTour').addEventListener('click',function(){closeHelp();openTour();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){if($('tourBg').classList.contains('on'))closeTour();else closeHelp();}});
+(function(){var seen=false;try{seen=localStorage.getItem(TK)==='1';}catch(e){}if(!seen)setTimeout(openTour,500);})();
+
+/* textos de ayuda en cada control del modo manual: botón «i» que se abre con clic, toque o Intro */
+var INFO=[
+ ['#outW','Tamaño final de la pieza en milímetros. Al cambiar el ancho, el alto se ajusta solo (y al revés).'],
+ ['#work','Densidad de la versión final, la que se mide y se descarga. Alta (40 px/mm) da bordes más lisos y más detalle; Normal (30 px/mm) es más rápida. La vista previa siempre es rápida (14 px/mm).'],
+ ['#smooth','Quita el ruido y el degradado de la imagen sin difuminar los bordes. Más alto = formas más limpias, menos detalle fino.'],
+ ['#k','Cuántos colores distintos se separan en la imagen. Menos colores = dibujo más simple.'],
+ ['#autoPap','Vuelve a la propuesta de papeles que hace la app: lo más oscuro a Negro, el color del borde a Fondo y el resto a Contorno.'],
+ ['#textOn','Las letras o detalles claros muy finos sobre otro color no caben con un contorno alrededor: se pintan de negro.'],
+ ['#decoSeg','Motivos pequeños sobre el fondo (burbujas, ADN…). Conservar los dibuja como línea; Quitar los elimina.'],
+ ['#toolBtn','Activa este modo y pulsa sobre una zona de la imagen para cambiarle el papel solo a ella.'],
+ ['#toolPap','Papel que recibirá la zona clicada: Negro (relleno), Blanco (vacío), Contorno (vacío con borde) o Fondo (se elimina).'],
+ ['#toolScope','«Esta zona» cambia solo la región clicada. «Zonas parecidas» cambia todas las del mismo color con el mismo entorno.'],
+ ['#spotOn','Las manchas blancas o con contorno muy pequeñas se rellenan de negro para que no se pierdan.'],
+ ['#spotA','Área máxima de esas manchas, en milímetros cuadrados.'],
+ ['#line','Grosor de la línea que se dibuja alrededor de las zonas con papel Contorno. Mínimo 0,5 mm.'],
+ ['#equal','Hace que también las líneas que ya traía el dibujo tengan ese grosor.'],
+ ['#speck','Motas negras más pequeñas que esto se borran.'],
+ ['#hole','Agujeros blancos más pequeños que esto se rellenan.'],
+ ['#closeSeg','Cierra pequeñas grietas entre trazos negros (1 ≈ 0,07 mm; 2 ≈ 0,13 mm a un tamaño normal).'],
+ ['#soft','Suaviza los dientes de sierra de los bordes antes de vectorizar.'],
+ ['#widenGaps','Abre hasta 0,5 mm las rendijas blancas muy finas (letras caladas en un fondo negro).'],
+ ['#fillGaps','Rellena de negro las rendijas blancas más estrechas de 0,5 mm que no se hayan podido abrir.'],
+ ['#alpha','Más bajo = esquinas marcadas; más alto = curvas suaves.'],
+ ['#tol','Más alto = menos nodos y archivo más ligero, pero se aparta algo más del dibujo.'],
+ ['#pName','Guarda todos estos ajustes (y los papeles actuales) en este navegador con un nombre.'],
+ ['#showMarks','Muestra sobre el resultado las líneas finas (rojo), huecos finos (naranja), piezas sueltas (violeta) y solapes (azul).']
+];
+var infoN=0;
+function addInfo(sel,text){
+  var el=document.querySelector(sel);if(!el)return;
+  var host=el.closest('.rng,.chk,.fld,.row,.tool-row')||el.parentNode;
+  var lab=host.querySelector('.rng-t span,.lbl')||host;
+  var id='ib'+(++infoN),btn=document.createElement('button');
+  btn.type='button';btn.className='ib';btn.textContent='i';btn.title=text;btn.setAttribute('aria-label','Qué hace: '+text);btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-controls',id);
+  if(host.classList.contains('chk')){btn.style.marginLeft='auto';host.appendChild(btn);}else lab.appendChild(btn);
+  var box=document.createElement('div');box.className='helpbox';box.id=id;box.hidden=true;box.textContent=text;
+  var after=(host.closest('.row,.tool-row')||host);after.parentNode.insertBefore(box,after.nextSibling);
+  btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=box.hidden;box.hidden=!o;btn.setAttribute('aria-expanded',String(o));});
+}
+INFO.forEach(function(p){addInfo(p[0],p[1]);});
+(function(){
+  var H=[['Imagen y tamaño','Carga la imagen y decide el tamaño final de la pieza en milímetros.'],['Colores','Separa la imagen en pocos colores planos. Aquí se decide cuánto detalle se conserva.'],['Papel de cada color','Cada color recibe un papel: Negro (relleno), Blanco (vacío), Contorno (vacío con borde negro) o Fondo (se elimina).'],['Retoque por zona','Para cambiar el papel de una región concreta sin tocar el resto de su color.'],['Línea','Grosor del borde dibujado alrededor de las zonas Contorno.'],['Limpieza','Quita motas, rellena agujeros y arregla las rendijas demasiado finas.'],['Vectorizado','Cómo se convierte el mapa en curvas (Potrace).'],['Ajustes guardados','Guarda y recupera combinaciones de ajustes en este navegador.']];
+  var hs=document.querySelectorAll('#panel .sec-h');
+  for(var i=0;i<hs.length&&i<H.length;i++){(function(h,t){
+    var id='ib'+(++infoN),b=document.createElement('button');b.type='button';b.className='ib';b.textContent='i';b.title=t;b.setAttribute('aria-label','Qué es esto: '+t);b.setAttribute('aria-expanded','false');b.setAttribute('aria-controls',id);h.appendChild(b);
+    var box=document.createElement('div');box.className='helpbox';box.id=id;box.hidden=true;box.textContent=t;h.parentNode.insertBefore(box,h.nextSibling);
+    b.addEventListener('click',function(){var o=box.hidden;box.hidden=!o;b.setAttribute('aria-expanded',String(o));});
+  })(hs[i],H[i][1]);}
+})();
+
+startWorker();
+updateSizeInfo();
+})();
+</script>
+</body>
+</html>
