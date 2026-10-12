@@ -312,3 +312,4 @@ a.avis-boton { text-decoration: none; }
 .avis-estado.is-ok { background: #dff3e6; color: #1d6b3a; }
 .avis-estado.is-aviso { background: #fdf0d5; color: #8a5a00; }
 .avis-grupo-url .pista code { font-size: 12px; overflow-wrap: anywhere; }
+.avis-op__predef { margin-left: auto; min-height: 34px; max-width: 62%; padding: 0 28px 0 12px; border: 1.5px solid var(--borde); border-radius: 999px; background: #fff; color: var(--texto); font: inherit; font-size: 13.5px; }

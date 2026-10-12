@@ -14,7 +14,7 @@
    ============================================================ */
 import { abrir3MF } from './visualizador-3mf.js';
 import { codificar, decodificar, comoDecodificada } from './visualizador-formato.js';
-import { montarVisualizador, letra, tramos } from './visualizador.js';
+import { montarVisualizador, letra, tramos } from './visualizador.js?v=20261014';
 
 const BUCKET = 'visualizador';
 const AVISO_KB = 4096; // aviso a partir de 4 MB por opción
@@ -270,8 +270,12 @@ function iniciar({ sb, raiz }) {
           <section class="avis-op__bloque">
             <h4 class="avis-op__tit">Colores</h4>
             <ul class="avis-op__colores">${o.colores.map((c, j) => `
-              <li class="avis-op__color"><span class="swatch" style="background:${esc(c.hex)}" title="Color del 3MF ${esc(c.hex)}"></span><b>Color ${letra(j)}</b><span class="avis-op__hex">${esc(c.hex)}</span></li>`).join('')}
+              <li class="avis-op__color"><span class="swatch" style="background:${esc(c.predef || c.hex)}" title="${c.predef ? 'Preseleccionado' : 'Color del 3MF ' + esc(c.hex)}"></span><b>Color ${letra(j)}</b>
+                <select class="avis-op__predef" data-predef="${j}" aria-label="Color preseleccionado de Color ${letra(j)}">
+                  <option value="">Original del modelo (${esc(c.hex)})</option>${paletaDe(o).map((x) => `<option value="${esc(x.hex)}"${c.predef && c.predef.toLowerCase() === String(x.hex).toLowerCase() ? ' selected' : ''}>${esc(x.name)}</option>`).join('')}
+                </select></li>`).join('')}
             </ul>
+            <p class="pista">Elige qué color del catálogo aparece ya seleccionado en cada parte; el cliente podrá cambiarlo.</p>
           </section>
           <section class="avis-op__bloque avis-precios">
             <h4 class="avis-op__tit">Precio por cantidad <span class="pista">cada tramo vale desde las unidades indicadas</span></h4>
@@ -311,7 +315,8 @@ function iniciar({ sb, raiz }) {
     const fila = e.target.closest('[data-i]');
     if (!fila) return;
     const o = opciones[+fila.dataset.i];
-    if (e.target.dataset.campo === 'material') o.material = e.target.value;
+    if (e.target.dataset.predef !== undefined) { o.colores[+e.target.dataset.predef].predef = e.target.value || undefined; pintarLista(); pintarVista(); return; }
+    if (e.target.dataset.campo === 'material') { o.material = e.target.value; const ok = new Set(paletaDe(o).map((x) => String(x.hex).toLowerCase())); o.colores.forEach((c) => { if (c.predef && !ok.has(c.predef.toLowerCase())) c.predef = undefined; }); pintarLista(); pintarVista(); return; }
     if (e.target.dataset.campo === 'visible') { o.visible = e.target.checked; fila.classList.toggle('is-oculta', !o.visible); pintarBarra(); pintarVista(); return; }
     if (e.target.dataset.tramo !== undefined) { ordenarTramos(o); pintarLista(); return; }
     pintarBarra();
@@ -358,6 +363,8 @@ function iniciar({ sb, raiz }) {
     if (!mallas.has(o.id)) mallas.set(o.id, fetch(o.modelo).then((r) => { if (!r.ok) throw new Error('No se pudo descargar el modelo (' + r.status + ')'); return r.arrayBuffer(); }).then(decodificar));
     return mallas.get(o.id);
   }
+  const paletaDe = (o) => { const p = paleta || {}; const l = /petg/i.test(o.material || '') ? p.petg : p.pla; return (l && l.length ? l : p.pla || []).slice(); };
+  cargarPaleta().then((p) => { if (!paleta) { paleta = p; pintarLista(); } });
   let espera = null;
   // Cambiar precios o la paleta no recarga el modelo: la vista previa lee las mismas opciones y solo se repinta el panel
   const refrescarVista = () => { clearTimeout(espera); espera = setTimeout(() => { if (vista) vista.refrescar(); else pintarVista(); }, 250); };
@@ -478,7 +485,7 @@ function iniciar({ sb, raiz }) {
     }
     const filas = opciones.map((o, i) => ({
       id: o.id, grupo: sinGrupos ? undefined : 'general', nombre: (o.nombre || '').trim() || 'Opción ' + (i + 1), material: o.material, modelo: o.modelo, miniatura: o.miniatura,
-      colores: o.colores.map((c, n) => ({ slot: c.slot, nombre: 'Color ' + letra(n), hex: c.hex })),
+      colores: o.colores.map((c, n) => ({ slot: c.slot, nombre: 'Color ' + letra(n), hex: c.hex, ...(c.predef ? { predef: c.predef } : {}) })),
       precios: tramos(o).map((t) => ({ desde: t.desde, unidad: t.unidad })),
       origen: o.origen || null, kb: o.kb || null, orden: i, visible: !!o.visible
     }));

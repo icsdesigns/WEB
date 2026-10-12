@@ -148,12 +148,13 @@
   /* ---------- Entrega ---------- */
   var entrega = function () { var c = document.querySelector('input[name="pedidoEntrega"]:checked'); return c ? c.value : null; };
   var grupoDir = $('pedidoDireccionGrupo'), campoDir = $('pedidoDireccion');
+  grupoDir.style.display = 'none';   // solo se muestra con «Envío»
   Array.prototype.forEach.call(document.querySelectorAll('input[name="pedidoEntrega"]'), function (r) {
     r.addEventListener('change', function () {
       Array.prototype.forEach.call(document.querySelectorAll('input[name="pedidoEntrega"]'), function (x) { x.closest('.plazo-option').classList.toggle('selected', x.checked); });
       $('errEntrega').classList.remove('show');
       var envio = entrega() === 'envio';
-      grupoDir.hidden = !envio; campoDir.required = envio;
+      grupoDir.hidden = !envio; grupoDir.style.display = envio ? '' : 'none'; campoDir.required = envio;
       if (!envio) { campoDir.value = ''; campoDir.classList.remove('input-error'); $('errDireccion').classList.remove('show'); }
     });
   });
@@ -187,6 +188,8 @@
     });
     return { resumen: nombres.length ? nombres.join(', ') : 'Indeterminado', grupos: [petg ? 'petg' : 'pla'], colores: nombres };
   }
+  // Enlace directo al archivo: la función de Supabase lo cambia por uno firmado cuando puede; si no, el correo lleva este
+  function urlPublica(ruta) { try { return sbClient.storage.from(CONF.bucket || 'solicitudes').getPublicUrl(ruta).data.publicUrl; } catch (e) { return ''; } }
   function construirPedido(rutas) {
     var textoPlazo = plazo() === 'urgente' ? 'Urgente' + (fechaTexto() ? ' (fecha necesaria: ' + fechaTexto() + ')' : '') : 'Flexible';
     var desc = ['Pedido desde el visualizador 3D.', 'Diseño: ' + tituloOpcion, 'Colores: ' + resumenColores().join('; '),
@@ -198,7 +201,7 @@
       fecha: new Date().toISOString(),
       cliente: { nombre: nombre.value.trim(), telefono: telefono.value.trim() },
       proyecto: { nombre: 'Pedido visualizador · ' + tituloOpcion + ' × ' + datos.unidades, descripcion: desc, tipo: tipo, tipoTexto: 'Pedido del visualizador 3D (' + datos.material + ')' },
-      archivos: { opcion: rutas.length ? 'otros' : 'ninguno', opcionTexto: rutas.length ? 'Archivos adjuntos con el pedido' : 'Sin archivos adjuntos', urls: [], rutas: rutas, medidas: null },
+      archivos: { opcion: rutas.length ? 'otros' : 'ninguno', opcionTexto: rutas.length ? 'Archivos adjuntos con el pedido' : 'Sin archivos adjuntos', urls: rutas.map(urlPublica).filter(Boolean), rutas: rutas, medidas: null },
       tasadora: null,
       colores: coloresWeb(),
       plazo: { tipo: plazo(), texto: textoPlazo, fecha: campoFecha.value || null },

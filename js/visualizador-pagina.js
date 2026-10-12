@@ -5,7 +5,7 @@
    catálogo (js/filamentos.js). ?opcion=<id> abre esa opción y
    ?embed=1 deja solo el componente para incrustarlo con un iframe.
    ============================================================ */
-import { montarVisualizador, CLAVE_PEDIDO } from './visualizador.js';
+import { montarVisualizador, CLAVE_PEDIDO } from './visualizador.js?v=20261018';
 import { decodificar } from './visualizador-formato.js';
 
 const SUPABASE = { url: 'https://yyezkumbjqnushwgqkzf.supabase.co', key: 'sb_publishable_S-YCLKYozH7T9DFE1gMtUw_1jWLZnIf' };

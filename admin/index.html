@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/css/fuentes.css">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/admin.css?v=20261006e">
-  <link rel="stylesheet" href="/css/visualizador.css?v=20261012">
+  <link rel="stylesheet" href="/css/visualizador.css?v=20261018">
   <!-- three.js para la tasadora y el visualizador: la misma versión que «Configura tu proyecto» -->
   <script type="importmap">
   { "imports": {
@@ -313,7 +313,7 @@
         $('tab-' + btn.dataset.tab).classList.remove('oculto');
         if (btn.dataset.tab === 'tasadora') abrirTasadora();
         if (btn.dataset.tab === 'galeria' && window.abrirGaleria) window.abrirGaleria();
-        if (btn.dataset.tab === 'visualizador') import('/js/admin-visualizador.js?v=20261012')
+        if (btn.dataset.tab === 'visualizador') import('/js/admin-visualizador.js?v=20261018')
           .then((m) => m.abrir({ sb, raiz: $('tab-visualizador') }))
           .catch((err) => { $('tab-visualizador').innerHTML = `<div class="panel"><p class="vacio">No se pudo cargar el visualizador: ${esc(err.message)}</p></div>`; });
       });

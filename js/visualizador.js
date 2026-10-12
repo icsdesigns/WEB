@@ -116,14 +116,19 @@ export async function crearVisor(contenedor) {
   controles.addEventListener('start', () => { animacion = null; clearTimeout(reanudar); girar(false); });
   controles.addEventListener('end', () => { clearTimeout(reanudar); reanudar = setTimeout(() => girar(true), 5000); });
 
+  // Durante la animación del panel el lienzo conserva su resolución final y solo se escala (uniforme, sin estirar)
+  let fijo = null;
+  const escalar = () => { if (fijo) lienzo.style.transform = `translate(-50%, -50%) scale(${(contenedor.clientHeight / fijo.h).toFixed(4)})`; };
   const medir = () => {
+    if (fijo) return escalar();
     const w = contenedor.clientWidth || 1, h = contenedor.clientHeight || 1;
-    renderer.setSize(w, h, false);
+    if (lienzo.width === Math.round(w * renderer.getPixelRatio()) && lienzo.height === Math.round(h * renderer.getPixelRatio())) return;
+    renderer.setSize(w, h, false);   // vaciar el lienzo y no redibujar en el mismo instante lo deja en blanco un fotograma (parpadeo)
     camara.aspect = w / h;
     camara.updateProjectionMatrix();
-    pintar();
+    if (grupo && enPantalla) { controles.update(); renderer.render(escena, camara); pendiente = false; } else pintar();
   };
-  const ro = new ResizeObserver(medir);
+  const ro = new ResizeObserver(medir);   // medir() redibuja en el mismo fotograma: el modelo sigue proporcionado y sin huecos
   ro.observe(contenedor);
   medir();
   // Sin gastar batería cuando la escena no se ve
@@ -169,6 +174,18 @@ export async function crearVisor(contenedor) {
   }
 
   return {
+    // Congela el tamaño final del lienzo (altura h) mientras el contenedor se anima hacia él; soltar() lo devuelve a la normalidad
+    fijar(h) {
+      const w = contenedor.clientWidth || 1;
+      fijo = null; lienzo.style.cssText = '';
+      renderer.setSize(w, h, false);
+      camara.aspect = w / h; camara.updateProjectionMatrix();
+      fijo = { h };
+      Object.assign(lienzo.style, { inset: 'auto', left: '50%', top: '50%', width: w + 'px', height: h + 'px', transformOrigin: 'center' });
+      escalar();
+      if (grupo) { controles.update(); renderer.render(escena, camara); pendiente = false; }
+    },
+    soltar() { if (!fijo) return; fijo = null; lienzo.style.cssText = ''; medir(); },
     // malla = { bbox, slots: [{ slot, trozos: [{ pos, idx }] }] }; colores = { slot: hex }
     mostrar(malla, colores) {
       liberar();
@@ -277,7 +294,7 @@ export function montarVisualizador(raiz, ajustes) {
   const escenaEl = $('.vis__escena'), estado = $('.vis__estado'), lista = $('[data-colores]');
   const campoUds = $('[data-unidades]'), cajaPrecio = $('[data-precio]');
   const cache = new Map();
-  let visor = null, actual = null, elegidos = {}, abierto = null, turno = 0, cantidad = 1;
+  let visor = null, actual = null, elegidos = {}, abierto = null, turno = 0, cantidad = 1, entrando = false;
 
   const indiceDe = (op) => opciones.indexOf(op);
   const paletaDe = (op) => {
@@ -286,9 +303,18 @@ export function montarVisualizador(raiz, ajustes) {
     return (l && l.length ? l : (p.pla || [])).slice();
   };
   const nombreColor = (op, hex) => {
-    const c = paletaDe(op).find((x) => normal(x.hex) === normal(hex));
-    return c ? c.name : null;
+    const pal = paletaDe(op);
+    const exacto = pal.find((x) => normal(x.hex) === normal(hex));
+    if (exacto) return exacto.name;
+    // El color del 3MF rara vez coincide al byte con el del catálogo (p. ej. #161616 frente a #000000): se usa el más cercano si es casi igual
+    const rgb = (h) => { const n = parseInt(normal(h).slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+    const o = rgb(hex);
+    let mejor = null, d = 1e9;
+    for (const x of pal) { const r = rgb(x.hex), e = Math.hypot(o[0] - r[0], o[1] - r[1], o[2] - r[2]); if (e < d) { d = e; mejor = x; } }
+    return mejor && d <= 40 ? mejor.name : null;
   };
+  // Colores del catálogo que el admin deja preseleccionados (si no hay, el original del modelo)
+  const predefinidos = (op) => { const r = {}; op.colores.forEach((c) => { if (c.predef && normal(c.predef) !== normal(c.hex)) r[c.slot] = c.predef; }); return r; };
   const minimo = (op) => { const t = tramos(op); return t.length ? t[0].desde : 1; };
   const mostrarEstado = (txt, error) => {
     estado.hidden = !txt;
@@ -346,12 +372,12 @@ export function montarVisualizador(raiz, ajustes) {
           <span class="vis__color-txt"><b>Color ${letra(n)}</b><span>${esc(nom)}</span></span>
           ${ICONO.flecha}
         </button>
-        <div class="vis__paleta" ${abierto === c.slot ? '' : 'hidden'}>
+        <div class="vis__paleta${abierto === c.slot && entrando ? ' is-entrando' : ''}" ${abierto === c.slot ? '' : 'hidden'}>
           ${orig}${pal.map((x) => `<button type="button" class="vis__muestra${normal(x.hex) === normal(hex) ? ' is-activa' : ''}" data-slot="${c.slot}" data-hex="${esc(x.hex)}" style="--m:${esc(x.fondo || x.hex)}" title="${esc(x.name)}" aria-label="${esc(x.name)}" aria-pressed="${normal(x.hex) === normal(hex)}"></button>`).join('')}
         </div>
       </div>`;
     }).join('');
-    $('[data-restaurar]').hidden = !op.colores.some((c) => elegidos[c.slot] && normal(elegidos[c.slot]) !== normal(c.hex));
+    $('[data-restaurar]').hidden = !op.colores.some((c) => normal(elegidos[c.slot] || c.hex) !== normal(predefinidos(op)[c.slot] || c.hex));
   }
 
   function pintarPrecio() {
@@ -383,14 +409,17 @@ export function montarVisualizador(raiz, ajustes) {
     const antes = panelEl.offsetHeight;
     clearTimeout(finAnim);
     panelEl.style.transition = 'none'; panelEl.style.height = '';
+    if (visor) visor.soltar();
     fn();
     const despues = panelEl.offsetHeight;
     if (!antes || Math.abs(despues - antes) < 2) { panelEl.style.overflow = ''; return; }
+    const altoEscena = escenaEl.clientHeight;
     panelEl.style.height = antes + 'px'; panelEl.style.overflow = 'hidden';
     void panelEl.offsetHeight; // fija la altura de partida antes de animar
+    if (visor && altoEscena) visor.fijar(altoEscena);
     panelEl.style.transition = 'height .38s cubic-bezier(.22,.7,.2,1)';
     panelEl.style.height = despues + 'px';
-    finAnim = setTimeout(() => { panelEl.style.transition = ''; panelEl.style.height = ''; panelEl.style.overflow = ''; }, 420);
+    finAnim = setTimeout(() => { if (visor) visor.soltar(); panelEl.style.transition = ''; panelEl.style.height = ''; panelEl.style.overflow = ''; }, 420);
   };
   const _colores = pintarColores, _precio = pintarPrecio;
   pintarColores = () => suave(_colores);
@@ -409,11 +438,11 @@ export function montarVisualizador(raiz, ajustes) {
       return;
     }
     const a = e.target.closest('[data-abrir]');
-    if (a) { const s = +a.dataset.abrir; abierto = abierto === s ? null : s; pintarColores(); const b = lista.querySelector(`[data-abrir="${s}"]`); if (b) b.focus(); }
+    if (a) { const s = +a.dataset.abrir; abierto = abierto === s ? null : s; entrando = abierto !== null; pintarColores(); entrando = false; const b = lista.querySelector(`[data-abrir="${s}"]`); if (b) b.focus(); }
   });
   $('[data-restaurar]').addEventListener('click', () => {
-    elegidos = {};
-    if (actual && visor) actual.colores.forEach((c) => visor.color(c.slot, c.hex));
+    elegidos = actual ? predefinidos(actual) : {};
+    if (actual && visor) actual.colores.forEach((c) => visor.color(c.slot, elegidos[c.slot] || c.hex));
     pintarTodo();
   });
 
@@ -463,7 +492,7 @@ export function montarVisualizador(raiz, ajustes) {
     if (!op) { mostrarEstado('Todavía no hay modelos para mostrar.'); return; }
     const mio = ++turno;
     const cambia = !actual || actual.id !== op.id;
-    actual = op; elegidos = {}; abierto = op.colores.length === 1 ? op.colores[0].slot : null;
+    actual = op; elegidos = predefinidos(op); abierto = op.colores.length === 1 ? op.colores[0].slot : null;
     if (cambia) cantidad = minimo(op);
     const rs = ajustes.restaurar && ajustes.restaurar.id === op.id ? ajustes.restaurar : null;
     if (rs) { // vuelta desde el formulario: se recupera lo elegido (una sola vez)
