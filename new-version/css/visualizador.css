@@ -302,3 +302,13 @@
 .avis-boton:disabled { opacity: .4; cursor: not-allowed; }
 a.avis-boton { text-decoration: none; }
 @media (max-width: 640px) { .avis-grupo-ficha { grid-template-columns: 1fr; } }
+
+/* Paleta que se despliega y cambios de tamaño amortiguados */
+.vis__paleta:not([hidden]) { animation: vis-paleta .32s cubic-bezier(.22,.7,.2,1) both; }
+@keyframes vis-paleta { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.vis__precio { animation: vis-paleta .3s ease-out both; }
+@media (prefers-reduced-motion: reduce) { .vis__paleta:not([hidden]), .vis__precio { animation: none; } }
+.avis-estado { display: inline-block; margin-left: 8px; padding: 1px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; vertical-align: middle; }
+.avis-estado.is-ok { background: #dff3e6; color: #1d6b3a; }
+.avis-estado.is-aviso { background: #fdf0d5; color: #8a5a00; }
+.avis-grupo-url .pista code { font-size: 12px; overflow-wrap: anywhere; }

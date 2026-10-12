@@ -51,16 +51,16 @@ function iniciar({ sb, raiz }) {
   let vista = null, vistaId = null, paleta = null, sinTabla = false;
   let grupos = [];       // visualizadores: { slug, nombre, producto, visible, nuevo? }  («general» siempre existe: /visualizador/)
   let grupoActual = 'general', sinGrupos = false, productos = [], gruposOriginales = '';
-  const gruposBorrados = [];
+  let grupoExtra = [];
   const ORIGEN = location.origin;
 
   raiz.innerHTML = `
     <div class="panel" data-panel-grupos>
-      <h2>Visualizadores <span class="pista">· cada uno tiene su propia dirección y puede vincularse al botón «Solicitar» de un producto</span></h2>
+      <h2>Dirección y producto <span class="pista">· el visualizador tiene una única dirección y puede vincularse al botón «Solicitar» de un producto</span></h2>
       <div data-grupos></div>
     </div>
     <div class="panel">
-      <h2>Añadir modelos desde un 3MF <span class="pista">· cada cama que elijas será una opción del visualizador seleccionado</span></h2>
+      <h2>Añadir modelos desde un 3MF <span class="pista">· cada cama que elijas será una opción del visualizador</span></h2>
       <label class="gal-zona" data-zona>
         <input type="file" accept=".3mf,model/3mf" data-archivo>
         ${ICONO.subir}
@@ -79,84 +79,41 @@ function iniciar({ sb, raiz }) {
     </div>`;
   const q = (s) => raiz.querySelector(s);
 
-  /* ---------- 0. Visualizadores (cada uno con su dirección y, si quieres, su producto) ---------- */
-  const delGrupo = (slug = grupoActual) => opciones.filter((o) => (o.grupo || 'general') === slug);
-  const slugDe = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
-  const RESERVADOS = ['pedido', 'general', 'admin'];
-  const baseUrl = ORIGEN + location.pathname.replace(/admin\/?(index\.html)?$/, '') + 'visualizador/';
-  const urlDe = (slug) => baseUrl + (slug === 'general' ? '' : slug + '/');
-  const grupoSel = () => grupos.find((g) => g.slug === grupoActual) || grupos[0];
-  const firmaGrupos = () => JSON.stringify(grupos.filter((g) => !g.nuevo).map((g) => [g.slug, g.nombre, g.producto || null, g.visible]));
-  const hayCambiosGrupos = () => gruposBorrados.length > 0 || grupos.some((g) => g.nuevo) || firmaGrupos() !== gruposOriginales;
+  /* ---------- 0. Un solo visualizador: dirección y producto vinculado ---------- */
+  // Todas las opciones son de este visualizador. El producto vinculado se guarda en la fila «general» de visualizador_grupos.
+  const delGrupo = () => opciones;
+  const baseUrl = ORIGEN + location.pathname.replace(/admin\/?(index\.html)?$/, '');
+  const URL_PUBLICA = baseUrl + 'llaveros-logo/';
+  const grupoSel = () => grupos.find((g) => g.slug === 'general') || grupos[0];
+  const firmaGrupos = () => JSON.stringify([grupoSel() && (grupoSel().producto || null)]);
+  const hayCambiosGrupos = () => firmaGrupos() !== gruposOriginales;
 
   function pintarGrupos() {
     const caja = q('[data-grupos]');
-    if (sinGrupos) {
-      caja.innerHTML = '<div class="aviso-sql"><p><strong>Para tener varios visualizadores</strong> ejecuta de nuevo <code>supabase/visualizador.sql</code> en Supabase › SQL Editor (añade el bloque 3) y recarga el panel. Mientras tanto solo existe el visualizador general.</p></div>';
-      return;
-    }
     const g = grupoSel();
-    const n = delGrupo(g.slug).length;
     caja.innerHTML = `
-      <div class="avis-grupos" role="tablist" aria-label="Visualizadores">${grupos.map((x) => `
-        <button type="button" class="avis-grupo${x.slug === g.slug ? ' is-activo' : ''}${x.visible ? '' : ' is-oculto'}" role="tab" aria-selected="${x.slug === g.slug}" data-grupo="${esc(x.slug)}">
-          ${esc(x.nombre || x.slug)}<small>${delGrupo(x.slug).length}</small></button>`).join('')}
-        <button type="button" class="avis-boton" data-nuevo-grupo>${ICONO.mas}Nuevo visualizador</button>
-      </div>
       <div class="avis-grupo-ficha">
-        <label class="avis-campo-et"><span>Nombre <i>(lo ve el cliente en el título)</i></span>
-          <input type="text" data-g="nombre" value="${esc(g.nombre)}" maxlength="60" ${g.slug === 'general' ? 'disabled' : ''}></label>
-        <label class="avis-campo-et"><span>Producto vinculado <i>(su botón «Solicitar» abrirá este visualizador)</i></span>
-          <select data-g="producto" ${g.slug === 'general' ? 'disabled' : ''}>
+        <label class="avis-campo-et"><span>Producto vinculado <i>(su botón «Solicitar» abrirá el visualizador)</i></span>
+          <select data-g="producto" ${sinGrupos ? 'disabled' : ''}>
             <option value="">Ninguno</option>
             ${productos.map((nom) => `<option ${g.producto === nom ? 'selected' : ''}>${esc(nom)}</option>`).join('')}
             ${g.producto && !productos.includes(g.producto) ? `<option selected>${esc(g.producto)}</option>` : ''}
-          </select></label>
+          </select>
+          ${sinGrupos ? '<span class="pista">Para vincular un producto ejecuta de nuevo <code>supabase/visualizador.sql</code> (bloque 3).</span>' : ''}</label>
         <div class="avis-campo-et avis-grupo-url"><span>Dirección para compartir</span>
-          <div class="avis-url"><code>${esc(urlDe(g.slug).replace(/^https?:\/\//, ''))}</code>
-            <button type="button" class="avis-boton avis-boton--suave" data-copiar-url>${ICONO.copiar}Copiar</button>
-            <a class="avis-boton avis-boton--suave" href="${esc(urlDe(g.slug))}" target="_blank" rel="noopener">Abrir</a></div>
-          ${g.nuevo ? '<span class="pista">La dirección sale del nombre y no se puede cambiar después, para que los enlaces compartidos sigan funcionando.</span>' : ''}</div>
-        <div class="avis-grupo-pie">
-          <label class="avis-op__visible"><span class="adm-interruptor"><input type="checkbox" data-g="visible" ${g.visible ? 'checked' : ''} ${g.slug === 'general' ? 'disabled' : ''} aria-label="Visible en la web"><span aria-hidden="true"></span></span>Visible</label>
-          ${g.slug === 'general' ? '<span class="pista">El visualizador general es el de <code>/visualizador/</code> y no se puede quitar.</span>'
-            : `<button type="button" class="avis-boton avis-boton--peligro" data-quitar-grupo ${n ? 'disabled title="Antes quita o mueve sus opciones"' : ''}>${ICONO.papelera}Eliminar visualizador</button>`}
-        </div>
+          <div class="avis-url"><code>${esc(URL_PUBLICA.replace(/^https?:\/\//, ''))}</code>
+            <button type="button" class="avis-boton avis-boton--suave" data-copiar-url>${ICONO.copiar}<span>Copiar</span></button>
+            <a class="avis-boton avis-boton--suave" href="${esc(URL_PUBLICA)}" target="_blank" rel="noopener">Abrir</a></div></div>
       </div>`;
   }
   q('[data-grupos]').addEventListener('click', (e) => {
-    const t = e.target.closest('[data-grupo]');
-    if (t) { grupoActual = t.dataset.grupo; vistaId = null; pintarGrupos(); pintarLista(); return; }
-    if (e.target.closest('[data-nuevo-grupo]')) {
-      const nombre = (prompt('Nombre del nuevo visualizador (por ejemplo «Llavero personalizado»):') || '').trim();
-      if (!nombre) return;
-      let slug = slugDe(nombre), k = 2;
-      if (!slug) return alert('Escribe un nombre con letras o números.');
-      const base = slug;
-      while (RESERVADOS.includes(slug) || grupos.some((x) => x.slug === slug)) slug = base + '-' + k++;
-      grupos.push({ slug, nombre, producto: null, visible: true, nuevo: true });
-      grupoActual = slug; vistaId = null;
-      pintarGrupos(); pintarLista(); return;
-    }
-    const g = grupoSel();
-    if (e.target.closest('[data-copiar-url]')) {
-      const b = e.target.closest('[data-copiar-url]');
-      (navigator.clipboard ? navigator.clipboard.writeText(urlDe(g.slug)) : Promise.reject()).then(() => { b.lastChild.textContent = 'Copiada'; setTimeout(() => { b.lastChild.textContent = 'Copiar'; }, 1600); }, () => prompt('Copia la dirección:', urlDe(g.slug)));
-      return;
-    }
-    if (e.target.closest('[data-quitar-grupo]')) {
-      if (!confirm('¿Eliminar el visualizador «' + g.nombre + '»? Su dirección dejará de funcionar al guardar los cambios.')) return;
-      grupos = grupos.filter((x) => x !== g);
-      if (!g.nuevo) gruposBorrados.push(g);
-      grupoActual = 'general'; vistaId = null;
-      pintarGrupos(); pintarLista();
-    }
+    const b = e.target.closest('[data-copiar-url]');
+    if (!b) return;
+    const txt = b.querySelector('span');
+    (navigator.clipboard ? navigator.clipboard.writeText(URL_PUBLICA) : Promise.reject()).then(() => { txt.textContent = 'Copiada'; setTimeout(() => { txt.textContent = 'Copiar'; }, 1600); }, () => prompt('Copia la dirección:', URL_PUBLICA));
   });
-  q('[data-grupos]').addEventListener('input', (e) => { if (e.target.dataset.g === 'nombre') { grupoSel().nombre = e.target.value; const b = raiz.querySelector('.avis-grupo.is-activo'); if (b) b.firstChild.textContent = e.target.value || grupoSel().slug; pintarBarra(); } });
   q('[data-grupos]').addEventListener('change', (e) => {
-    const g = grupoSel();
-    if (e.target.dataset.g === 'producto') { g.producto = e.target.value || null; pintarBarra(); }
-    if (e.target.dataset.g === 'visible') { g.visible = e.target.checked; pintarGrupos(); pintarBarra(); }
+    if (e.target.dataset.g === 'producto') { grupoSel().producto = e.target.value || null; pintarBarra(); }
   });
 
   /* ---------- 1. Leer el 3MF ---------- */
@@ -267,9 +224,10 @@ function iniciar({ sb, raiz }) {
     const rg = await sb.from('visualizador_grupos').select('*').order('orden', { ascending: true }).order('creado', { ascending: true });
     sinGrupos = !!rg.error;
     grupos = sinGrupos ? [] : (rg.data || []).map((g) => ({ slug: g.slug, nombre: g.nombre, producto: g.producto || null, visible: g.visible !== false }));
-    if (!grupos.some((g) => g.slug === 'general')) grupos.unshift({ slug: 'general', nombre: 'Visualizador general', producto: null, visible: true, nuevo: sinGrupos ? false : true });
-    if (!grupos.some((g) => g.slug === grupoActual)) grupoActual = 'general';
-    gruposBorrados.length = 0;
+    grupoExtra = grupos.filter((g) => g.slug !== 'general');   // grupos de pruebas anteriores: se limpian al guardar
+    if (!grupos.some((g) => g.slug === 'general')) grupos.unshift({ slug: 'general', nombre: 'Visualizador general', producto: null, visible: true });
+    const general = grupos.find((g) => g.slug === 'general');
+    if (!general.producto) { const c = grupoExtra.find((g) => g.producto); if (c) general.producto = c.producto; }
     try { const rp = await sb.from('productos').select('nombre').order('nombre', { ascending: true }); productos = rp.error ? [] : (rp.data || []).map((x) => x.nombre).filter(Boolean); } catch (e) { productos = []; }
     opciones = (r.data || []).map((f) => ({ ...f, grupo: f.grupo || 'general', colores: Array.isArray(f.colores) ? f.colores : [], precios: Array.isArray(f.precios) ? f.precios : [] }));
     originales = firma(); gruposOriginales = firmaGrupos();
@@ -497,10 +455,6 @@ function iniciar({ sb, raiz }) {
       if (o.precios.some((t) => !(+t.desde >= 1) || t.unidad === '' || !(+t.unidad >= 0))) throw new Error('Revisa los precios de ' + nom + ': cada tramo necesita unidades (1 o más) y un precio.');
       if (new Set(o.precios.map((t) => Math.floor(+t.desde))).size !== o.precios.length) throw new Error('Los precios de ' + nom + ' tienen dos tramos que empiezan en las mismas unidades.');
     }
-    for (const g of grupos) {
-      if (!(g.nombre || '').trim()) throw new Error('Todos los visualizadores necesitan un nombre.');
-      if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(g.slug)) throw new Error('La dirección «' + g.slug + '» no es válida.');
-    }
     const st = sb.storage.from(BUCKET);
     const nuevas = opciones.filter((o) => o.nueva);
     for (let k = 0; k < nuevas.length; k++) {
@@ -518,11 +472,12 @@ function iniciar({ sb, raiz }) {
     }
     progreso('Guardando…');
     if (!sinGrupos) {
-      const rg = await sb.from('visualizador_grupos').upsert(grupos.map((g, n) => ({ slug: g.slug, nombre: g.nombre.trim(), producto: g.producto || null, visible: g.visible !== false, orden: n })));
-      if (rg.error) throw paso('al guardar los visualizadores (tabla visualizador_grupos)', rg.error);
+      const g = grupoSel();
+      const rg = await sb.from('visualizador_grupos').upsert([{ slug: 'general', nombre: g.nombre || 'Visualizador general', producto: g.producto || null, visible: true, orden: 0 }]);
+      if (rg.error) throw paso('al guardar el producto vinculado (tabla visualizador_grupos)', rg.error);
     }
     const filas = opciones.map((o, i) => ({
-      id: o.id, grupo: sinGrupos ? undefined : (o.grupo || 'general'), nombre: (o.nombre || '').trim() || 'Opción ' + (i + 1), material: o.material, modelo: o.modelo, miniatura: o.miniatura,
+      id: o.id, grupo: sinGrupos ? undefined : 'general', nombre: (o.nombre || '').trim() || 'Opción ' + (i + 1), material: o.material, modelo: o.modelo, miniatura: o.miniatura,
       colores: o.colores.map((c, n) => ({ slot: c.slot, nombre: 'Color ' + letra(n), hex: c.hex })),
       precios: tramos(o).map((t) => ({ desde: t.desde, unidad: t.unidad })),
       origen: o.origen || null, kb: o.kb || null, orden: i, visible: !!o.visible
@@ -537,11 +492,9 @@ function iniciar({ sb, raiz }) {
       if (rutas.length) await st.remove(rutas); // si falla, el archivo queda huérfano pero la web ya no lo usa
       borradas.shift();
     }
-    while (gruposBorrados.length) {
-      const g = gruposBorrados[0];
-      const r = await sb.from('visualizador_grupos').delete().eq('slug', g.slug);
-      if (r.error) throw r.error;
-      gruposBorrados.shift();
+    if (!sinGrupos && grupoExtra.length) { // los grupos de pruebas anteriores desaparecen: ya solo hay un visualizador
+      const r = await sb.from('visualizador_grupos').delete().neq('slug', 'general');
+      if (r.error) throw paso('al limpiar grupos anteriores', r.error);
     }
   }
 

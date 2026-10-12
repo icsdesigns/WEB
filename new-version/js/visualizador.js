@@ -373,6 +373,28 @@ export function montarVisualizador(raiz, ajustes) {
         ${min > 1 ? `<p class="vis__precio-nota">Pedido mínimo: ${min} unidades.</p>` : ''}`;
     }
   }
+  /* Amortigua los cambios de tamaño: al abrir una paleta, cambiar de opción o actualizar el precio, la altura del panel
+     (de la que depende la del visor) pasa de la anterior a la nueva con una transición en vez de saltar. */
+  const panelEl = $('.vis__panel');
+  const sinMovimiento = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)');
+  let finAnim = null;
+  const suave = (fn) => {
+    if (!panelEl.isConnected || (sinMovimiento && sinMovimiento.matches)) return fn();
+    const antes = panelEl.offsetHeight;
+    clearTimeout(finAnim);
+    panelEl.style.transition = 'none'; panelEl.style.height = '';
+    fn();
+    const despues = panelEl.offsetHeight;
+    if (!antes || Math.abs(despues - antes) < 2) { panelEl.style.overflow = ''; return; }
+    panelEl.style.height = antes + 'px'; panelEl.style.overflow = 'hidden';
+    void panelEl.offsetHeight; // fija la altura de partida antes de animar
+    panelEl.style.transition = 'height .38s cubic-bezier(.22,.7,.2,1)';
+    panelEl.style.height = despues + 'px';
+    finAnim = setTimeout(() => { panelEl.style.transition = ''; panelEl.style.height = ''; panelEl.style.overflow = ''; }, 420);
+  };
+  const _colores = pintarColores, _precio = pintarPrecio;
+  pintarColores = () => suave(_colores);
+  pintarPrecio = () => suave(_precio);
   const pintarTodo = () => { pintarColores(); pintarPrecio(); };
 
   lista.addEventListener('click', (e) => {

@@ -143,7 +143,7 @@
           var img = imgUrl(p.imagen);
           var btn = explorar
             ? '<button type="button" class="btn-explorar" id="btnExplorarBibliotecas">Explorar</button>'
-            : '<button type="button" class="btn-comprar" data-product="' + esc(p.nombre) + '" data-category="' + esc(p.categoria || '') + '"' + (vis[p.nombre] ? ' data-config-url="/new-version/visualizador/' + esc(vis[p.nombre]) + '/"' : '') + '>Solicitar</button>';
+            : '<button type="button" class="btn-comprar" data-product="' + esc(p.nombre) + '" data-category="' + esc(p.categoria || '') + '"' + (vis[p.nombre] ? ' data-config-url="/new-version/llaveros-logo/"' : '') + '>Solicitar</button>';
           return '<div class="product-card" data-category="' + esc(p.categoria || '') + '">' +
             '<div class="product-image">' + (img ? '<img src="' + esc(img) + '" alt="' + esc(p.nombre) + '" width="240" height="240" loading="lazy" decoding="async">' : '') + '</div>' +
             '<h3>' + esc(p.nombre) + '</h3>' +
