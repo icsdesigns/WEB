@@ -141,7 +141,7 @@ input[type=range]{width:100%;accent-color:var(--ac);height:22px;background:trans
   .views{flex-direction:column;flex:none}
   .pw{border-right:none;border-bottom:1px solid var(--border)}
   .pane{height:38vh;flex:none}
-  .tbar .stxt{flex:1 0 100%}
+  .tbar .stxt{flex:1 0 100%;white-space:normal;min-width:0}
   .ab-name,.ab-bktx,.ab-priv{display:none}
   .ab-back{padding:0 9px}
 }
@@ -345,7 +345,7 @@ body[data-mode=auto] #backAuto{display:none}
     <div class="row" style="margin-top:10px">
       <label class="fld"><span class="lbl">Ancho (mm)</span><input class="inp" type="text" inputmode="decimal" autocomplete="off" id="outW" value="80"></label>
       <label class="fld"><span class="lbl">Alto (mm)</span><input class="inp" type="text" inputmode="decimal" autocomplete="off" id="outH" value="80"></label>
-      <label class="fld"><span class="lbl">Resolución</span><select class="inp" id="work"><option value="1000">1000 px</option><option value="1400">1400 px</option><option value="1600" selected>1600 px</option><option value="2000">2000 px</option></select></label>
+      <label class="fld"><span class="lbl">Calidad</span><select class="inp" id="work"><option value="30">Normal · 30 px/mm</option><option value="40" selected>Alta · 40 px/mm</option></select></label>
     </div>
     <div class="hint" id="pxInfo">Cambia el ancho o el alto; el otro se ajusta. Las líneas finas se recalculan al cambiar el tamaño.</div>
   </div>
@@ -394,7 +394,7 @@ body[data-mode=auto] #backAuto{display:none}
       <label class="fld"><span class="lbl">Quitar motas negras &lt; mm²</span><input class="inp" type="text" inputmode="decimal" autocomplete="off" id="speck" value="0,15"></label>
       <label class="fld"><span class="lbl">Rellenar huecos &lt; mm²</span><input class="inp" type="text" inputmode="decimal" autocomplete="off" id="hole" value="0,3"></label>
     </div>
-    <div class="row"><span class="lbl">Cerrar huecos de</span><div class="seg" id="closeSeg"><button data-v="0">0 px</button><button data-v="1" class="on">1 px</button><button data-v="2">2 px</button></div></div>
+    <div class="row"><span class="lbl">Cerrar huecos de</span><div class="seg" id="closeSeg"><button data-v="0">0</button><button data-v="1" class="on">1</button><button data-v="2">2</button></div></div>
     <div class="rng"><div class="rng-t"><span>Suavizar dientes de sierra</span><b id="v-soft">1</b></div><input type="range" id="soft" min="0" max="3" step="1" value="1"></div>
     <label class="chk"><input type="checkbox" id="widenGaps"><span>Ensanchar huecos blancos finos hasta 0,5 mm<br><span class="hint">Para texto o detalles calados en blanco sobre negro: abre las rendijas en vez de taparlas.</span></span></label>
     <label class="chk"><input type="checkbox" id="fillGaps"><span>Cerrar huecos blancos finos (&lt; 0,5 mm)<br><span class="hint">Rellena de negro las rendijas blancas estrechas (si también ensanchas, solo las que no se hayan podido abrir).</span></span></label>
@@ -421,7 +421,7 @@ body[data-mode=auto] #backAuto{display:none}
   <p><b>Qué hace esta app:</b> convierte una ilustración en color en un dibujo de línea en blanco y negro, listo para extruir en Autodesk Fusion. Exporta SVG y DXF en milímetros, con un grosor mínimo de 0,5 mm en todas las líneas.</p>
   <p style="margin-top:8px"><button class="btn sm" id="helpTour">Ver la guía rápida</button></p>
   <h3>Modo automático: 3 pasos</h3>
-  <ol><li><b>Sube tu imagen</b> (JPG, PNG o WebP).</li><li><b>Elige el tamaño</b> en milímetros, por ancho o por alto. El «Nivel de detalle» (Simple, Normal, Detallado) decide cuántos colores se separan.</li><li><b>Elige un resultado</b> entre las tres propuestas y pulsa <b>Descargar SVG para Fusion</b>. El DXF y el PNG están a su lado. La marcada como «Recomendada» es la que mejor puntúa.</li></ol>
+  <ol><li><b>Sube tu imagen</b> (JPG, PNG o WebP).</li><li><b>Elige el tamaño</b> en milímetros, por ancho o por alto. El «Nivel de detalle» (Simple, Normal, Detallado) decide cuántos colores se separan.</li><li><b>Elige un resultado</b> entre las tres propuestas (se ven en vista rápida; la elegida se recalcula en alta calidad, a 40 px/mm, y es la que mide el semáforo y la que se descarga) y pulsa <b>Descargar SVG para Fusion</b>. El DXF y el PNG están a su lado. La marcada como «Recomendada» es la que mejor puntúa.</li></ol>
   <h3>Cuándo usar «Ajustar a mano»</h3>
   <p>Si una propuesta se queda cerca pero no del todo (una letra que debería ser negra, un color que sobra, un fondo que se cuela), pulsa «Ajustar a mano». Se abre la herramienta completa con la propuesta elegida ya cargada. Cada color de la imagen tiene un <b>papel</b>:</p>
   <div class="pgrid">
@@ -1577,7 +1577,7 @@ var Potrace=(function(){
 'use strict';
 var W=0,H=0,N=0,ST=null,_thickN=0,_thickMask=null,THIN_MERGE=1.5;
 function post(m,tr){self.postMessage(m,tr||[]);}
-function prog(s){post({t:'prog',msg:s});}
+function prog(s,f){post({t:'prog',msg:s,f:f});}
 
 /* ---------- utilidades ---------- */
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
@@ -2003,7 +2003,7 @@ function getQ(k,smooth,quiet){
     else if(darkBg)papers.push(Ls[c]<=Ls[dark]+10?3:0);
     else papers.push(Ls[c]<=Ls[dark]+10?0:(c===fb?3:2));
   }
-  var ST2={labels:L,cc:cc,k:K,palLab:palLab};
+  var ST2={labels:L,cc:cc,k:K,palLab:palLab,lab:lab,alpha:tr,trL:trL};
   var Q={key:key,k:k,smooth:smooth,ST:ST2,pal:pal,papers:papers,darkBg:darkBg,K:K,trL:trL,btot:btot,palLab:palLab,adj:adj};
   QC[key]=Q;QCK.push(key);
   while(QCK.length>6){delete QC[QCK.shift()];}
@@ -2031,14 +2031,230 @@ function compPapers(P){
   }
   return {cp:cp,forced:forced};
 }
+
+/* ===== densidad de trabajo =====
+   Las propuestas y la vista del modo manual se calculan a PREV_DENS px/mm (rápido);
+   la versión final (la que se mide y se descarga) a P.dens (40 o 30 px/mm). */
+var PREV_DENS=14,FINAL_MAXN=12e6,FINAL_HARDN=20e6,FINAL_MIND=20,PREV_MAXN=2.5e6;
+function gridFor(P){
+  var asp=IMG.w/IMG.h,mm=P.mm,d,warn=0;
+  function nOf(dd){var w=Math.max(8,Math.round(mm*dd));return w*Math.max(8,Math.round(w/asp));}
+  if(P.final){
+    var want=P.dens||40;d=want;
+    while(nOf(d)>FINAL_MAXN&&d>FINAL_MIND)d-=1;
+    if(d<want)warn=1;
+    if(nOf(d)>FINAL_HARDN){d=Math.sqrt(FINAL_HARDN*asp)/mm;warn=2;}
+  }else{
+    d=Math.min(P.dens||PREV_DENS,Math.sqrt((P.maxN||PREV_MAXN)*asp)/mm);
+  }
+  var w=Math.max(8,Math.round(mm*d)),h=Math.max(8,Math.round(w*IMG.h/IMG.w));
+  return {w:w,h:h,d:w/mm,warn:warn};
+}
+
+/* ---------- campo continuo a alta resolución ---------- */
+function boxDownLab(lab,w,h,n){
+  var w2=Math.floor(w/n),h2=Math.floor(h/n),o=new Float32Array(w2*h2*3),x,y,dx,dy,c,s,inv=1/(n*n);
+  for(y=0;y<h2;y++)for(x=0;x<w2;x++)for(c=0;c<3;c++){
+    s=0;for(dy=0;dy<n;dy++)for(dx=0;dx<n;dx++)s+=lab[((y*n+dy)*w+x*n+dx)*3+c];
+    o[(y*w2+x)*3+c]=s*inv;
+  }
+  return {lab:o,w:w2,h:h2};
+}
+function cubicW(t,w){var t2=t*t,t3=t2*t;w[0]=-0.5*t3+t2-0.5*t;w[1]=1.5*t3-2.5*t2+1;w[2]=-1.5*t3+2*t2+0.5*t;w[3]=0.5*t3-0.5*t2;}
+function gaussBlurF(F,w,h,sg){
+  if(sg<0.45)return;
+  var R=Math.max(1,Math.ceil(3*sg)),ker=new Float32Array(2*R+1),i,s=0,x,y,k,acc,tmp=new Float32Array(w*h),o;
+  for(i=-R;i<=R;i++){ker[i+R]=Math.exp(-i*i/(2*sg*sg));s+=ker[i+R];}
+  for(i=0;i<ker.length;i++)ker[i]/=s;
+  for(y=0;y<h;y++){o=y*w;
+    for(x=0;x<w;x++){acc=0;for(k=-R;k<=R;k++){var xx=x+k;xx=xx<0?0:xx>=w?w-1:xx;acc+=ker[k+R]*F[o+xx];}tmp[o+x]=acc;}}
+  for(x=0;x<w;x++){
+    for(y=0;y<h;y++){acc=0;for(k=-R;k<=R;k++){var yy=y+k;yy=yy<0?0:yy>=h?h-1:yy;acc+=ker[k+R]*tmp[yy*w+x];}F[y*w+x]=acc;}}
+}
+/* Imagen suavizada (Lab, resolución de análisis) → ampliación bicúbica a Wh×Hh → para cada píxel:
+   F = «tinta» continua 0..1 = dN/(dB+dN) (distancia al centro más cercano que NO va a Negro entre la suma de distancias
+   al más cercano que va a Negro y al más cercano que no); Lh = etiqueta del centro más cercano. */
+function hiField(Wh,Hh,isBl,trL,sigma){
+  var src=ST.lab,sw=IMG.w,sh=IMG.h,pl=ST.palLab,K=ST.k,x,y,c,k,ratio=sw/Wh;
+  if(ratio>1.5){var bd=boxDownLab(src,sw,sh,Math.floor(ratio));src=bd.lab;sw=bd.w;sh=bd.h;}
+  var F=new Float32Array(Wh*Hh),Lh=new Uint8Array(Wh*Hh);
+  var xi=new Int32Array(Wh*4),xw=new Float32Array(Wh*4),wt=new Float32Array(4),wy=new Float32Array(4);
+  for(x=0;x<Wh;x++){
+    var sx=(x+0.5)*sw/Wh-0.5,i0=Math.floor(sx);cubicW(sx-i0,wt);
+    for(k=0;k<4;k++){var ii=i0-1+k;xi[x*4+k]=(ii<0?0:ii>=sw?sw-1:ii)*3;xw[x*4+k]=wt[k];}
+  }
+  var al=ST.alpha,axm=null;
+  if(al){axm=new Int32Array(Wh);for(x=0;x<Wh;x++)axm[x]=Math.min(IMG.w-1,Math.floor((x+0.5)*IMG.w/Wh));}
+  var list=[];for(c=0;c<K;c++)if(c!==trL)list.push(c);
+  var nl=list.length,pL=new Float32Array(nl),pA=new Float32Array(nl),pB=new Float32Array(nl),bl=new Uint8Array(nl),lab=new Uint8Array(nl);
+  for(c=0;c<nl;c++){var l=list[c];pL[c]=pl[l*3];pA[c]=pl[l*3+1];pB[c]=pl[l*3+2];bl[c]=isBl[l]?1:0;lab[c]=l;}
+  var cache={};
+  function hrow(jj){
+    var r=new Float32Array(3*Wh),b0,b1,b2,b3,v0,v1,v2,q;
+    for(var xx=0;xx<Wh;xx++){
+      q=xx*4;b0=xi[q];b1=xi[q+1];b2=xi[q+2];b3=xi[q+3];var w0=xw[q],w1=xw[q+1],w2=xw[q+2],w3=xw[q+3],rb=jj*sw*3;
+      r[xx*3]=w0*src[rb+b0]+w1*src[rb+b1]+w2*src[rb+b2]+w3*src[rb+b3];
+      r[xx*3+1]=w0*src[rb+b0+1]+w1*src[rb+b1+1]+w2*src[rb+b2+1]+w3*src[rb+b3+1];
+      r[xx*3+2]=w0*src[rb+b0+2]+w1*src[rb+b1+2]+w2*src[rb+b2+2]+w3*src[rb+b3+2];
+    }
+    return r;
+  }
+  var hasB=false,hasN=false;for(c=0;c<nl;c++){if(bl[c])hasB=true;else hasN=true;}
+  for(y=0;y<Hh;y++){
+    var sy=(y+0.5)*sh/Hh-0.5,j0=Math.floor(sy),r0,r1,r2,r3;cubicW(sy-j0,wy);
+    var ys=[0,0,0,0];
+    for(k=0;k<4;k++){var jj=j0-1+k;ys[k]=jj<0?0:jj>=sh?sh-1:jj;}
+    for(k=0;k<4;k++)if(!cache[ys[k]])cache[ys[k]]=hrow(ys[k]);
+    r0=cache[ys[0]];r1=cache[ys[1]];r2=cache[ys[2]];r3=cache[ys[3]];
+    for(var key in cache){var kk=+key;if(kk!==ys[0]&&kk!==ys[1]&&kk!==ys[2]&&kk!==ys[3])delete cache[key];}
+    var wy0=wy[0],wy1=wy[1],wy2=wy[2],wy3=wy[3],o=y*Wh,aro=al?Math.min(IMG.h-1,Math.floor((y+0.5)*IMG.h/Hh))*IMG.w:0;
+    for(x=0;x<Wh;x++){
+      if(al&&al[aro+axm[x]]){F[o+x]=0;Lh[o+x]=trL;continue;}
+      var i3=x*3,L=wy0*r0[i3]+wy1*r1[i3]+wy2*r2[i3]+wy3*r3[i3],a=wy0*r0[i3+1]+wy1*r1[i3+1]+wy2*r2[i3+1]+wy3*r3[i3+1],b=wy0*r0[i3+2]+wy1*r1[i3+2]+wy2*r2[i3+2]+wy3*r3[i3+2];
+      var bestD=1e30,best=0,dB=1e30,dN=1e30,d,dl,da,db;
+      for(c=0;c<nl;c++){
+        dl=L-pL[c];da=a-pA[c];db=b-pB[c];d=dl*dl+da*da+db*db;
+        if(d<bestD){bestD=d;best=c;}
+        if(bl[c]){if(d<dB)dB=d;}else if(d<dN)dN=d;
+      }
+      Lh[o+x]=lab[best];
+      F[o+x]=!hasB?0:!hasN?1:(Math.sqrt(dN)/(Math.sqrt(dB)+Math.sqrt(dN)+1e-6));
+    }
+  }
+  gaussBlurF(F,Wh,Hh,sigma);
+  return {F:F,Lh:Lh};
+}
+
+/* ---------- eje medio (medial axis) a partir de la distancia exacta ---------- */
+/* M: máscara (1 = rasgo). Devuelve la distancia D (px) de cada píxel del rasgo al fondo y las crestas de D (eje medio). */
+function axisRidge(M,edge,lim){
+  var d2=edtSq(M,W,H,0,edge),n=N,i,D=d2,x,y,w=W,h=H,R=new Uint8Array(n),a,b,d,o;
+  for(i=0;i<n;i++)D[i]=M[i]?Math.sqrt(d2[i]):0;
+  for(y=1;y<h-1;y++){o=y*w;
+    for(x=1;x<w-1;x++){
+      i=o+x;d=D[i];if(d<=0||d>=lim)continue;
+      /* cresta: ningún vecino sube casi 1 por píxel (en ese caso hay un disco mayor que contiene a este) */
+      if(D[i-1]-d<0.75&&D[i+1]-d<0.75&&D[i-w]-d<0.75&&D[i+w]-d<0.75&&D[i-w-1]-d<1.06&&D[i-w+1]-d<1.06&&D[i+w-1]-d<1.06&&D[i+w+1]-d<1.06)R[i]=1;
+    }
+  }
+  return {D:D,R:R};
+}
+/* tramos de eje con lo>D>hi... : D en (lo,hi) (rasgo más fino que 2·hi), longitud ≥ minLen y D casi constante (trazo, no punta de esquina) */
+function filterAxis(ax,lo,hi,minLen,slope){
+  var D=ax.D,R=ax.R,n=N,i,d,cand=new Uint8Array(n),any=false,c;
+  for(i=0;i<n;i++)if(R[i]){d=D[i];if(d>lo&&d<hi){cand[i]=1;any=true;}}
+  if(!any)return {keep:null,count:0,minD:0};
+  /* quitar las ramas en rampa (las que salen hacia las esquinas: la distancia crece o decrece más de 0,45 por píxel): no son trazo, son «huesos» */
+  var steep=[],ii,jx,jy,px0,py0,dd,dxx,dyy,ramp;
+  for(i=0;i<n;i++){
+    if(!cand[i])continue;
+    py0=(i/W)|0;px0=i-py0*W;if(px0<4||py0<4||px0>=W-4||py0>=H-4)continue;
+    ramp=0;
+    for(jy=-4;jy<=4;jy++)for(jx=-4;jx<=4;jx++){
+      dd=jx*jx+jy*jy;if(dd<9||dd>20)continue;ii=i+jy*W+jx;if(!cand[ii])continue;
+      dd=Math.abs(D[i]-D[ii])/Math.sqrt(jx*jx+jy*jy);if(dd>ramp)ramp=dd;
+    }
+    if(ramp>0.45)steep.push(i);
+  }
+  for(i=0;i<steep.length;i++)cand[steep[i]]=0;
+  /* los tramos se agrupan con una conexión holgada (el eje a veces se corta 1–2 px por la cuantización) */
+  var cand2=new Uint8Array(n),ci;
+  for(i=0;i<n;i++){if(!cand[i])continue;py0=(i/W)|0;px0=i-py0*W;
+    for(jy=-1;jy<=1;jy++){var qy=py0+jy;if(qy<0||qy>=H)continue;for(jx=-1;jx<=1;jx++){var qx=px0+jx;if(qx>=0&&qx<W)cand2[qy*W+qx]=1;}}}
+  var cc=labelBin(cand2,W,H,true,1),mn=new Float32Array(cc.n).fill(1e9),mx=new Float32Array(cc.n),carea=new Int32Array(cc.n),bx0=new Int32Array(cc.n).fill(1<<30),bx1=new Int32Array(cc.n).fill(-1),by0=new Int32Array(cc.n).fill(1<<30),by1=new Int32Array(cc.n).fill(-1),xx,yy;
+  for(i=0;i<n;i++)if(cand[i]){c=cc.id[i];carea[c]++;d=D[i];if(d<mn[c])mn[c]=d;if(d>mx[c])mx[c]=d;yy=(i/W)|0;xx=i-yy*W;if(xx<bx0[c])bx0[c]=xx;if(xx>bx1[c])bx1[c]=xx;if(yy<by0[c])by0[c]=yy;if(yy>by1[c])by1[c]=yy;}
+  var ok=new Uint8Array(cc.n),count=0,minD=1e9;
+  for(c=0;c<cc.n;c++){
+    /* longitud del tramo: diagonal de su caja (rampa recta) o, si es mayor, área/3 (curvas) */
+    var len=Math.max(Math.hypot(bx1[c]-bx0[c]+1,by1[c]-by0[c]+1),cc.area[c]/3);
+    if(len>=minLen&&(mx[c]-mn[c])<=slope*len){ok[c]=1;count++;if(mn[c]<minD)minD=mn[c];}
+  }
+  if(!count)return {keep:null,count:0,minD:0};
+  var keep=new Uint8Array(n);
+  for(i=0;i<n;i++)if(cand[i]&&ok[cc.id[i]])keep[i]=1;
+  return {keep:keep,count:count,minD:minD};
+}
+/* Apertura con un disco de 0,5 mm: lo negro que no cubre ningún disco de ese tamaño es demasiado fino.
+   En esas zonas se ponen discos de radio rB en el eje medio (engrosa cuellos, islas y puntas hasta 0,5 mm). */
+var _enfB=null;
+function enforceMin(B,rB,only){
+  var r0=rB-0.5,ax=axisRidge(B,true,rB),D=ax.D,R=ax.R,n=N,i,C=new Uint8Array(n),any=false;
+  for(i=0;i<n;i++)if(D[i]>=r0-0.05){C[i]=1;}
+  var dC=edtSq(C,W,H,1),lim=(r0-0.5)*(r0-0.5),res=new Uint8Array(n);C=null;
+  for(i=0;i<n;i++)if(B[i]&&dC[i]>lim){res[i]=1;any=true;}
+  dC=null;
+  if(!any){_enfB=B;return only?{count:0,mask:null,minD:0}:0;}
+  /* las esquinas convexas de 60° o más abiertas también dejan un resto, pero muy plano (D < 0,5·r): no se tocan */
+  var lr=labelBin(res,W,H,true,1),big=new Uint8Array(lr.n),cnt=0,c,mxD=new Float32Array(lr.n);
+  for(i=0;i<n;i++){c=lr.id[i];if(c>=0&&D[i]>mxD[c])mxD[c]=D[i];}
+  /* ...pero un trazo muy fino (pelo de 0,1–0,2 mm) también es plano: se distingue por ser alargado (área/D grande) */
+  /* (el escalonado de un borde diagonal de una zona gruesa también es alargado, pero va pegado a negro grueso
+     en toda su longitud y solo tiene 1 px de grueso; un pelo lo toca poco, o algo más si tiene ≥ 2 px de núcleo) */
+  var hair=new Uint8Array(lr.n),touch=new Int32Array(lr.n),x,y,q;
+  for(i=0;i<n;i++){c=lr.id[i];if(c<0)continue;x=i%W;y=(i-x)/W;
+    if((x>0&&B[q=i-1]&&!res[q])||(x<W-1&&B[q=i+1]&&!res[q])||(y>0&&B[q=i-W]&&!res[q])||(y<H-1&&B[q=i+W]&&!res[q]))touch[c]++;}
+  /* ...y un puente corto y fino entre dos huecos blancos (pinzamiento) también es plano y corto: se distingue porque
+     tiene blanco a los dos lados (dos tramos de borde blanco separados); una esquina solo tiene uno */
+  var E=new Uint8Array(n),dx,dy,xx,yy;
+  for(i=0;i<n;i++){if(!res[i])continue;x=i%W;y=(i-x)/W;
+    for(dy=-1;dy<=1;dy++){yy=y+dy;if(yy<0||yy>=H)continue;for(dx=-1;dx<=1;dx++){xx=x+dx;if(xx<0||xx>=W)continue;q=yy*W+xx;if(!B[q])E[q]=1;}}}
+  var le=labelBin(E,W,H,true,1),f1=new Int32Array(lr.n).fill(-1),two=new Uint8Array(lr.n),e;E=null;
+  for(i=0;i<n;i++){c=lr.id[i];if(c<0||two[c])continue;x=i%W;y=(i-x)/W;
+    for(dy=-1;dy<=1;dy++){yy=y+dy;if(yy<0||yy>=H)continue;for(dx=-1;dx<=1;dx++){xx=x+dx;if(xx<0||xx>=W)continue;e=le.id[yy*W+xx];
+      if(e<0)continue;if(f1[c]<0)f1[c]=e;else if(f1[c]!==e)two[c]=1;}}}
+  le=null;
+  for(c=0;c<lr.n;c++){
+    if(lr.area[c]<3)continue;
+    if(mxD[c]>=0.5*r0){big[c]=1;cnt++;}
+    else if((lr.area[c]/Math.max(1,mxD[c])>=3*r0&&(touch[c]<0.25*lr.area[c]||(mxD[c]>=2&&touch[c]<0.5*lr.area[c])))||two[c]){big[c]=1;hair[c]=1;cnt++;}
+  }
+  if(!cnt){_enfB=B;return only?{count:0,mask:null,minD:0}:0;}
+  for(i=0;i<n;i++){c=lr.id[i];res[i]=(c>=0&&big[c])?1:0;}
+  if(only){var mn=1e9;for(c=0;c<lr.n;c++)if(big[c]&&mxD[c]<mn)mn=mxD[c];return {count:cnt,mask:res,minD:mn};}
+  var near=dilate(res,1.5),keep=new Uint8Array(n),k=0;
+  /* solo el eje de la parte fina (D ≥ 0,5·r): las ramas que van a las esquinas harían «huesos» */
+  for(i=0;i<n;i++)if(near[i]&&B[i]&&R[i]&&D[i]>=0.5*r0){keep[i]=1;k++;}
+  /* en los pelos, todo su eje */
+  for(i=0;i<n;i++){c=lr.id[i];if(c>=0&&hair[c]&&R[i]&&!keep[i]){keep[i]=1;k++;}}
+  /* islas o puntas sin eje marcado: su píxel más interior hace de centro */
+  var mx=new Float32Array(lr.n),arg=new Int32Array(lr.n).fill(-1),has=new Uint8Array(lr.n);
+  for(i=0;i<n;i++){c=lr.id[i];if(c<0||!big[c])continue;if(keep[i])has[c]=1;if(D[i]>mx[c]){mx[c]=D[i];arg[c]=i;}}
+  for(c=0;c<lr.n;c++)if(big[c]&&!has[c]&&arg[c]>=0){keep[arg[c]]=1;k++;}
+  _enfB=k?growDiscs(B,keep,rB,1):B;
+  return cnt;
+}
+function quickMetrics(B,rB,sH,tinyMm){
+  var n=N,i,c,kB=enforceMin(B,rB,true);_enfB=null;
+  var Wt=new Uint8Array(n);for(i=0;i<n;i++)Wt[i]=B[i]?0:1;
+  var axG=axisRidge(Wt,false,rB+1),gmin=0.4/sH,mLo=0.3*rB;Wt=null;
+  var kG=filterAxis(axG,mLo,rB-1,gmin,0.3),gl=0;
+  if(kG.count>0){gl=1;var kG2=filterAxis(axG,mLo,0.15/sH-0.5,gmin,0.3);if(kG2.count>=40||kG.count>=80)gl=2;}
+  var cb=labelBin(B,W,H,true,1),tiny=0,tp=tinyMm/(sH*sH);for(c=0;c<cb.n;c++)if(cb.area[c]<tp)tiny++;
+  return {thin:kB.count,gapLevel:gl,gapCount:kG.count,tiny:tiny};
+}
+/* copia de M con discos de radio r (px) centrados en los píxeles marcados de keep puestos a val */
+function growDiscs(M,keep,r,val){
+  var out=M.slice(),w=W,h=H,n=N,R=Math.ceil(r),hw=new Int32Array(2*R+1),dy,i,x,y,r2=r*r,xa,xb,yy,o;
+  for(dy=-R;dy<=R;dy++)hw[dy+R]=dy*dy<=r2?Math.floor(Math.sqrt(r2-dy*dy)):-1;
+  for(i=0;i<n;i++){
+    if(!keep[i])continue;
+    y=(i/w)|0;x=i-y*w;
+    for(dy=-R;dy<=R;dy++){
+      yy=y+dy;if(yy<0||yy>=h||hw[dy+R]<0)continue;
+      xa=x-hw[dy+R];xb=x+hw[dy+R];if(xa<0)xa=0;if(xb>=w)xb=w-1;
+      o=yy*w;for(var xx=xa;xx<=xb;xx++)out[o+xx]=val;
+    }
+  }
+  return out;
+}
+
+/* ---------- renderizado ---------- */
 function renderCore(P){
-  var t0=Date.now(),s=P.mm/W,cc=ST.cc,i,c,x,y,p;
-  var rm=0.25/s;           /* radio mínimo en px (0,5 mm de línea) */
-  var tpx=Math.max(P.line,0.5)/s;
-  prog('Asignando papeles…');
+  var t0=Date.now(),sL=P.mm/W,cc=ST.cc,i,c,x,y,p;
+  var WL=W,HL=H,NL=N;
+  prog('Asignando papeles…',0.05);
   var cps=compPapers(P),cp=cps.cp,forced=cps.forced;
   /* decoración del fondo: zonas pequeñas Blanco/Contorno rodeadas por un color con papel Fondo */
-  /* «sobre el fondo» = al menos un 35 % de su borde toca zonas con papel Fondo que llegan al borde de la imagen */
   var isDeco=new Uint8Array(cc.n),decoN=0,decoMax=0.015*N,bgT=new Float64Array(cc.n),allT=new Float64Array(cc.n);
   for(i=0;i<cc.nbA.length;i++){var ca=cc.nbA[i],cq=cc.nbB[i];allT[ca]+=cc.nbV[i];if(cp[cq]===3&&cc.tb[cq])bgT[ca]+=cc.nbV[i];}
   for(c=0;c<cc.n;c++){
@@ -2046,11 +2262,10 @@ function renderCore(P){
     if((cp[c]===1||cp[c]===2)&&cc.area[c]<decoMax&&allT[c]>0&&bgT[c]>=0.35*allT[c]){isDeco[c]=1;decoN++;}
   }
   if(P.deco==='remove')for(c=0;c<cc.n;c++)if(isDeco[c])cp[c]=3;
-  /* letras y detalles claros finos sobre un color más oscuro (que no sea Negro ni Fondo): pasan a Negro,
-     porque con su contorno ya no quedaría nada blanco dentro (p. ej. el texto crema sobre un disco verde) */
+  /* letras y detalles claros finos sobre un color más oscuro (que no sea Negro ni Fondo): pasan a Negro */
   var textN=0;
   if(P.textMm>0){
-    var tmax=P.textMm/s/2,pl0=ST.palLab;
+    var tmax=P.textMm/sL/2,pl0=ST.palLab;
     for(c=0;c<cc.n;c++){
       if(forced[c]||isDeco[c])continue;
       if(cp[c]!==1&&cp[c]!==2)continue;
@@ -2061,128 +2276,220 @@ function renderCore(P){
       cp[c]=0;textN++;
     }
   }
-  /* regla de manchas pequeñas → negro (no se aplica a la decoración: se conserva como línea) */
+  /* regla de manchas pequeñas → negro */
   var spotN=0;
   if(P.spotOn){
-    var amax=P.spotA/(s*s);
+    var amax=P.spotA/(sL*sL);
     for(c=0;c<cc.n;c++){
       if(forced[c]||isDeco[c])continue;
-      if((cp[c]===1||cp[c]===2)&&!cc.tb[c]&&cc.area[c]<=amax&&cc.maxd[c]*s>=0.2){cp[c]=0;spotN++;}
+      if((cp[c]===1||cp[c]===2)&&!cc.tb[c]&&cc.area[c]<=amax&&cc.maxd[c]*sL>=0.2){cp[c]=0;spotN++;}
     }
   }
-  var B=new Uint8Array(N),S=new Uint8Array(N),id=cc.id,hasS=false,a,b,pa,pb;
-  for(i=0;i<N;i++)B[i]=cp[id[i]]===0?1:0;
-  prog('Dibujando contornos…');
-  for(y=0;y<H;y++){
-    for(x=0;x<W;x++){
-      p=y*W+x;a=id[p];pa=cp[a];
-      if(x<W-1){b=id[p+1];if(b!==a){pb=cp[b];if((pa===2||pb===2)&&pa!==0&&pb!==0){S[p]=1;S[p+1]=1;hasS=true;}}}
-      if(y<H-1){b=id[p+W];if(b!==a){pb=cp[b];if((pa===2||pb===2)&&pa!==0&&pb!==0){S[p]=1;S[p+W]=1;hasS=true;}}}
+  var G=gridFor(P),Wh=G.w,Hh=G.h,Nh=Wh*Hh,sH=P.mm/Wh,tm={},tt=Date.now();
+  function lap(k){var n=Date.now();tm[k]=n-tt;tt=n;}
+  var res;
+  W=Wh;H=Hh;N=Nh;
+  try{res=renderHi(P,{cp:cp,cc:cc,isDeco:isDeco,decoN:decoN,textN:textN,spotN:spotN,G:G,sL:sL,sH:sH,WL:WL,HL:HL,NL:NL,lap:lap,t0:t0,tm:tm});}
+  finally{W=WL;H=HL;N=NL;}
+  return res;
+}
+function renderHi(P,X){
+  var cp=X.cp,cc=X.cc,isDeco=X.isDeco,decoN=X.decoN,textN=X.textN,spotN=X.spotN,G=X.G,sL=X.sL,sH=X.sH,WL=X.WL,HL=X.HL,NL=X.NL,lap=X.lap,tm=X.tm,t0=X.t0;
+  var Wh=W,Hh=H,Nh=N,i,c,x,y,p,fin=!!P.final,cid=cc.id,K=ST.k;
+  prog('Clasificando colores a '+Math.round(G.d)+' px/mm…',fin?0.12:0.1);
+  var isBl=new Uint8Array(K);for(c=0;c<K;c++)isBl[c]=P.papers[c]===0?1:0;
+  var hf=hiField(Wh,Hh,isBl,ST.trL==null?-1:ST.trL,0.04/sH),F=hf.F,Lh=hf.Lh,B=new Uint8Array(Nh),thr=P.inkThr||0.5;
+  for(i=0;i<Nh;i++)B[i]=F[i]>thr?1:0;
+  F=null;lap('campo');
+  /* zonas con papel distinto del que les toca por su color (retoques, reglas): se proyectan al mapa fino */
+  var fz=new Uint8Array(cc.n),anyZ=false;
+  for(c=0;c<cc.n;c++){var dfl=P.papers[cc.lbl[c]];if(dfl===0&&cp[c]!==0){fz[c]=1;anyZ=true;}else if(dfl!==0&&cp[c]===0){fz[c]=2;anyZ=true;}}
+  if(anyZ){
+    var zn=new Uint8Array(NL),zb=new Uint8Array(NL),dx,dy,q,xx,yy;
+    for(y=0;y<HL;y++)for(x=0;x<WL;x++){
+      p=y*WL+x;c=cid[p];if(!fz[c])continue;
+      for(dy=-1;dy<=1;dy++){yy=y+dy;if(yy<0||yy>=HL)continue;for(dx=-1;dx<=1;dx++){xx=x+dx;if(xx<0||xx>=WL)continue;q=yy*WL+xx;
+        if(fz[c]===1)zn[q]=1;else if(!zb[q]||(dx===0&&dy===0))zb[q]=cc.lbl[c]+1;}}
     }
+    var qx=new Int32Array(Wh);for(x=0;x<Wh;x++)qx[x]=Math.min(WL-1,Math.floor((x+0.5)*WL/Wh));
+    for(y=0;y<Hh;y++){
+      var qo=Math.min(HL-1,Math.floor((y+0.5)*HL/Hh))*WL,o=y*Wh;
+      for(x=0;x<Wh;x++){q=qo+qx[x];if(zn[q])B[o+x]=0;}
+      for(x=0;x<Wh;x++){q=qo+qx[x];if(zb[q]&&Lh[o+x]===zb[q]-1)B[o+x]=1;}
+    }
+    zn=null;zb=null;
+  }
+  Lh=null;
+  /* contornos: líneas centradas en la frontera entre zonas (una de ellas con papel Contorno), con grosor exacto en mm.
+     La frontera se toma de un voto suavizado de las zonas vecinas (no escalonada); luego distancia exacta. */
+  var tpx=Math.max(P.line,0.5)/sH,hasS=false;
+  var band=new Uint8Array(NL);
+  for(y=0;y<HL;y++)for(x=0;x<WL;x++){
+    p=y*WL+x;var a=cid[p],pa=cp[a],b,pb;
+    if(x<WL-1){b=cid[p+1];if(b!==a){pb=cp[b];if((pa===2||pb===2)&&pa!==0&&pb!==0){band[p]=1;band[p+1]=1;hasS=true;}}}
+    if(y<HL-1){b=cid[p+WL];if(b!==a){pb=cp[b];if((pa===2||pb===2)&&pa!==0&&pb!==0){band[p]=1;band[p+WL]=1;hasS=true;}}}
   }
   if(hasS){
-    var lines=dilate(S,Math.max(0,(tpx-2)/2));
-    for(i=0;i<N;i++)if(lines[i])B[i]=1;
+    prog('Dibujando contornos…',fin?0.2:0.2);
+    /* ensanchar la banda 2 px */
+    var bd2=new Uint8Array(NL);
+    for(y=0;y<HL;y++)for(x=0;x<WL;x++){if(!band[y*WL+x])continue;
+      for(var dy2=-2;dy2<=2;dy2++){var y2=y+dy2;if(y2<0||y2>=HL)continue;for(var dx2=-2;dx2<=2;dx2++){var x2=x+dx2;if(x2>=0&&x2<WL)bd2[y2*WL+x2]=1;}}}
+    band=bd2;
+    var Cid=new Int32Array(Nh).fill(-1),ids=[0,0,0,0,0,0,0,0,0],ws=[0,0,0,0,0,0,0,0,0],kx=WL/Wh,ky=HL/Hh,inv=1/(2*0.62*0.62);
+    for(y=0;y<Hh;y++){
+      var fy=(y+0.5)*ky-0.5,cy=Math.round(fy),qy=Math.min(HL-1,Math.max(0,Math.floor((y+0.5)*ky)));
+      for(x=0;x<Wh;x++){
+        var fx=(x+0.5)*kx-0.5,qx2=Math.min(WL-1,Math.max(0,Math.floor((x+0.5)*kx)));
+        if(!band[qy*WL+qx2])continue;
+        var cx=Math.round(fx),nn=0,ddy,ddx;
+        for(ddy=-1;ddy<=1;ddy++){var py=cy+ddy;if(py<0||py>=HL)continue;
+          for(ddx=-1;ddx<=1;ddx++){var px2=cx+ddx;if(px2<0||px2>=WL)continue;
+            var id2=cid[py*WL+px2],wgt=Math.exp(-((px2-fx)*(px2-fx)+(py-fy)*(py-fy))*inv),k2;
+            for(k2=0;k2<nn;k2++)if(ids[k2]===id2){ws[k2]+=wgt;break;}
+            if(k2===nn){ids[nn]=id2;ws[nn]=wgt;nn++;}
+          }}
+        var bi=0,bw=-1;for(var k3=0;k3<nn;k3++)if(ws[k3]>bw){bw=ws[k3];bi=ids[k3];}
+        Cid[y*Wh+x]=bi;
+      }
+    }
+    band=null;
+    var E=new Uint8Array(Nh),anyE=false;
+    for(y=0;y<Hh;y++)for(x=0;x<Wh;x++){
+      p=y*Wh+x;var a2=Cid[p];if(a2<0)continue;var pa2=cp[a2],b2,pb2;
+      if(x<Wh-1){b2=Cid[p+1];if(b2>=0&&b2!==a2){pb2=cp[b2];if((pa2===2||pb2===2)&&pa2!==0&&pb2!==0){E[p]=1;E[p+1]=1;anyE=true;}}}
+      if(y<Hh-1){b2=Cid[p+Wh];if(b2>=0&&b2!==a2){pb2=cp[b2];if((pa2===2||pb2===2)&&pa2!==0&&pb2!==0){E[p]=1;E[p+Wh]=1;anyE=true;}}}
+    }
+    Cid=null;
+    if(anyE){var lines=dilate(E,Math.max(0,(tpx-2)/2));for(i=0;i<Nh;i++)if(lines[i])B[i]=1;lines=null;}
+    E=null;
   }
-  S=null;
-  if(P.equal){prog('Igualando líneas…');B=thicken(B,0.75*tpx,tpx/2,'replace');}
-  prog('Limpiando…');
-  if(P.close>0){B=erode(dilate(B,P.close),P.close);}
-  if(P.soft>0)B=boxSmooth(B,P.soft);
-  var specPx=P.speck/(s*s),holePx=P.hole/(s*s),r1,r2;
-  var cb=labelBin(B,W,H,true,1),rm1=0;
-  for(i=0;i<N;i++){c=cb.id[i];if(c>=0&&cb.area[c]<specPx){B[i]=0;rm1++;}}
+  band=null;
+  lap('contornos');
+  if(P.equal){prog('Igualando líneas…',0.3);B=thicken(B,0.75*tpx,tpx/2,'replace');}
+  prog('Limpiando…',fin?0.35:0.3);
+  var closePx=Math.round(P.close*sL/sH);
+  if(closePx>0){B=erode(dilate(B,closePx),closePx);}
+  var softPx=Math.round(P.soft*sL/sH*0.5);
+  if(P.soft>0&&softPx>0)B=boxSmooth(B,softPx);
+  var specPx=P.speck/(sH*sH),holePx=P.hole/(sH*sH);
+  var cb=labelBin(B,W,H,true,1);
+  for(i=0;i<Nh;i++){c=cb.id[i];if(c>=0&&cb.area[c]<specPx)B[i]=0;}
   var cw=labelBin(B,W,H,false,0);
-  for(i=0;i<N;i++){c=cw.id[i];if(c>=0&&!cw.tb[c]&&cw.area[c]<holePx)B[i]=1;}
+  for(i=0;i<Nh;i++){c=cw.id[i];if(c>=0&&!cw.tb[c]&&cw.area[c]<holePx)B[i]=1;}
   cb=null;cw=null;
-  var Bpre=B.slice(),widenN=0;
-  if(P.widenGaps){
-    /* ensanchar rendijas blancas finas (texto calado en un fondo negro…) hasta 0,5 mm:
-       mismo método que el engrosado, sobre el blanco; lo de fuera de la imagen no cuenta como estrecho */
-    prog('Ensanchando huecos finos…');
-    var Wt=new Uint8Array(N);for(i=0;i<N;i++)Wt[i]=B[i]?0:1;
-    var spw=thinSplit(Wt,rm+0.5,false,true);widenN=spw.count;
-    if(widenN){var dw=dilate(skeleton(spw.thin),rm+0.5);for(i=0;i<N;i++)if(dw[i])B[i]=0;}
-    Wt=null;
+  lap('limpieza');
+  var Bpre=B.slice(),widenN=0,thickN=0,thickMask=null;
+  /* ancho mínimo: 0,5 mm = 2·rB − 1 px (rB = 0,25 mm + medio píxel de margen para que Potrace no lo adelgace) */
+  var rB=0.25/sH+0.5;
+  function fixBlack(){
+    var ax=axisRidge(B,true,rB+1),k=filterAxis(ax,0.3*rB,rB,rB,0.3);
+    if(k.count){B=growDiscs(B,k.keep,rB,1);}
+    return k;
   }
-  prog('Engrosando líneas finas…');
-  /* Una franja de n px tiene distancia máxima (n+1)/2 al otro color: ancho ≥ 2·rm ⇔ distancia ≥ rm+0,5.
-     Se engruesa todo lo que no llega y se deja medio píxel de margen para que Potrace no lo vuelva a adelgazar. */
-  _thickMask=null;
-  B=thicken(B,rm+0.5,rm+0.5,'union');var thickN=_thickN,thickMask=_thickMask;_thickMask=null;
+  /* orden: primero se ensanchan los huecos blancos finos y después se engrosa el negro fino (como el prototipo);
+     el núcleo de los trazos negros finos se protege para que el ensanchado no los rompa */
+  var k0=null;
+  if(P.widenGaps){
+    prog('Ensanchando huecos finos…',fin?0.45:0.4);
+    var ax0=axisRidge(B,true,rB+1);k0=filterAxis(ax0,0.3*rB,rB,rB,0.3);ax0=null;
+    var Wt=new Uint8Array(Nh);for(i=0;i<Nh;i++)Wt[i]=B[i]?0:1;
+    var axW=axisRidge(Wt,false,rB+1),kW=filterAxis(axW,0.3*rB,rB,rB,0.3);widenN=kW.count;
+    axW=null;
+    if(kW.count){
+      var Wg=growDiscs(Wt,kW.keep,rB,1);
+      var pr=k0.keep?growDiscs(new Uint8Array(Nh),k0.keep,0.5*rB,1):null;
+      for(i=0;i<Nh;i++)if(Wg[i]&&!Wt[i]&&!(pr&&pr[i]))B[i]=0;
+      pr=null;Wg=null;
+    }
+    Wt=null;k0=null;
+  }
+  prog('Engrosando líneas finas (eje medio)…',fin?0.52:0.45);
+  var k1=fixBlack();thickN=k1.count;thickMask=k1.keep;if(k1.count)fixBlack();  /* segunda pasada: lo recién engrosado puede dejar otro estrechamiento al unirse con vecinos */
+  lap('ancho minimo');
   /* el engrosado puede cerrar agujeros diminutos: se rellenan con el mismo umbral */
   var cw2=labelBin(B,W,H,false,0);
-  for(i=0;i<N;i++){c=cw2.id[i];if(c>=0&&!cw2.tb[c]&&cw2.area[c]<holePx)B[i]=1;}
+  for(i=0;i<Nh;i++){c=cw2.id[i];if(c>=0&&!cw2.tb[c]&&cw2.area[c]<holePx)B[i]=1;}
   cw2=null;
-  var RW=rm+0.25;
+  var RW=0.25/sH-0.75;
   if(P.fillGaps){
-    prog('Cerrando huecos finos…');
+    prog('Cerrando huecos finos…',fin?0.62:0.55);
     var tw=thinWhite(B,RW);
-    for(i=0;i<N;i++)if(tw.mask[i])B[i]=1;
-    /* lo tapado puede dejar una franja negra fina (p. ej. contra el borde de la imagen): se vuelve a engrosar */
-    if(tw.count){
-      var tk=_thickN;B=thicken(B,rm+0.5,rm+0.5,'union');thickN+=_thickN;_thickN=tk;
-      /* y lo que ese engrosado haya vuelto a estrechar se tapa otra vez */
-      tw=thinWhite(B,RW);for(i=0;i<N;i++)if(tw.mask[i])B[i]=1;
-    }
+    for(i=0;i<Nh;i++)if(tw.mask[i])B[i]=1;
+    if(tw.count){fixBlack();}
   }
-  /* limpieza final: ensanchar/tapar/engrosar pueden dejar motas o agujeros de pocos píxeles */
   if(P.widenGaps||P.fillGaps){
-    var cb3=labelBin(B,W,H,true,1);for(i=0;i<N;i++){c=cb3.id[i];if(c>=0&&cb3.area[c]<specPx)B[i]=0;}
-    var cw3=labelBin(B,W,H,false,0);for(i=0;i<N;i++){c=cw3.id[i];if(c>=0&&!cw3.tb[c]&&cw3.area[c]<holePx)B[i]=1;}
+    var cb3=labelBin(B,W,H,true,1);for(i=0;i<Nh;i++){c=cb3.id[i];if(c>=0&&cb3.area[c]<specPx)B[i]=0;}
+    var cw3=labelBin(B,W,H,false,0);for(i=0;i<Nh;i++){c=cw3.id[i];if(c>=0&&!cw3.tb[c]&&cw3.area[c]<holePx)B[i]=1;}
     cb3=cw3=null;
   }
-  /* cuánto ha cambiado el dibujo al ensanchar, engrosar y cerrar (mide cuánto detalle no cabe a este tamaño) */
+  /* garantía final: nada negro más fino de 0,5 mm (cuellos cortos, islas pequeñas, puntas agudas),
+     sin los filtros de longitud y pendiente del paso anterior */
+  var enfN=enforceMin(B,rB);B=_enfB;_enfB=null;
+  /* los discos pueden dejar un cuello cóncavo junto a ellos: más pasadas hasta que no quede nada (como mucho 3) */
+  if(enfN){fixBlack();for(var ep=0;ep<3;ep++){var e2=enforceMin(B,rB);B=_enfB;_enfB=null;enfN+=e2;if(!e2)break;}}
+  thickN+=enfN;
+  lap('huecos');
   var chgPx=0,inkPre=0,blackPx0=0;
-  for(i=0;i<N;i++){if(Bpre[i])inkPre++;if(B[i]!==Bpre[i])chgPx++;if(B[i])blackPx0++;}
-  var chg=chgPx/Math.max(1,inkPre),ink=blackPx0/N;
-  /* detalles perdidos: «chg» es una media sobre todo el negro y diluye lo pequeño (un subtítulo dentro de un disco negro);
-     aquí se cuentan uno a uno los huecos blancos y las piezas negras de al menos 0,1 mm² que desaparecen en más de la mitad */
-  var lost=lostDetails(Bpre,B,0.1/(s*s));Bpre=null;
-  if(P.light){return {t:'render',stats:{chg:chg,ink:ink,lost:lost,widenN:widenN,thickN:thickN,textN:textN,ms:Date.now()-t0}};}
+  for(i=0;i<Nh;i++){if(Bpre[i])inkPre++;if(B[i]!==Bpre[i])chgPx++;if(B[i])blackPx0++;}
+  var chg=chgPx/Math.max(1,inkPre),ink=blackPx0/Nh;
+  var lost=lostDetails(Bpre,B,0.1/(sH*sH));Bpre=null;
+  lap('perdidas');
+  if(P.light){
+    /* para el tamaño recomendado: las mismas medidas que el semáforo (sin vectorizar) */
+    var lq=quickMetrics(B,rB,sH,P.tiny);
+    return {t:'render',W:Wh,H:Hh,dens:G.d,warn:G.warn,final:fin,stats:{chg:chg,ink:ink,lost:lost,widenN:widenN,thickN:thickN,textN:textN,thinCount:lq.thin,gapLevel:lq.gapLevel,gapCount:lq.gapCount,tiny:lq.tiny,ms:Date.now()-t0}};
+  }
   /* ---- vectorizar ---- */
-  prog('Vectorizando…');
-  var pl=Potrace.trace(B,W,H,{turdsize:1,alphamax:P.alpha,opttolerance:P.tol,optcurve:true});
+  prog('Vectorizando…',fin?0.72:0.7);
+  var tolH=P.tol*Math.max(1,sL/sH*(P.tolK||0.5));
+  var pl=Potrace.trace(B,W,H,{turdsize:1,alphamax:P.alpha,opttolerance:tolH,optcurve:true});
   var np=pl.length,pn=new Int32Array(np),tot=0,j;
   for(i=0;i<np;i++){pn[i]=pl[i].curve.n;tot+=pn[i];}
-  var tags=new Uint8Array(tot),pts=new Float32Array(tot*6),o=0;
+  var tags=new Uint8Array(tot),pts=new Float32Array(tot*6),o2=0;
   for(i=0;i<np;i++){
     var cv=pl[i].curve;
     for(j=0;j<cv.n;j++){
-      tags[o]=cv.tag[j]==='CURVE'?1:0;
-      for(var q=0;q<3;q++){var pt=cv.c[j*3+q]||cv.c[j*3+1];pts[o*6+q*2]=pt.x;pts[o*6+q*2+1]=pt.y;}
-      o++;
+      tags[o2]=cv.tag[j]==='CURVE'?1:0;
+      for(var q2=0;q2<3;q2++){var pt=cv.c[j*3+q2]||cv.c[j*3+1];pts[o2*6+q2*2]=pt.x;pts[o2*6+q2*2+1]=pt.y;}
+      o2++;
     }
   }
-  /* ---- métricas ---- */
-  prog('Midiendo calidad…');
-  var marks=new Uint8Array(N),thinBl=thinSplit(B,rm+0.25,false);
-  for(i=0;i<N;i++)if(thinBl.thinLine[i])marks[i]|=1;
-  var tw2=thinWhite(B,RW);
-  var gapLevel=0,gapCount=tw2.count;
+  pl=null;
+  lap('potrace');
+  /* ---- métricas (con el mismo método de eje medio con el que se corrige) ---- */
+  prog('Midiendo calidad…',fin?0.85:0.85);
+  var marks=new Uint8Array(Nh),mHi=rB-1.0,mLo=0.3*rB;
+  /* línea fina: el mismo criterio que la garantía final (apertura con un disco de 0,5 mm) */
+  var kB=enforceMin(B,rB,true);_enfB=null;
+  if(kB.mask){for(i=0;i<Nh;i++)if(kB.mask[i])marks[i]|=1;}
+  var Wt2=new Uint8Array(Nh);for(i=0;i<Nh;i++)Wt2[i]=B[i]?0:1;
+  var axG=axisRidge(Wt2,false,rB+1),gmin=0.4/sH;
+  var kG=filterAxis(axG,mLo,mHi,gmin,0.3),gapLevel=0,gapCount=kG.count;
   if(gapCount>0){
-    for(i=0;i<N;i++)if(tw2.mask[i])marks[i]|=2;
-    var r03=0.15/s+0.25;
+    for(i=0;i<Nh;i++)if(kG.keep[i])marks[i]|=2;
     gapLevel=1;
-    var tw3=thinWhite(B,r03);if(tw3.count>0)gapLevel=2;
+    var kG2=filterAxis(axG,mLo,0.15/sH-0.5,gmin,0.3);if(kG2.count>=40||gapCount>=80)gapLevel=2;
   }
-  var cb2=labelBin(B,W,H,true,1),tiny=0,tinyPx=P.tiny/(s*s),blackPx=0;
+  axG=null;Wt2=null;
+  var cb2=labelBin(B,W,H,true,1),tiny=0,tinyPx=P.tiny/(sH*sH),blackPx=0;
   var isTiny=new Uint8Array(cb2.n);
   for(c=0;c<cb2.n;c++){if(cb2.area[c]<tinyPx){isTiny[c]=1;tiny++;}}
-  for(i=0;i<N;i++){if(B[i])blackPx++;c=cb2.id[i];if(c>=0&&isTiny[c])marks[i]|=4;}
-  /* decoración: cuántas piezas negras finales salen de ella, cuántas son motas y cuántas se engrosaron */
+  for(i=0;i<Nh;i++){if(B[i])blackPx++;c=cb2.id[i];if(c>=0&&isTiny[c])marks[i]|=4;}
   var decoPieces=0,decoTiny=0,decoThick=0;
   if(decoN>0&&P.deco!=='remove'){
-    var dm=new Uint8Array(N),idc=cc.id;
-    for(i=0;i<N;i++)if(isDeco[idc[i]])dm[i]=1;
+    var dm=new Uint8Array(Nh),qx3=new Int32Array(Wh);for(x=0;x<Wh;x++)qx3[x]=Math.min(WL-1,Math.floor((x+0.5)*WL/Wh));
+    for(y=0;y<Hh;y++){var qo3=Math.min(HL-1,Math.floor((y+0.5)*HL/Hh))*WL;for(x=0;x<Wh;x++)if(isDeco[cid[qo3+qx3[x]]])dm[y*Wh+x]=1;}
     dm=dilate(dm,tpx+1);
     var seenP=new Uint8Array(cb2.n),inD=new Int32Array(cb2.n),tot2=new Int32Array(cb2.n);
-    for(i=0;i<N;i++){c=cb2.id[i];if(c<0)continue;tot2[c]++;if(dm[i])inD[c]++;}
+    for(i=0;i<Nh;i++){c=cb2.id[i];if(c<0)continue;tot2[c]++;if(dm[i])inD[c]++;}
     for(c=0;c<cb2.n;c++)if(inD[c]>0.5*tot2[c]){decoPieces++;if(isTiny[c])decoTiny++;}
-    if(thickMask){var tc=labelBin(thickMask,W,H,true,1),hit=new Uint8Array(tc.n);for(i=0;i<N;i++){c=tc.id[i];if(c>=0&&dm[i])hit[c]=1;}for(c=0;c<tc.n;c++)if(hit[c])decoThick++;}
+    if(thickMask){var tc=labelBin(thickMask,W,H,true,1),hit=new Uint8Array(tc.n);for(i=0;i<Nh;i++){c=tc.id[i];if(c>=0&&dm[i])hit[c]=1;}for(c=0;c<tc.n;c++)if(hit[c])decoThick++;}
   }
-  return {t:'render',B:B,marks:marks,np:np,pn:pn,tags:tags,pts:pts,
-    stats:{chg:chg,ink:ink,lost:lost,textN:textN,nodes:tot,paths:np,thinCount:thinBl.countLine,thinMinW:thinBl.countLine?thinBl.minW*s:null,thickN:thickN,gapCount:gapCount,gapLevel:gapLevel,tiny:tiny,blackPx:blackPx,spots:spotN,pieces:cb2.n,decoN:decoN,decoPieces:decoPieces,decoTiny:decoTiny,decoThick:decoThick,widenN:widenN,ms:Date.now()-t0}};
+  lap('medidas');
+  var out={t:'render',B:B,marks:marks,np:np,pn:pn,tags:tags,pts:pts,W:Wh,H:Hh,dens:G.d,warn:G.warn,final:fin,
+    stats:{chg:chg,ink:ink,lost:lost,textN:textN,nodes:tot,paths:np,thinCount:kB.count,thinMinW:kB.count?2*kB.minD*sH:null,thickN:thickN,gapCount:gapCount,gapLevel:gapLevel,tiny:tiny,blackPx:blackPx,spots:spotN,pieces:cb2.n,decoN:decoN,decoPieces:decoPieces,decoTiny:decoTiny,decoThick:decoThick,widenN:widenN,ms:Date.now()-t0,tm:tm}};
+  return out;
 }
 function lostDetails(Bp,B,amin){
   var n=0,i,c,cw=labelBin(Bp,W,H,false,0),k=new Int32Array(cw.n);
@@ -2193,7 +2500,12 @@ function lostDetails(Bp,B,amin){
   for(c=0;c<cb.n;c++)if(cb.area[c]>=amin&&k[c]<0.5*cb.area[c])n++;
   return n;
 }
-function doRender(P){var r=renderCore(P);post(r,[]);}
+function postRes(r){
+  var tr=[];if(r.B){tr.push(r.B.buffer,r.marks.buffer,r.pn.buffer,r.tags.buffer,r.pts.buffer);}
+  post(r,tr);
+}
+function doRender(P){var r=renderCore(P);postRes(r);}
+
 
 /* ---------- etapa 3: selección de zona ---------- */
 function doPick(m){
@@ -2276,11 +2588,11 @@ function planAuto(Q,vid,mm,level){
   }
   /* ajustes según la variante y el nivel */
   var base=Math.min(1.6,Math.max(0.6,mm*0.011)),P;
-  if(vid==='macizo')P={line:base*1.2,spotA:5,speck:0.3*lv.cl,hole:0.6*lv.cl,deco:'remove',textMm:3};
-  else if(vid==='detalle')P={line:Math.max(0.5,base*0.75),spotA:1.5,speck:0.08*lv.cl,hole:0.2*lv.cl,deco:(mm>=70&&level>=1)?'keep':'remove',textMm:2.2};
-  else P={line:base,spotA:3,speck:0.15*lv.cl,hole:0.3*lv.cl,deco:(mm>=70&&level>=1)?'keep':'remove',textMm:3};
+  if(vid==='macizo')P={line:base*1.2,spotA:5,speck:0.15*lv.cl,hole:0.12*lv.cl,deco:'remove',textMm:3};
+  else if(vid==='detalle')P={line:Math.max(0.5,base*0.75),spotA:1.5,speck:0.05*lv.cl,hole:0.06*lv.cl,deco:(mm>=70&&level>=1)?'keep':'remove',textMm:2.2};
+  else P={line:base,spotA:3,speck:0.1*lv.cl,hole:0.1*lv.cl,deco:(mm>=70&&level>=1)?'keep':'remove',textMm:3};
   P.line=r2(Math.max(0.5,P.line),2);P.speck=r2(P.speck,2);P.hole=r2(P.hole,2);
-  P.mm=mm;P.equal=false;P.spotOn=true;P.close=1;P.soft=1;P.fillGaps=true;P.widenGaps=true;P.alpha=1;P.tol=0.4;P.tiny=0.4;
+  P.mm=mm;P.equal=false;P.spotOn=true;P.close=1;P.soft=1;P.fillGaps=false;P.widenGaps=true;P.alpha=1;P.tol=0.4;P.tiny=0.4;
   P.papers=papers;P.ov=[];
   return {papers:papers,P:P,info:info};
 }
@@ -2290,15 +2602,15 @@ function autoVariant(m){
   var pl=planAuto(Q,m.id,m.mm,m.level);
   ST=Q.ST;
   if(m.light){
-    var P0=m.P||pl.P;P0.light=true;P0.mm=m.mm;
-    var r0=renderCore(P0);r0.t='arec';r0.id=m.id;r0.gen=m.gen;r0.rg=m.rg;r0.mm=m.mm;post(r0,[]);return;
+    var P0=m.P||pl.P;P0.light=true;P0.final=!!m.confirm;P0.mm=m.mm;P0.dens=m.confirm?(m.dens||40):PREV_DENS;P0.maxN=8e6; /* la búsqueda no puede bajar mucho de 14 px/mm o las medidas dejan de valer */
+    var r0=renderCore(P0);r0.t='arec';r0.id=m.id;r0.gen=m.gen;r0.rg=m.rg;r0.mm=m.mm;r0.confirm=!!m.confirm;post(r0,[]);return;
   }
-  var P=pl.P;P.light=false;
-  prog('Dibujando «'+m.name+'»…');
+  var P=pl.P;P.light=false;P.final=!!m.final;P.dens=m.final?(m.dens||40):PREV_DENS;
+  if(!m.final)prog('Dibujando «'+m.name+'»…',0.05);
   var r=renderCore(P);
-  r.t='variant';r.id=m.id;r.gen=m.gen;r.papers=pl.papers;r.P=P;r.k=vq.k;r.smooth=vq.smooth;r.info=pl.info;r.W=W;r.H=H;
+  r.t=m.final?'afinal':'variant';r.id=m.id;r.gen=m.gen;r.papers=pl.papers;r.P=P;r.k=vq.k;r.smooth=vq.smooth;r.info=pl.info;
   r.pal=Q.pal;
-  post(r,[]);
+  postRes(r);
 }
 /* el motor vuelve a poner activa la cuantización pedida y la envía al modo manual (sin recalcular si ya está) */
 function useQuant(m){
@@ -2334,7 +2646,7 @@ window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type
 'use strict';
 var $=function(id){return document.getElementById(id);};
 var PAPN=['Negro','Blanco','Contorno','Fondo'];
-var MINLINE=0.5;
+var MINLINE=0.5,PREV=14;
 function pnum(s){return parseFloat(String(s==null?'':s).replace(',','.'));}
 function dnum(v){return String(v).replace('.',',');}
 function fmt(n,d){return Number(n).toLocaleString('es-ES',{minimumFractionDigits:d==null?0:d,maximumFractionDigits:d==null?0:d});}
@@ -2344,7 +2656,7 @@ function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('on');cle
 /* ---------- estado ---------- */
 var S={
   bmp:null,name:'',W:0,H:0,rgba:null,
-  work:1600,smooth:40,k:6,
+  work:1600,qual:40,smooth:40,k:6,
   palette:[],papers:[],ov:[],labels:null,
   P:{mm:80,line:0.8,equal:false,spotOn:true,spotA:3,speck:0.15,hole:0.3,close:1,soft:1,fillGaps:false,widenGaps:false,alpha:1,tol:0.4,tiny:0.4,deco:'keep',textMm:0},
   res:null,ev:null,
@@ -2356,7 +2668,7 @@ var S={
 window.__LN=S;
 
 /* ---------- worker ---------- */
-var worker=null,busy=false,wantQuant=false,wantRender=false,qgen=0,rgen=0,jobGen=0,jobKind='',pickCb=null,pendingApply=null;
+var worker=null,busy=false,wantQuant=false,wantRender=false,wantFinal=false,qgen=0,rgen=0,jobGen=0,jobKind='',pickCb=null,pendingApply=null;
 function startWorker(){
   var src=$('wk').textContent;
   worker=new Worker(URL.createObjectURL(new Blob([src],{type:'text/javascript'})));
@@ -2395,20 +2707,21 @@ function pump(){
     setBusy(true,'Procesando colores…');
     worker.postMessage({t:'quant',smooth:S.smooth,k:S.k});
   }else if(wantRender&&S.quantReady){
-    wantRender=false;busy=true;jobKind='render';jobGen=rgen;
-    setBusy(true,'Procesando…');
-    worker.postMessage({t:'render',P:renderParams()});
+    var fin=wantFinal;wantRender=false;wantFinal=false;busy=true;jobKind='render';jobGen=rgen;
+    setBusy(true,fin?'Calculando la versión final a '+S.qual+' px/mm…':'Procesando…');
+    worker.postMessage({t:'render',P:renderParams(fin)});
   }
 }
-function renderParams(){
+function renderParams(fin){
   var P=S.P,o=[];
   for(var i=0;i<S.ov.length;i++)o.push({c:S.ov[i].c,paper:S.ov[i].paper,scope:S.ov[i].scope});
-  return {papers:S.papers.slice(),ov:o,mm:P.mm,line:Math.max(MINLINE,P.line),equal:P.equal,spotOn:P.spotOn,spotA:P.spotA,speck:P.speck,hole:P.hole,close:P.close,soft:P.soft,fillGaps:P.fillGaps,widenGaps:P.widenGaps,alpha:P.alpha,tol:P.tol,tiny:P.tiny,deco:P.deco,textMm:P.textMm};
+  return {papers:S.papers.slice(),ov:o,mm:P.mm,line:Math.max(MINLINE,P.line),equal:P.equal,spotOn:P.spotOn,spotA:P.spotA,speck:P.speck,hole:P.hole,close:P.close,soft:P.soft,fillGaps:P.fillGaps,widenGaps:P.widenGaps,alpha:P.alpha,tol:P.tol,tiny:P.tiny,deco:P.deco,textMm:P.textMm,final:!!fin,dens:fin?S.qual:PREV};
 }
 function onWorker(e){
   var m=e.data;
-  if(m.t==='prog'){$('busyTxt').textContent=m.msg;autoProg(m.msg);return;}
+  if(m.t==='prog'){$('busyTxt').textContent=m.msg;autoProg(m.msg,m.f);return;}
   if(m.t==='variant'){autoVariantIn(m);return;}
+  if(m.t==='afinal'){autoFinalIn(m);return;}
   if(m.t==='arec'){autoRecIn(m);return;}
   if(m.t==='imgok')return;
   if(m.t==='error'){busy=false;setBusy(false);console.error(m.msg);toast('No se pudo procesar la imagen');if(m.for==='auto'&&A.running){A.running=false;showProg(false);}return;}
@@ -2426,9 +2739,10 @@ function onWorker(e){
   }
   if(m.t==='render'){
     busy=false;
-    if(jobGen!==rgen||wantQuant||wantRender){setBusy(true,'Procesando…');pump();return;}
+    if(jobGen!==rgen||wantQuant||wantRender){if(S.finalCb&&m.final)wantFinal=true;setBusy(true,'Procesando…');pump();return;}
     setBusy(false);
     S.res=m;showResult();
+    if(m.final&&S.finalCb){var cb=S.finalCb;S.finalCb=null;cb();}
     pump();
   }
 }
@@ -2439,6 +2753,12 @@ function requestRender(delay){
   rgen++;wantRender=true;clearTimeout(rT);
   if(delay){wantRender=false;rT=setTimeout(function(){wantRender=true;pump();},delay);}
   else pump();
+}
+/* descargar siempre usa la versión final (alta densidad): si lo que se ve es la vista rápida, se calcula antes */
+function withFinal(cb){
+  if(S.res&&S.res.final){cb();return;}
+  if(!S.quantReady)return;
+  S.finalCb=cb;rgen++;clearTimeout(rT);wantRender=true;wantFinal=true;pump();
 }
 var qT=null;
 function requestQuantDebounced(){clearTimeout(qT);qT=setTimeout(function(){pendingApply=null;requestQuant();},400);}
@@ -2496,8 +2816,9 @@ function setSize(which,v){
 function updateSizeInfo(){
   if(!S.W){$('sizeInfo').textContent='Sin imagen';return;}
   var s=S.P.mm/S.W,h=S.P.mm*S.H/S.W;
-  $('sizeInfo').textContent='Salida '+fmt(S.P.mm,1)+' × '+fmt(h,1)+' mm · mapa de trabajo '+S.W+'×'+S.H+' px';
-  $('pxInfo').textContent='1 px de trabajo = '+fmt(s,3)+' mm. Línea mínima 0,5 mm = '+fmt(0.5/s,1)+' px.';
+  var fw=Math.round(S.P.mm*S.qual),fh=Math.round(S.P.mm*S.qual*S.H/S.W);
+  $('sizeInfo').textContent='Salida '+fmt(S.P.mm,1)+' × '+fmt(h,1)+' mm · vista rápida a '+PREV+' px/mm · versión final a '+S.qual+' px/mm ('+fmt(fw)+'×'+fmt(fh)+' px)';
+  $('pxInfo').textContent='La vista rápida se calcula al momento; la versión final (alta densidad) se calcula al descargar o al elegir una propuesta. Línea mínima: 0,5 mm.';
 }
 
 /* ---------- paleta ---------- */
@@ -2608,7 +2929,7 @@ $('outW').addEventListener('input',function(){var v=pnum(this.value);if(v>=5&&v<
 $('outH').addEventListener('input',function(){var v=pnum(this.value);if(v>=5&&v<=1000&&S.W){var w=v*S.W/S.H;S.P.mm=w;$('outW').value=dnum(Math.round(w*100)/100);updateSizeInfo();requestRender(350);}});
 $('outW').addEventListener('change',function(){var v=pnum(this.value);if(!(v>=5))v=5;if(v>1000)v=1000;if(!S.W){S.P.mm=v;this.value=dnum(v);return;}setSize('w',v);requestRender(0);});
 $('outH').addEventListener('change',function(){var v=pnum(this.value);if(!(v>=5))v=5;if(v>1000)v=1000;if(!S.W)return;setSize('h',v);requestRender(0);});
-$('work').addEventListener('change',function(){S.work=+this.value;if(S.bmp){pendingApply=null;prepareImage();}});
+$('work').addEventListener('change',function(){S.qual=(+this.value===30)?30:40;updateSizeInfo();if(S.res&&S.res.final)requestRender(0);});
 
 /* ---------- entrada de archivos ---------- */
 $('file').addEventListener('change',function(){if(this.files&&this.files[0])loadFile(this.files[0]);this.value='';});
@@ -2659,12 +2980,13 @@ function pathString(res,k,dec){
 }
 function drawRight(){
   if(!S.res)return;
-  var c=$('cR'),x=c.getContext('2d');
+  var c=$('cR'),x=c.getContext('2d'),RW=S.res.W,RH=S.res.H;
+  if(c.width!==RW||c.height!==RH){c.width=RW;c.height=RH;}
   if(S.rightView==='vec'){
     x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.fillStyle='#000';
     x.fill(new Path2D(pathString(S.res,1,2)),'evenodd');
   }else{
-    var B=S.res.B,N=S.W*S.H,id=x.createImageData(S.W,S.H),d=id.data,v;
+    var B=S.res.B,N=RW*RH,id=x.createImageData(RW,RH),d=id.data,v;
     for(var i=0;i<N;i++){v=B[i]?0:255;d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255;}
     x.putImageData(id,0,0);
   }
@@ -2674,11 +2996,12 @@ var MCOL={1:[255,59,48],2:[255,149,0],4:[175,82,222],8:[0,122,255]};
 function drawMarks(){
   var c=$('cM'),x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);
   if(!S.res||!$('showMarks').checked)return;
-  var m=S.res.marks,N=S.W*S.H,id=x.createImageData(S.W,S.H),d=id.data,any=false,sel=S.sel,i,v,col;
+  if(c.width!==S.res.W||c.height!==S.res.H){c.width=S.res.W;c.height=S.res.H;}
+  var m=S.res.marks,N=S.res.W*S.res.H,id=x.createImageData(S.res.W,S.res.H),d=id.data,any=false,sel=S.sel,i,v,col;
   var selBit=sel==='line'?1:sel==='gap'?2:sel==='tiny'?4:sel==='closed'?8:0;
   if(sel&&!selBit){return;}
   /* ampliar marcas 3 px para que se vean con el zoom de ajuste */
-  var W=S.W,H=S.H,rad=Math.max(2,Math.round(Math.max(W,H)/500));
+  var W=S.res.W,H=S.res.H,rad=Math.max(2,Math.round(Math.max(W,H)/500));
   var big=new Uint8Array(N);
   for(i=0;i<N;i++){v=m[i];if(selBit)v&=selBit;if(v){
     var px=i%W,py=(i-px)/W;
@@ -2781,7 +3104,7 @@ function nearEdge(B,W,H,r){
   return R;
 }
 function evaluate(r,P){
-  var st=r.stats,W=S.W,H=S.H,N=W*H,s=P.mm/W,ev={};
+  var st=r.stats,W=r.W,H=r.H,N=W*H,s=P.mm/W,ev={};
   /* fidelidad: rasterizar el SVG y comparar con el mapa */
   var c=document.createElement('canvas');c.width=W;c.height=H;
   var x=c.getContext('2d',{willReadFrequently:true});
@@ -2817,6 +3140,8 @@ function showResult(){
   drawRight();
   var ev=evaluate(S.res,S.P);S.ev=ev;setChips(ev);drawMarks();
   var st=S.res.stats,m=[],P=S.P;
+  if(!S.res.final)m.push('<div class="qm">Vista rápida ('+fmt(S.res.dens,0)+' px/mm). Al descargar se calcula la versión final a '+S.qual+' px/mm; <button class="btn sm" data-a="final">Calcular la versión final ahora</button></div>');
+  else if(S.res.warn)m.push('<div class="qm"><b>Tamaño grande:</b> para no agotar la memoria la versión final se ha calculado a '+fmt(S.res.dens,0)+' px/mm en vez de '+S.qual+' px/mm'+(S.res.dens<20?' (menos de 20 px/mm: los detalles finos pueden perder precisión)':'')+'.</div>');
   if(st.widenN>0)m.push('<div class="qm">Se ensancharon <b>'+st.widenN+'</b> huecos blancos finos hasta 0,5 mm.</div>');
   if(st.lost>=3)m.push('<div class="qm">A '+fmt(P.mm,0)+' mm <b>se pierden '+st.lost+' detalles pequeños</b> (letras, huecos finos): aumenta el tamaño o dales otro papel con «Clic en zona».</div>');
   if(st.thickN>0)m.push('<div class="qm">Se engrosaron <b>'+st.thickN+'</b> zonas más finas de 0,5 mm hasta ese mínimo.'+(st.thickN>40?' <b>Hay mucho detalle fino</b>: a este tamaño cambia de aspecto; puedes quitarlo con «Clic en zona» → Fondo.':'')+'</div>');
@@ -2824,7 +3149,7 @@ function showResult(){
     var dp=[];if(st.decoThick>0)dp.push(st.decoThick+' parte'+(st.decoThick>1?'s':'')+' más fina'+(st.decoThick>1?'s':'')+' de 0,5 mm (engrosada'+(st.decoThick>1?'s':'')+')');if(st.decoTiny>0)dp.push(st.decoTiny+' mota'+(st.decoTiny>1?'s':''));
     m.push('<div class="qm">Decoración del fondo conservada como línea ('+st.decoN+' zona'+(st.decoN>1?'s':'')+').'+(dp.length?' <b>A '+fmt(P.mm,0)+' mm tiene '+dp.join(' y ')+'.</b>':'')+' <button class="btn sm" data-a="decoOff">Quitar decoración</button></div>');
   }else if(st.decoN>0)m.push('<div class="qm">Decoración del fondo quitada ('+st.decoN+' zona'+(st.decoN>1?'s':'')+'). <button class="btn sm" data-a="decoOn">Conservarla como línea</button></div>');
-  if(ev.closed.lvl>0)m.push('<div class="qm">Hay trazados que se solapan (azul): sube la resolución de trabajo o baja la tolerancia de simplificación.</div>');
+  if(ev.closed.lvl>0)m.push('<div class="qm">Hay trazados que se solapan (azul): baja la tolerancia de simplificación o sube el tamaño.</div>');
   if(ev.gap.lvl>0)m.push('<div class="qm">Hay huecos blancos estrechos (naranja). <button class="btn sm" data-a="widen">Ensanchar a 0,5 mm</button><button class="btn sm" data-a="gaps">Cerrar huecos finos</button><button class="btn sm" data-a="deco">Quitar decoración con clic</button></div>');
   if(st.tiny>0)m.push('<div class="qm">Hay piezas negras minúsculas (violeta), que se perderían al imprimir. <button class="btn sm" data-a="tiny">Quitarlas</button><button class="btn sm" data-a="deco">Quitar decoración con clic</button></div>');
   if(ev.fid.lvl>0)m.push('<div class="qm">El vector se aparta del mapa B/N: baja la tolerancia de simplificación o el valor de «Esquinas».</div>');
@@ -2840,6 +3165,7 @@ $('qmsg').addEventListener('click',function(e){
   else if(a==='widen'){setGapOpt('widenGaps',true);requestRender(0);}
   else if(a==='tiny'){S.P.speck=Math.max(S.P.speck,S.P.tiny);$('speck').value=dnum(S.P.speck);requestRender(0);}
   else if(a==='decoOff'||a==='decoOn'){setDeco(a==='decoOff'?'remove':'keep');requestRender(0);}
+  else if(a==='final'){withFinal(function(){toast('Versión final calculada.');});}
   else if(a==='deco'){S.toolPap=3;[].forEach.call($('toolPap').children,function(x){x.classList.toggle('on',x.dataset.p==='3');});setTool(true);}
 });
 
@@ -2852,12 +3178,12 @@ function dl(blob,name){
 }
 function mmStr(v){return String(Math.round(v*1000)/1000);}
 function buildSVG(r,mm){
-  r=r||S.res;mm=mm||S.P.mm;var s=mm/S.W,wmm=S.W*s,hmm=S.H*s;
+  r=r||S.res;mm=mm||S.P.mm;var s=mm/r.W,wmm=r.W*s,hmm=r.H*s;
   var d=pathString(r,s,3);
   return '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="'+mmStr(wmm)+'mm" height="'+mmStr(hmm)+'mm" viewBox="0 0 '+mmStr(wmm)+' '+mmStr(hmm)+'">\n<path fill="#000000" fill-rule="evenodd" stroke="none" d="'+d+'"/>\n</svg>\n';
 }
 function buildDXF(r,mm){
-  r=r||S.res;mm=mm||S.P.mm;var s=mm/S.W,hmm=S.H*s,pn=r.pn,tags=r.tags,pts=r.pts,o=0,i,j,out=[];
+  r=r||S.res;mm=mm||S.P.mm;var s=mm/r.W,hmm=r.H*s,pn=r.pn,tags=r.tags,pts=r.pts,o=0,i,j,out=[];
   function v(n){return (Math.round(n*1000)/1000).toString();}
   out.push('0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n9\n$INSBASE\n10\n0.0\n20\n0.0\n30\n0.0\n9\n$INSUNITS\n70\n4\n9\n$MEASUREMENT\n70\n1\n0\nENDSEC');
   out.push('0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLTYPE\n70\n1\n0\nLTYPE\n2\nCONTINUOUS\n70\n0\n3\nSolid line\n72\n65\n73\n0\n40\n0.0\n0\nENDTAB\n0\nTABLE\n2\nLAYER\n70\n1\n0\nLAYER\n2\n0\n70\n0\n62\n7\n6\nCONTINUOUS\n0\nENDTAB\n0\nENDSEC');
@@ -2888,15 +3214,17 @@ function buildDXF(r,mm){
   out.push('0\nENDSEC\n0\nEOF');
   return out.join('\n')+'\n';
 }
-$('exSvg').addEventListener('click',function(){if(!S.res)return;dl(new Blob([buildSVG()],{type:'image/svg+xml'}),baseName()+'.svg');});
-$('exDxf').addEventListener('click',function(){if(!S.res)return;dl(new Blob([buildDXF()],{type:'application/dxf'}),baseName()+'.dxf');});
+$('exSvg').addEventListener('click',function(){if(!S.res)return;withFinal(function(){dl(new Blob([buildSVG()],{type:'image/svg+xml'}),baseName()+'.svg');});});
+$('exDxf').addEventListener('click',function(){if(!S.res)return;withFinal(function(){dl(new Blob([buildDXF()],{type:'application/dxf'}),baseName()+'.dxf');});});
 $('exPng').addEventListener('click',function(){
   if(!S.res)return;
-  var c=document.createElement('canvas');c.width=S.W;c.height=S.H;var x=c.getContext('2d');
-  var id=x.createImageData(S.W,S.H),d=id.data,B=S.res.B,N=S.W*S.H,v;
-  for(var i=0;i<N;i++){v=B[i]?0:255;d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255;}
-  x.putImageData(id,0,0);
-  c.toBlob(function(b){if(b)dl(b,baseName()+'_mapa.png');},'image/png');
+  withFinal(function(){
+    var r=S.res,c=document.createElement('canvas');c.width=r.W;c.height=r.H;var x=c.getContext('2d');
+    var id=x.createImageData(r.W,r.H),d=id.data,B=r.B,N=r.W*r.H,v;
+    for(var i=0;i<N;i++){v=B[i]?0:255;d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255;}
+    x.putImageData(id,0,0);
+    c.toBlob(function(b){if(b)dl(b,baseName()+'_mapa.png');},'image/png');
+  });
 });
 window.__LNexport={svg:function(){var t=curExport();return buildSVG(t.res,t.mm);},dxf:function(){var t=curExport();return buildDXF(t.res,t.mm);}};
 
@@ -2911,7 +3239,7 @@ function refreshPresets(){
 }
 function currentSettings(){
   var P=S.P;
-  return {k:S.k,smooth:S.smooth,work:S.work,mm:P.mm,line:P.line,equal:P.equal,spotOn:P.spotOn,spotA:P.spotA,speck:P.speck,hole:P.hole,close:P.close,soft:P.soft,fillGaps:P.fillGaps,widenGaps:P.widenGaps,alpha:P.alpha,tol:P.tol,deco:P.deco,textMm:P.textMm,papers:S.papers.slice()};
+  return {k:S.k,smooth:S.smooth,qual:S.qual,mm:P.mm,line:P.line,equal:P.equal,spotOn:P.spotOn,spotA:P.spotA,speck:P.speck,hole:P.hole,close:P.close,soft:P.soft,fillGaps:P.fillGaps,widenGaps:P.widenGaps,alpha:P.alpha,tol:P.tol,deco:P.deco,textMm:P.textMm,papers:S.papers.slice()};
 }
 $('pSave').addEventListener('click',function(){
   var n=$('pName').value.trim();if(!n){toast('Escribe un nombre para el ajuste.');return;}
@@ -2924,19 +3252,18 @@ function setVal(id,v){var e=$(id);if(e)e.value=String(v);}
 $('pLoad').addEventListener('click',function(){
   var n=$('pSel').value,o=loadPresets(),c=o[n];if(!c){toast('No hay ajuste seleccionado.');return;}
   var P=S.P,num=function(v,d,mn,mx){v=Number(v);return isNaN(v)?d:Math.min(mx,Math.max(mn,v));};
-  var oldK=S.k,oldSm=S.smooth,oldWork=S.work;
-  S.k=num(c.k,6,3,10);S.smooth=num(c.smooth,40,0,100);S.work=[1000,1400,1600,2000].indexOf(+c.work)>=0?+c.work:1600;
+  var oldK=S.k,oldSm=S.smooth;
+  S.k=num(c.k,6,3,10);S.smooth=num(c.smooth,40,0,100);S.qual=(+c.qual===30)?30:40;
   P.line=num(c.line,0.8,MINLINE,10);P.equal=!!c.equal;P.spotOn=c.spotOn!==false;P.spotA=num(c.spotA,3,0.1,100);P.speck=num(c.speck,0.15,0,20);P.hole=num(c.hole,0.3,0,20);
   P.close=num(c.close,1,0,2);P.soft=num(c.soft,1,0,3);P.fillGaps=!!c.fillGaps;P.widenGaps=!!c.widenGaps;P.alpha=num(c.alpha,1,0,1.3);P.tol=num(c.tol,0.4,0.1,1.5);P.textMm=num(c.textMm,0,0,10);$('textOn').checked=P.textMm>0;setDeco(c.deco);
-  setVal('k',S.k);$('v-k').textContent=S.k;setVal('smooth',S.smooth);$('v-smooth').textContent=S.smooth;setVal('work',S.work);
+  setVal('k',S.k);$('v-k').textContent=S.k;setVal('smooth',S.smooth);$('v-smooth').textContent=S.smooth;setVal('work',S.qual);
   setVal('line',dnum(P.line));$('equal').checked=P.equal;$('spotOn').checked=P.spotOn;setVal('spotA',dnum(P.spotA));setVal('speck',dnum(P.speck));setVal('hole',dnum(P.hole));
   [].forEach.call($('closeSeg').children,function(x){x.classList.toggle('on',+x.dataset.v===P.close);});
   setVal('soft',P.soft);$('v-soft').textContent=P.soft;$('fillGaps').checked=P.fillGaps;$('widenGaps').checked=P.widenGaps;
   setVal('alpha',P.alpha);$('v-alpha').textContent=fmt(P.alpha,2);setVal('tol',P.tol);$('v-tol').textContent=fmt(P.tol,2);
   if(c.mm>=5){if(S.W)setSize('w',c.mm);else{P.mm=+c.mm;$('outW').value=dnum(P.mm);}}
   if(!S.bmp){toast('Ajuste «'+n+'» cargado.');return;}
-  if(S.work!==oldWork){pendingApply={papers:c.papers};prepareImage();}
-  else if(S.k!==oldK||S.smooth!==oldSm||!S.quantReady){pendingApply={papers:c.papers};requestQuant();}
+  if(S.k!==oldK||S.smooth!==oldSm||!S.quantReady){pendingApply={papers:c.papers};requestQuant();}
   else{
     if(Array.isArray(c.papers)&&c.papers.length===S.papers.length){snapshot();S.papers=c.papers.slice();buildPalette();}
     requestRender(0);
@@ -2956,10 +3283,14 @@ function vdef(id){for(var i=0;i<VDEF.length;i++)if(VDEF[i].id===id)return VDEF[i
 function curV(){return A.sel>=0?A.vars[A.sel]:null;}
 function curExport(){var v=document.body.dataset.mode==='auto'?curV():null;return v?{res:v.res,mm:v.mm}:{res:S.res,mm:S.P.mm};}
 function mkCanvas(res){
-  var c=document.createElement('canvas');c.width=S.W;c.height=S.H;var x=c.getContext('2d');
-  var id=x.createImageData(S.W,S.H),d=id.data,B=res.B,N=S.W*S.H,v;
+  var RW=res.W,RH=res.H,c=document.createElement('canvas');c.width=RW;c.height=RH;var x=c.getContext('2d');
+  var id=x.createImageData(RW,RH),d=id.data,B=res.B,N=RW*RH,v;
   for(var i=0;i<N;i++){v=B[i]?0:255;d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255;}
-  x.putImageData(id,0,0);return c;
+  x.putImageData(id,0,0);
+  /* vista: como mucho 1800 px de lado, reducido con suavizado */
+  var f=Math.min(1,1800/Math.max(RW,RH));
+  if(f<1){var c2=document.createElement('canvas');c2.width=Math.round(RW*f);c2.height=Math.round(RH*f);var x2=c2.getContext('2d');x2.imageSmoothingQuality='high';x2.drawImage(c,0,0,c2.width,c2.height);c.width=1;c.height=1;return c2;}
+  return c;
 }
 function setMode(m){
   document.body.dataset.mode=m;
@@ -2970,11 +3301,14 @@ function setMode(m){
 function summarize(v){
   var ev=v.ev,st=v.res.stats,R=[],lvl=0,mm=fmt(v.mm,0);
   function add(l,t){R.push(t);if(l>lvl)lvl=l;}
-  if(ev.closed.lvl>0)add(2,'hay trazos que se solapan y Fusion no los separaría bien');
-  if(ev.line.lvl>0)add(2,'quedan líneas más finas de 0,5 mm');
-  if(ev.gap.lvl===2)add(2,'quedan rendijas blancas muy estrechas');else if(ev.gap.lvl===1)add(1,'quedan rendijas blancas algo estrechas');
+  /* en vista rápida (14 px/mm) los cuellos, las rendijas y las piezas diminutas no se miden bien:
+     para ordenar las propuestas solo cuenta lo que no depende de la densidad */
+  var pv=v.final===false;
+  if(!pv&&ev.closed.lvl>0)add(2,'hay trazos que se solapan y Fusion no los separaría bien');
+  if(!pv&&ev.line.lvl>0)add(2,'quedan líneas más finas de 0,5 mm');
+  if(pv){}else if(ev.gap.lvl===2)add(2,'quedan rendijas blancas muy estrechas');else if(ev.gap.lvl===1)add(1,'quedan rendijas blancas algo estrechas');
   if(ev.fid.lvl>=2)add(2,'el vector se aparta bastante del dibujo');else if(ev.fid.lvl===1)add(1,'el vector se aparta un poco del dibujo');
-  if(st.tiny>25)add(2,'hay '+st.tiny+' piezas negras diminutas que se perderían');else if(st.tiny>0)add(1,'hay '+st.tiny+' pieza'+(st.tiny>1?'s':'')+' negra'+(st.tiny>1?'s':'')+' diminuta'+(st.tiny>1?'s':'')+' que se perdería'+(st.tiny>1?'n':''));
+  if(pv){}else if(st.tiny>25)add(2,'hay '+st.tiny+' piezas negras diminutas que se perderían');else if(st.tiny>0)add(1,'hay '+st.tiny+' pieza'+(st.tiny>1?'s':'')+' negra'+(st.tiny>1?'s':'')+' diminuta'+(st.tiny>1?'s':'')+' que se perdería'+(st.tiny>1?'n':''));
   var lo=st.lost||0;
   if(st.chg>0.14||(lo>=6&&st.chg>0.08))add(2,'a '+mm+' mm el texto pequeño y los detalles finos no se leerán (se empastan)'+(lo?': se pierden '+lo+' letras o huecos pequeños':''));
   else if(lo>=3)add(1,'a '+mm+' mm se pierden '+lo+' detalles pequeños (letras o huecos finos)');
@@ -2999,9 +3333,9 @@ function showProg(on,txt,f){
   $('aProg').classList.toggle('on',!!on);if(txt)$('aProgT').textContent=txt;
   if(f!=null)$('aProgB').style.width=Math.round(f*100)+'%';
 }
-function autoProg(msg){
-  if(!A.running)return;
-  showProg(true,'Propuesta '+Math.min(3,A.done+1)+' de 3 · '+msg,(A.done+0.4)/3);
+function autoProg(msg,f){
+  if(A.running){showProg(true,'Propuesta '+Math.min(3,A.done+1)+' de 3 · '+msg,(A.done+(f==null?0.4:Math.min(0.95,f)))/3);return;}
+  if(A.finalPend&&document.body.dataset.mode==='auto')showProg(true,'Versión final · '+msg,f==null?0.5:f);
 }
 function autoImageLoaded(){
   var b=$('aBox');b.classList.remove('empty0');
@@ -3051,7 +3385,7 @@ $('aView').addEventListener('click',function(e){
 function autoRun(){
   if(!S.rgba||!worker)return;
   A.gen++;A.recGen++;clearTimeout(A.st);
-  A.vars=[];A.sel=-1;A.done=0;A.running=true;A.queue=VDEF.map(function(v){return v.id;});A.t0=performance.now();
+  A.vars=[];A.sel=-1;A.done=0;A.running=true;A.finalPend=false;A.queue=VDEF.map(function(v){return v.id;});A.t0=performance.now();
   if(A.manual&&Math.abs(A.manual.mm-A.mm)>0.01)A.manual=null;
   showProg(true,'Preparando las propuestas…',0.03);
   renderThumbs();drawBig();setExports(false);updateSem();
@@ -3062,7 +3396,7 @@ function autoVariantIn(m){
   if(m.gen!==A.gen)return;
   var qi=A.queue.indexOf(m.id);if(qi<0)return;A.queue.splice(qi,1);
   var v={id:m.id,name:vdef(m.id).name,res:m,mm:A.mm,ms:m.stats.ms};
-  v.ev=evaluate(m,{mm:A.mm,tiny:0.4});v.sum=summarize(v);v.score=scoreV(v);v.canvas=mkCanvas(m);v.rec=null;
+  v.final=false;v.ev=evaluate(m,{mm:A.mm,tiny:0.4});v.sum=summarize(v);v.score=scoreV(v);v.canvas=mkCanvas(m);v.rec=null;m.B=null;m.marks=null;
   A.vars.push(v);A.done++;
   if(A.vars.length===1)A.sel=0;
   showProg(true,'Propuesta '+A.done+' de 3 lista…',A.done/3);
@@ -3076,15 +3410,49 @@ function autoFinish(){
   A.sel=0;
   if(keep)for(var i=0;i<A.vars.length;i++)if(A.vars[i].id===keep)A.sel=i;
   A.running=false;A.tTotal=Math.round(performance.now()-A.t0);showProg(false);
-  renderThumbs();drawBig();updateSem();setExports(true);
+  renderThumbs();drawBig();updateSem();updateExports();
   window.__autoDone=A.gen;
-  recFor(curV());
+  requestFinal(curV());
+  /* La «Recomendada» no puede salir solo de la vista rápida (a 14 px/mm las rendijas y los cuellos se miden mal):
+     si hay motores libres y memoria, las otras dos versiones finales se calculan a la vez y al terminar se reordena. */
+  var live=1;for(var a=0;a<AUXW.length;a++)if(AUXW[a])live++;
+  var fw=Math.round(A.mm*S.qual),fh=Math.round(fw*S.H/S.W);
+  A.allFinal=live>=3&&fw*fh<=10.5e6;
+  if(A.allFinal)A.vars.forEach(function(v){if(v!==curV())requestFinal(v);});
 }
+/* versión final (alta densidad) de la propuesta elegida: la calcula el motor que ya tiene sus colores en caché */
+function requestFinal(v){
+  if(!v||v.final||v.finalPend||v.id==='manual')return;
+  v.finalPend=true;A.finalPend=true;
+  showProg(true,'Versión final a '+S.qual+' px/mm…',0.05);
+  updateSem();updateExports();
+  var wi=A.wi&&A.wi[v.id]!=null?A.wi[v.id]:null;
+  postTo(wi,{t:'auto',final:true,dens:S.qual,gen:A.gen,id:v.id,name:v.name,level:A.level,mm:v.mm});
+}
+function autoFinalIn(m){
+  if(m.gen!==A.gen)return;
+  var v=null;for(var i=0;i<A.vars.length;i++)if(A.vars[i].id===m.id)v=A.vars[i];
+  if(!v)return;
+  v.res=m;v.final=true;v.finalPend=false;v.canvas=mkCanvas(m);v.ev=evaluate(m,{mm:v.mm,tiny:0.4});v.sum=summarize(v);v.score=scoreV(v);v.rec=null;v.recPending=false;
+  A.finalPend=false;for(var j=0;j<A.vars.length;j++)if(A.vars[j].finalPend)A.finalPend=true;
+  if(!A.finalPend)showProg(false);
+  var allIn=A.vars.every(function(x){return x.final||x.id==='manual';});
+  if(allIn&&A.allFinal&&!A.pickId){
+    /* todas en versión final: la recomendada se decide con las medidas reales */
+    A.vars.sort(function(a,b){return (b.id==='manual'?-1e9:b.score)-(a.id==='manual'?-1e9:a.score);});
+    A.sel=0;
+  }
+  renderThumbs();drawBig();updateSem();updateExports();
+  if(curV()&&curV().final)recFor(curV());
+  window.__finalDone=(window.__finalDone||0)+1;
+  if(allIn||!A.allFinal)window.__finalsDone=A.gen;
+}
+function updateExports(){var v=curV(),on=!!v&&!!v.final&&!A.running&&!v.finalPend;setExports2(on);}
 function renderThumbs(){
   var h='',i;
   for(i=0;i<A.vars.length;i++){
     var v=A.vars[i];
-    h+='<button class="ath" data-i="'+i+'" aria-pressed="'+(i===A.sel)+'" title="'+esc(vdef(v.id).desc)+'">'+(i===0&&!A.running&&A.vars.length>1&&v.id!=='manual'?'<span class="rb">Recomendada</span>':'')+'<canvas width="200" height="200"></canvas><span class="nm"><span class="qd '+LV[v.sum.lvl]+'"></span>'+esc(v.name)+'</span></button>';
+    h+='<button class="ath" data-i="'+i+'" aria-pressed="'+(i===A.sel)+'" title="'+esc(vdef(v.id).desc)+'">'+(i===0&&!A.running&&A.vars.length>1&&v.id!=='manual'?'<span class="rb">Recomendada</span>':'')+'<canvas width="200" height="200"></canvas><span class="nm"><span class="qd '+(v.final?LV[v.sum.lvl]:'')+'"></span>'+esc(v.name)+'</span></button>';
   }
   if(A.running||!S.rgba){
     for(var j=0;j<VDEF.length;j++){var got=false;for(i=0;i<A.vars.length;i++)if(A.vars[i].id===VDEF[j].id)got=true;
@@ -3102,26 +3470,30 @@ function renderThumbs(){
 $('aThumbs').addEventListener('click',function(e){
   var b=e.target.closest('button.ath');if(!b)return;
   var i=+b.dataset.i;if(i===A.sel)return;
-  A.sel=i;A.pickId=A.vars[i].id;renderThumbs();drawBig();updateSem();recFor(curV());
+  A.sel=i;A.pickId=A.vars[i].id;renderThumbs();drawBig();updateSem();updateExports();
+  if(curV().final)recFor(curV());else requestFinal(curV());
 });
 function drawBig(){
   var c=$('aCv'),v=curV();
   if(!S.rgba){return;}
-  c.width=S.W;c.height=S.H;var x=c.getContext('2d');
-  if(A.view==='orig'||!v){x.drawImage(origCanvas(),0,0);}
-  else x.drawImage(v.canvas,0,0);
+  var vv=(A.view==='orig'||!v)?null:v;
+  c.width=vv?vv.canvas.width:S.W;c.height=vv?vv.canvas.height:S.H;var x=c.getContext('2d');
+  x.imageSmoothingQuality='high';x.drawImage(vv?vv.canvas:origCanvas(),0,0,c.width,c.height);
   $('aTitle').textContent=(A.view==='orig'||!v)?'Imagen original':'Vista previa · '+v.name;
 }
 function updateSem(){
   var v=curV(),dot=$('aSemDot'),btn=$('aSemBtn');btn.style.display='none';
   if(!S.rgba){dot.className='qd';$('aSemT').textContent='Esperando imagen';$('aSemW').textContent='Sube una imagen y elige el tamaño.';return;}
   if(!v){dot.className='qd';$('aSemT').textContent='Calculando…';$('aSemW').textContent='Un momento: se están preparando las propuestas.';return;}
+  if(!v.final){dot.className='qd';$('aSemT').textContent='Calculando la versión final…';$('aSemW').textContent='Las propuestas se ven en vista rápida. La medida del semáforo y la descarga usan la versión final a '+S.qual+' px/mm.';return;}
   var sm=v.sum;dot.className='qd '+LV[sm.lvl];
   $('aSemT').textContent=sm.lvl===0?'Listo para extruir':sm.lvl===1?'Revisa':'No apto a este tamaño';
   var why=sm.lvl===0?'Todas las líneas y huecos miden al menos 0,5 mm y no hay trazos que se crucen.':sm.reasons.join('; ')+'.';
   why=why.charAt(0).toUpperCase()+why.slice(1);
-  if(sm.lvl>0&&v.rec&&v.rec>0){why+=' A '+fmt(v.rec,0)+' mm o más se vería bien.';btn.textContent='Usar '+fmt(v.rec,0)+' mm';btn.style.display='';btn.dataset.mm=v.rec;}
-  else if(sm.lvl>0&&v.rec===-1)why+=' Ni ampliando mucho se resuelve: prueba el nivel «Simple» u otra propuesta.';
+  var gapNote=' Las rendijas estrechas son puntos concretos: se ven en naranja en «Ajustar a mano» y se pueden dejar así o retocar.';
+  if(sm.lvl>0&&v.rec&&v.rec>0){why+=' A '+fmt(v.rec,0)+' mm o más se resolvería'+(v.recGap?' (salvo las rendijas estrechas)':'')+'.';btn.textContent='Usar '+fmt(v.rec,0)+' mm';btn.style.display='';btn.dataset.mm=v.rec;}
+  else if(sm.lvl>0&&v.rec===-2)why+=gapNote;
+  else if(sm.lvl>0&&v.rec===-1)why+=' Ni al triple de tamaño se resuelve del todo: prueba el nivel «Simple», otra propuesta o «Ajustar a mano».';
   else if(sm.lvl>0&&v.recPending)why+=' Calculando un tamaño recomendado…';
   $('aSemW').textContent=why;
 }
@@ -3134,33 +3506,48 @@ $('aSemBtn').addEventListener('click',function(){
 var REC_THR=0.04;
 function recFor(v){
   if(!v||v.sum.lvl===0||v.id==='manual'||v.rec!==null||v.recPending||!v.res.P)return;
-  var gen=A.gen;A.recGen++;v.recPending=true;v.recList=[1.25,1.5,2,3,4].map(function(f){return Math.ceil(v.mm*f/5)*5;}).filter(function(m){return m<=400;});
-  v.recI=0;updateSem();recStep(v,gen);
+  /* solo se busca tamaño para lo que se arregla ampliando (letras, empaste, líneas finas, piezas diminutas).
+     Las rendijas blancas estrechas no: al ampliar aparecen otras nuevas (detalles que a este tamaño se limpian) */
+  var st=v.res.stats;v.recNeed={chg:st.chg>0.06,lost:(st.lost||0)>=3,thin:v.ev.line.lvl>0,tiny:st.tiny>0};
+  v.recGap=v.ev.gap.lvl>0;
+  if(!v.recNeed.chg&&!v.recNeed.lost&&!v.recNeed.thin&&!v.recNeed.tiny){v.rec=-2;updateSem();return;}
+  var gen=A.gen;v.rg=++A.recGen;v.recPending=true;v.recList=[1.25,1.5,2,3].map(function(f){return Math.ceil(v.mm*f/5)*5;}).filter(function(m){return m<=400;});
+  v.recI=0;updateSem();recStep(v,gen,true);
 }
-function recStep(v,gen){
+/* el tamaño recomendado debe dejar el semáforo en verde con las mismas medidas y a la misma densidad que la versión final
+   (a 14 px/mm las rendijas y los cuellos no se miden bien): se prueba 1,25×, 1,5×, 2× y 3× sin vectorizar */
+function recStep(v,gen,confirm){
   if(v.recI>=v.recList.length){v.recPending=false;v.rec=-1;if(curV()===v)updateSem();return;}
   var P=JSON.parse(JSON.stringify(v.res.P));P.light=true;
   /* al mismo motor que calculó la propuesta: ya tiene sus colores en caché */
-  postTo(A.wi&&A.wi[v.id]!=null?A.wi[v.id]:null,{t:'auto',light:true,gen:gen,rg:A.recGen,id:v.id,level:A.level,mm:v.recList[v.recI],P:P});
+  postTo(A.wi&&A.wi[v.id]!=null?A.wi[v.id]:null,{t:'auto',light:true,confirm:!!confirm,dens:S.qual,gen:gen,rg:v.rg,id:v.id,level:A.level,mm:v.recList[v.recI],P:P});
 }
+function recOk(st,nd){return (!nd.chg||st.chg<=REC_THR)&&(!nd.lost||(st.lost||0)<=2)&&(!nd.thin||!st.thinCount)&&(!nd.tiny||!st.tiny);}
 function autoRecIn(m){
-  if(m.gen!==A.gen||m.rg!==A.recGen)return;
+  if(m.gen!==A.gen)return;
   var v=null;for(var i=0;i<A.vars.length;i++)if(A.vars[i].id===m.id)v=A.vars[i];
-  if(!v||!v.recPending)return;
-  if(m.stats.chg<=REC_THR&&(m.stats.lost||0)<=2){v.rec=v.recList[v.recI];v.recPending=false;if(curV()===v)updateSem();return;}
-  v.recI++;recStep(v,m.gen);
+  if(!v||!v.recPending||m.rg!==v.rg)return;
+  (window.__recLog=window.__recLog||[]).push({id:m.id,mm:m.mm,dens:m.dens,st:m.stats});
+  if(recOk(m.stats,v.recNeed)){v.rec=v.recList[v.recI];v.recPending=false;if(curV()===v)updateSem();return;}
+  v.recI++;recStep(v,m.gen,true);
 }
 /* descargas del modo automático */
 function setExports2(on){['aSvg','aDxf','aPng'].forEach(function(id){$(id).disabled=!on;});}
 var setExports0=setExports;
-setExports=function(on){setExports0(on);setExports2(!!curV()&&!!on);};
+setExports=function(on){setExports0(on);if(!on)setExports2(false);else updateExports();};
 $('aSvg').addEventListener('click',function(){var t=curExport();if(!t.res)return;dl(new Blob([buildSVG(t.res,t.mm)],{type:'image/svg+xml'}),baseName(t.mm)+'.svg');});
 $('aDxf').addEventListener('click',function(){var t=curExport();if(!t.res)return;dl(new Blob([buildDXF(t.res,t.mm)],{type:'application/dxf'}),baseName(t.mm)+'.dxf');});
-$('aPng').addEventListener('click',function(){var v=curV();if(!v)return;v.canvas.toBlob(function(b){if(b)dl(b,baseName(v.mm)+'_mapa.png');},'image/png');});
+$('aPng').addEventListener('click',function(){
+  /* a la densidad final, no la vista reducida de pantalla */
+  var v=curV();if(!v||!v.final||!v.res.B)return;var r=v.res,c=document.createElement('canvas');c.width=r.W;c.height=r.H;var x=c.getContext('2d');
+  var id=x.createImageData(r.W,r.H),d=id.data,B=r.B,N=r.W*r.H,q;
+  for(var i=0;i<N;i++){q=B[i]?0:255;d[i*4]=q;d[i*4+1]=q;d[i*4+2]=q;d[i*4+3]=255;}
+  x.putImageData(id,0,0);c.toBlob(function(b){if(b)dl(b,baseName(v.mm)+'_mapa.png');},'image/png');
+});
 /* ---- paso a modo manual y vuelta ---- */
 function syncUI(){
   var P=S.P;
-  setVal('k',S.k);$('v-k').textContent=S.k;setVal('smooth',S.smooth);$('v-smooth').textContent=S.smooth;setVal('work',S.work);
+  setVal('k',S.k);$('v-k').textContent=S.k;setVal('smooth',S.smooth);$('v-smooth').textContent=S.smooth;setVal('work',S.qual);
   setVal('line',dnum(P.line));$('equal').checked=!!P.equal;$('spotOn').checked=!!P.spotOn;setVal('spotA',dnum(P.spotA));setVal('speck',dnum(P.speck));setVal('hole',dnum(P.hole));
   [].forEach.call($('closeSeg').children,function(x){x.classList.toggle('on',+x.dataset.v===P.close);});
   setVal('soft',P.soft);$('v-soft').textContent=P.soft;$('fillGaps').checked=!!P.fillGaps;$('widenGaps').checked=!!P.widenGaps;
@@ -3190,15 +3577,19 @@ function backToAuto(){
   S.advSig=null;S.advSigPending=false;
   setMode('auto');
   if(changed&&S.res){
-    var v={id:'manual',name:'Tu ajuste a mano',res:S.res,ev:S.ev,mm:S.P.mm,ms:0,rec:null,canvas:mkCanvas(S.res)};
-    v.sum=summarize(v);v.score=0;A.manual=v;A.pickId='manual';
-    if(Math.abs(S.P.mm-A.mm)>0.01){
-      A.mm=S.P.mm;A.dim='w';A.val=S.P.mm;$('aSize').value=dnum(Math.round(A.val*100)/100);
-      [].forEach.call($('aDim').children,function(x){x.classList.toggle('on',x.dataset.d==='w');});updateDimTxt();
-      autoRun();return;
-    }
-    A.vars=A.vars.filter(function(x){return x.id!=='manual';});A.vars.push(v);A.sel=A.vars.length-1;
-    renderThumbs();drawBig();updateSem();setExports(true);
+    var go=function(){
+      var v={id:'manual',name:'Tu ajuste a mano',res:S.res,ev:S.ev,mm:S.P.mm,ms:0,rec:null,canvas:mkCanvas(S.res),final:true};
+      v.sum=summarize(v);v.score=0;A.manual=v;A.pickId='manual';
+      if(Math.abs(S.P.mm-A.mm)>0.01){
+        A.mm=S.P.mm;A.dim='w';A.val=S.P.mm;$('aSize').value=dnum(Math.round(A.val*100)/100);
+        [].forEach.call($('aDim').children,function(x){x.classList.toggle('on',x.dataset.d==='w');});updateDimTxt();
+        autoRun();return;
+      }
+      A.vars=A.vars.filter(function(x){return x.id!=='manual';});A.vars.push(v);A.sel=A.vars.length-1;
+      renderThumbs();drawBig();updateSem();updateExports();
+    };
+    /* el ajuste a mano se guarda con la versión final (la vista rápida no se puede descargar) */
+    if(S.res.final)go();else withFinal(go);
   }
 }
 $('aManual').addEventListener('click',enterAdv);
@@ -3242,7 +3633,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){if($('tourB
 /* textos de ayuda en cada control del modo manual: botón «i» que se abre con clic, toque o Intro */
 var INFO=[
  ['#outW','Tamaño final de la pieza en milímetros. Al cambiar el ancho, el alto se ajusta solo (y al revés).'],
- ['#work','Resolución del mapa de trabajo. Más píxeles = más precisión, pero más lento.'],
+ ['#work','Densidad de la versión final, la que se mide y se descarga. Alta (40 px/mm) da bordes más lisos y más detalle; Normal (30 px/mm) es más rápida. La vista previa siempre es rápida (14 px/mm).'],
  ['#smooth','Quita el ruido y el degradado de la imagen sin difuminar los bordes. Más alto = formas más limpias, menos detalle fino.'],
  ['#k','Cuántos colores distintos se separan en la imagen. Menos colores = dibujo más simple.'],
  ['#autoPap','Vuelve a la propuesta de papeles que hace la app: lo más oscuro a Negro, el color del borde a Fondo y el resto a Contorno.'],
@@ -3257,7 +3648,7 @@ var INFO=[
  ['#equal','Hace que también las líneas que ya traía el dibujo tengan ese grosor.'],
  ['#speck','Motas negras más pequeñas que esto se borran.'],
  ['#hole','Agujeros blancos más pequeños que esto se rellenan.'],
- ['#closeSeg','Cierra pequeñas grietas entre trazos negros. 1 píxel suele bastar; 2 cierra más.'],
+ ['#closeSeg','Cierra pequeñas grietas entre trazos negros (1 ≈ 0,07 mm; 2 ≈ 0,13 mm a un tamaño normal).'],
  ['#soft','Suaviza los dientes de sierra de los bordes antes de vectorizar.'],
  ['#widenGaps','Abre hasta 0,5 mm las rendijas blancas muy finas (letras caladas en un fondo negro).'],
  ['#fillGaps','Rellena de negro las rendijas blancas más estrechas de 0,5 mm que no se hayan podido abrir.'],
