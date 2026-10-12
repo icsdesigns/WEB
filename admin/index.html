@@ -5,410 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>Dashboard · SILAB 3D</title>
-  <link rel="icon" type="image/png" href="../img/favicon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #ffffff;
-      --card: #ffffff;
-      --texto: #2F2F2F;
-      --gris: #6B7280;
-      --primario: #BC556D;
-      --primario-hover: #B7516B;
-      --primario-claro: #F2D6DC;
-      --peligro: #dc2626;
-      --ok: #16a34a;
-      --borde: rgba(188,85,109,0.15);
-      --borde-input: #E0D0D4;
-      --radio: 18px;
-      --radio-sm: 12px;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Outfit', sans-serif;
-      background-color: var(--bg);
-      background-image: radial-gradient(circle, rgba(188,85,109,0.11) 1.5px, transparent 1.5px);
-      background-size: 30px 30px;
-      color: var(--texto);
-      min-height: 100vh;
-    }
-    .oculto { display: none !important; }
-
-    /* ---------- LOGIN ---------- */
-    #pantalla-login {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-    .caja-login {
-      background: var(--card);
-      border: 1px solid var(--borde);
-      border-radius: var(--radio);
-      box-shadow: 0 20px 50px rgba(188,85,109,0.2);
-      padding: 2.5rem 2rem;
-      width: 100%;
-      max-width: 400px;
-    }
-    .logo-login { height: 64px; width: auto; margin: 0 auto 1.2rem; display: block; }
-    .caja-login h1 {
-      font-size: 1.45rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin-bottom: .35rem;
-      text-align: center;
-    }
-    .caja-login h1 .accent { color: var(--primario); }
-    .acceso-badge {
-      display: flex;
-      width: fit-content;
-      margin: 0 auto 1.6rem;
-      align-items: center;
-      gap: 8px;
-      background: var(--primario-claro);
-      color: var(--primario-hover);
-      padding: 6px 15px;
-      border-radius: 50px;
-      font-size: .72rem;
-      font-weight: 700;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-    }
-    .badge-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--primario);
-      animation: badge-pulse 2s infinite;
-    }
-    @keyframes badge-pulse {
-      0%,100% { box-shadow: 0 0 0 0 rgba(188,85,109,0.4); }
-      50%      { box-shadow: 0 0 0 8px rgba(188,85,109,0); }
-    }
-    .caja-login label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .3rem; }
-    .caja-login input {
-      width: 100%;
-      padding: .7rem .9rem;
-      border: 1.5px solid var(--borde-input);
-      border-radius: var(--radio-sm);
-      font-size: 1rem;
-      font-family: inherit;
-      margin-bottom: 1rem;
-      transition: border-color .25s, box-shadow .25s;
-    }
-    .caja-login input:focus {
-      outline: none;
-      border-color: var(--primario);
-      box-shadow: 0 0 0 4px rgba(188,85,109,0.12);
-    }
-    .btn {
-      display: inline-block;
-      width: 100%;
-      padding: .75rem 1.4rem;
-      background: var(--primario);
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-      font-size: .95rem;
-      font-family: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all .3s;
-    }
-    .btn:hover {
-      background: var(--primario-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 22px rgba(188,85,109,0.38);
-    }
-    .btn:disabled { opacity: .6; cursor: wait; transform: none; box-shadow: none; }
-    .error-msg {
-      background: #fee2e2;
-      color: #991b1b;
-      border-radius: 8px;
-      padding: .6rem .8rem;
-      font-size: .85rem;
-      margin-bottom: 1rem;
-    }
-    .aviso-config {
-      background: #fef3c7;
-      color: #92400e;
-      border-radius: 8px;
-      padding: .8rem;
-      font-size: .85rem;
-      margin-bottom: 1rem;
-      line-height: 1.4;
-    }
-
-    /* ---------- DASHBOARD ---------- */
-    header.barra {
-      position: sticky;
-      top: 0;
-      z-index: 980;
-      height: 72px;
-      background: rgba(255,255,255,0.94);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(242,214,220,0.7);
-    }
-    .barra-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 0 28px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-    .logo-barra { height: 48px; width: auto; transition: transform 0.3s; }
-    .logo-barra:hover { transform: scale(1.04); }
-    .barra-derecha { display: flex; align-items: center; }
-    header.barra .usuario { font-size: .85rem; color: var(--gris); margin-right: 1rem; }
-    .btn-salir {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--primario);
-      color: #fff;
-      border: none;
-      padding: 10px 22px;
-      border-radius: 50px;
-      font-size: .855rem;
-      font-family: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s;
-      white-space: nowrap;
-    }
-    .btn-salir:hover {
-      background: var(--primario-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 22px rgba(188,85,109,0.38);
-    }
-
-    nav.pestanas {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .5rem;
-      padding: 1.4rem 1.2rem 0;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    nav.pestanas button {
-      padding: 9px 20px;
-      border-radius: 50px;
-      border: 1.5px solid var(--borde-input);
-      background: var(--card);
-      color: var(--gris);
-      font-family: inherit;
-      font-size: .875rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .25s;
-      white-space: nowrap;
-    }
-    nav.pestanas button:hover {
-      border-color: var(--primario);
-      color: var(--primario);
-      background: var(--primario-claro);
-    }
-    nav.pestanas button.activa {
-      background: var(--primario);
-      border-color: var(--primario);
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(188,85,109,0.35);
-    }
-
-    main { max-width: 1000px; margin: 0 auto; padding: 1.2rem; }
-    .panel {
-      background: var(--card);
-      border-radius: var(--radio);
-      border: 1px solid var(--borde);
-      box-shadow: 0 6px 24px rgba(188,85,109,0.07);
-      padding: 1.4rem;
-      margin-bottom: 1.2rem;
-    }
-    .panel h2 { font-size: 1.02rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: .9rem; }
-
-    form.fila { display: flex; flex-wrap: wrap; gap: .6rem; }
-    form.fila input, form.fila select, form.fila textarea {
-      padding: .6rem .8rem;
-      border: 1.5px solid var(--borde-input);
-      border-radius: var(--radio-sm);
-      font-size: .9rem;
-      flex: 1 1 150px;
-      font-family: inherit;
-      transition: border-color .25s, box-shadow .25s;
-    }
-    form.fila input:focus, form.fila select:focus, form.fila textarea:focus {
-      outline: none;
-      border-color: var(--primario);
-      box-shadow: 0 0 0 4px rgba(188,85,109,0.12);
-    }
-    form.fila textarea { flex-basis: 100%; resize: vertical; min-height: 70px; }
-    form.fila button { flex: 0 0 auto; width: auto; padding: .6rem 1.5rem; }
-
-    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
-    th { text-align: left; color: var(--gris); font-size: .76rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: .5rem .6rem; border-bottom: 2px solid var(--primario-claro); }
-    td { padding: .65rem .6rem; border-bottom: 1px solid rgba(188,85,109,0.09); vertical-align: top; }
-    td select { padding: .35rem; border: 1.5px solid var(--borde-input); border-radius: 8px; font-family: inherit; }
-    .btn-borrar { background: transparent; border: none; color: var(--peligro); cursor: pointer; font-size: .85rem; font-family: inherit; }
-    .btn-borrar:hover { text-decoration: underline; }
-    .btn-cancelar {
-      background: var(--card);
-      color: var(--gris);
-      border: 1.5px solid var(--borde-input);
-    }
-    .btn-cancelar:hover {
-      background: var(--primario-claro);
-      color: var(--primario);
-      border-color: var(--primario);
-      box-shadow: none;
-    }
-    .vacio { color: var(--gris); font-size: .9rem; padding: 1rem 0; text-align: center; }
-    input[type="checkbox"] { accent-color: var(--primario); width: 16px; height: 16px; cursor: pointer; }
-    .nota-card { border: 1px solid var(--borde); border-radius: var(--radio-sm); padding: 1rem; margin-bottom: .7rem; transition: box-shadow .25s; }
-    .nota-card:hover { box-shadow: 0 6px 20px rgba(188,85,109,0.12); }
-    .nota-card h3 { font-size: .95rem; font-weight: 700; margin-bottom: .3rem; }
-    .nota-card p { font-size: .88rem; color: var(--texto); white-space: pre-wrap; }
-    .nota-card .meta { font-size: .75rem; color: var(--gris); margin-top: .5rem; display: flex; justify-content: space-between; }
-    .campo-inline { display: flex; align-items: center; gap: .4rem; font-size: .88rem; flex: 0 0 auto; padding: .3rem .2rem; }
-    .campo-inline input[type="color"] { width: 38px; height: 30px; border: 1px solid var(--borde); border-radius: 6px; padding: 0; cursor: pointer; }
-    .swatch { display: inline-block; width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--borde); vertical-align: middle; margin-right: .45rem; }
-    .stock-bajo td { background: #fef2f2; }
-    .stock-input { width: 75px; padding: .35rem; border: 1.5px solid var(--borde-input); border-radius: 8px; font-family: inherit; }
-    .pista { font-size: .75rem; color: var(--gris); font-weight: 400; }
-    .campo-archivo {
-      display: flex; align-items: center; gap: .5rem;
-      padding: .6rem .8rem;
-      border: 1.5px dashed var(--borde-input);
-      border-radius: var(--radio-sm);
-      font-size: .88rem; color: var(--gris);
-      cursor: pointer; flex: 1 1 200px;
-      transition: border-color .25s;
-    }
-    .campo-archivo:hover { border-color: var(--primario); color: var(--primario); }
-    .campo-archivo input[type="file"] { font-size: .8rem; font-family: inherit; max-width: 100%; }
-    .mini {
-      width: 48px; height: 48px;
-      object-fit: cover;
-      border-radius: 10px;
-      border: 1px solid var(--borde);
-      display: block;
-    }
-    .mini-vacia {
-      width: 48px; height: 48px;
-      border-radius: 10px;
-      border: 1.5px dashed var(--borde-input);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--borde-input); font-size: 1.1rem;
-    }
-    .btn-mini {
-      background: transparent; border: none;
-      color: var(--primario); cursor: pointer;
-      font-size: .8rem; font-family: inherit; font-weight: 600;
-      padding: 0; display: block;
-    }
-    .btn-mini:hover { text-decoration: underline; }
-    /* ---------- RESUMEN (KPIs) ---------- */
-    .kpis {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.1rem;
-      padding-top: .4rem;
-    }
-    .kpi {
-      background: var(--card);
-      border: 1px solid var(--borde);
-      border-radius: var(--radio);
-      box-shadow: 0 6px 24px rgba(188,85,109,0.07);
-      padding: 1.7rem 1.6rem;
-      text-align: center;
-      cursor: pointer;
-      transition: transform .25s, box-shadow .25s;
-    }
-    .kpi:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(188,85,109,0.18); }
-    .kpi-icono {
-      width: 56px; height: 56px;
-      margin: 0 auto .9rem;
-      border-radius: 50%;
-      background: var(--primario-claro);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.6rem;
-    }
-    .kpi-valor {
-      font-size: 2.6rem;
-      font-weight: 900;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      color: var(--primario);
-    }
-    .kpi-titulo {
-      font-size: .8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--texto);
-      margin-top: .35rem;
-    }
-    .kpi-detalle { font-size: .82rem; color: var(--gris); margin-top: .45rem; }
-    .kpi-detalle .alerta-texto { color: var(--peligro); font-weight: 600; }
-
-    /* ---------- TOOLBAR DE BÚSQUEDA ---------- */
-    .toolbar { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 1rem; }
-    .toolbar input, .toolbar select {
-      padding: .55rem .9rem;
-      border: 1.5px solid var(--borde-input);
-      border-radius: 50px;
-      font-size: .88rem;
-      font-family: inherit;
-      transition: border-color .25s, box-shadow .25s;
-    }
-    .toolbar input { flex: 1 1 200px; }
-    .toolbar input:focus, .toolbar select:focus {
-      outline: none;
-      border-color: var(--primario);
-      box-shadow: 0 0 0 4px rgba(188,85,109,0.12);
-    }
-
-    /* ---------- MÓVIL: TABLAS COMO TARJETAS ---------- */
-    @media (max-width: 640px) {
-      .panel table, .panel tbody, .panel tr, .panel td { display: block; width: 100%; }
-      .panel thead { display: none; }
-      .panel tr {
-        border: 1px solid var(--borde);
-        border-radius: var(--radio-sm);
-        padding: .5rem .9rem;
-        margin-bottom: .8rem;
-        background: var(--card);
-      }
-      .panel tr.stock-bajo { background: #fef2f2; }
-      .panel td {
-        border: none;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-        padding: .4rem 0;
-      }
-      .panel td::before {
-        content: attr(data-label);
-        font-size: .7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .06em;
-        color: var(--gris);
-        flex-shrink: 0;
-      }
-      .panel td[data-label=""]::before { display: none; }
-      .panel td .mini, .panel td .mini-vacia { margin-left: auto; }
-      .barra-container { padding: 0 16px; }
-      .logo-barra { height: 40px; }
-      header.barra .usuario { display: none; }
-    }
-  </style>
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <link rel="preload" href="/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/css/fuentes.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/admin.css?v=20261006e">
+  <link rel="stylesheet" href="/css/visualizador.css?v=20261012">
+  <!-- three.js para la tasadora y el visualizador: la misma versión que «Configura tu proyecto» -->
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+  } }
+  </script>
 </head>
 <body>
 
@@ -425,11 +34,11 @@
   <!-- ---------- PANTALLA DE LOGIN ---------- -->
   <div id="pantalla-login">
     <div class="caja-login">
-      <img src="../img/SILAB3D_v3_horizontal_negro-compressed.png" alt="SILAB 3D" class="logo-login">
+      <img src="/img/logo-silab3d.png" alt="SILAB 3D" class="logo-login">
       <h1>Panel de <span class="accent">gestión</span></h1>
       <div class="acceso-badge"><span class="badge-dot"></span> Acceso privado</div>
       <div id="aviso-config" class="aviso-config oculto">
-        ⚠️ Falta configurar este archivo: abre <strong>admin/index.html</strong> y pega tu
+        Falta configurar este archivo: abre <strong>admin/index.html</strong> y pega tu
         <strong>Project URL</strong> y tu <strong>anon key</strong> de Supabase en la sección
         CONFIGURACIÓN (parte superior del archivo).
       </div>
@@ -448,7 +57,7 @@
   <div id="pantalla-dashboard" class="oculto">
     <header class="barra">
       <div class="barra-container">
-        <a href="../index.html"><img src="../img/SILAB3D_v3_horizontal_negro-compressed.png" alt="SILAB 3D" class="logo-barra"></a>
+        <a href="/" title="Ir a la web"><img src="/img/logo-silab3d.png" alt="SILAB 3D" class="logo-barra"></a>
         <div class="barra-derecha">
           <span class="usuario" id="usuario-email"></span>
           <button class="btn-salir" id="btn-salir">Cerrar sesión</button>
@@ -461,7 +70,11 @@
       <button data-tab="filamentos">Filamentos</button>
       <button data-tab="productos">Productos</button>
       <button data-tab="trabajos">Trabajos</button>
+      <button data-tab="galeria">Galería</button>
+      <button data-tab="visualizador">Visualizador</button>
+      <button data-tab="tasadora">Tasadora</button>
       <button data-tab="notas">Notas</button>
+      <button data-tab="analitica">Analítica</button>
     </nav>
 
     <main>
@@ -473,7 +86,7 @@
       <!-- NOTAS -->
       <section id="tab-notas" class="oculto">
         <div class="panel">
-          <h2>➕ Nueva nota</h2>
+          <h2>Nueva nota</h2>
           <form class="fila" id="form-nota">
             <input type="text" id="nota-titulo" placeholder="Título" required>
             <textarea id="nota-contenido" placeholder="Contenido de la nota..." required></textarea>
@@ -481,9 +94,9 @@
           </form>
         </div>
         <div class="panel">
-          <h2>🗒️ Notas</h2>
+          <h2>Notas</h2>
           <div class="toolbar">
-            <input type="search" id="buscar-notas" placeholder="🔍 Buscar en las notas...">
+            <input type="search" id="buscar-notas" placeholder="Buscar en las notas...">
           </div>
           <div id="lista-notas"></div>
         </div>
@@ -492,7 +105,7 @@
       <!-- FILAMENTOS (STOCK) -->
       <section id="tab-filamentos" class="oculto">
         <div class="panel">
-          <h2 id="titulo-form-filamento">➕ Nuevo filamento</h2>
+          <h2 id="titulo-form-filamento">Nuevo filamento</h2>
           <form class="fila" id="form-filamento">
             <select id="filamento-material" required title="Material principal">
               <option value="" disabled selected>Material principal...</option>
@@ -507,23 +120,24 @@
               <option value="">Material secundario...</option>
             </select>
             <input type="text" id="filamento-nombre" placeholder="Nombre del material (ej: Matte Red)" required>
-            <label class="campo-inline">Color
-              <input type="color" id="filamento-color-picker" value="#BC556D">
-            </label>
-            <input type="text" id="filamento-hex" placeholder="#BC556D" maxlength="7" pattern="^#?[0-9a-fA-F]{6}$" style="flex:0 1 130px">
-            <input type="text" id="filamento-proveedor" placeholder="Proveedor (SUNLU, Bambu Lab...)">
-            <select id="filamento-abundancia" title="Abundancia">
-              <option value="elevada">Elevada (&gt;500g)</option>
-              <option value="reducida">Reducida (&lt;500g)</option>
+            <select id="filamento-tipo-color" title="Tipo de color" style="flex:0 1 200px">
+              <option value="1">Color sólido</option>
+              <option value="2">Degradado 2 colores</option>
+              <option value="4">Multicolor 4 colores</option>
             </select>
+            <div class="colores-filamento" id="filamento-colores"></div>
+            <input type="text" id="filamento-proveedor" placeholder="Proveedor (SUNLU, Bambu Lab...)">
+            <label class="campo-inline">Cantidad
+              <input type="number" id="filamento-cantidad" value="1" min="0" step="0.5" inputmode="decimal" required style="width:84px">
+            </label>
             <button type="submit" class="btn" id="btn-filamento">Añadir</button>
             <button type="button" class="btn btn-cancelar oculto" id="btn-cancelar-filamento">Cancelar</button>
           </form>
         </div>
         <div class="panel">
-          <h2>🧵 Stock de filamentos <span class="pista">(los de abundancia reducida se marcan en rojo)</span></h2>
+          <h2>Stock de filamentos <span class="pista">(con 0,5 o menos se marcan en rojo · la cantidad no se muestra en la web)</span></h2>
           <div class="toolbar">
-            <input type="search" id="buscar-filamentos" placeholder="🔍 Buscar nombre, tipo o proveedor...">
+            <input type="search" id="buscar-filamentos" placeholder="Buscar nombre, tipo o proveedor...">
             <select id="filtro-material">
               <option value="todos">Todos los materiales</option>
               <option value="PLA">PLA</option>
@@ -541,14 +155,14 @@
       <!-- PRODUCTOS -->
       <section id="tab-productos" class="oculto">
         <div class="panel">
-          <h2 id="titulo-form-producto">➕ Nuevo producto</h2>
+          <h2 id="titulo-form-producto">Nuevo producto</h2>
           <form class="fila" id="form-producto">
             <input type="text" id="producto-nombre" placeholder="Nombre" required>
             <select id="producto-categoria" title="Categoría"></select>
-            <button type="button" class="btn btn-cancelar" id="btn-nueva-categoria" title="Crear una categoría nueva">➕ Categoría</button>
+            <button type="button" class="btn btn-cancelar" id="btn-nueva-categoria" title="Crear una categoría nueva"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Categoría</button>
             <input type="text" id="producto-descripcion" placeholder="Descripción corta (la que se ve en la tarjeta)">
             <input type="number" id="producto-precio" placeholder="Precio interno (€, opcional)" step="0.01" min="0">
-            <label class="campo-archivo">📷 Imagen
+            <label class="campo-archivo"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Imagen
               <input type="file" id="producto-imagen" accept="image/*">
             </label>
             <span class="pista" style="flex-basis:100%">La imagen se comprime automáticamente (máx. 800 px, WebP) antes de subirse, para ocupar el mínimo espacio.</span>
@@ -557,9 +171,9 @@
           </form>
         </div>
         <div class="panel">
-          <h2>🛍️ Productos de la web</h2>
+          <h2>Productos de la web <span class="pista">· marca «Novedad» para que salga en la ventana de la home (rota entre los marcados)</span></h2>
           <div class="toolbar">
-            <input type="search" id="buscar-productos" placeholder="🔍 Buscar producto...">
+            <input type="search" id="buscar-productos" placeholder="Buscar producto...">
             <select id="filtro-categoria">
               <option value="todas">Todas las categorías</option>
             </select>
@@ -572,7 +186,7 @@
       <!-- TRABAJOS REALIZADOS -->
       <section id="tab-trabajos" class="oculto">
         <div class="panel">
-          <h2>➕ Nuevo trabajo realizado</h2>
+          <h2>Nuevo trabajo realizado</h2>
           <form class="fila" id="form-trabajo">
             <input type="text" id="trabajo-titulo" placeholder="Título del trabajo" required>
             <input type="text" id="trabajo-cliente" placeholder="Cliente (opcional)">
@@ -583,16 +197,60 @@
           </form>
         </div>
         <div class="panel">
-          <h2>🏆 Historial de trabajos</h2>
+          <h2>Historial de trabajos</h2>
           <div class="toolbar">
-            <input type="search" id="buscar-trabajos" placeholder="🔍 Buscar título o cliente...">
+            <input type="search" id="buscar-trabajos" placeholder="Buscar título o cliente...">
           </div>
           <div id="lista-trabajos"></div>
+        </div>
+      </section>
+      <!-- GALERÍA: fotos de trabajos realizados que se ven en Valoraciones (js/admin-galeria.js) -->
+      <section id="tab-galeria" class="oculto">
+        <div class="panel">
+          <h2>Subir fotos a la galería <span class="pista">· se ven en Valoraciones › Nuestros trabajos</span></h2>
+          <label class="gal-zona" id="gal-zona">
+            <input type="file" id="gal-archivos" accept="image/*" multiple>
+            <svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+            <strong>Arrastra aquí las fotos o pulsa para elegirlas</strong>
+            <span class="pista">JPG, PNG, HEIC (si tu navegador lo abre) o WebP. Se convierten a WebP: 1600 px para verlas en grande y 640 px para la rejilla.</span>
+          </label>
+          <div id="gal-cola"></div>
+        </div>
+        <div class="panel">
+          <h2>Fotos publicadas <span class="pista" id="gal-cuenta"></span></h2>
+          <div id="gal-lista"><p class="vacio">Cargando…</p></div>
+        </div>
+      </section>
+      <!-- VISUALIZADOR: opciones del visualizador 3D de la web, desde 3MF (js/admin-visualizador.js) -->
+      <section id="tab-visualizador" class="oculto"></section>
+      <!-- TASADORA: la misma del formulario «Configura tu proyecto» + funciones extra (js/admin-tasadora.js monta la pestaña) -->
+      <section id="tab-tasadora" class="oculto">
+        <div data-tasadora><div class="panel"><p class="vacio">Cargando la tasadora…</p></div></div>
+      </section>
+
+      <!-- ANALÍTICA -->
+      <section id="tab-analitica" class="oculto">
+        <div class="panel panel-analitica">
+          <h2>Tráfico de la web <span class="pista">(visitas, páginas, procedencia y clics en contacto y presupuesto)</span></h2>
+          <div id="analitica-contenido"></div>
         </div>
       </section>
     </main>
   </div>
 
+  <script>
+    // Enlace compartido de Umami (Ajustes del sitio → Compartir → activar URL compartida). Es de solo lectura.
+    const UMAMI_SHARE_URL = '';
+    (function () {
+      const cont = document.getElementById('analitica-contenido');
+      if (!UMAMI_SHARE_URL) {
+        cont.innerHTML = '<p class="vacio">La analítica aún no está conectada. Pega el enlace compartido de Umami en UMAMI_SHARE_URL (parte superior del script de esta página).</p>';
+        return;
+      }
+      cont.innerHTML = '<iframe class="analitica-frame" src="' + UMAMI_SHARE_URL + '" title="Estadísticas de silab3d.com" loading="lazy"></iframe>' +
+        '<p class="pista" style="margin-top:10px"><a href="' + UMAMI_SHARE_URL + '" target="_blank" rel="noopener">Abrir en pantalla completa</a></p>';
+    })();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // ================= INICIALIZACIÓN =================
@@ -651,10 +309,39 @@
       btn.addEventListener('click', () => {
         document.querySelectorAll('nav.pestanas button').forEach((b) => b.classList.remove('activa'));
         btn.classList.add('activa');
-        ['resumen', 'notas', 'productos', 'filamentos', 'trabajos'].forEach((t) => $('tab-' + t).classList.add('oculto'));
+        ['resumen', 'notas', 'productos', 'filamentos', 'trabajos', 'galeria', 'visualizador', 'tasadora', 'analitica'].forEach((t) => $('tab-' + t).classList.add('oculto'));
         $('tab-' + btn.dataset.tab).classList.remove('oculto');
+        if (btn.dataset.tab === 'tasadora') abrirTasadora();
+        if (btn.dataset.tab === 'galeria' && window.abrirGaleria) window.abrirGaleria();
+        if (btn.dataset.tab === 'visualizador') import('/js/admin-visualizador.js?v=20261012')
+          .then((m) => m.abrir({ sb, raiz: $('tab-visualizador') }))
+          .catch((err) => { $('tab-visualizador').innerHTML = `<div class="panel"><p class="vacio">No se pudo cargar el visualizador: ${esc(err.message)}</p></div>`; });
       });
     });
+
+    // ================= TASADORA =================
+    // Se monta al abrir la pestaña por primera vez, leyendo la del formulario (ver js/admin-tasadora.js)
+    let tasadoraLista = null;
+    function abrirTasadora() {
+      if (!tasadoraLista) tasadoraLista = (async () => {
+        const html = await (await fetch('/configura-tu-proyecto/', { cache: 'no-cache' })).text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        // El import map (three.js) tiene que estar antes del primer módulo de la página
+        const mapa = doc.querySelector('script[type="importmap"]');
+        if (mapa && !document.querySelector('script[type="importmap"]')) {
+          const s = document.createElement('script');
+          s.type = 'importmap'; s.textContent = mapa.textContent;
+          document.head.appendChild(s);
+        }
+        const { montar } = await import('/js/admin-tasadora.js?v=20261006b');
+        return montar(doc, { sb, raiz: $('tab-tasadora') });
+      })().catch((err) => {
+        tasadoraLista = null;
+        const hueco = document.querySelector('#tab-tasadora [data-tasadora]');
+        if (hueco) hueco.innerHTML = `<p class="vacio">No se pudo cargar la tasadora: ${esc(err.message)}</p>`;
+      });
+      tasadoraLista.then((t) => { if (t) requestAnimationFrame(() => t.mostrar()); });
+    }
 
     window.irATab = (tab) => {
       const btn = document.querySelector(`nav.pestanas button[data-tab="${tab}"]`);
@@ -763,6 +450,19 @@
       renderResumen();
     }
 
+    window.cambiarDestacado = async (id, destacado, input) => {
+      const { error } = await sb.from('productos').update({ destacado }).eq('id', id);
+      if (error) {
+        if (input) input.checked = !destacado;
+        alert(/destacado/.test(error.message)
+          ? 'Falta crear la columna «destacado» en Supabase. En SQL Editor ejecuta:\n\nalter table productos add column destacado boolean not null default false;'
+          : 'Error: ' + error.message);
+        return;
+      }
+      const p = productosCache.find((x) => x.id === id);
+      if (p) p.destacado = destacado;
+    };
+
     function renderProductos() {
       const cont = $('lista-productos');
       if (!productosCache.length) { cont.innerHTML = '<p class="vacio">No hay productos todavía.</p>'; return; }
@@ -773,12 +473,12 @@
         (!q || (p.nombre + ' ' + (p.descripcion || '')).toLowerCase().includes(q)));
       if (!data.length) { cont.innerHTML = '<p class="vacio">Sin resultados para esta búsqueda.</p>'; return; }
       cont.innerHTML = `<table>
-        <thead><tr><th>Imagen</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Visible en web</th><th></th></tr></thead>
+        <thead><tr><th>Imagen</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Visible en web</th><th title="Sale en la ventana de novedades de la home">Novedad</th><th></th></tr></thead>
         <tbody>${data.map((p) => {
           const url = urlImagenProducto(p.imagen);
           return `
           <tr>
-            <td data-label="Imagen">${url ? `<img class="mini" src="${esc(url)}" alt="" loading="lazy">` : '<span class="mini-vacia">📷</span>'}
+            <td data-label="Imagen">${url ? `<img class="mini" src="${esc(url)}" alt="" loading="lazy">` : '<span class="mini-vacia"><svg class=\"s3d-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 16V4\"/><path d=\"m7 9 5-5 5 5\"/><path d=\"M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3\"/></svg></span>'}
                 <button class="btn-mini" onclick="cambiarImagenProducto('${p.id}')">${url ? 'Cambiar' : 'Subir'}</button></td>
             <td data-label="Nombre"><strong>${esc(p.nombre)}</strong><br><span class="pista">${esc(p.descripcion || '')}</span></td>
             <td data-label="Categoría">
@@ -789,6 +489,7 @@
             </td>
             <td data-label="Precio">${p.precio != null ? Number(p.precio).toFixed(2) + ' €' : '—'}</td>
             <td data-label="Visible en web"><input type="checkbox" ${p.visible ? 'checked' : ''} onchange="cambiarVisible('${p.id}', this.checked)"></td>
+            <td data-label="Novedad"><input type="checkbox" ${p.destacado ? 'checked' : ''} onchange="cambiarDestacado('${p.id}', this.checked, this)" title="Mostrar en la ventana de novedades de la home"></td>
             <td data-label="">
               <button class="btn-mini" onclick="editarProducto('${p.id}')">Editar</button>
               <button class="btn-borrar" onclick="borrarProducto('${p.id}')">Borrar</button>
@@ -815,7 +516,7 @@
       $('producto-categoria').value = p.categoria || '';
       $('producto-descripcion').value = p.descripcion || '';
       $('producto-precio').value = p.precio != null ? p.precio : '';
-      $('titulo-form-producto').textContent = '✏️ Editando: ' + p.nombre;
+      $('titulo-form-producto').textContent = 'Editando: ' + p.nombre;
       $('btn-producto').textContent = 'Guardar cambios';
       $('btn-cancelar-producto').classList.remove('oculto');
       $('titulo-form-producto').scrollIntoView({ behavior: 'smooth' });
@@ -824,7 +525,7 @@
     function salirEdicionProducto() {
       productoEditando = null;
       $('form-producto').reset();
-      $('titulo-form-producto').textContent = '➕ Nuevo producto';
+      $('titulo-form-producto').textContent = 'Nuevo producto';
       $('btn-producto').textContent = 'Añadir';
       $('btn-cancelar-producto').classList.add('oculto');
     }
@@ -969,15 +670,42 @@
         tipos.map((t) => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
     });
 
-    // Hex y cuadro de tonos sincronizados en ambos sentidos
-    $('filamento-color-picker').addEventListener('input', () => {
-      $('filamento-hex').value = $('filamento-color-picker').value.toUpperCase();
+    // ---- Colores del filamento: 1 (sólido), 2 (degradado) o 4 (multicolor) ----
+    // Se guardan en «hex» separados por coma: «#AA0000» · «#AA0000,#0000AA» · «#A,#B,#C,#D»
+    const COLORES_BASE = ['#BC556D', '#3A7BD5', '#F2C94C', '#27AE60'];
+    const normHex = (v) => { let t = String(v || '').trim(); if (t && !t.startsWith('#')) t = '#' + t; return t.toUpperCase(); };
+    const esHex = (v) => /^#[0-9A-F]{6}$/.test(v);
+
+    function pintarColores(lista) {
+      const n = Number($('filamento-tipo-color').value);
+      const actuales = lista || [...$('filamento-colores').querySelectorAll('.hex-mini')].map((i) => normHex(i.value));
+      const cols = Array.from({ length: n }, (_, i) => esHex(actuales[i]) ? actuales[i] : COLORES_BASE[i]);
+      $('filamento-colores').innerHTML = cols.map((c, i) => `
+        <label class="campo-inline" title="Color ${i + 1}">${n > 1 ? i + 1 : 'Color'}
+          <input type="color" value="${c}" data-i="${i}">
+          <input type="text" class="hex-mini" value="${c}" maxlength="7" pattern="^#?[0-9a-fA-F]{6}$" data-i="${i}" aria-label="Hex del color ${i + 1}">
+        </label>`).join('');
+    }
+    // Cuadro de tonos y hex sincronizados en ambos sentidos
+    $('filamento-colores').addEventListener('input', (e) => {
+      const i = e.target.dataset.i;
+      if (i == null) return;
+      const par = $('filamento-colores').querySelectorAll(`[data-i="${i}"]`);
+      if (e.target.type === 'color') par[1].value = e.target.value.toUpperCase();
+      else if (esHex(normHex(e.target.value))) par[0].value = normHex(e.target.value).toLowerCase();
     });
-    $('filamento-hex').addEventListener('input', () => {
-      let v = $('filamento-hex').value.trim();
-      if (v && !v.startsWith('#')) v = '#' + v;
-      if (/^#[0-9a-fA-F]{6}$/.test(v)) $('filamento-color-picker').value = v;
-    });
+    $('filamento-tipo-color').addEventListener('change', () => pintarColores());
+    function leerColores() {
+      const lista = [...$('filamento-colores').querySelectorAll('.hex-mini')].map((i) => normHex(i.value));
+      return lista.every(esHex) ? lista.join(',') : null;
+    }
+    // Lista guardada → tipo (1, 2 o 4); los degradados antiguos de 3 colores pasan a multicolor
+    function cargarColores(hex) {
+      const lista = String(hex || '').split(',').map(normHex).filter(esHex);
+      $('filamento-tipo-color').value = lista.length >= 3 ? '4' : lista.length === 2 ? '2' : '1';
+      pintarColores(lista.length ? lista : null);
+    }
+    pintarColores();
 
     async function cargarFilamentos() {
       const { data, error } = await sb.from('filamentos').select('*')
@@ -998,18 +726,15 @@
         (!q || (f.nombre + ' ' + (f.secundario || '') + ' ' + (f.proveedor || '')).toLowerCase().includes(q)));
       if (!data.length) { cont.innerHTML = '<p class="vacio">Sin resultados para esta búsqueda.</p>'; return; }
       cont.innerHTML = `<table>
-        <thead><tr><th>Material</th><th>Nombre</th><th>Color</th><th>Proveedor</th><th>Abundancia</th><th>Visible en web</th><th></th></tr></thead>
+        <thead><tr><th>Material</th><th>Nombre</th><th>Color</th><th>Proveedor</th><th>Cantidad</th><th>Visible en web</th><th></th></tr></thead>
         <tbody>${data.map((f) => `
-          <tr class="${f.abundancia === 'reducida' ? 'stock-bajo' : ''}">
+          <tr class="${cantidadDe(f) <= STOCK_BAJO ? 'stock-bajo' : ''}">
             <td data-label="Material"><strong>${esc(f.material)}</strong>${f.secundario ? `<br><span class="pista">${esc(f.secundario)}</span>` : ''}</td>
             <td data-label="Nombre">${esc(f.nombre)}</td>
             <td data-label="Color"><span class="swatch" style="background:${swatchCss(f.hex)}"></span><span class="pista">${esc(f.hex || '—')}</span></td>
             <td data-label="Proveedor">${esc(f.proveedor || '—')}</td>
-            <td data-label="Abundancia">
-              <select onchange="cambiarAbundancia('${f.id}', this.value)">
-                <option value="elevada" ${f.abundancia === 'elevada' ? 'selected' : ''}>Elevada (&gt;500g)</option>
-                <option value="reducida" ${f.abundancia === 'reducida' ? 'selected' : ''}>Reducida (&lt;500g)</option>
-              </select>
+            <td data-label="Cantidad">
+              <input type="number" class="cantidad" value="${cantidadDe(f)}" min="0" step="0.5" inputmode="decimal" onchange="cambiarCantidad('${f.id}', this)" aria-label="Cantidad de ${esc(f.nombre)}">
             </td>
             <td data-label="Visible en web"><input type="checkbox" ${f.visible ? 'checked' : ''} onchange="cambiarVisibleFilamento('${f.id}', this.checked)"></td>
             <td data-label="">
@@ -1036,11 +761,10 @@
       $('filamento-material').dispatchEvent(new Event('change'));
       $('filamento-secundario').value = f.secundario || '';
       $('filamento-nombre').value = f.nombre;
-      $('filamento-hex').value = f.hex || '';
-      if (/^#[0-9a-fA-F]{6}$/.test(f.hex || '')) $('filamento-color-picker').value = f.hex;
+      cargarColores(f.hex);
       $('filamento-proveedor').value = f.proveedor || '';
-      $('filamento-abundancia').value = f.abundancia;
-      $('titulo-form-filamento').textContent = '✏️ Editando: ' + f.nombre;
+      $('filamento-cantidad').value = cantidadDe(f);
+      $('titulo-form-filamento').textContent = 'Editando: ' + f.nombre;
       $('btn-filamento').textContent = 'Guardar cambios';
       $('btn-cancelar-filamento').classList.remove('oculto');
       $('titulo-form-filamento').scrollIntoView({ behavior: 'smooth' });
@@ -1049,49 +773,70 @@
     function salirEdicionFilamento() {
       filamentoEditando = null;
       $('form-filamento').reset();
+      pintarColores(COLORES_BASE);
       $('filamento-secundario').innerHTML = '<option value="">Material secundario...</option>';
-      $('titulo-form-filamento').textContent = '➕ Nuevo filamento';
+      $('titulo-form-filamento').textContent = 'Nuevo filamento';
       $('btn-filamento').textContent = 'Añadir';
       $('btn-cancelar-filamento').classList.add('oculto');
     }
 
     $('btn-cancelar-filamento').addEventListener('click', salirEdicionFilamento);
 
-    // Admite también varios hex separados por coma (degradados antiguos)
+    // 1 color: sólido · 2: degradado · 4 (o 3 antiguos): multicolor por cuartos
     function swatchCss(hex) {
-      const partes = String(hex || '#888').split(',').map((h) => {
-        const t = h.trim();
-        return t.startsWith('#') ? t : '#' + t;
-      });
-      return partes.length > 1
-        ? `linear-gradient(135deg, ${esc(partes.join(', '))})`
-        : esc(partes[0]);
+      const partes = String(hex || '#888').split(',').map(normHex);
+      if (partes.length === 1) return esc(partes[0]);
+      if (partes.length === 2) return `linear-gradient(135deg, ${esc(partes.join(', '))})`;
+      const paso = 100 / partes.length;
+      // Cada cuarto se funde tenuemente con el siguiente, como en la web
+      const costura = `color-mix(in srgb, ${partes[partes.length - 1]}, ${partes[0]})`;
+      return esc(`conic-gradient(${costura} 0%, ${partes.map((c, i) => `${c} ${i * paso + 4}% ${(i + 1) * paso - 4}%`).join(', ')}, ${costura} 100%)`);
     }
 
     $('form-filamento').addEventListener('submit', async (e) => {
       e.preventDefault();
-      let hex = $('filamento-hex').value.trim();
-      if (hex && !hex.startsWith('#')) hex = '#' + hex;
+      const hex = leerColores();
+      if (!hex) { alert('Revisa los colores: cada uno debe ser un hex de 6 cifras, p. ej. #BC556D.'); return; }
       const campos = {
         material: $('filamento-material').value,
         secundario: $('filamento-secundario').value || null,
         nombre: $('filamento-nombre').value.trim(),
-        hex: hex || $('filamento-color-picker').value.toUpperCase(),
+        hex,
         proveedor: $('filamento-proveedor').value.trim() || null,
-        abundancia: $('filamento-abundancia').value,
+        cantidad: leerCantidad($('filamento-cantidad').value),
       };
+      if (campos.cantidad === null) { alert(AVISO_PASO); return; }
       const { error } = filamentoEditando
         ? await sb.from('filamentos').update(campos).eq('id', filamentoEditando.id)
         : await sb.from('filamentos').insert(campos);
-      if (error) { alert('Error al guardar: ' + error.message); return; }
+      if (error) { alert(errorCantidad(error)); return; }
       salirEdicionFilamento();
       cargarFilamentos();
     });
 
-    window.cambiarAbundancia = async (id, abundancia) => {
-      const { error } = await sb.from('filamentos').update({ abundancia }).eq('id', id);
-      if (error) alert('Error: ' + error.message);
-      cargarFilamentos();
+    // Cantidad en stock (de 0,5 en 0,5). Solo la ve el panel: la web pública no la pide.
+    const STOCK_BAJO = 0.5;
+    const AVISO_PASO = 'La cantidad va de 0,5 en 0,5 (0 · 0,5 · 1 · 1,5…).';
+    const SQL_CANTIDAD = 'alter table filamentos add column cantidad numeric(5,1) not null default 1 check (cantidad >= 0 and cantidad * 2 = floor(cantidad * 2));';
+    // Mientras no exista la columna, se deduce de la antigua «abundancia»
+    const cantidadDe = (f) => f.cantidad != null ? Number(f.cantidad) : (f.abundancia === 'reducida' ? 0.5 : 1);
+    function leerCantidad(v) {
+      const n = Number(String(v).replace(',', '.'));
+      return String(v).trim() !== '' && Number.isFinite(n) && n >= 0 && Number.isInteger(n * 2) ? n : null;
+    }
+    const errorCantidad = (error) => /cantidad/.test(error.message)
+      ? 'Falta crear la columna «cantidad» en Supabase. En SQL Editor ejecuta:\n\n' + SQL_CANTIDAD
+      : 'Error al guardar: ' + error.message;
+
+    window.cambiarCantidad = async (id, input) => {
+      const f = filamentosCache.find((x) => x.id === id);
+      const cantidad = leerCantidad(input.value);
+      if (cantidad === null) { alert(AVISO_PASO); input.value = cantidadDe(f); return; }
+      const { error } = await sb.from('filamentos').update({ cantidad }).eq('id', id);
+      if (error) { alert(errorCantidad(error)); input.value = cantidadDe(f); return; }
+      if (f) f.cantidad = cantidad;
+      input.closest('tr').classList.toggle('stock-bajo', cantidad <= STOCK_BAJO);
+      renderResumen();
     };
 
     window.borrarFilamento = async (id) => {
@@ -1160,13 +905,13 @@
     // ================= RESUMEN (KPIs) =================
     function renderResumen() {
       const materiales = [...new Set(filamentosCache.map((f) => f.material))].length;
-      const bajos = filamentosCache.filter((f) => f.abundancia === 'reducida').length;
+      const bajos = filamentosCache.filter((f) => cantidadDe(f) <= STOCK_BAJO).length;
       const visibles = productosCache.filter((p) => p.visible).length;
       const totalIngresos = trabajosCache.reduce((s, t) => s + (Number(t.precio) || 0), 0);
 
       const detalleFilamentos = filamentosCache.length
         ? `${materiales} ${materiales === 1 ? 'material' : 'materiales'}` +
-          (bajos ? ` · <span class="alerta-texto">${bajos} con abundancia reducida</span>` : ' · stock al día')
+          (bajos ? ` · <span class="alerta-texto">${bajos} con poca cantidad</span>` : ' · stock al día')
         : 'Añade tu primer filamento';
       const detalleProductos = productosCache.length
         ? `${visibles} visibles en la web`
@@ -1176,9 +921,9 @@
         : 'Registra tu primer trabajo';
 
       $('kpis').innerHTML =
-        kpiHtml('🧵', 'Filamentos', filamentosCache.length, detalleFilamentos, 'filamentos') +
-        kpiHtml('🛍️', 'Productos', productosCache.length, detalleProductos, 'productos') +
-        kpiHtml('🏆', 'Trabajos realizados', trabajosCache.length, detalleTrabajos, 'trabajos');
+        kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 2.5 7 12 11.5 21.5 7z"/><path d="m2.5 12 9.5 4.5L21.5 12"/><path d="m2.5 17 9.5 4.5L21.5 17"/></svg>', 'Filamentos', filamentosCache.length, detalleFilamentos, 'filamentos') +
+        kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/><path d="m7.8 5.3 8.5 4.5"/></svg>', 'Productos', productosCache.length, detalleProductos, 'productos') +
+        kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.75 5.57 6.15.9-4.45 4.34 1.05 6.12L12 17.35 6.5 20.13l1.05-6.12L3.1 9.67l6.15-.9z"/></svg>', 'Trabajos realizados', trabajosCache.length, detalleTrabajos, 'trabajos');
     }
 
     function kpiHtml(icono, titulo, valor, detalle, tab) {
@@ -1216,5 +961,6 @@
 
     comprobarSesion();
   </script>
+  <script src="/js/admin-galeria.js?v=20261007"></script>
 </body>
 </html>

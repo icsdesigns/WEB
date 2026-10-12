@@ -3,2004 +3,421 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SILAB 3D - Impresión 3D Salamanca</title>
-  <meta name="keywords" content="Impresión 3D, 3D, Impresión 3D Salamanca, Salamanca">
-  <meta name="description" content="Servicios de Impresión 3D en Salamanca. Expertos en tecnología 3D para tus proyectos.">
-  <link rel="icon" type="image/png" href="img/favicon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/custom.css">
-
-  <style>
-    /* ============================================================
-       VARIABLES & RESET
-    ============================================================ */
-    :root {
-      --primary:        #BC556D;
-      --primary-dark:   #B7516B;
-      --primary-light:  #F2D6DC;
-      --dark:           #2F2F2F;
-      --darker:         #1A1A1A;
-      --white:          #FFFFFF;
-      --gray-bg:        #F9F7F8;
-      --gray-text:      #6B7280;
-      --border:         rgba(188,85,109,0.15);
-      --radius:         18px;
-      --radius-sm:      12px;
-      --shadow:         0 4px 24px rgba(0,0,0,0.07);
-      --shadow-hover:   0 20px 50px rgba(188,85,109,0.2);
-      --nav-h:          72px;
-      --index-spacing-scale: 0.88;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: var(--primary-light) #f5f5f5; }
-    body {
-      font-family: 'Outfit', sans-serif;
-      color: var(--dark);
-      background: var(--white);
-      line-height: 1.6;
-      padding-top: 0;
-      overflow-x: hidden;
-    }
-    img { max-width: 100%; height: auto; display: block; }
-    a { text-decoration: none; color: inherit; }
-    ul { list-style: none; }
-
-    /* ============================================================
-       ANIMATIONS
-    ============================================================ */
-    @keyframes float {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(-14px); }
-    }
-    @keyframes fadeInLeft {
-      from { opacity:0; transform:translateX(-36px); }
-      to   { opacity:1; transform:translateX(0); }
-    }
-    @keyframes fadeInRight {
-      from { opacity:0; transform:translateX(36px); }
-      to   { opacity:1; transform:translateX(0); }
-    }
-    @keyframes fadeInUp {
-      from { opacity:0; transform:translateY(28px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-    @keyframes spin-slow {
-      to { transform: rotate(360deg); }
-    }
-    @keyframes badge-pulse {
-      0%,100% { box-shadow: 0 0 0 0 rgba(188,85,109,0.4); }
-      50%      { box-shadow: 0 0 0 8px rgba(188,85,109,0); }
-    }
-
-    /* Scroll-reveal */
-    .reveal {
-      opacity: 0;
-      transform: translateY(32px);
-      transition: opacity 0.75s ease, transform 0.75s ease;
-    }
-    .reveal.visible { opacity:1; transform:translateY(0); }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
-    .reveal-delay-4 { transition-delay: 0.4s; }
-    .reveal-delay-5 { transition-delay: 0.5s; }
-    .reveal-delay-6 { transition-delay: 0.6s; }
-
-    /* ============================================================
-       UTILITIES
-    ============================================================ */
-    .container {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 0 28px;
-    }
-
-    /* ============================================================
-       NAVBAR
-    ============================================================ */
-    .navbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 900;
-      height: var(--nav-h);
-      background: rgba(255,255,255,0.94);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(242,214,220,0.7);
-      transition: box-shadow 0.3s, background 0.3s;
-    }
-    .navbar.scrolled {
-      box-shadow: 0 2px 24px rgba(188,85,109,0.13);
-    }
-    .navbar-container {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 0 28px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    /* Hamburger */
-    .hamburger-menu {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 10px;
-      transition: background 0.2s;
-      z-index: 10;
-    }
-    .hamburger-menu span {
-      display: block;
-      width: 22px; height: 2px;
-      background: var(--dark);
-      border-radius: 2px;
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-    }
-    /* Sin botón de cierre: la hamburguesa no se transforma en X (se cierra tocando fuera) */
-    .hamburger-menu.open span,
-    .hamburger-menu.active span {
-      transform: none !important;
-      opacity: 1 !important;
-    }
-
-    /* CTA left */
-    .navbar-left .btn-presupuesto {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--primary);
-      color: #fff;
-      padding: 10px 22px;
-      border-radius: 50px;
-      font-size: 0.855rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      transition: all 0.3s;
-      white-space: nowrap;
-    }
-    .navbar-left .btn-presupuesto:hover {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 22px rgba(188,85,109,0.38);
-    }
-
-    /* Center logo */
-    .navbar-center { display:flex; align-items:center; }
-    .navbar-logo { height: 48px; width: auto; transition: transform 0.3s; }
-    .navbar-logo:hover { transform: scale(1.04); }
-
-    /* Nav links */
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .nav-links a {
-      color: var(--dark);
-      font-size: 0.9rem;
-      font-weight: 500;
-      padding: 8px 14px;
-      border-radius: 10px;
-      transition: all 0.2s;
-      position: relative;
-      /* index.html es la única página que carga css/custom.css, que aplica
-         border-bottom a .nav-links a y lo colorea en .active. Eso duplicaba el
-         subrayado del enlace activo (borde ancho + guion del ::after). */
-      border-bottom: none;
-    }
-    .nav-links a:hover { color: var(--primary); background: var(--primary-light); }
-    .nav-links a.active {
-      color: var(--primary);
-      font-weight: 700;
-    }
-    .nav-links a:active { transform: translateY(1px); }
-    .nav-links a.active::after {
-      content: '';
-      position: absolute;
-      bottom: 5px; left: 50%;
-      transform: translateX(-50%);
-      width: 14px; height: 2.5px;
-      background: var(--primary);
-      border-radius: 2px;
-    }
-
-    /* ============================================================
-       MOBILE MENU · OVERLAY + DRAWER (rediseño)
-    ============================================================ */
-    .menu-overlay {
-      position: fixed; inset: 0;
-      background: rgba(26,26,26,0.5);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.35s ease, visibility 0.35s ease;
-      z-index: 950;
-    }
-    .menu-overlay.show { opacity: 1; visibility: visible; }
-    /* Con el menú abierto: navbar opaco y sin línea inferior para una transición continua */
-    .navbar:has(.mobile-menu.open) {
-      background: var(--white);
-      border-bottom-color: transparent;
-      box-shadow: none;
-    }
-
-    .mobile-menu {
-      position: fixed;
-      top: var(--nav-h); left: 0; right: 0;
-      width: 100%;
-      padding: 0;
-      height: fit-content;
-      max-height: min(66dvh, calc(100dvh - var(--nav-h)));
-      background: var(--white);
-      z-index: 960;
-      transform: translateY(-105%);
-      visibility: hidden;
-      /* Cierre: curva ease-in rápida para que se repliegue sin engancharse arriba */
-      transition: transform 0.3s cubic-bezier(0.5,0,0.9,0.4), visibility 0s linear 0.3s;
-      display: flex;
-      flex-direction: column;
-      border-radius: 0 0 26px 26px;
-      box-shadow: 0 26px 54px -14px rgba(43,26,32,0.32);
-      overflow-y: auto;
-    }
-    .mobile-menu.open {
-      transform: translateY(0);
-      visibility: visible;
-      /* Apertura: curva ease-out suave */
-      transition: transform 0.42s cubic-bezier(0.22,1,0.36,1), visibility 0s;
-    }
-    /* Neutraliza el sistema antiguo (script.js/custom.css añaden .active):
-       solo .open controla el menú, evitando el cuadro blanco atrapado al cerrar */
-    .mobile-menu.active { animation: none !important; display: flex !important; }
-
-    /* Navegación */
-    .mobile-menu-nav {
-      flex: 0 0 auto;
-      padding: clamp(12px,2.2vh,20px) clamp(14px,5vw,22px);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      gap: clamp(3px,0.9vh,8px);
-    }
-    .mobile-menu-link {
-      position: relative;
-      display: flex; align-items: center;
-      gap: clamp(11px,3vw,14px);
-      padding: clamp(7px,1.1vh,10px) clamp(11px,3vw,14px);
-      border-radius: 14px;
-      color: var(--dark);
-      transition: background 0.25s, color 0.25s, transform 0.15s;
-    }
-    .mobile-menu-link:active { transform: scale(0.98); }
-    .mobile-menu-icon {
-      width: clamp(32px,4.4vh,38px); height: clamp(32px,4.4vh,38px);
-      border-radius: 11px;
-      background: rgba(188,85,109,0.09); color: var(--primary);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      transition: background 0.25s, color 0.25s, box-shadow 0.25s, transform 0.25s;
-    }
-    .mobile-menu-icon svg {
-      width: clamp(17px,2.3vh,20px); height: clamp(17px,2.3vh,20px);
-      fill: none; stroke: currentColor; stroke-width: 1.9;
-      stroke-linecap: round; stroke-linejoin: round;
-    }
-    .mobile-menu-label {
-      font-weight: 650; font-size: clamp(0.9rem,2.2vh,1rem);
-      letter-spacing: -0.01em; flex: 1;
-    }
-    .mobile-menu-arrow {
-      color: var(--gray-text); flex-shrink: 0;
-      opacity: 0; transform: translateX(-6px);
-      transition: opacity 0.25s, transform 0.25s;
-    }
-    .mobile-menu-arrow svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .mobile-menu-link:hover { background: rgba(188,85,109,0.06); }
-    .mobile-menu-link:hover .mobile-menu-icon { transform: translateY(-1px); }
-    .mobile-menu-link:hover .mobile-menu-arrow { opacity: 0.55; transform: translateX(0); }
-    .mobile-menu-link.active {
-      background: linear-gradient(100deg, var(--primary-light) 0%, rgba(242,214,220,0.35) 100%);
-      color: var(--primary-dark);
-    }
-    .mobile-menu-link.active .mobile-menu-icon {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #fff; box-shadow: 0 6px 16px rgba(188,85,109,0.4);
-    }
-    .mobile-menu-link.active .mobile-menu-label { font-weight: 750; }
-    .mobile-menu-link.active .mobile-menu-arrow { opacity: 0.9; transform: translateX(0); color: var(--primary); }
-    .mobile-menu-link.active::before {
-      content: ''; position: absolute; left: calc(-1 * clamp(14px,5vw,22px)); top: 50%;
-      transform: translateY(-50%);
-      width: 4px; height: 62%; border-radius: 0 4px 4px 0;
-      background: linear-gradient(var(--primary), var(--primary-dark));
-    }
-
-    /* Entrada escalonada de los enlaces (deslizan desde arriba) */
-    .mobile-menu-nav .mobile-menu-link { opacity: 0; transform: translateY(-12px); }
-    .mobile-menu.open .mobile-menu-nav .mobile-menu-link {
-      animation: drawerLinkIn 0.42s cubic-bezier(0.22,1,0.36,1) forwards;
-    }
-    .mobile-menu.open .mobile-menu-link:nth-of-type(1) { animation-delay: 0.06s; }
-    .mobile-menu.open .mobile-menu-link:nth-of-type(2) { animation-delay: 0.11s; }
-    .mobile-menu.open .mobile-menu-link:nth-of-type(3) { animation-delay: 0.16s; }
-    .mobile-menu.open .mobile-menu-link:nth-of-type(4) { animation-delay: 0.21s; }
-    .mobile-menu.open .mobile-menu-link:nth-of-type(5) { animation-delay: 0.26s; }
-    @keyframes drawerLinkIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Ítem destacado: Configura tu proyecto (mismo espaciado que el resto) */
-    .mobile-menu-link--cta .mobile-menu-icon {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #fff; box-shadow: 0 5px 14px rgba(188,85,109,0.38);
-    }
-    .mobile-menu-link--cta .mobile-menu-icon svg { fill: currentColor; stroke: none; }
-    .mobile-menu-link--cta .mobile-menu-label { color: var(--primary-dark); font-weight: 750; }
-
-    /* Alturas muy reducidas (móvil apaisado): permite scroll y compacta */
-    @media (max-height: 480px) {
-      .mobile-menu-nav { justify-content: flex-start; gap: 4px; }
-      .mobile-menu-link { padding: 8px 12px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .mobile-menu, .menu-overlay, .mobile-menu-link { transition: none; }
-      .mobile-menu.open .mobile-menu-nav .mobile-menu-link { animation: none; opacity: 1; transform: none; }
-    }
-
-    /* El menú lateral es exclusivo de la versión móvil */
-    @media (min-width: 769px) {
-      .mobile-menu, .menu-overlay, .hamburger-menu { display: none !important; }
-    }
-
-    /* ============================================================
-       HERO
-    ============================================================ */
-    .hero-main {
-      padding-top: var(--nav-h);
-      min-height: calc(100vh * var(--index-spacing-scale));
-      display: flex;
-      align-items: center;
-      background-color: var(--white);
-      background-image:
-        radial-gradient(circle, rgba(188,85,109,0.11) 1.5px, transparent 1.5px);
-      background-size: 30px 30px;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero-main::before {
-      content: '';
-      position: absolute;
-      top: -80px; right: -80px;
-      width: 560px; height: 560px;
-      background: radial-gradient(circle, rgba(242,214,220,0.6) 0%, transparent 68%);
-      pointer-events: none;
-    }
-    .hero-main::after {
-      content: '';
-      position: absolute;
-      bottom: -60px; left: -60px;
-      width: 420px; height: 420px;
-      background: radial-gradient(circle, rgba(188,85,109,0.07) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .hero-main-container {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 80px 28px;
-      display: grid;
-      grid-template-columns: 1fr 1.1fr;
-      gap: 64px;
-      align-items: center;
-    }
-
-    .hero-main-image {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      animation: fadeInLeft 1s ease 0.1s both;
-    }
-    .hero-img-wrap {
-      position: relative;
-      width: 420px; height: 420px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .ring {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      border: 1.5px solid rgba(188,85,109,0.22);
-    }
-    .ring:nth-child(2) { inset: -22px; border-color: rgba(188,85,109,0.13); }
-    .ring:nth-child(3) { inset: -44px; border-color: rgba(188,85,109,0.07); }
-    .ring-spin {
-      position: absolute;
-      inset: -66px;
-      border-radius: 50%;
-      border: 1.5px dashed rgba(188,85,109,0.3);
-      animation: spin-slow 22s linear infinite;
-    }
-    .ring-spin::before,
-    .ring-spin::after {
-      content: '';
-      position: absolute;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--primary);
-      top: 50%; left: -4px;
-      transform: translateY(-50%);
-    }
-    .ring-spin::after {
-      left: auto; right: -4px;
-      background: var(--primary-light);
-      border: 2px solid var(--primary);
-    }
-
-    .hero-image-circular {
-      width: 370px; height: 370px;
-      border-radius: 50%;
-      object-fit: cover;
-      box-shadow: 0 24px 70px rgba(188,85,109,0.28), 0 0 0 6px var(--primary-light);
-      animation: float 5.5s ease-in-out infinite;
-      position: relative; z-index: 2;
-    }
-
-    .hero-main-content {
-      animation: fadeInRight 1s ease 0.25s both;
-    }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      padding: 7px 16px;
-      border-radius: 50px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 24px;
-    }
-    .badge-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--primary);
-      animation: badge-pulse 2s infinite;
-    }
-
-    .hero-main-title {
-      font-size: clamp(2.5rem, 5.5vw, 4rem);
-      font-weight: 900;
-      line-height: 1.12;
-      color: var(--dark);
-      letter-spacing: -0.04em;
-      margin-bottom: 24px;
-    }
-    .hero-main-title .accent {
-      display: block;
-      color: var(--primary);
-    }
-
-    .hero-main-text {
-      font-size: 1.08rem;
-      color: #5a5a5a;
-      line-height: 1.78;
-      margin-bottom: 38px;
-      max-width: 500px;
-      font-weight: 400;
-    }
-    .hero-main-text strong { color: var(--dark); font-weight: 600; }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      padding: 17px 34px;
-      border-radius: 50px;
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      transition: all 0.35s;
-      box-shadow: 0 8px 32px rgba(188,85,109,0.38);
-      position: relative;
-      overflow: hidden;
-    }
-    .btn-primary::after {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
-      transition: left 0.6s;
-    }
-    .btn-primary:hover::after { left: 100%; }
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 14px 44px rgba(188,85,109,0.5);
-    }
-    .btn-arrow { transition: transform 0.3s; font-style: normal; }
-    .btn-primary:hover .btn-arrow { transform: translateX(5px); }
-
-    /* ============================================================
-       SECTION SHARED HEADER
-    ============================================================ */
-    .section-header {
-      text-align: center;
-      margin-bottom: 60px;
-    }
-    .section-label {
-      display: inline-block;
-      color: var(--primary);
-      font-size: 0.76rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .section-title {
-      font-size: clamp(2rem, 4vw, 2.9rem);
-      font-weight: 800;
-      color: var(--dark);
-      letter-spacing: -0.03em;
-      line-height: 1.18;
-      margin-bottom: 18px;
-    }
-    .section-desc {
-      font-size: 1.05rem;
-      color: var(--gray-text);
-      max-width: 620px;
-      margin: 0 auto;
-      line-height: 1.72;
-    }
-    .section-desc strong { color: var(--dark); font-weight: 600; }
-
-    /* ============================================================
-       PRODUCTOS
-    ============================================================ */
-    .productos-section {
-      padding: calc(110px * var(--index-spacing-scale)) 0;
-      background: var(--gray-bg);
-      position: relative;
-      overflow: hidden;
-    }
-    .productos-section::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary), var(--primary-dark), #e899ae);
-    }
-    .productos-section::after {
-      content: '';
-      position: absolute;
-      top: -120px; right: -120px;
-      width: 500px; height: 500px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(188,85,109,0.07) 0%, transparent 65%);
-      pointer-events: none;
-    }
-
-    .productos-grid {
-      --producto-margin: 26px;
-      --producto-space: 16px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      max-width: 860px;
-      margin: 0 auto;
-    }
-
-    .producto-card {
-      background: var(--white);
-      border: 1.5px solid rgba(188,85,109,0.12);
-      border-radius: 20px;
-      padding: var(--producto-margin);
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: var(--producto-space);
-      transition: all 0.38s cubic-bezier(0.4,0,0.2,1);
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.04);
-    }
-    /* shimmer sweep on hover */
-    .producto-card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 60%; height: 100%;
-      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.55), transparent);
-      transition: left 0.6s ease;
-      pointer-events: none;
-    }
-    .producto-card:hover::after { left: 160%; }
-    /* gradient accent bar at bottom */
-    .producto-card::before {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.38s ease;
-      z-index: 1;
-    }
-    .producto-card:hover::before { transform: scaleX(1); }
-    .producto-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 22px 55px rgba(188,85,109,0.18);
-      border-color: rgba(188,85,109,0.28);
-    }
-
-    .producto-img-box {
-      width: 70px; height: 70px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, var(--primary-light), #fbe8ed);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.35s, box-shadow 0.35s;
-      box-shadow: 0 3px 14px rgba(188,85,109,0.13);
-      position: relative;
-    }
-    .producto-card:hover .producto-img-box {
-      transform: scale(1.1) rotate(-3deg);
-      box-shadow: 0 8px 22px rgba(188,85,109,0.26);
-    }
-    .producto-img-box img {
-      width: 38px; height: 38px;
-      object-fit: contain;
-      transition: transform 0.35s;
-    }
-    .producto-card:hover .producto-img-box img { transform: scale(1.08); }
-
-    .producto-card h3 {
-      font-size: 1.05rem;
-      font-weight: 800;
-      color: var(--dark);
-      letter-spacing: -0.02em;
-      line-height: 1.3;
-      margin-block: -0.15em;
-    }
-    .producto-card p {
-      font-size: 0.875rem;
-      color: var(--gray-text);
-      line-height: 1.5;
-      margin-block: -0.25em;
-    }
-
-    /* ============================================================
-       PROCESO / HAZ TUS PROYECTOS REALIDAD
-    ============================================================ */
-    #proceso { scroll-margin-top: calc(var(--nav-h) + 12px); }
-
-    .proceso-section {
-      padding: calc(110px * var(--index-spacing-scale)) 0;
-      background: var(--gray-bg);
-      position: relative;
-      overflow: hidden;
-    }
-    .proceso-section::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary), var(--primary-dark), #e899ae);
-    }
-    .proceso-section::after {
-      content: '';
-      position: absolute;
-      top: -140px; left: -140px;
-      width: 480px; height: 480px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(188,85,109,0.07) 0%, transparent 65%);
-      pointer-events: none;
-    }
-
-    .proceso-grid {
-      --proceso-gap: 32px;
-      --proceso-margin: 26px;
-      --proceso-space: 16px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      align-items: stretch;
-      gap: var(--proceso-gap);
-      max-width: 1160px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    .proceso-step {
-      background: var(--white);
-      border: 1.5px solid rgba(188,85,109,0.12);
-      border-radius: 22px;
-      padding: var(--proceso-margin);
-      text-align: center;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: var(--proceso-space);
-      box-shadow: 0 2px 16px rgba(0,0,0,0.04);
-      transition: all 0.38s cubic-bezier(0.4,0,0.2,1);
-    }
-    .proceso-step::before {
-      content: '';
-      position: absolute;
-      bottom: 6px; left: 22px; right: 22px;
-      height: 3px;
-      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-      border-radius: 3px;
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.38s ease;
-    }
-    .proceso-step:hover::before { transform: scaleX(1); }
-    .proceso-step:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 22px 55px rgba(188,85,109,0.18);
-      border-color: rgba(188,85,109,0.28);
-    }
-
-    /* flecha conectora entre pasos */
-    .proceso-step:not(:last-child)::after {
-      content: '\2192';
-      position: absolute;
-      top: 50%;
-      right: calc(-1 * var(--proceso-gap));
-      transform: translateY(-50%);
-      width: var(--proceso-gap);
-      text-align: center;
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: rgba(188,85,109,0.45);
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    .proceso-img-box {
-      width: 74px; height: 74px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, var(--primary-light), #fbe8ed);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 3px 14px rgba(188,85,109,0.13);
-      transition: transform 0.35s, box-shadow 0.35s;
-    }
-    .proceso-step:hover .proceso-img-box {
-      transform: scale(1.08) rotate(-3deg);
-      box-shadow: 0 8px 22px rgba(188,85,109,0.26);
-    }
-    .proceso-img-box svg { width: 48px; height: 48px; display: block; }
-
-    .proceso-step h3 {
-      font-size: 1.05rem;
-      font-weight: 800;
-      color: var(--dark);
-      letter-spacing: -0.02em;
-      line-height: 1.3;
-      margin-block: -0.15em;
-      text-wrap: balance;
-    }
-    .proceso-step p {
-      font-size: 0.875rem;
-      color: var(--gray-text);
-      line-height: 1.55;
-      max-width: 30ch;
-      margin: -0.275em auto;
-      text-wrap: pretty;
-    }
-
-    .proceso-cta {
-      text-align: center;
-      margin-top: 52px;
-    }
-    .proceso-cta-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: var(--white);
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 16px 34px;
-      border-radius: 50px;
-      box-shadow: 0 10px 30px rgba(188,85,109,0.28);
-      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1), box-shadow 0.32s;
-    }
-    .proceso-cta-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 18px 42px rgba(188,85,109,0.34);
-    }
-    .proceso-cta-sub {
-      margin-top: 20px;
-      font-size: 0.88rem;
-      color: var(--gray-text);
-    }
-
-    /* ============================================================
-       MATERIALES PREVIEW
-    ============================================================ */
-    .materiales-preview {
-      padding: 110px 0;
-      background: var(--primary-light);
-      position: relative;
-      overflow: hidden;
-    }
-    .materiales-preview::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-    }
-    .materiales-preview::after {
-      content: '';
-      position: absolute;
-      bottom: -30px; right: -30px;
-      width: 300px; height: 300px;
-      border-radius: 50%;
-      background: rgba(188,85,109,0.08);
-      pointer-events: none;
-    }
-
-    /* contraste sobre el fondo rosa de la franja */
-    .materiales-preview .section-label { color: #8E3B50; }
-    .materiales-preview .section-title { color: var(--darker); }
-    .materiales-preview .section-desc { color: #5A4750; }
-    .materiales-preview .section-desc strong { color: var(--darker); }
-    .materiales-preview .material-preview-card {
-      border-color: rgba(188,85,109,0.3);
-      box-shadow: 0 6px 22px rgba(71,12,59,0.1);
-    }
-    .materiales-preview .material-preview-card:hover {
-      border-color: rgba(188,85,109,0.45);
-    }
-    .materiales-preview .material-preview-card::after { background: rgba(188,85,109,0.13); }
-    .materiales-preview .mat-label { color: #8E3B50; }
-    .materiales-preview .material-preview-card p { color: #5A5560; }
-    .materiales-preview .link-arrow { color: #9C4359; }
-
-    .materiales-preview-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-
-    .material-preview-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 52px 44px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      border: 1.5px solid rgba(188,85,109,0.18);
-      position: relative;
-      overflow: hidden;
-      transition: all 0.38s ease;
-      cursor: pointer;
-    }
-    .material-preview-card::after {
-      content: '';
-      position: absolute;
-      top: 0; right: 0;
-      width: 110px; height: 110px;
-      border-radius: 0 var(--radius) 0 110px;
-      background: var(--primary-light);
-      transition: width 0.35s, height 0.35s;
-    }
-    .material-preview-card:hover::after {
-      width: 160px; height: 160px;
-    }
-    .material-preview-card:hover {
-      transform: translateY(-7px);
-      box-shadow: var(--shadow-hover);
-      border-color: rgba(188,85,109,0.35);
-    }
-
-    .mat-label {
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--primary);
-      position: relative; z-index: 1;
-    }
-    .material-preview-card h3 {
-      font-size: 2.4rem;
-      font-weight: 900;
-      color: var(--dark);
-      letter-spacing: -0.04em;
-      line-height: 1;
-      position: relative; z-index: 1;
-    }
-    .material-preview-card p {
-      font-size: 1rem;
-      color: var(--gray-text);
-      position: relative; z-index: 1;
-    }
-    .link-arrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--primary);
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-top: 10px;
-      position: relative; z-index: 1;
-      transition: gap 0.25s;
-    }
-    .material-preview-card:hover .link-arrow { gap: 13px; }
-
-    /* ============================================================
-       CONTACTO
-    ============================================================ */
-    .contacto-section {
-      padding: 110px 0;
-      background: var(--dark);
-      position: relative;
-      overflow: hidden;
-    }
-    .contacto-section::before {
-      content: '';
-      position: absolute;
-      top: -100px; right: -100px;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(188,85,109,0.14) 0%, transparent 65%);
-      pointer-events: none;
-    }
-    .contacto-section::after {
-      content: '';
-      position: absolute;
-      bottom: -80px; left: -80px;
-      width: 360px; height: 360px;
-      background: radial-gradient(circle, rgba(188,85,109,0.08) 0%, transparent 65%);
-      pointer-events: none;
-    }
-
-    .contacto-section .section-label { color: rgba(242,214,220,0.8); }
-    .contacto-section .section-title  { color: var(--white); }
-    .contacto-section .section-desc   { color: rgba(255,255,255,0.55); }
-    .contacto-section .section-desc strong { color: rgba(255,255,255,0.85); }
-
-    .contacto-grid {
-      --contacto-margin: 26px;
-      --contacto-space: 16px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
-    }
-
-    .contacto-card {
-      background: rgba(255,255,255,0.05);
-      border: 1.5px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius);
-      padding: var(--contacto-margin);
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: var(--contacto-space);
-      transition: all 0.38s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .contacto-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(188,85,109,0.12), transparent);
-      opacity: 0;
-      transition: opacity 0.35s;
-    }
-    .contacto-card:hover::before { opacity: 1; }
-    .contacto-card:hover {
-      border-color: rgba(188,85,109,0.45);
-      transform: translateY(-7px);
-      box-shadow: 0 20px 50px rgba(188,85,109,0.22);
-    }
-
-    .contacto-icon-box {
-      width: 72px; height: 72px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.1);
-      transition: background 0.3s, transform 0.3s;
-      position: relative; z-index: 1;
-    }
-    .contacto-card:hover .contacto-icon-box {
-      background: rgba(188,85,109,0.25);
-      transform: scale(1.07);
-    }
-    .contacto-icon-box img { width: 42px; height: 42px; object-fit: contain; }
-
-    .contacto-card h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--white);
-      line-height: 1.3;
-      margin-block: -0.15em;
-      position: relative; z-index: 1;
-    }
-    .contacto-card p {
-      font-size: 0.875rem;
-      color: rgba(255,255,255,0.55);
-      line-height: 1.5;
-      margin-block: -0.25em;
-      position: relative; z-index: 1;
-    }
-
-    /* ============================================================
-       FOOTER
-    ============================================================ */
-    .footer {
-      background: var(--darker);
-      padding: 44px 0;
-      margin-top: 0 !important;
-      border-top: 1px solid rgba(188,85,109,0.2);
-    }
-    .footer .container {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-      text-align: center;
-    }
-    .footer p {
-      font-size: 0.875rem;
-      color: rgba(255,255,255,0.42);
-    }
-    .footer a {
-      color: var(--primary);
-      font-weight: 600;
-      transition: color 0.2s;
-    }
-    .footer a:hover { color: #e899ae; }
-    .footer .sep { color: rgba(255,255,255,0.2); margin: 0 8px; }
-    .footer p:last-child a {
-      display: inline;
-      margin: 0;
-    }
-    .footer p:last-child .sep {
-      display: inline;
-    }
-
-    /* ============================================================
-       MODALS
-    ============================================================ */
-    .quote-modal {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-      z-index: 1800;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .quote-modal[style*="display: block"],
-    .quote-modal[style*="display:block"] {
-      display: flex !important;
-    }
-
-    .quote-modal-content {
-      background: var(--white);
-      border-radius: 24px;
-      padding: 44px 40px;
-      width: 100%;
-      max-width: 520px;
-      max-height: 90vh;
-      overflow-y: auto;
-      position: relative;
-      animation: fadeInUp 0.38s ease;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.2);
-    }
-    .quote-modal-content h2 {
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: var(--dark);
-      letter-spacing: -0.025em;
-      margin-bottom: 28px;
-      text-align: center;
-    }
-
-    .quote-modal-close,
-    .quote-contact-modal-close {
-      position: absolute;
-      top: 18px; right: 20px;
-      font-size: 1.6rem;
-      cursor: pointer;
-      color: #bbb;
-      line-height: 1;
-      transition: color 0.2s, transform 0.2s;
-      background: none; border: none;
-      font-family: inherit;
-    }
-    .quote-modal-close:hover,
-    .quote-contact-modal-close:hover {
-      color: var(--primary);
-      transform: rotate(90deg);
-    }
-
-    .form-group { margin-bottom: 20px; }
-    .form-group label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--dark);
-      margin-bottom: 7px;
-    }
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1.5px solid #E5E7EB;
-      border-radius: 12px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.95rem;
-      color: var(--dark);
-      outline: none;
-      resize: vertical;
-      transition: border-color 0.25s, box-shadow 0.25s;
-      background: #FDFCFC;
-    }
-    .form-group input:focus,
-    .form-group textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(188,85,109,0.11);
-      background: var(--white);
-    }
-    .form-note {
-      font-size: 0.82rem;
-      color: #999;
-      line-height: 1.55;
-      margin-top: 14px;
-      text-align: center;
-    }
-
-    .cta-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      padding: 14px 28px;
-      border-radius: 50px;
-      font-size: 1rem;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      font-family: 'Outfit', sans-serif;
-      letter-spacing: 0.01em;
-      transition: all 0.3s;
-      width: 100%;
-      margin-top: 16px;
-    }
-    .cta-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(188,85,109,0.42);
-    }
-
-    .contact-options-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 8px;
-    }
-    .contact-option-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      padding: 30px 20px;
-      border: 1.5px solid #E5E7EB;
-      border-radius: 18px;
-      transition: all 0.28s;
-      color: var(--dark);
-      cursor: pointer;
-    }
-    .contact-option-card:hover {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      transform: translateY(-5px);
-      box-shadow: 0 12px 32px rgba(188,85,109,0.18);
-    }
-    .contact-option-icon { font-size: 2.2rem; }
-    .contact-option-card h3 { font-size: 1.05rem; font-weight: 700; }
-    .contact-option-card p { font-size: 0.82rem; color: #888; text-align: center; }
-
-    /* ============================================================
-       TERMS POPUP
-    ============================================================ */
-    .terms-popup {
-      display: none;
-      position: fixed;
-      bottom: 20px; left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 40px);
-      max-width: 700px;
-      background: var(--white);
-      border: 1.5px solid #E5E7EB;
-      border-radius: 18px;
-      box-shadow: 0 10px 50px rgba(0,0,0,0.16);
-      z-index: 1700;
-      padding: 22px 28px;
-      animation: fadeInUp 0.4s ease;
-    }
-    .terms-popup.show { display: block; }
-    .terms-popup-content {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    .terms-popup-content > p {
-      flex: 1;
-      font-size: 0.875rem;
-      color: #555;
-      line-height: 1.55;
-      min-width: 200px;
-    }
-    .terms-popup-buttons { display: flex; gap: 10px; }
-    .terms-btn {
-      padding: 10px 22px;
-      border-radius: 50px;
-      font-size: 0.875rem;
-      font-weight: 700;
-      cursor: pointer;
-      border: none;
-      font-family: 'Outfit', sans-serif;
-      transition: all 0.2s;
-    }
-    .terms-btn-accept {
-      background: var(--primary);
-      color: white;
-    }
-    .terms-btn-accept:hover {
-      background: var(--primary-dark);
-      box-shadow: 0 4px 16px rgba(188,85,109,0.35);
-    }
-    .terms-btn-reject {
-      background: #F3F4F6;
-      color: #666;
-    }
-    .terms-btn-reject:hover { background: #E5E7EB; }
-
-    /* ============================================================
-       SCROLLBAR
-    ============================================================ */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #f5f5f5; }
-    ::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
-    /* ============================================================
-       RESPONSIVE
-    ============================================================ */
-    @media (max-width: 1024px) {
-      .productos-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 768px) {
-      .navbar { z-index: 980; }
-      .hamburger-menu { display: flex; }
-      .navbar-left,
-      .nav-links       { display: none; }
-      /* Igual que en /productos/: la hamburguesa queda a la izquierda en el flujo y
-         el logo se centra en el viewport; con justify-content:center se solapaban. */
-      .navbar-container { justify-content: space-between; }
-      .navbar-center { position: absolute; left: 50%; transform: translateX(-50%); }
-
-      .hero-main-container {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 56px;
-        padding: 70px 24px;
-      }
-      .hero-main-image { order: -1; }
-      .hero-img-wrap   { width: 280px; height: 280px; }
-      .hero-image-circular { width: 250px; height: 250px; }
-      .ring-spin       { inset: -40px; }
-      .hero-main-text  { margin: 0 auto 32px; }
-      .btn-primary     { width: 100%; justify-content: center; max-width: 340px; }
-
-      .materiales-preview-grid {
-        grid-template-columns: 1fr;
-        justify-items: center;
-      }
-      .material-preview-card {
-        width: 100%;
-        max-width: 360px;
-        padding: 38px 30px;
-        align-items: center;
-        text-align: center;
-      }
-      .material-preview-card h3 {
-        white-space: nowrap;
-        line-height: 1.05;
-      }
-
-      .contacto-grid {
-        grid-template-columns: 1fr;
-        max-width: 360px;
-        margin: 0 auto;
-        justify-items: center;
-      }
-
-      .contacto-card {
-        width: 100%;
-        max-width: 320px;
-      }
-      .contacto-grid { --contacto-margin: 22px; --contacto-space: 14px; }
-
-      .proceso-grid {
-        grid-template-columns: repeat(2, 1fr);
-        --proceso-gap: 34px;
-      }
-      .proceso-step:nth-child(2n)::after { display: none; }
-
-      .quote-modal-content { padding: 30px 22px; }
-      .contact-options-grid { grid-template-columns: 1fr; }
-      .terms-popup-content  { flex-direction: column; gap: 16px; }
-    }
-
-    @media (max-width: 480px) {
-      .productos-grid { 
-        grid-template-columns: repeat(2, 1fr); 
-        gap: 12px;
-        max-width: 100%; 
-        margin: 0 auto; 
-      }
-      .productos-grid { --producto-margin: 18px; --producto-space: 12px; }
-      .producto-img-box { width: 56px; height: 56px; border-radius: 16px; }
-      .producto-img-box img { width: 32px; height: 32px; }
-      .producto-card h3 { font-size: 0.95rem; }
-      .producto-card p { font-size: 0.8rem; }
-      .material-preview-card {
-        max-width: 100%;
-        padding: 34px 22px;
-      }
-      .material-preview-card h3 {
-        font-size: clamp(2rem, 12vw, 2.3rem);
-      }
-      .proceso-grid {
-        grid-template-columns: 1fr;
-        max-width: 340px;
-        --proceso-gap: 46px;
-        --proceso-margin: 22px;
-        --proceso-space: 14px;
-      }
-      .proceso-step:not(:last-child)::after {
-        display: block;
-        content: '\2193';
-        top: auto;
-        bottom: calc(-1 * var(--proceso-gap));
-        right: 50%;
-        width: auto;
-        height: var(--proceso-gap);
-        line-height: var(--proceso-gap);
-        transform: translateX(50%);
-      }
-      .proceso-img-box { width: 68px; height: 68px; border-radius: 18px; }
-      .proceso-img-box svg { width: 44px; height: 44px; }
-      .proceso-cta-btn { width: 100%; justify-content: center; padding: 15px 22px; }
-      .section-title  { font-size: 1.9rem; }
-    }
-  </style>
-<style>
-/* ── Banner idéntico al de /productos/ ──────────────────────────────────────
-   index.html carga css/custom.css (productos no), que convierte el contenedor en
-   grid y fuerza el logo a width:max(300px,12vw): en móvil desbordaba y la
-   hamburguesa se montaba sobre el logo. Aquí se replica la geometría de
-   /productos/ y se neutralizan esas reglas heredadas. */
-.navbar-container{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;grid-template-columns:none!important;align-items:center!important;justify-content:space-between!important;text-align:start;max-width:1180px;margin:0 auto;padding:0 20px;gap:16px;height:100%}
-.navbar-logo{height:48px!important;width:auto!important;max-width:none}
-.navbar-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center}
-.hamburger-menu{z-index:2;margin:0!important;position:static;order:0}
-@media (max-width:1300px){ .navbar-logo{height:48px!important;width:auto!important} }
-@media (max-width:768px){ .navbar-left,.nav-links{display:none!important} .hamburger-menu{display:flex} .navbar-container{padding:0 28px} .navbar-logo{height:48px!important} }
-</style>
+  <title>Impresión 3D en Salamanca · Regalos y piezas | SILAB 3D</title>
+  <meta name="description" content="Estudio de impresión 3D en Salamanca. Regalos personalizados, figuras, litofanías, llaveros y piezas a medida. Presupuesto gratis en menos de 24 h.">
+  <link rel="canonical" href="https://silab3d.com/">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <link rel="apple-touch-icon" href="/img/favicon.png">
+  <meta name="theme-color" content="#BC556D">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SILAB 3D">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:title" content="Impresión 3D en Salamanca · Regalos y piezas | SILAB 3D">
+  <meta property="og:description" content="Estudio de impresión 3D en Salamanca. Regalos personalizados, figuras, litofanías, llaveros y piezas a medida. Presupuesto gratis en menos de 24 h.">
+  <meta property="og:url" content="https://silab3d.com/">
+  <meta property="og:image" content="https://silab3d.com/img/og/og-inicio.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="SILAB 3D, impresión 3D en Salamanca: innovación capa a capa">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Impresión 3D en Salamanca · Regalos y piezas | SILAB 3D">
+  <meta name="twitter:description" content="Estudio de impresión 3D en Salamanca. Regalos personalizados, figuras, litofanías, llaveros y piezas a medida. Presupuesto gratis en menos de 24 h.">
+  <meta name="twitter:image" content="https://silab3d.com/img/og/og-inicio.jpg">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","@id":"https://silab3d.com/#negocio","name":"SILAB 3D","description":"Estudio de impresión 3D en Salamanca: regalos personalizados, figuras, litofanías, llaveros y piezas a medida.","url":"https://silab3d.com/","logo":"https://silab3d.com/img/favicon.png","image":"https://silab3d.com/img/og/og-inicio.jpg","telephone":"+34644070487","email":"silab3d@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Salamanca","postalCode":"37001","addressRegion":"Castilla y León","addressCountry":"ES"},"areaServed":[{"@type":"City","name":"Salamanca"},{"@type":"Country","name":"España"}],"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"21:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"10:00","closes":"20:00"}],"hasMap":"https://www.google.com/maps?cid=13396822311427547363","sameAs":["https://www.instagram.com/silab3d/","https://www.google.com/maps?cid=13396822311427547363"],"knowsAbout":["Impresión 3D","Diseño 3D","PLA","PETG","Litofanías"],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Servicios de impresión 3D","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Llaveros personalizados","areaServed":"Salamanca"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Jarrones y decoración impresa en 3D","areaServed":"Salamanca"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Figuras personalizadas","areaServed":"Salamanca"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Litofanías y lámparas personalizadas","areaServed":"Salamanca"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Trofeos y regalos para eventos","areaServed":"Salamanca"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Diseño 3D y piezas a medida","areaServed":"Salamanca"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Prototipos y piezas funcionales en PETG","areaServed":"Salamanca"}}]}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"SILAB 3D","url":"https://silab3d.com/","inLanguage":"es-ES","publisher":{"@id":"https://silab3d.com/#negocio"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Cuánto cuesta imprimir una pieza en 3D?","acceptedAnswer":{"@type":"Answer","text":"Depende del tamaño, el material, el acabado y las unidades. Por eso cada presupuesto es a medida, gratuito y sin compromiso: cuéntanos tu idea en el configurador y tendrás tu presupuesto en menos de 24 h."}},{"@type":"Question","name":"¿Qué archivos necesito para encargar una pieza?","acceptedAnswer":{"@type":"Answer","text":"Nos sirven modelos 3D en STL, 3MF o STEP, y también imágenes de referencia. Si solo tienes la idea, no hay problema: diseñamos la pieza desde cero."}},{"@type":"Question","name":"¿Cuánto tarda un pedido?","acceptedAnswer":{"@type":"Answer","text":"Depende del tipo de producto y del grado de personalización. Al pedir presupuesto puedes marcarlo como urgente o flexible, y te confirmamos el plazo antes de empezar a imprimir."}},{"@type":"Question","name":"¿Hacéis envíos?","acceptedAnswer":{"@type":"Answer","text":"Sí. Entregamos en mano en Salamanca o enviamos a cualquier punto de España. El plazo del envío depende de la empresa de transporte."}},{"@type":"Question","name":"¿Qué materiales y colores tenéis?","acceptedAnswer":{"@type":"Answer","text":"Trabajamos con PLA y PETG. El PLA es ideal para piezas decorativas y el PETG para piezas que necesitan más resistencia. Puedes ver todos los colores en materiales."}},{"@type":"Question","name":"¿Imprimís piezas técnicas o de repuesto?","acceptedAnswer":{"@type":"Answer","text":"Sí, imprimimos prototipos y piezas funcionales, normalmente en PETG. No fabricamos piezas homologadas para usos médicos, mecánicos críticos o de seguridad."}}]}</script>
+  <link rel="preload" as="image" href="/img/inicio3.webp" fetchpriority="high">
+  <link rel="preload" href="/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/css/fuentes.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/home.css">
+  <link rel="stylesheet" href="/css/destacado.css">
 </head>
+<body class="s3d-page page-home">
 
-<body>
-
-  <nav class="navbar" id="navbar">
-    <div class="navbar-container">
-      <button class="hamburger-menu" id="hamburgerMenu" aria-label="Abrir menú">
+  <!-- Cabecera común (base.css) -->
+  <header class="site-header" id="navbar">
+    <div class="site-header__inner">
+      <a href="/" class="site-header__logo" aria-label="SILAB 3D, ir al inicio">
+        <img src="/img/logo-silab3d.png" alt="SILAB 3D" width="857" height="282">
+      </a>
+      <nav class="site-nav" aria-label="Principal">
+        <a href="/" class="site-nav__link" aria-current="page">Inicio</a>
+        <a href="/productos/" class="site-nav__link">Productos</a>
+        <a href="/materiales/" class="site-nav__link">Materiales</a>
+        <a href="/valoraciones/" class="site-nav__link">Valoraciones</a>
+        <a href="/#contacto" class="site-nav__link">Contacto</a>
+      </nav>
+      <a href="/configura-tu-proyecto/" class="s3d-btn s3d-btn--primary site-header__cta">Configura tu proyecto</a>
+      <button type="button" class="site-header__toggle" id="hamburgerMenu" aria-label="Abrir menú" aria-controls="mobileMenu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
-
-      <div class="navbar-left">
-        <a href="/configura-tu-proyecto/" class="btn-presupuesto">
-          ✦ Configura tu proyecto
-        </a>
-      </div>
-
-      <div class="navbar-center">
-        <a href="/">
-          <img src="img/SILAB3D_v3_horizontal_negro-compressed.png" alt="SILAB 3D" class="navbar-logo" width="1257" height="361">
-        </a>
-      </div>
-
-      <ul class="nav-links">
-        <li><a href="/" class="active">Inicio</a></li>
-        <li><a href="/productos/">Productos</a></li>
-        <li><a href="/materiales/">Materiales</a></li>
-        <li><a href="/valoraciones/">Valoraciones</a></li>
-      </ul>
     </div>
+  </header>
+  <aside class="site-menu" id="mobileMenu" aria-label="Menú" aria-hidden="true">
+    <nav class="site-menu__nav" aria-label="Principal">
+      <a href="/" class="site-menu__link" aria-current="page"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.6 12 3l9 6.6"/><path d="M5 10.5V20h14v-9.5"/><path d="M9.5 20v-5.5h5V20"/></svg>Inicio</a>
+      <a href="/productos/" class="site-menu__link"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6.5V20a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6.5L18 2z"/><path d="M3 6.5h18"/><path d="M16 10.5a4 4 0 0 1-8 0"/></svg>Productos</a>
+      <a href="/materiales/" class="site-menu__link"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 2.5 7 12 11.5 21.5 7z"/><path d="m2.5 12 9.5 4.5L21.5 12"/><path d="m2.5 17 9.5 4.5L21.5 17"/></svg>Materiales</a>
+      <a href="/valoraciones/" class="site-menu__link"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.75 5.57 6.15.9-4.45 4.34 1.05 6.12L12 17.35 6.5 20.13l1.05-6.12L3.1 9.67l6.15-.9z"/></svg>Valoraciones</a>
+      <a href="/#contacto" class="site-menu__link"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg>Contacto</a>
+    </nav>
+    <a href="/configura-tu-proyecto/" class="s3d-btn s3d-btn--primary site-menu__cta site-menu__link-cta">Configura tu proyecto</a>
+    <div class="site-menu__contact">
+      <a href="https://wa.me/34644070487" target="_blank" rel="noopener"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg>644 07 04 87</a>
+      <a href="mailto:silab3d@gmail.com"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg>silab3d@gmail.com</a>
+    </div>
+  </aside>
+  <div class="site-overlay" id="menuOverlay"></div>
 
-    <aside class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menú de navegación" aria-hidden="true">
-      <nav class="mobile-menu-nav" aria-label="Principal">
-        <a href="/" class="mobile-menu-link active" aria-current="page">
-          <span class="mobile-menu-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M3 9.6 12 3l9 6.6"/><path d="M5 10.5V20h14v-9.5"/><path d="M9.5 20v-5.5h5V20"/></svg>
-          </span>
-          <span class="mobile-menu-label">Inicio</span>
-          <span class="mobile-menu-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
-        </a>
-        <a href="/productos/" class="mobile-menu-link">
-          <span class="mobile-menu-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M6 2 3 6.5V20a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6.5L18 2z"/><path d="M3 6.5h18"/><path d="M16 10.5a4 4 0 0 1-8 0"/></svg>
-          </span>
-          <span class="mobile-menu-label">Productos</span>
-          <span class="mobile-menu-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
-        </a>
-        <a href="/materiales/" class="mobile-menu-link">
-          <span class="mobile-menu-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 2.5 2.5 7 12 11.5 21.5 7z"/><path d="m2.5 12 9.5 4.5L21.5 12"/><path d="m2.5 17 9.5 4.5L21.5 17"/></svg>
-          </span>
-          <span class="mobile-menu-label">Materiales</span>
-          <span class="mobile-menu-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
-        </a>
-        <a href="/valoraciones/" class="mobile-menu-link">
-          <span class="mobile-menu-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 3.2l2.75 5.57 6.15.9-4.45 4.34 1.05 6.12L12 17.35 6.5 20.13l1.05-6.12L3.1 9.67l6.15-.9z"/></svg>
-          </span>
-          <span class="mobile-menu-label">Valoraciones</span>
-          <span class="mobile-menu-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
-        </a>
-        <a href="/configura-tu-proyecto/" class="mobile-menu-link mobile-menu-link--cta">
-          <span class="mobile-menu-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 2l1.7 5.1a3 3 0 0 0 1.9 1.9L20.7 10.7l-5.1 1.7a3 3 0 0 0-1.9 1.9L12 19.4l-1.7-5.1a3 3 0 0 0-1.9-1.9L3.3 10.7l5.1-1.7a3 3 0 0 0 1.9-1.9z"/></svg>
-          </span>
-          <span class="mobile-menu-label">Configura tu proyecto</span>
-          <span class="mobile-menu-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
-        </a>
+  <main id="contenido">
+
+    <!-- ======================= HERO ======================= -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero__grid">
+        <div class="hero__copy">
+          <h1 class="hero__title" id="hero-title">
+            <span class="hero__kicker">Impresión 3D en Salamanca</span>
+            <span class="hero__motto">Innovación <em>capa a capa</em></span>
+          </h1>
+          <p class="hero__lead">
+            Diseñamos e imprimimos en 3D <strong>regalos personalizados, figuras, litofanías y piezas a medida</strong>.
+            Tú pones la idea y nosotros la convertimos en una pieza real, cuidando cada detalle.
+          </p>
+          <div class="hero__actions">
+            <a href="/configura-tu-proyecto/" class="s3d-btn s3d-btn--primary">Configura tu proyecto</a>
+            <a href="/productos/" class="s3d-btn s3d-btn--ghost">Ver productos</a>
+          </div>
+        </div>
+        <figure class="hero__media">
+          <img src="/img/inicio3.webp" alt="Pirámide texturizada impresa en 3D bajo el cartel de neón de SILAB 3D" width="1254" height="1254" fetchpriority="high" decoding="async">
+          <figcaption class="hero__tag">
+            <span class="hero__tag-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+            <span><b>Hecho en Salamanca</b>Diseño e impresión en nuestro taller</span>
+          </figcaption>
+        </figure>
+        <ul class="trust">
+          <li><a href="https://www.google.com/maps?cid=13396822311427547363" target="_blank" rel="noopener"><span class="stars" aria-hidden="true">★★★★★</span> <b>5,0</b> en Google</a></li>
+          <li><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>Tu presupuesto en menos de 24 h</li>
+          <li><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.2 2.4 2.4 4.8-5"/></svg>Gratis y sin compromiso</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ======================= PRODUCTOS ======================= -->
+    <section class="section products" id="productos" aria-labelledby="productos-title">
+      <div class="wrap">
+        <header class="section-head">
+          <span class="eyebrow">Catálogo</span>
+          <h2 id="productos-title">Productos personalizados impresos en 3D</h2>
+          <p>Llaveros, jarrones, figuras, litofanías y trofeos. Todos se pueden adaptar a tu gusto, y si no encuentras lo que buscas, <strong>lo diseñamos a medida</strong>.</p>
+        </header>
+        <div class="product-grid">
+          <a href="/productos/#productos" data-filter="llaveros" class="card product-card">
+            <img src="/img/catalogo/llaveros.webp" alt="Dos llaveros con forma de pieza de puzle y una inicial grabada" width="720" height="540" loading="lazy" decoding="async">
+            <h3>Llaveros</h3>
+            <p>Personalizables con tus diseños favoritos</p>
+            <span class="more">Ver llaveros<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+          </a>
+          <a href="/productos/#productos" data-filter="decoracion" class="card product-card">
+            <img src="/img/catalogo/decoracion.webp" alt="Jarrón morado ondulado impreso en 3D con margaritas" width="720" height="540" loading="lazy" decoding="async">
+            <h3>Decoración</h3>
+            <p>Jarrones, marcapáginas, skylines y más</p>
+            <span class="more">Ver decoración<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+          </a>
+          <a href="/productos/#productos" data-filter="figuras" class="card product-card">
+            <img src="/img/catalogo/figuras.webp" alt="Figura verde de personaje impresa en 3D sobre una peana" width="720" height="540" loading="lazy" decoding="async">
+            <h3>Figuras</h3>
+            <p>Esculturas y figuras decorativas únicas</p>
+            <span class="more">Ver figuras<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+          </a>
+          <a href="/productos/#productos" data-filter="ilustracion" class="card product-card">
+            <img src="/img/catalogo/ilustraciones.webp" alt="Lámpara litofanía en forma de cubo con fotos de un gato y un perro" width="720" height="540" loading="lazy" decoding="async">
+            <h3>Ilustraciones</h3>
+            <p>Litofanías luminosas y cuadros geométricos</p>
+            <span class="more">Ver ilustraciones<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+          </a>
+          <a href="/productos/#productos" data-filter="eventos" class="card product-card">
+            <img src="/img/catalogo/eventos.webp" alt="Copa y medalla de primer puesto impresas en 3D en color bronce" width="720" height="540" loading="lazy" decoding="async">
+            <h3>Eventos</h3>
+            <p>Trofeos, nombres personalizados y tartas</p>
+            <span class="more">Ver eventos<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+          </a>
+          <a href="/productos/#productos" data-filter="medida" class="card product-card">
+            <img src="/img/catalogo/medida.webp" alt="Escuadra de soporte negra impresa en 3D con sus cotas en milímetros" width="720" height="540" loading="lazy" decoding="async">
+            <h3>Diseños a medida</h3>
+            <p>Creamos lo que imaginas, adaptado a ti</p>
+            <span class="more">Ver diseños a medida<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+          </a>
+        </div>
+        <div class="products__foot">
+          <a href="/productos/" class="s3d-btn s3d-btn--ghost">Ver todo el catálogo</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= PROCESO ======================= -->
+    <section class="section process" id="proceso" aria-labelledby="proceso-title">
+      <div class="wrap">
+        <header class="section-head">
+          <span class="eyebrow">Proceso</span>
+          <h2 id="proceso-title">Haz tus proyectos realidad</h2>
+          <p>Tráenos tu proyecto y nosotros nos encargamos del resto. Estos son los <strong>4 pasos</strong> que damos contigo desde la idea hasta tenerlo en tus manos.</p>
+        </header>
+        <ol class="process-grid">
+          <li class="card process-step">
+            <span class="step-no">Paso 1</span>
+            <span class="step-art">
+              <svg viewBox="0 0 80 80" aria-hidden="true">
+                <g fill="none" stroke="#BC556D" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4">
+                  <path d="M40 8 C52 22 56 36 54 50 L26 50 C24 36 28 22 40 8 Z"/>
+                  <path d="M26 38 L14 60 L26 54"/>
+                  <path d="M54 38 L66 60 L54 54"/>
+                  <path d="M31 50 L34 64 L46 64 L49 50"/>
+                  <circle cx="40" cy="29" r="7"/>
+                </g>
+              </svg>
+            </span>
+            <h3>Envíanos tu proyecto</h3>
+            <p>En formato .stl, .3mf o similares. Y si solo tienes la idea, no te preocupes: haremos el diseño de 0.</p>
+          </li>
+          <li class="card process-step">
+            <span class="step-no">Paso 2</span>
+            <span class="step-art">
+              <svg viewBox="0 0 80 80" aria-hidden="true">
+                <rect x="16" y="10" width="42" height="54" rx="6" fill="#FFFFFF" stroke="#BC556D" stroke-width="2.4"/>
+                <g stroke="#BC556D" stroke-width="2.4" stroke-linecap="round" opacity="0.55">
+                  <line x1="24" y1="23" x2="50" y2="23"/>
+                  <line x1="24" y1="32" x2="50" y2="32"/>
+                  <line x1="24" y1="41" x2="42" y2="41"/>
+                </g>
+                <circle cx="55" cy="55" r="14" fill="#BC556D"/>
+                <text x="55" y="61" text-anchor="middle" font-family="Outfit, sans-serif" font-size="17" font-weight="800" fill="#FFFFFF">&#8364;</text>
+              </svg>
+            </span>
+            <h3>Elaboramos un presupuesto</h3>
+            <p>De forma rápida y sencilla. Configuraremos el trabajo cuidando cada detalle.</p>
+          </li>
+          <li class="card process-step">
+            <span class="step-no">Paso 3</span>
+            <span class="step-art">
+              <svg viewBox="0 0 80 80" aria-hidden="true">
+                <g stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+                  <path d="M26 38 L14 60 L26 54 Z" fill="#9C4359"/>
+                  <path d="M54 38 L66 60 L54 54 Z" fill="#9C4359"/>
+                  <path d="M31 50 L34 64 L46 64 L49 50 Z" fill="#8E3B50"/>
+                  <path d="M40 8 C52 22 56 36 54 50 L26 50 C24 36 28 22 40 8 Z" fill="#E58BA0"/>
+                  <path d="M40 8 C52 22 56 36 54 50 L40 50 Z" fill="#BC556D" stroke="none"/>
+                  <path d="M40 8 C52 22 56 36 54 50 L26 50 C24 36 28 22 40 8 Z" fill="none"/>
+                  <circle cx="40" cy="29" r="7" fill="#FFFFFF"/>
+                </g>
+              </svg>
+            </span>
+            <h3>Iniciamos la producción</h3>
+            <p>Con los materiales seleccionados para tu proyecto, en nuestro taller y con control de cada capa.</p>
+          </li>
+          <li class="card process-step">
+            <span class="step-no">Paso 4</span>
+            <span class="step-art">
+              <svg viewBox="0 0 80 80" aria-hidden="true">
+                <path d="M14 28 L40 16 L66 28 L40 40 Z" fill="#E58BA0" stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round"/>
+                <path d="M14 28 L40 40 L40 68 L14 56 Z" fill="#BC556D" stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round"/>
+                <path d="M66 28 L40 40 L40 68 L66 56 Z" fill="#9C4359" stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round"/>
+                <path d="M27 22 L53 34" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+              </svg>
+            </span>
+            <h3>Entregamos en el plazo acordado</h3>
+            <p>En nuestro punto de entrega local o mediante envío, donde tú nos digas.</p>
+          </li>
+        </ol>
+        <div class="process__cta">
+          <a href="/configura-tu-proyecto/" class="s3d-btn s3d-btn--primary">Configura tu proyecto</a>
+          <p>Tu presupuesto en menos de 24 h, gratis y sin compromiso. Solo te llevará 1 minuto.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= MATERIALES ======================= -->
+    <section class="section materials" id="materiales" aria-labelledby="materiales-title">
+      <div class="wrap">
+        <header class="section-head">
+          <span class="eyebrow">Filamentos</span>
+          <h2 id="materiales-title">Materiales y colores</h2>
+          <p>Elegimos el material según el uso de tu pieza. Así se comparan los dos que usamos en el taller.</p>
+        </header>
+        <div class="material-grid">
+          <article class="card material-card material-card--pla">
+            <span class="mat-code">Ácido poliláctico</span>
+            <h3 class="mat-nombre">PLA</h3>
+            <p class="mat-lema">Tu aliado creativo</p>
+            <p>Preciso, de origen vegetal y con la mayor variedad de colores y acabados.</p>
+            <ul class="mat-usos" aria-label="Ideal para"><li>Figuras</li><li>Jarrones</li><li>Llaveros</li><li>Decoración</li></ul>
+            <div class="mat-specs"><div class="mat-spec"><span>Precisión</span><span class="mat-spec__barra" role="img" aria-label="4 de 5"><i style="--v:80%"></i></span><b>4/5</b></div><div class="mat-spec"><span>Resistencia</span><span class="mat-spec__barra" role="img" aria-label="3 de 5"><i style="--v:60%"></i></span><b>3/5</b></div><div class="mat-spec"><span>Durabilidad</span><span class="mat-spec__barra" role="img" aria-label="2 de 5"><i style="--v:40%"></i></span><b>2/5</b></div></div>
+            <a class="mat-colores" href="/materiales/#pla"><span data-colores="pla">Ver colores disponibles</span><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </article>
+          <article class="card material-card material-card--petg">
+            <span class="mat-code">Tereftalato de polietileno glicol</span>
+            <h3 class="mat-nombre">PETG</h3>
+            <p class="mat-lema">Potencia y durabilidad</p>
+            <p>Aguanta golpes, calor, humedad y uso diario sin deformarse.</p>
+            <ul class="mat-usos" aria-label="Ideal para"><li>Funcionales</li><li>Soportes</li><li>Carcasas</li><li>Exterior</li></ul>
+            <div class="mat-specs"><div class="mat-spec"><span>Precisión</span><span class="mat-spec__barra" role="img" aria-label="3 de 5"><i style="--v:60%"></i></span><b>3/5</b></div><div class="mat-spec"><span>Resistencia</span><span class="mat-spec__barra" role="img" aria-label="4 de 5"><i style="--v:80%"></i></span><b>4/5</b></div><div class="mat-spec"><span>Durabilidad</span><span class="mat-spec__barra" role="img" aria-label="4 de 5"><i style="--v:80%"></i></span><b>4/5</b></div></div>
+            <a class="mat-colores" href="/materiales/#petg"><span data-colores="petg">Ver colores disponibles</span><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </article>
+        </div>
+        <div class="materials__foot">
+          <a href="/materiales/#elegir" class="s3d-btn s3d-btn--ghost">¿Qué material elijo?</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= OPINIONES ======================= -->
+    <section class="section reviews" id="opiniones" aria-labelledby="opiniones-title">
+      <div class="wrap">
+        <header class="section-head">
+          <span class="eyebrow">Opiniones</span>
+          <h2 id="opiniones-title">Lo que dicen nuestros clientes</h2>
+          <p>Cada pieza pasa por nuestras manos antes de llegar a las tuyas. Esto es lo que opinan quienes ya han confiado en nosotros.</p>
+        </header>
+        <!-- Carrusel con las fotos de pedidos subidas en el panel › Galería (js/carrusel.js); oculto si no hay fotos -->
+        <div class="carrusel" data-carrusel hidden>
+          <div class="carrusel__pista" tabindex="0" aria-label="Pedidos recientes"></div>
+          <button type="button" class="carrusel__btn carrusel__btn--ant" aria-label="Fotos anteriores"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
+          <button type="button" class="carrusel__btn carrusel__btn--sig" aria-label="Más fotos"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+        </div>
+        <div class="reviews__lista" id="reviewsWidget" data-resenas data-destacadas="6">
+          <a class="resenas__nota" href="https://www.google.com/maps?cid=13396822311427547363" target="_blank" rel="noopener"><span class="resenas__cifra">5,0</span><span class="resenas__pie"><span class="resena__estrellas" aria-hidden="true">★★★★★</span><span>Opiniones en Google</span></span></a>
+        </div>
+        <div class="reviews__foot">
+          <a href="/valoraciones/" class="s3d-btn s3d-btn--ghost">Ver trabajos</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= PREGUNTAS FRECUENTES ======================= -->
+    <section class="section faq" id="preguntas" aria-labelledby="faq-title">
+      <div class="wrap">
+        <header class="section-head">
+          <span class="eyebrow">Preguntas frecuentes</span>
+          <h2 id="faq-title">Resolvemos tus dudas</h2>
+        </header>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>¿Cuánto cuesta imprimir una pieza en 3D?<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+            <p class="answer">Depende del tamaño, el material, el acabado y las unidades. Por eso cada presupuesto es a medida, gratuito y sin compromiso: cuéntanos tu idea en el <a href="/configura-tu-proyecto/">configurador</a> y tendrás tu presupuesto en menos de 24 h.</p>
+          </details>
+          <details class="faq-item">
+            <summary>¿Qué archivos necesito para encargar una pieza?<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+            <p class="answer">Nos sirven modelos 3D en STL, 3MF o STEP, y también imágenes de referencia. Si solo tienes la idea, no hay problema: diseñamos la pieza desde cero.</p>
+          </details>
+          <details class="faq-item">
+            <summary>¿Cuánto tarda un pedido?<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+            <p class="answer">Depende del tipo de producto y del grado de personalización. Al pedir presupuesto puedes marcarlo como urgente o flexible, y te confirmamos el plazo antes de empezar a imprimir.</p>
+          </details>
+          <details class="faq-item">
+            <summary>¿Hacéis envíos?<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+            <p class="answer">Sí. Entregamos en mano en Salamanca o enviamos a cualquier punto de España. El plazo del envío depende de la empresa de transporte.</p>
+          </details>
+          <details class="faq-item">
+            <summary>¿Qué materiales y colores tenéis?<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+            <p class="answer">Trabajamos con PLA y PETG. El PLA es ideal para piezas decorativas y el PETG para piezas que necesitan más resistencia. Puedes ver todos los colores en <a href="/materiales/">materiales</a>.</p>
+          </details>
+          <details class="faq-item">
+            <summary>¿Imprimís piezas técnicas o de repuesto?<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+            <p class="answer">Sí, imprimimos prototipos y piezas funcionales, normalmente en PETG. No fabricamos piezas homologadas para usos médicos, mecánicos críticos o de seguridad.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= CONTACTO ======================= -->
+    <section class="section contact" id="contacto" aria-labelledby="contacto-title">
+      <div class="wrap">
+        <header class="section-head">
+          <span class="eyebrow">Contacto</span>
+          <h2 id="contacto-title">Tu proyecto empieza con un hola</h2>
+          <p>Escríbenos por el canal que prefieras y tendrás tu presupuesto en menos de 24 h.</p>
+        </header>
+        <div class="contact-grid">
+          <a href="https://api.whatsapp.com/send/?phone=34644070487&amp;text=%C2%A1Hola%21+Me+gustar%C3%ADa+solicitar+un+presupuesto+de+impresi%C3%B3n.&amp;type=phone_number&amp;app_absent=0" class="card contact-card" target="_blank" rel="noopener">
+            <span class="icon-box"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg></span>
+            <h3>WhatsApp</h3>
+            <p>+34 644 07 04 87</p>
+          </a>
+          <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=silab3d@gmail.com&amp;su=Presupuesto%20de%20impresi%C3%B3n&amp;body=%C2%A1Hola!%20Me%20gustar%C3%ADa%20solicitar%20presupuesto%20para%20el%20siguiente%20proyecto%3A" class="card contact-card" target="_blank" rel="noopener">
+            <span class="icon-box"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg></span>
+            <h3>Email</h3>
+            <p>silab3d@gmail.com</p>
+          </a>
+          <a href="https://ig.me/m/silab3d" class="card contact-card" target="_blank" rel="noopener">
+            <span class="icon-box"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></span>
+            <h3>Instagram</h3>
+            <p>@silab3d</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- Pie común (base.css) -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div class="site-footer__brand">
+        <img src="/img/logo-silab3d.png" alt="SILAB 3D" width="857" height="282" loading="lazy">
+        <p class="site-footer__motto">Innovación <em>capa a capa</em></p>
+        <p>Estudio de impresión 3D en Salamanca. Regalos personalizados, figuras, litofanías y piezas a medida.</p>
+      </div>
+      <div>
+        <p class="site-footer__title">Explora</p>
+        <ul class="site-footer__list">
+          <li><a href="/productos/">Productos</a></li>
+          <li><a href="/materiales/">Materiales</a></li>
+          <li><a href="/valoraciones/">Valoraciones</a></li>
+          <li><a href="/configura-tu-proyecto/">Configura tu proyecto</a></li>
+          <li><a href="/pedidos/">Seguimiento de pedidos</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="site-footer__title">Contacto</p>
+        <ul class="site-footer__list">
+          <li><a href="https://wa.me/34644070487" target="_blank" rel="noopener"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg>+34 644 07 04 87</a></li>
+          <li><a href="mailto:silab3d@gmail.com"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg>silab3d@gmail.com</a></li>
+          <li><a href="https://www.instagram.com/silab3d/" target="_blank" rel="noopener"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg>@silab3d</a></li>
+          <li><a href="https://www.google.com/maps?cid=13396822311427547363" target="_blank" rel="noopener"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Salamanca · recogida o envío</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="site-footer__title">Horario</p>
+        <dl class="site-footer__hours">
+          <dt>Lun – Vie</dt><dd>9:00 – 21:00</dd>
+          <dt>Sábado</dt><dd>10:00 – 20:00</dd>
+          <dt>Domingo</dt><dd>Cerrado</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="site-footer__bottom">
+      <span>© 2026 SILAB 3D · Impresión 3D en Salamanca</span>
+      <nav class="site-footer__legal" aria-label="Legal">
+        <a href="/terminos/">Términos y condiciones</a>
+        <a href="/privacidad/">Privacidad</a>
+        <a href="/aviso-legal/">Aviso legal</a>
       </nav>
-    </aside>
-  </nav>
-
-  <div class="menu-overlay" id="menuOverlay"></div>
-
-  <section class="hero-main">
-    <div class="hero-main-container">
-      <div class="hero-main-image">
-        <div class="hero-img-wrap">
-          <div class="ring"></div>
-          <div class="ring"></div>
-          <div class="ring"></div>
-          <div class="ring-spin"></div>
-          <img src="img/inicio3.webp" alt="SILAB 3D Impresión 3D" class="hero-image-circular" width="370" height="370">
-        </div>
-      </div>
-
-      <div class="hero-main-content">
-        <div class="hero-badge">
-          <span class="badge-dot"></span>
-          Impresión 3D · Salamanca
-        </div>
-        <h1 class="hero-main-title">
-          Innovación
-          <span class="accent">capa a capa</span>
-        </h1>
-        <p class="hero-main-text">
-          Damos vida a tus ideas con <strong>impresión 3D de alta calidad</strong>. Ya sea para prototipos,
-          <strong>piezas personalizadas</strong> o proyectos creativos, ofrecemos soluciones
-          <strong>rápidas, precisas y a tu medida</strong>.
-        </p>
-        <a href="#productos" class="btn-primary">
-          Descubre nuestros servicios
-          <em class="btn-arrow">→</em>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <section id="productos" class="productos-section">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-label">✦ Catálogo</span>
-        <h2 class="section-title">Nuestros Productos</h2>
-        <p class="section-desc">
-          Descubre nuestra colección de <strong>productos impresos en 3D</strong>: llaveros personalizables,
-          jarrones modernos, figuras únicas, litofanías luminosas y <strong>diseños a medida</strong>.
-          Creatividad, utilidad y personalización en cada detalle.
-        </p>
-      </div>
-
-      <div class="productos-grid">
-        <a href="/productos/#productos" onclick="sessionStorage.setItem('filterCategory', 'llaveros');" class="producto-card reveal reveal-delay-1">
-          <div class="producto-img-box">
-            <img src="img/Llaveros.png" alt="Llaveros" width="46" height="46">
-          </div>
-          <h3>Llaveros</h3>
-          <p>Personalizables con tus diseños favoritos</p>
-        </a>
-
-        <a href="/productos/#productos" onclick="sessionStorage.setItem('filterCategory', 'decoracion');" class="producto-card reveal reveal-delay-2">
-          <div class="producto-img-box">
-            <img src="img/Jarrones.png" alt="Decoración" width="46" height="46">
-          </div>
-          <h3>Decoración</h3>
-          <p>Jarrones, marcapáginas, skylines y más</p>
-        </a>
-
-        <a href="/productos/#productos" onclick="sessionStorage.setItem('filterCategory', 'figuras');" class="producto-card reveal reveal-delay-3">
-          <div class="producto-img-box">
-            <img src="img/Figuras.png" alt="Figuras" width="46" height="46">
-          </div>
-          <h3>Figuras</h3>
-          <p>Esculturas y figuras decorativas únicas</p>
-        </a>
-
-        <a href="/productos/#productos" onclick="sessionStorage.setItem('filterCategory', 'ilustracion');" class="producto-card reveal reveal-delay-4">
-          <div class="producto-img-box">
-            <img src="img/Ilustraciones.png" alt="Ilustraciones" width="46" height="46">
-          </div>
-          <h3>Ilustraciones</h3>
-          <p>Litofanías luminosas y cuadros geométricos</p>
-        </a>
-
-        <a href="/productos/#productos" onclick="sessionStorage.setItem('filterCategory', 'eventos');" class="producto-card reveal reveal-delay-5">
-          <div class="producto-img-box">
-            <img src="img/trophy_flat.svg" alt="Eventos" width="46" height="46">
-          </div>
-          <h3>Eventos</h3>
-          <p>Trofeos, nombres personalizados y tartas</p>
-        </a>
-
-        <a href="/productos/#productos" onclick="sessionStorage.setItem('filterCategory', 'medida');" class="producto-card reveal reveal-delay-6">
-          <div class="producto-img-box">
-            <img src="img/Diseños a medida_emoji.png" alt="Diseños a medida" width="46" height="46">
-          </div>
-          <h3>Diseños a medida</h3>
-          <p>Creamos lo que imaginas, adaptado a ti</p>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <section class="materiales-preview">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-label">Filamentos</span>
-        <h2 class="section-title">Materiales</h2>
-        <p class="section-desc">
-          Explora nuestra colección de <strong>filamentos 3D</strong>, disponibles en una
-          <strong>amplia variedad de materiales y colores</strong>. Perfectos para cualquier proyecto.
-          Encuentra la <strong>combinación ideal</strong> para tus impresiones.
-        </p>
-      </div>
-
-      <div class="materiales-preview-grid">
-        <a href="/materiales/#pla" class="material-preview-card reveal reveal-delay-1">
-          <span class="mat-label">Material</span>
-          <h3>PLA</h3>
-          <p>Elige versatilidad</p>
-          <span class="link-arrow">Descubrir materiales →</span>
-        </a>
-        <a href="/materiales/#petg" class="material-preview-card reveal reveal-delay-2">
-          <span class="mat-label">Material</span>
-          <h3>PETG</h3>
-          <p>Elige resistencia</p>
-          <span class="link-arrow">Descubrir materiales →</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================================
-       PROCESO - HAZ TUS PROYECTOS REALIDAD
-  ====================================================== -->
-  <section id="proceso" class="proceso-section">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-label">Proceso</span>
-        <h2 class="section-title">Haz tus proyectos realidad</h2>
-        <p class="section-desc">
-          Tr&aacute;enos tu proyecto y nosotros nos encargamos del resto.
-          Estos son los <strong>4 pasos</strong> que damos contigo desde la idea hasta tenerlo en tus manos.
-        </p>
-      </div>
-
-      <div class="proceso-grid">
-
-        <!-- Paso 1: figura solo con contornos pespunteados -->
-        <div class="proceso-step reveal reveal-delay-1">
-          <div class="proceso-img-box">
-            <svg viewBox="0 0 80 80" role="img" aria-label="Boceto de una figura dibujada solo con contornos pespunteados">
-              <g fill="none" stroke="#BC556D" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4">
-                <path d="M40 8 C52 22 56 36 54 50 L26 50 C24 36 28 22 40 8 Z"/>
-                <path d="M26 38 L14 60 L26 54"/>
-                <path d="M54 38 L66 60 L54 54"/>
-                <path d="M31 50 L34 64 L46 64 L49 50"/>
-                <circle cx="40" cy="29" r="7"/>
-              </g>
-            </svg>
-          </div>
-          <h3>Env&iacute;anos tu proyecto</h3>
-          <p>En formato .stl, .3mf o similares. Y si solo tienes la idea, no te preocupes: haremos el dise&ntilde;o de 0.</p>
-        </div>
-
-        <!-- Paso 2: presupuesto -->
-        <div class="proceso-step reveal reveal-delay-2">
-          <div class="proceso-img-box">
-            <svg viewBox="0 0 80 80" role="img" aria-label="Documento de presupuesto">
-              <rect x="16" y="10" width="42" height="54" rx="6" fill="#FFFFFF" stroke="#BC556D" stroke-width="2.4"/>
-              <g stroke="#BC556D" stroke-width="2.4" stroke-linecap="round" opacity="0.55">
-                <line x1="24" y1="23" x2="50" y2="23"/>
-                <line x1="24" y1="32" x2="50" y2="32"/>
-                <line x1="24" y1="41" x2="42" y2="41"/>
-              </g>
-              <circle cx="55" cy="55" r="14" fill="#BC556D"/>
-              <text x="55" y="61" text-anchor="middle" font-family="Outfit, sans-serif" font-size="17" font-weight="800" fill="#FFFFFF">&#8364;</text>
-            </svg>
-          </div>
-          <h3>Elaboramos un presupuesto</h3>
-          <p>De forma r&aacute;pida y sencilla. Configuraremos el trabajo cuidando cada detalle.</p>
-        </div>
-
-        <!-- Paso 3: la misma figura del paso 1, ya rellena -->
-        <div class="proceso-step reveal reveal-delay-3">
-          <div class="proceso-img-box">
-            <svg viewBox="0 0 80 80" role="img" aria-label="La misma figura del paso 1, ya impresa y rellena">
-              <g stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
-                <path d="M26 38 L14 60 L26 54 Z" fill="#9C4359"/>
-                <path d="M54 38 L66 60 L54 54 Z" fill="#9C4359"/>
-                <path d="M31 50 L34 64 L46 64 L49 50 Z" fill="#8E3B50"/>
-                <path d="M40 8 C52 22 56 36 54 50 L26 50 C24 36 28 22 40 8 Z" fill="#E58BA0"/>
-                <path d="M40 8 C52 22 56 36 54 50 L40 50 Z" fill="#BC556D" stroke="none"/>
-                <path d="M40 8 C52 22 56 36 54 50 L26 50 C24 36 28 22 40 8 Z" fill="none"/>
-                <circle cx="40" cy="29" r="7" fill="#FFFFFF"/>
-              </g>
-            </svg>
-          </div>
-          <h3>Iniciamos la producci&oacute;n</h3>
-          <p>Con los materiales seleccionados para tu proyecto, en nuestro taller y con control de cada capa.</p>
-        </div>
-
-        <!-- Paso 4: entrega -->
-        <div class="proceso-step reveal reveal-delay-4">
-          <div class="proceso-img-box">
-            <svg viewBox="0 0 80 80" role="img" aria-label="Paquete listo para entrega o env&iacute;o">
-              <path d="M14 28 L40 16 L66 28 L40 40 Z" fill="#E58BA0" stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round"/>
-              <path d="M14 28 L40 40 L40 68 L14 56 Z" fill="#BC556D" stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round"/>
-              <path d="M66 28 L40 40 L40 68 L66 56 Z" fill="#9C4359" stroke="#8E3B50" stroke-width="2.2" stroke-linejoin="round"/>
-              <path d="M27 22 L53 34" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
-            </svg>
-          </div>
-          <h3>Entregamos en el plazo acordado</h3>
-          <p>En nuestro punto de entrega local o mediante env&iacute;o, donde t&uacute; nos digas.</p>
-        </div>
-
-      </div>
-
-      <div class="proceso-cta reveal">
-        <a href="/configura-tu-proyecto/" class="proceso-cta-btn">
-          Configura tu proyecto
-        </a>
-        <p class="proceso-cta-sub">Gratuito, sin compromiso y con respuesta en menos de 24 h. Solo te llevar&aacute; 1 minuto.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="contacto-section">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-label">Contacto</span>
-        <h2 class="section-title">Tu proyecto empieza con un hola 👋</h2>
-        <p class="section-desc">
-          Contacta con nosotros mediante las siguientes <strong>alternativas interactivas</strong>.
-        </p>
-      </div>
-
-      <div class="contacto-grid">
-        <a href="https://api.whatsapp.com/send/?phone=34644070487&text=%C2%A1Hola%21+Me+gustar%C3%ADa+solicitar+un+presupuesto+de+impresi%C3%B3n.&type=phone_number&app_absent=0" class="contacto-card reveal reveal-delay-1" target="_blank" rel="noopener noreferrer">
-          <div class="contacto-icon-box">
-            <img src="img/WhatsApp.png" alt="WhatsApp" width="42" height="42">
-          </div>
-          <h3>WhatsApp</h3>
-          <p>+34 644 07 04 87</p>
-        </a>
-
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=silab3d@gmail.com&su=Presupuesto%20de%20impresi%C3%B3n&body=%C2%A1Hola!%20Me%20gustar%C3%ADa%20solicitar%20presupuesto%20para%20el%20siguiente%20proyecto%3A" class="contacto-card reveal reveal-delay-2" target="_blank" rel="noopener noreferrer">
-          <div class="contacto-icon-box">
-            <img src="img/Email.png" alt="Email" width="42" height="42">
-          </div>
-          <h3>Email</h3>
-          <p>silab3d@gmail.com</p>
-        </a>
-
-        <a href="https://ig.me/m/silab3d" class="contacto-card reveal reveal-delay-3" target="_blank" rel="noopener noreferrer">
-          <div class="contacto-icon-box">
-            <img src="img/Instagram.png" alt="Instagram" width="42" height="42">
-          </div>
-          <h3>Instagram</h3>
-          <p>@silab3d</p>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2026 SILAB 3D. Todos los derechos reservados.</p>
-      <p>📧 silab3d@gmail.com &nbsp;&nbsp;|&nbsp;&nbsp; 📱 +34 644 07 04 87</p>
-      <p>
-        <a href="/terminos/">Términos y Condiciones</a>
-        <span class="sep">|</span>
-        <a href="/privacidad/">Política de Privacidad</a>
-        <span class="sep">|</span>
-        <a href="/aviso-legal/">Aviso Legal</a>
-      </p>
     </div>
   </footer>
 
-  <div id="quoteFormModal" class="quote-modal">
-    <div class="quote-modal-content">
-      <button class="quote-modal-close" aria-label="Cerrar">&times;</button>
-      <h2>Solicita tu presupuesto</h2>
-      <form id="quoteForm">
-        <div class="form-group">
-          <label for="customerName">Nombre *</label>
-          <input type="text" id="customerName" name="customerName" required placeholder="Tu nombre completo">
-        </div>
-        <div class="form-group">
-          <label for="customerContact">Teléfono / Email de contacto *</label>
-          <input type="text" id="customerContact" name="customerContact" required placeholder="Teléfono o email">
-        </div>
-        <div class="form-group">
-          <label for="projectName">Nombre del proyecto *</label>
-          <input type="text" id="projectName" name="projectName" required placeholder="Ej: Prototipo de pieza mecánica">
-        </div>
-        <div class="form-group">
-          <label for="projectDescription">Descripción del proyecto *</label>
-          <textarea id="projectDescription" name="projectDescription" required placeholder="Describe tu proyecto en detalle..." rows="5"></textarea>
-        </div>
-        <p class="form-note">
-          Incluye las medidas estimadas del modelo, así como toda la información que pueda ser necesaria
-          para llevarlo a cabo. En caso de disponer de un proyecto, inclúyelo en el siguiente paso.
-        </p>
-        <button type="submit" class="cta-button">Siguiente →</button>
-      </form>
-    </div>
-  </div>
 
-  <div id="quoteContactModal" class="quote-modal">
-    <div class="quote-modal-content">
-      <button class="quote-contact-modal-close" aria-label="Cerrar">&times;</button>
-      <h2>Elige cómo contactarnos</h2>
-      <div class="contact-options-grid">
-        <a id="quoteModalWhatsApp" href="#" target="_blank" class="contact-option-card">
-          <div class="contact-option-icon">📱</div>
-          <h3>WhatsApp</h3>
-          <p>Respuesta inmediata</p>
-        </a>
-        <a id="quoteModalEmail" href="#" target="_blank" class="contact-option-card">
-          <div class="contact-option-icon">📧</div>
-          <h3>Email</h3>
-          <p>Comunicación formal</p>
-        </a>
-      </div>
-    </div>
-  </div>
+  <a class="wa-fab" href="https://wa.me/34644070487?text=%C2%A1Hola!%20Me%20gustar%C3%ADa%20pedir%20un%20presupuesto." target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg></a>
 
-  <div id="termsPopup" class="terms-popup">
-    <div class="terms-popup-content">
-      <p>
-        Al navegar en esta web, aceptas los
-        <a href="/terminos/" target="_blank" style="color:var(--primary);font-weight:700;text-decoration:underline;">
-          Términos y Condiciones
-        </a>
-        de la misma.
-      </p>
-      <div class="terms-popup-buttons">
-        <button id="acceptTerms" class="terms-btn terms-btn-accept">Aceptar</button>
-        <button id="rejectTerms" class="terms-btn terms-btn-reject">Rechazar</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 20);
-    }, { passive: true });
-
-    const hamburger  = document.getElementById('hamburgerMenu');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const overlay    = document.getElementById('menuOverlay');
-
-    function openMenu() {
-      mobileMenu.classList.add('open');
-      hamburger.classList.add('open');
-      overlay.classList.add('show');
-      hamburger.setAttribute('aria-expanded', 'true');
-      mobileMenu.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeMenu() {
-      mobileMenu.classList.remove('open');
-      hamburger.classList.remove('open');
-      overlay.classList.remove('show');
-      hamburger.setAttribute('aria-expanded', 'false');
-      mobileMenu.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-    hamburger.setAttribute('aria-expanded', 'false');
-    hamburger.addEventListener('click', () =>
-      mobileMenu.classList.contains('open') ? closeMenu() : openMenu()
-    );
-    overlay.addEventListener('click', closeMenu);
-    mobileMenu.querySelectorAll('.mobile-menu-link')
-      .forEach(link => link.addEventListener('click', closeMenu));
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) closeMenu();
-    });
-
-    const revealEls = document.querySelectorAll('.reveal');
-    const revealObs = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.1 });
-    revealEls.forEach(el => revealObs.observe(el));
-
-    const termsPopup = document.getElementById('termsPopup');
-    if (!localStorage.getItem('silab_terms_accepted')) {
-      setTimeout(() => termsPopup.classList.add('show'), 1800);
-    }
-    document.getElementById('acceptTerms').addEventListener('click', () => {
-      localStorage.setItem('silab_terms_accepted', '1');
-      termsPopup.classList.remove('show');
-    });
-    document.getElementById('rejectTerms').addEventListener('click', () => {
-      termsPopup.classList.remove('show');
-    });
-
-    function openModal(id) {
-      const m = document.getElementById(id);
-      if (m) { m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-    }
-    function closeModal(id) {
-      const m = document.getElementById(id);
-      if (m) { m.style.display = 'none'; document.body.style.overflow = ''; }
-    }
-
-    document.querySelector('.quote-modal-close')
-      ?.addEventListener('click', () => closeModal('quoteFormModal'));
-    document.querySelector('.quote-contact-modal-close')
-      ?.addEventListener('click', () => closeModal('quoteContactModal'));
-
-    document.querySelectorAll('.quote-modal').forEach(modal => {
-      modal.addEventListener('click', e => {
-        if (e.target === modal) {
-          modal.style.display = 'none';
-          document.body.style.overflow = '';
-        }
-      });
-    });
-
-    window.openModal = openModal;
-    window.closeModal = closeModal;
-  </script>
-
-  <!-- Budget Calculator Logic -->
-  <script>
-    (function () {
-      const MARGIN = 0.30; // +30% high estimate
-
-      function getActive(groupId, attr) {
-        const btn = document.querySelector('#' + groupId + ' .calc-opt.active');
-        return btn ? parseFloat(btn.getAttribute(attr)) : 1;
-      }
-
-      function formatEUR(val) {
-        return val.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-      }
-
-      function updatePrice() {
-        const base  = getActive('calcProduct',  'data-base');
-        const mult  = getActive('calcMaterial', 'data-mult');
-        const size  = getActive('calcSize',     'data-size');
-        const qtyEl = document.getElementById('calcQtyVal');
-        const qty   = qtyEl ? (parseInt(qtyEl.textContent) || 1) : 1;
-
-        // Bulk discount: 5% per extra unit, capped at 25%
-        const discount = Math.min((qty - 1) * 0.05, 0.25);
-        const unit = base * mult * size * (1 - discount);
-        const low  = unit * qty;
-        const high = low * (1 + MARGIN);
-
-        const el = document.getElementById('calcPrice');
-        if (!el) return;
-        el.innerHTML = formatEUR(low) + '<span>– ' + formatEUR(high) + '</span>';
-
-        // Pulse animation
-        el.style.transform = 'scale(1.06)';
-        el.style.color = '#e899ae';
-        setTimeout(() => {
-          el.style.transform = 'scale(1)';
-          el.style.color = '#fff';
-        }, 280);
-      }
-
-      // Single-select chips per group
-      ['calcProduct', 'calcMaterial', 'calcSize'].forEach(function (groupId) {
-        const groupEl = document.getElementById(groupId);
-        if (!groupEl) return;
-
-        groupEl.addEventListener('click', function (e) {
-          const btn = e.target.closest('.calc-opt');
-          if (!btn) return;
-          this.querySelectorAll('.calc-opt').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          updatePrice();
-        });
-      });
-
-      // Quantity counter
-      let qty = 1;
-      const calcQtyDown = document.getElementById('calcQtyDown');
-      const calcQtyUp = document.getElementById('calcQtyUp');
-      const calcQtyVal = document.getElementById('calcQtyVal');
-
-      if (calcQtyDown && calcQtyVal) {
-        calcQtyDown.addEventListener('click', function () {
-          if (qty > 1) { qty--; calcQtyVal.textContent = qty; updatePrice(); }
-        });
-      }
-      if (calcQtyUp && calcQtyVal) {
-        calcQtyUp.addEventListener('click', function () {
-          if (qty < 99) { qty++; calcQtyVal.textContent = qty; updatePrice(); }
-        });
-      }
-
-      updatePrice();
-    })();
-  </script>
-
-  <script defer src="js/script.js"></script>
+  <script src="/js/site.js" defer></script>
+  <script src="/js/analitica.js" defer></script>
+  <script src="/js/filamentos.js" defer></script>
+  <script src="/js/home.js" defer></script>
+  <script src="/js/resenas.js?v=20261007e" defer></script>
+  <script src="/js/carrusel.js?v=20261007b" defer></script>
+  <script src="/js/destacado.js" defer></script>
 </body>
 </html>
-
-
-

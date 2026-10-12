@@ -3,1200 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configura Tu Proyecto - SILAB 3D</title>
+  <title>Presupuesto de impresión 3D gratis en 1 minuto | SILAB 3D</title>
+  <meta name="description" content="Cuéntanos tu idea, medidas y colores y tendrás tu presupuesto de impresión 3D en menos de 24 h, gratis y sin compromiso.">
   <link rel="canonical" href="https://silab3d.com/configura-tu-proyecto/">
-  <link rel="apple-touch-icon" href="https://silab3d.com/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <link rel="apple-touch-icon" href="/img/favicon.png">
+  <meta name="theme-color" content="#BC556D">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="SILAB 3D">
   <meta property="og:locale" content="es_ES">
-  <meta property="og:title" content="Configura Tu Proyecto - SILAB 3D">
-  <meta property="og:description" content="Configura tu proyecto de impresión 3D en SILAB. Cuéntanos los detalles y recibe tu presupuesto personalizado en Salamanca.">
+  <meta property="og:title" content="Presupuesto de impresión 3D gratis en 1 minuto | SILAB 3D">
+  <meta property="og:description" content="Cuéntanos tu idea, medidas y colores y tendrás tu presupuesto de impresión 3D en menos de 24 h, gratis y sin compromiso.">
   <meta property="og:url" content="https://silab3d.com/configura-tu-proyecto/">
-  <meta property="og:image" content="https://silab3d.com/img/inicio2.jpg">
+  <meta property="og:image" content="https://silab3d.com/img/og/og-configura.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Configura tu proyecto de impresión 3D con SILAB 3D">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Configura Tu Proyecto - SILAB 3D">
-  <meta name="twitter:description" content="Configura tu proyecto de impresión 3D en SILAB. Cuéntanos los detalles y recibe tu presupuesto personalizado en Salamanca.">
-  <meta name="twitter:image" content="https://silab3d.com/img/inicio2.jpg">
-  <meta name="description" content="Configura tu proyecto de impresión 3D en SILAB. Cuéntanos los detalles y recibe tu presupuesto personalizado en Salamanca.">
-  <link rel="icon" type="image/png" href="../img/favicon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <style>
-    /* ============================================================
-       VARIABLES & RESET
-    ============================================================ */
-    :root {
-      --primary:       #BC556D;
-      --primary-dark:  #B7516B;
-      --primary-light: #F2D6DC;
-      --dark:          #2F2F2F;
-      --darker:        #1A1A1A;
-      --white:         #FFFFFF;
-      --gray-bg:       #F9F7F8;
-      --gray-text:     #6B7280;
-      --border:        #EDE0E3;
-      --radius:        18px;
-      --radius-sm:     12px;
-      --shadow:        0 4px 24px rgba(0,0,0,0.06);
-      --shadow-hover:  0 20px 50px rgba(188,85,109,0.2);
-      --nav-h:         72px;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: var(--primary-light) #f5f5f5; }
-    body {
-      font-family: 'Outfit', sans-serif;
-      color: var(--dark);
-      background: var(--white);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-    img { max-width: 100%; height: auto; display: block; }
-    a { text-decoration: none; color: inherit; }
-    ul { list-style: none; }
-
-    /* ============================================================
-       ANIMATIONS
-    ============================================================ */
-    @keyframes fadeInUp {
-      from { opacity:0; transform:translateY(24px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-    @keyframes fadeInLeft {
-      from { opacity:0; transform:translateX(-30px); }
-      to   { opacity:1; transform:translateX(0); }
-    }
-    @keyframes spin-slow { to { transform: rotate(360deg); } }
-    @keyframes badge-pulse {
-      0%,100% { box-shadow: 0 0 0 0 rgba(188,85,109,0.4); }
-      50%      { box-shadow: 0 0 0 8px rgba(188,85,109,0); }
-    }
-    @keyframes stepIn {
-      from { opacity:0; transform:translateX(24px); }
-      to   { opacity:1; transform:translateX(0); }
-    }
-    @keyframes checkPop {
-      0%   { transform: scale(0) rotate(-10deg); }
-      70%  { transform: scale(1.2) rotate(3deg); }
-      100% { transform: scale(1) rotate(0); }
-    }
-
-    /* ============================================================
-       UTILITIES
-    ============================================================ */
-    .container { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
-
-    /* ============================================================
-       NAVBAR
-    ============================================================ */
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-
-    
-    
-
-    
-    
-    
-
-    
-    
-    
-    
-    
-
-    /* Mobile menu */
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    /* ============================================================
-       HERO (compact – no image, centered)
-    ============================================================ */
-    .hero-main {
-      padding-top: var(--nav-h);
-      padding-bottom: 0;
-      background-color: var(--white);
-      background-image: radial-gradient(circle, rgba(188,85,109,0.11) 1.5px, transparent 1.5px);
-      background-size: 30px 30px;
-      position: relative; overflow: hidden;
-    }
-    .hero-main::before {
-      content:''; position:absolute; top:-80px; right:-80px;
-      width:460px; height:460px;
-      background: radial-gradient(circle, rgba(242,214,220,0.55) 0%, transparent 70%);
-      pointer-events:none;
-    }
-    .hero-main::after {
-      content:''; position:absolute; bottom:-40px; left:-40px;
-      width:300px; height:300px;
-      background: radial-gradient(circle, rgba(188,85,109,0.07) 0%, transparent 70%);
-      pointer-events:none;
-    }
-
-    .hero-main-container {
-      max-width: 780px; margin: 0 auto;
-      padding: 80px 28px 60px;
-      text-align: center;
-      animation: fadeInUp 0.9s ease both;
-      position: relative; z-index: 1;
-    }
-
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--primary-light); color: var(--primary-dark);
-      padding: 7px 16px; border-radius: 50px;
-      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-      margin-bottom: 24px;
-    }
-    .badge-dot {
-      width: 7px; height: 7px; border-radius: 50%; background: var(--primary);
-      animation: badge-pulse 2s infinite;
-    }
-
-    .hero-main-title {
-      font-size: clamp(2.4rem, 5vw, 3.6rem);
-      font-weight: 900; line-height: 1.1;
-      color: var(--dark); letter-spacing: -0.04em;
-      margin-bottom: 18px;
-    }
-    .hero-main-title .accent { color: var(--primary); }
-    .hero-main-text {
-      font-size: 1.08rem; color: #5a5a5a; line-height: 1.75;
-      max-width: 540px; margin: 0 auto;
-    }
-    .hero-main-text strong { color: var(--dark); font-weight: 600; }
-
-    /* Step indicator in hero */
-    .step-indicator-hero {
-      display: flex; align-items: center; justify-content: center;
-      gap: 0; margin-top: 40px;
-    }
-    .step-dot {
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      position: relative;
-    }
-    .step-dot-circle {
-      width: 36px; height: 36px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 800;
-      border: 2px solid var(--border);
-      background: var(--white);
-      color: var(--gray-text);
-      transition: all 0.4s;
-      position: relative; z-index: 1;
-    }
-    .step-dot.active .step-dot-circle {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: white;
-      box-shadow: 0 4px 16px rgba(188,85,109,0.4);
-    }
-    .step-dot.done .step-dot-circle {
-      background: var(--primary-light);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-    .step-dot.done .step-dot-circle::after {
-      content: '✓';
-      font-size: 0.85rem; font-weight: 900;
-    }
-    .step-dot.done .step-dot-circle span { display: none; }
-
-    .step-dot-label {
-      font-size: 0.72rem; font-weight: 600;
-      color: var(--gray-text); white-space: nowrap;
-      transition: color 0.3s;
-    }
-    .step-dot.active .step-dot-label { color: var(--primary); }
-    .step-dot.done  .step-dot-label { color: var(--primary-dark); }
-
-    .step-connector {
-      width: 60px; height: 2px;
-      background: var(--border);
-      margin: 0 4px;
-      margin-bottom: 22px;
-      transition: background 0.4s;
-      flex-shrink: 0;
-    }
-    .step-connector.done { background: var(--primary); }
-
-    /* ============================================================
-       QUOTE SECTION
-    ============================================================ */
-    .quote-page {
-      padding: 0 0 100px;
-      background: var(--white);
-    }
-
-    .quote-wrapper {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 0 28px;
-    }
-
-    /* ============================================================
-       FORM CARDS (steps)
-    ============================================================ */
-    .quote-section-card {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: 24px;
-      padding: 44px 44px;
-      box-shadow: var(--shadow);
-      animation: stepIn 0.45s ease both;
-      margin-top: 24px;
-    }
-
-    .quote-section-title {
-      font-size: 1.35rem; font-weight: 800;
-      color: var(--dark); letter-spacing: -0.025em;
-      margin-bottom: 28px;
-      padding-bottom: 18px;
-      border-bottom: 1.5px solid var(--primary-light);
-      display: flex; align-items: center; gap: 10px;
-    }
-    .quote-section-title .step-num {
-      width: 30px; height: 30px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white; display: inline-flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 800; flex-shrink: 0;
-    }
-
-    /* Grid */
-    .quote-form-grid { display: grid; gap: 20px; }
-    .quote-form-grid-2 { grid-template-columns: 1fr 1fr; }
-    .form-group-span-2 { grid-column: 1 / -1; }
-    .form-group-colors { grid-column: 1 / -1; }
-
-    /* Form group */
-    .form-group { display: flex; flex-direction: column; gap: 7px; }
-    .form-group label {
-      font-size: 0.875rem; font-weight: 600; color: var(--dark);
-    }
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%; padding: 13px 16px;
-      border: 1.5px solid #E5E7EB; border-radius: var(--radius-sm);
-      font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--dark);
-      outline: none; resize: vertical; background: #FDFCFC;
-      transition: border-color 0.25s, box-shadow 0.25s;
-      appearance: none;
-    }
-    .form-group select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 16px center;
-      padding-right: 42px;
-      cursor: pointer;
-    }
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(188,85,109,0.11);
-      background: var(--white);
-    }
-    .form-group input.input-error,
-    .form-group textarea.input-error,
-    .form-group select.input-error {
-      border-color: #ef4444;
-      box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
-    }
-    .field-error {
-      font-size: 0.8rem; color: #ef4444; font-weight: 500;
-      display: none;
-    }
-    .field-error.show { display: block; }
-
-    /* ============================================================
-       STEP ACTIONS
-    ============================================================ */
-    .quote-step-actions {
-      display: flex; justify-content: flex-end; gap: 12px;
-      margin-top: 32px;
-    }
-
-    .quote-step-button {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 14px 32px; border-radius: 50px;
-      font-family: 'Outfit', sans-serif; font-size: 0.975rem; font-weight: 700;
-      cursor: pointer; border: none; transition: all 0.3s;
-      letter-spacing: 0.01em;
-    }
-
-    /* Primary (next) */
-    .quote-step-button:not(.quote-step-button-secondary) {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      box-shadow: 0 6px 24px rgba(188,85,109,0.35);
-    }
-    .quote-step-button:not(.quote-step-button-secondary):hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 32px rgba(188,85,109,0.5);
-    }
-
-    /* Secondary (back) */
-    .quote-step-button-secondary {
-      background: var(--white);
-      color: var(--gray-text);
-      border: 1.5px solid var(--border) !important;
-    }
-    .quote-step-button-secondary:hover {
-      border-color: rgba(188,85,109,0.3) !important;
-      color: var(--primary);
-      background: var(--primary-light);
-    }
-
-    /* ============================================================
-       COLOR / MATERIAL SELECTOR
-    ============================================================ */
-    .project-colors-board { display: flex; flex-direction: column; gap: 20px; }
-
-    .color-material-selector {
-      display: grid;
-      grid-auto-flow: column;
-      grid-auto-columns: minmax(0, 1fr);
-      gap: 12px;
-    }
-
-    /* Los materiales que no corresponden al tipo de proyecto no se muestran */
-    .color-material-card[hidden] { display: none !important; }
-
-    .color-material-card {
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      padding: 20px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--white);
-      cursor: pointer;
-      transition: all 0.3s;
-      font-family: 'Outfit', sans-serif;
-      position: relative; overflow: hidden;
-    }
-    .color-material-card::after {
-      content:''; position:absolute; bottom:0; left:0; right:0; height:2.5px;
-      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-      transform:scaleX(0); transform-origin:left; transition:transform 0.3s;
-    }
-    .color-material-card:hover::after,
-    .color-material-card.active::after,
-    .color-material-card.selected::after { transform:scaleX(1); }
-
-    .color-material-card:hover {
-      border-color: rgba(188,85,109,0.35);
-      background: var(--primary-light);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(188,85,109,0.18);
-    }
-    .color-material-card.selected,
-    .color-material-card.active {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      box-shadow: 0 6px 20px rgba(188,85,109,0.22);
-    }
-    .color-material-card.active .card-title { color: var(--primary-dark); }
-    /* Marca de seleccion en la esquina del cuadro */
-    .color-material-card.active::before {
-      content: '✓';
-      position: absolute; top: 6px; right: 9px;
-      font-size: 0.8rem; font-weight: 800; line-height: 1;
-      color: var(--primary);
-    }
-
-    .card-icon { font-size: 1.8rem; }
-    .card-title { font-size: 0.875rem; font-weight: 700; color: var(--dark); text-align: center; }
-    .card-subtitle { font-size: 0.75rem; color: var(--gray-text); }
-    .card-color-count {
-      font-size: 0.75rem; font-weight: 700;
-      color: var(--primary);
-      background: var(--primary-light);
-      padding: 2px 10px; border-radius: 50px;
-    }
-
-    /* Selected colors display */
-    .color-selection-display {
-      background: var(--gray-bg);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-    }
-    .selection-title {
-      font-size: 0.82rem; font-weight: 600; color: var(--gray-text);
-      margin-bottom: 16px; line-height: 1.5;
-    }
-
-    .color-chips-container {
-      display: flex; flex-wrap: wrap; gap: 10px; min-height: 52px;
-    }
-    .color-chips-empty {
-      display: flex; align-items: center; gap: 10px;
-      color: var(--gray-text); font-size: 0.875rem;
-    }
-    .empty-icon { font-size: 1.3rem; }
-
-    /* Individual chip */
-    .color-chip {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 14px 6px 8px;
-      border: 1.5px solid var(--border); border-radius: 50px;
-      background: var(--white); font-size: 0.82rem; font-weight: 600;
-      color: var(--dark); cursor: default;
-      animation: fadeInUp 0.25s ease;
-    }
-    .color-chip-dot {
-      width: 18px; height: 18px; border-radius: 50%;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-      flex-shrink: 0;
-    }
-    .color-chip-remove {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 16px; height: 16px; border-radius: 50%;
-      background: #E5E7EB; color: #888;
-      font-size: 0.65rem; cursor: pointer; border: none;
-      font-family: inherit; transition: background 0.2s;
-      margin-left: 2px;
-    }
-    .color-chip-remove:hover { background: #fecdd3; color: var(--primary); }
-
-    /* Color catalog */
-    .color-catalog-direct {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-    }
-
-    .catalog-sections { display: flex; flex-direction: column; gap: 28px; }
-    .catalog-section-title {
-      font-size: 0.78rem; font-weight: 800; color: var(--primary);
-      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px;
-    }
-    .catalog-color-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-      gap: 10px;
-    }
-    .catalog-color-item {
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      padding: 12px 8px;
-      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-      cursor: pointer; transition: all 0.25s;
-      background: var(--white);
-    }
-    .catalog-color-item:hover {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 18px rgba(188,85,109,0.18);
-    }
-    .catalog-color-item.selected {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      box-shadow: 0 0 0 3px rgba(188,85,109,0.2);
-    }
-    .catalog-color-item.selected::after {
-      content: '✓';
-      position: absolute; right: 4px; top: 4px;
-      font-size: 0.6rem; font-weight: 900;
-      color: var(--primary);
-    }
-    .catalog-color-item { position: relative; }
-    .catalog-color-circle {
-      width: 38px; height: 38px; border-radius: 50%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.14);
-      transition: transform 0.25s;
-    }
-    .catalog-color-item:hover .catalog-color-circle { transform: scale(1.1); }
-    .catalog-color-name {
-      font-size: 0.68rem; font-weight: 600; color: var(--dark);
-      text-align: center; line-height: 1.3;
-    }
-
-    /* ============================================================
-       CONTACT OPTIONS (step 4)
-    ============================================================ */
-    .quote-page-contact {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: 24px;
-      padding: 48px 44px;
-      box-shadow: var(--shadow);
-      animation: stepIn 0.45s ease both;
-      margin-top: 24px;
-      text-align: center;
-    }
-
-    .contact-options-title {
-      font-size: 1.3rem; font-weight: 800;
-      color: var(--dark); letter-spacing: -0.02em;
-      line-height: 1.45; margin-bottom: 36px;
-      max-width: 540px; margin-left: auto; margin-right: auto;
-    }
-    .contact-options-title .accent { color: var(--primary); }
-
-    .contact-options-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 16px; max-width: 420px; margin: 0 auto 32px;
-    }
-    .contact-option-card {
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
-      padding: 30px 20px;
-      border: 1.5px solid var(--border); border-radius: var(--radius);
-      transition: all 0.3s; color: var(--dark); cursor: pointer;
-    }
-    .contact-option-card:hover {
-      border-color: var(--primary); background: var(--primary-light);
-      transform: translateY(-5px); box-shadow: var(--shadow-hover);
-    }
-    .contact-option-icon { font-size: 2.2rem; }
-    .contact-option-card h3 { font-size: 1.05rem; font-weight: 800; }
-    .contact-option-card p { font-size: 0.82rem; color: var(--gray-text); }
-
-    /* ============================================================
-       PROJECT BLOCKS (paso 2 · secciones)
-    ============================================================ */
-    /* Divisor de grupo compacto (micro-etiqueta) */
-    .field-divider {
-      display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
-      margin: 26px 0 14px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-    .field-divider-label {
-      font-size: 0.72rem; font-weight: 800; color: var(--primary);
-      letter-spacing: 0.1em; text-transform: uppercase;
-    }
-    .field-divider-hint {
-      font-size: 0.78rem; color: var(--gray-text); font-weight: 500;
-    }
-    .label-opt { color: var(--gray-text); font-weight: 500; }
-    /* Fecha para el plazo urgente · solo visible con plazo Urgente */
-    .deadline-date-group[hidden] { display: none !important; }
-    .deadline-date-group {
-      margin-top: 14px; margin-bottom: 0;
-      padding: 14px 16px;
-      border: 1px solid #ead9e6; border-radius: 12px;
-      background: #fdf7fb;
-    }
-    .deadline-date-group input[type="date"] { max-width: 260px; }
-
-    /* Plazo deseado · tarjetas compactas horizontales */
-    .plazo-selector {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    }
-    .plazo-option {
-      display: flex; align-items: center; gap: 12px; text-align: left;
-      padding: 13px 15px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: #FDFCFC;
-      cursor: pointer;
-      transition: all 0.25s;
-      position: relative;
-    }
-    .plazo-option input {
-      position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
-    }
-    .plazo-option:hover {
-      border-color: rgba(188,85,109,0.4);
-      background: var(--primary-light);
-    }
-    .plazo-option.selected,
-    .plazo-option:has(input:checked) {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      box-shadow: 0 4px 14px rgba(188,85,109,0.16);
-    }
-    .plazo-icon { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
-    .plazo-text { display: flex; flex-direction: column; gap: 1px; }
-    .plazo-title { font-size: 0.9rem; font-weight: 700; color: var(--dark); }
-    .plazo-option.selected .plazo-title,
-    .plazo-option:has(input:checked) .plazo-title { color: var(--primary-dark); }
-    .plazo-desc { font-size: 0.72rem; color: var(--gray-text); line-height: 1.3; }
-
-    /* ============================================================
-       REFERENCE FILES BLOCK (paso 2 · parte B)
-    ============================================================ */
-    .reference-block {
-      margin-top: 28px;
-      padding-top: 24px;
-      border-top: 1.5px dashed var(--border);
-    }
-    .reference-block-title {
-      font-size: 1rem; font-weight: 800; color: var(--dark);
-      letter-spacing: -0.01em; margin-bottom: 16px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .reference-upload { margin-top: 18px; animation: fadeInUp 0.3s ease; }
-    .reference-dropzone {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 8px; text-align: center;
-      padding: 32px 20px;
-      border: 2px dashed var(--primary-light);
-      border-radius: var(--radius);
-      background: var(--gray-bg);
-      cursor: pointer; transition: all 0.25s;
-    }
-    .reference-dropzone:hover,
-    .reference-dropzone.dragover {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      transform: translateY(-2px);
-    }
-    .dropzone-icon { font-size: 1.8rem; }
-    .dropzone-text { font-size: 0.95rem; color: var(--dark); }
-    .dropzone-text strong { color: var(--primary); font-weight: 700; }
-    .dropzone-hint { font-size: 0.78rem; color: var(--gray-text); }
-
-    .reference-files-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
-    .reference-file {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 14px;
-      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-      background: var(--white);
-      animation: fadeInUp 0.2s ease;
-    }
-    .reference-file-icon { font-size: 1.25rem; flex-shrink: 0; }
-    .reference-file-info { flex: 1; min-width: 0; }
-    .reference-file-name {
-      font-size: 0.85rem; font-weight: 600; color: var(--dark);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .reference-file-sub { display: flex; align-items: center; gap: 8px; }
-    .reference-file-meta { font-size: 0.72rem; color: var(--gray-text); }
-    .reference-file-status { font-size: 0.72rem; font-weight: 700; }
-    .reference-file-status.uploading { color: var(--gray-text); }
-    .reference-file-status.done { color: #0a9077; }
-    .reference-file-status.error { color: #ef4444; }
-    .reference-file-remove {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: #E5E7EB; color: #888; border: none; cursor: pointer;
-      font-size: 0.7rem; display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: background 0.2s;
-    }
-    .reference-file-remove:hover { background: #fecdd3; color: var(--primary); }
-    .reference-files-meta {
-      font-size: 0.78rem; color: var(--gray-text); margin-top: 12px;
-      display: flex; justify-content: space-between; align-items: center; gap: 10px;
-    }
-
-    /* ============================================================
-       FOOTER
-    ============================================================ */
-    
-    
-    
-    
-    
-    
-
-    /* ============================================================
-       SCROLLBAR
-    ============================================================ */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #f5f5f5; }
-    ::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
-    /* ============================================================
-       RESPONSIVE
-    ============================================================ */
-    @media (max-width: 768px) {
-      .hamburger-menu { display: flex; }
-      .navbar-left, .nav-links { display: none; }
-      .navbar-container { justify-content: space-between; }
-      .navbar-center { position: absolute; left: 50%; transform: translateX(-50%); }
-
-      .hero-main-container { padding: 70px 24px 50px; }
-      .step-connector { width: 32px; }
-      .step-dot-label { font-size: 0.65rem; }
-
-      .quote-section-card,
-      .quote-page-contact { padding: 28px 22px; }
-
-      .quote-form-grid-2 { grid-template-columns: 1fr; }
-      .color-material-selector { grid-auto-flow: row; grid-template-columns: repeat(2, 1fr); }
-      .contact-options-grid { grid-template-columns: 1fr; max-width: 280px; }
-
-      .quote-step-actions { flex-direction: column-reverse; }
-      .quote-step-button { width: 100%; }
-    }
-    @media (max-width: 480px) {
-      .plazo-selector { grid-template-columns: 1fr; }
-      .color-material-selector { grid-auto-flow: row; grid-template-columns: repeat(2, 1fr); }
-      .catalog-color-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
-      .step-indicator-hero { gap: 0; }
-      .step-dot-label { display: none; }
-      .step-connector { width: 24px; margin-bottom: 0; }
-      .step-dot-circle { width: 30px; height: 30px; font-size: 0.72rem; }
-    }
-  
-    /* --- chrome (restaurado tras revertir base.css) --- */
-/* --- Navbar --- */
-    .navbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 980;
-      height: var(--nav-h);
-      background: rgba(255,255,255,0.94);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(242,214,220,0.7);
-      transition: box-shadow 0.3s;
-    }
-    .navbar.scrolled { box-shadow: 0 2px 24px rgba(188,85,109,0.13); }
-
-    .navbar-container {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 0 28px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .hamburger-menu {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 10px;
-      transition: background 0.2s;
-    }
-    .hamburger-menu span {
-      display: block;
-      width: 22px; height: 2px;
-      background: var(--dark, #2F2F2F);
-      border-radius: 2px;
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-    }
-    /* Sin botón de cierre: la hamburguesa no se transforma en X (se cierra tocando fuera) */
-    .hamburger-menu.open span,
-    .hamburger-menu.active span {
-      transform: none !important;
-      opacity: 1 !important;
-    }
-
-
-    .navbar-left .btn-presupuesto {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--primary);
-      color: #fff;
-      padding: 10px 22px;
-      border-radius: 50px;
-      font-size: 0.855rem;
-      font-weight: 700;
-      transition: all 0.3s;
-      white-space: nowrap;
-    }
-    .navbar-left .btn-presupuesto:hover {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 22px rgba(188,85,109,0.38);
-    }
-
-    .navbar-center { display:flex; align-items:center; }
-    .navbar-logo { height: 48px; width: auto; transition: transform 0.3s; }
-    .navbar-logo:hover { transform: scale(1.04); }
-
-    .nav-links { display: flex; align-items: center; gap: 4px; }
-    .nav-links a {
-      color: var(--dark);
-      font-size: 0.9rem;
-      font-weight: 500;
-      padding: 8px 14px;
-      border-radius: 10px;
-      transition: all 0.2s;
-      position: relative;
-    }
-    .nav-links a:hover { color: var(--primary); background: var(--primary-light); }
-    .nav-links a.active { color: var(--primary); font-weight: 700; }
-    .nav-links a:active { transform: translateY(1px); }
-    .nav-links a.active::after {
-      content: '';
-      position: absolute;
-      bottom: 5px; left: 50%;
-      transform: translateX(-50%);
-      width: 14px; height: 2.5px;
-      background: var(--primary);
-      border-radius: 2px;
-    }
-
-/* --- Menú móvil --- */
-    .menu-overlay {
-      position: fixed; inset: 0;
-      background: rgba(26,26,26,0.5);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.35s ease, visibility 0.35s ease;
-      z-index: 950;
-    }
-    .menu-overlay.show { opacity: 1; visibility: visible; }
-    /* El navbar permanece sobre el menú desplegable */
-    .navbar { z-index: 990; }
-    /* Con el menú abierto: navbar opaco y sin línea inferior para una transición continua */
-    .navbar:has(.mobile-menu.open) {
-      background: var(--white, #FFFFFF);
-      border-bottom-color: transparent;
-      box-shadow: none;
-    }
-
-    .mobile-menu {
-      position: fixed;
-      top: var(--nav-h, 72px); left: 0; right: 0;
-      width: 100%;
-      padding: 0;
-      height: fit-content;
-      max-height: min(66dvh, calc(100dvh - var(--nav-h, 72px)));
-      background: var(--white, #FFFFFF);
-      z-index: 960;
-      transform: translateY(-105%);
-      visibility: hidden;
-      /* Cierre: curva ease-in rápida para que se repliegue sin engancharse arriba */
-      transition: transform 0.3s cubic-bezier(0.5,0,0.9,0.4), visibility 0s linear 0.3s;
-      display: flex;
-      flex-direction: column;
-      border-radius: 0 0 26px 26px;
-      box-shadow: 0 26px 54px -14px rgba(43,26,32,0.32);
-      overflow-y: auto;
-    }
-    .mobile-menu.open {
-      transform: translateY(0);
-      visibility: visible;
-      /* Apertura: curva ease-out suave */
-      transition: transform 0.42s cubic-bezier(0.22,1,0.36,1), visibility 0s;
-    }
-    /* Neutraliza el sistema antiguo (script.js/custom.css añaden .active):
-       solo .open controla el menú, evitando el cuadro blanco atrapado al cerrar */
-    .mobile-menu.active { animation: none !important; display: flex !important; }
-
-    /* Navegación */
-    .mobile-menu-nav {
-      flex: 0 0 auto;
-      padding: clamp(12px,2.2vh,20px) clamp(14px,5vw,22px);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      gap: clamp(3px,0.9vh,8px);
-    }
-    .mobile-menu-link {
-      position: relative;
-      display: flex; align-items: center;
-      gap: clamp(11px,3vw,14px);
-      padding: clamp(7px,1.1vh,10px) clamp(11px,3vw,14px);
-      border-radius: 14px;
-      color: var(--dark, #2F2F2F);
-      transition: background 0.25s, color 0.25s, transform 0.15s;
-    }
-    .mobile-menu-link:active { transform: scale(0.98); }
-    .mobile-menu-icon {
-      width: clamp(32px,4.4vh,38px); height: clamp(32px,4.4vh,38px);
-      border-radius: 11px;
-      background: rgba(188,85,109,0.09); color: var(--primary, #BC556D);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      transition: background 0.25s, color 0.25s, box-shadow 0.25s, transform 0.25s;
-    }
-    .mobile-menu-icon svg {
-      width: clamp(17px,2.3vh,20px); height: clamp(17px,2.3vh,20px);
-      fill: none; stroke: currentColor; stroke-width: 1.9;
-      stroke-linecap: round; stroke-linejoin: round;
-    }
-    .mobile-menu-label {
-      font-weight: 650; font-size: clamp(0.9rem,2.2vh,1rem);
-      letter-spacing: -0.01em; flex: 1;
-    }
-    .mobile-menu-arrow {
-      color: var(--gray-text, #6B7280); flex-shrink: 0;
-      opacity: 0; transform: translateX(-6px);
-      transition: opacity 0.25s, transform 0.25s;
-    }
-    .mobile-menu-arrow svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .mobile-menu-link:hover { background: rgba(188,85,109,0.06); }
-    .mobile-menu-link:hover .mobile-menu-icon { transform: translateY(-1px); }
-    .mobile-menu-link:hover .mobile-menu-arrow { opacity: 0.55; transform: translateX(0); }
-    .mobile-menu-link.active {
-      background: linear-gradient(100deg, var(--primary-light, #F2D6DC) 0%, rgba(242,214,220,0.35) 100%);
-      color: var(--primary-dark, #B7516B);
-    }
-    .mobile-menu-link.active .mobile-menu-icon {
-      background: linear-gradient(135deg, var(--primary, #BC556D), var(--primary-dark, #B7516B));
-      color: #fff; box-shadow: 0 6px 16px rgba(188,85,109,0.4);
-    }
-    .mobile-menu-link.active .mobile-menu-label { font-weight: 750; }
-    .mobile-menu-link.active .mobile-menu-arrow { opacity: 0.9; transform: translateX(0); color: var(--primary, #BC556D); }
-    .mobile-menu-link.active::before {
-      content: ''; position: absolute; left: calc(-1 * clamp(14px,5vw,22px)); top: 50%;
-      transform: translateY(-50%);
-      width: 4px; height: 62%; border-radius: 0 4px 4px 0;
-      background: linear-gradient(var(--primary, #BC556D), var(--primary-dark, #B7516B));
-    }
-
-    /* Entrada escalonada de los enlaces (deslizan desde arriba) */
-    .mobile-menu-nav .mobile-menu-link { opacity: 0; transform: translateY(-12px); }
-    .mobile-menu.open .mobile-menu-nav .mobile-menu-link {
-      animation: drawerLinkIn 0.42s cubic-bezier(0.22,1,0.36,1) forwards;
-    }
-    .mobile-menu.open .mobile-menu-link:nth-of-type(1) { animation-delay: 0.06s; }
-    .mobile-menu.open .mobile-menu-link:nth-of-type(2) { animation-delay: 0.11s; }
-    .mobile-menu.open .mobile-menu-link:nth-of-type(3) { animation-delay: 0.16s; }
-    .mobile-menu.open .mobile-menu-link:nth-of-type(4) { animation-delay: 0.21s; }
-    .mobile-menu.open .mobile-menu-link:nth-of-type(5) { animation-delay: 0.26s; }
-    @keyframes drawerLinkIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Ítem destacado: Configura tu proyecto (mismo espaciado que el resto) */
-    .mobile-menu-link--cta .mobile-menu-icon {
-      background: linear-gradient(135deg, var(--primary, #BC556D), var(--primary-dark, #B7516B));
-      color: #fff; box-shadow: 0 5px 14px rgba(188,85,109,0.38);
-    }
-    .mobile-menu-link--cta .mobile-menu-icon svg { fill: currentColor; stroke: none; }
-    .mobile-menu-link--cta .mobile-menu-label { color: var(--primary-dark, #B7516B); font-weight: 750; }
-
-    /* Alturas muy reducidas (móvil apaisado): permite scroll y compacta */
-    @media (max-height: 480px) {
-      .mobile-menu-nav { justify-content: flex-start; gap: 4px; }
-      .mobile-menu-link { padding: 8px 12px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .mobile-menu, .menu-overlay, .mobile-menu-link { transition: none; }
-      .mobile-menu.open .mobile-menu-nav .mobile-menu-link { animation: none; opacity: 1; transform: none; }
-    }
-
-    /* El menú lateral es exclusivo de la versión móvil */
-    @media (min-width: 769px) {
-      .mobile-menu, .menu-overlay, .hamburger-menu { display: none !important; }
-    }
-
-
-/* --- Footer --- */
-    .footer {
-      background: var(--darker);
-      padding: 44px 0;
-      border-top: 1px solid rgba(188,85,109,0.2);
-    }
-    .footer .container {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-      text-align: center;
-    }
-    .footer p { font-size: 0.875rem; color: rgba(255,255,255,0.42); }
-    .footer a { color: var(--primary); font-weight: 600; transition: color 0.2s; }
-    .footer a:hover { color: #e899ae; }
-    .footer .sep { color: rgba(255,255,255,0.2); margin: 0 8px; }
-
-/* --- Responsive del chrome --- */
-@media (max-width: 768px) {
-  .hamburger-menu { display: flex; }
-  .navbar-left, .nav-links { display: none; }
-  .navbar-container { justify-content: space-between; }
-  .navbar-center { position: absolute; left: 50%; transform: translateX(-50%); }
-}
-  </style>
-  <link rel="stylesheet" href="../css/enhancements.css">
-<style>/* Logo centrado en el viewport a cualquier ancho */ .navbar-center{position:absolute;left:50%;transform:translateX(-50%)}</style>
+  <meta name="twitter:title" content="Presupuesto de impresión 3D gratis en 1 minuto | SILAB 3D">
+  <meta name="twitter:description" content="Cuéntanos tu idea, medidas y colores y tendrás tu presupuesto de impresión 3D en menos de 24 h, gratis y sin compromiso.">
+  <meta name="twitter:image" content="https://silab3d.com/img/og/og-configura.jpg">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://silab3d.com/"},{"@type":"ListItem","position":2,"name":"Configura tu proyecto","item":"https://silab3d.com/configura-tu-proyecto/"}]}</script>
+  <link rel="preload" href="/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/css/fuentes.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/configura.css">
+  <link rel="stylesheet" href="/css/presupuesto.css?v=20261002e">
+  <link rel="stylesheet" href="/css/configura-v2.css?v=20261012b">
+  <link rel="stylesheet" href="/css/legal-inline.css">
 </head>
-<body class="page-configura-tu-proyecto">
+<body class="s3d-page page-configura-tu-proyecto">
 
-  <!-- ======================================================
-       NAVBAR
-  ====================================================== -->
-  <nav class="navbar" id="navbar">
-    <div class="navbar-container">
-      <button class="hamburger-menu" id="hamburgerMenu" aria-label="Abrir menú">
+  <!-- Cabecera común (base.css) -->
+  <header class="site-header" id="navbar">
+    <div class="site-header__inner">
+      <a href="/" class="site-header__logo" aria-label="SILAB 3D, ir al inicio">
+        <img src="/img/logo-silab3d.png" alt="SILAB 3D" width="857" height="282">
+      </a>
+      <nav class="site-nav" aria-label="Principal">
+        <a href="/" class="site-nav__link">Inicio</a>
+        <a href="/productos/" class="site-nav__link">Productos</a>
+        <a href="/materiales/" class="site-nav__link">Materiales</a>
+        <a href="/valoraciones/" class="site-nav__link">Valoraciones</a>
+        <a href="/#contacto" class="site-nav__link">Contacto</a>
+      </nav>
+      <a href="/configura-tu-proyecto/" class="s3d-btn s3d-btn--primary site-header__cta">Configura tu proyecto</a>
+      <button type="button" class="site-header__toggle" id="hamburgerMenu" aria-label="Abrir menú" aria-controls="mobileMenu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
-      <div class="navbar-left">
-        <a href="/configura-tu-proyecto/" class="btn-presupuesto">✦ Configura tu proyecto</a>
-      </div>
-      <div class="navbar-center">
-        <a href="/">
-          <img src="../img/SILAB3D_v3_horizontal_negro-compressed.png" alt="SILAB 3D" class="navbar-logo" width="1257" height="361">
-        </a>
-      </div>
-      <ul class="nav-links">
-        <li><a href="/">Inicio</a></li>
-        <li><a href="/productos/">Productos</a></li>
-        <li><a href="/materiales/">Materiales</a></li>
-        <li><a href="/valoraciones/">Valoraciones</a></li>
-      </ul>
     </div>
-
-    <aside class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menú de navegación" aria-hidden="true">
-          <nav class="mobile-menu-nav" aria-label="Principal">
-            <a href="/" class="mobile-menu-link">
-              <span class="mobile-menu-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M3 9.6 12 3l9 6.6"/><path d="M5 10.5V20h14v-9.5"/><path d="M9.5 20v-5.5h5V20"/></svg>
-              </span>
-              <span class="mobile-menu-label">Inicio</span>
-              <span class="mobile-menu-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
-            </a>
-            <a href="/productos/" class="mobile-menu-link">
-              <span class="mobile-menu-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M6 2 3 6.5V20a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6.5L18 2z"/><path d="M3 6.5h18"/><path d="M16 10.5a4 4 0 0 1-8 0"/></svg>
-              </span>
-              <span class="mobile-menu-label">Productos</span>
-              <span class="mobile-menu-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
-            </a>
-            <a href="/materiales/" class="mobile-menu-link">
-              <span class="mobile-menu-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 2.5 2.5 7 12 11.5 21.5 7z"/><path d="m2.5 12 9.5 4.5L21.5 12"/><path d="m2.5 17 9.5 4.5L21.5 17"/></svg>
-              </span>
-              <span class="mobile-menu-label">Materiales</span>
-              <span class="mobile-menu-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
-            </a>
-            <a href="/valoraciones/" class="mobile-menu-link">
-              <span class="mobile-menu-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 3.2l2.75 5.57 6.15.9-4.45 4.34 1.05 6.12L12 17.35 6.5 20.13l1.05-6.12L3.1 9.67l6.15-.9z"/></svg>
-              </span>
-              <span class="mobile-menu-label">Valoraciones</span>
-              <span class="mobile-menu-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
-            </a>
-            <a href="/configura-tu-proyecto/" class="mobile-menu-link mobile-menu-link--cta active" aria-current="page">
-              <span class="mobile-menu-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 2l1.7 5.1a3 3 0 0 0 1.9 1.9L20.7 10.7l-5.1 1.7a3 3 0 0 0-1.9 1.9L12 19.4l-1.7-5.1a3 3 0 0 0-1.9-1.9L3.3 10.7l5.1-1.7a3 3 0 0 0 1.9-1.9z"/></svg>
-              </span>
-              <span class="mobile-menu-label">Configura tu proyecto</span>
-              <span class="mobile-menu-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
-            </a>
-          </nav>
-        </aside>
-  </nav>
-  <div class="menu-overlay" id="menuOverlay"></div>
-
-
-  <!-- ======================================================
-       HERO (compact, centered)
-  ====================================================== -->
-  <section class="hero-main">
-    <div class="hero-main-container">
-      <div class="hero-badge">
-        <span class="badge-dot"></span>
-        Presupuesto gratuito · 1 minuto
-      </div>
-      <h1 class="hero-main-title">
-        Configura tu
-        <span class="accent">proyecto</span>
-      </h1>
-      <p class="hero-main-text">
-        Cuéntanos lo esencial y cerramos tu presupuesto rápidamente.
-        <strong>No te llevará más de 1 minuto.</strong>
-      </p>
-
-      <!-- Step indicator -->
-      <div class="step-indicator-hero" id="stepIndicator">
-        <div class="step-dot active" id="stepDot1">
-          <div class="step-dot-circle"><span>1</span></div>
-          <span class="step-dot-label">Contacto</span>
-        </div>
-        <div class="step-connector" id="stepConn1"></div>
-        <div class="step-dot" id="stepDot2">
-          <div class="step-dot-circle"><span>2</span></div>
-          <span class="step-dot-label">Proyecto</span>
-        </div>
-        <div class="step-connector" id="stepConn2"></div>
-        <div class="step-dot" id="stepDot3">
-          <div class="step-dot-circle"><span>3</span></div>
-          <span class="step-dot-label">Colores</span>
-        </div>
-        <div class="step-connector" id="stepConn3"></div>
-        <div class="step-dot" id="stepDot4">
-          <div class="step-dot-circle"><span>4</span></div>
-          <span class="step-dot-label">Enviar</span>
-        </div>
-      </div>
+  </header>
+  <aside class="site-menu" id="mobileMenu" aria-label="Menú" aria-hidden="true">
+    <nav class="site-menu__nav" aria-label="Principal">
+      <a href="/" class="site-menu__link"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.6 12 3l9 6.6"/><path d="M5 10.5V20h14v-9.5"/><path d="M9.5 20v-5.5h5V20"/></svg>Inicio</a>
+      <a href="/productos/" class="site-menu__link"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6.5V20a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6.5L18 2z"/><path d="M3 6.5h18"/><path d="M16 10.5a4 4 0 0 1-8 0"/></svg>Productos</a>
+      <a href="/materiales/" class="site-menu__link"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 2.5 7 12 11.5 21.5 7z"/><path d="m2.5 12 9.5 4.5L21.5 12"/><path d="m2.5 17 9.5 4.5L21.5 17"/></svg>Materiales</a>
+      <a href="/valoraciones/" class="site-menu__link"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.75 5.57 6.15.9-4.45 4.34 1.05 6.12L12 17.35 6.5 20.13l1.05-6.12L3.1 9.67l6.15-.9z"/></svg>Valoraciones</a>
+      <a href="/#contacto" class="site-menu__link"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg>Contacto</a>
+    </nav>
+    <a href="/configura-tu-proyecto/" class="s3d-btn s3d-btn--primary site-menu__cta site-menu__link-cta">Configura tu proyecto</a>
+    <div class="site-menu__contact">
+      <a href="https://wa.me/34644070487" target="_blank" rel="noopener"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg>644 07 04 87</a>
+      <a href="mailto:silab3d@gmail.com"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg>silab3d@gmail.com</a>
     </div>
-  </section>
+  </aside>
+  <div class="site-overlay" id="menuOverlay"></div>
 
+  <main id="contenido">
 
-  <!-- ======================================================
-       QUOTE SECTION
-  ====================================================== -->
+    <section class="page-hero page-hero--text page-hero--center" aria-labelledby="page-title">
+      <div class="wrap page-hero__grid">
+        <div class="page-hero__copy">
+          <span class="eyebrow">Presupuesto gratuito · 1 minuto</span>
+          <h1 id="page-title">Configura tu <em>proyecto</em></h1>
+          <p class="page-hero__lead">Cuéntanos lo esencial y tendrás tu presupuesto en menos de 24 h. <strong>No te llevará más de 1 minuto.</strong></p>
+          <div class="step-indicator-hero" id="stepIndicator">
+            <div class="step-dot active" id="stepDot1"><div class="step-dot-circle"><span>1</span></div><span class="step-dot-label">Proyecto</span></div>
+            <div class="step-connector" id="stepConn1"></div>
+            <div class="step-dot" id="stepDot2"><div class="step-dot-circle"><span>2</span></div><span class="step-dot-label">Archivos</span></div>
+            <div class="step-connector" id="stepConn2"></div>
+            <div class="step-dot" id="stepDot3"><div class="step-dot-circle"><span>3</span></div><span class="step-dot-label">Colores</span></div>
+            <div class="step-connector" id="stepConn3"></div>
+            <div class="step-dot" id="stepDot4"><div class="step-dot-circle"><span>4</span></div><span class="step-dot-label">Enviar</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   <section class="quote-page">
     <div class="quote-wrapper">
       <form id="projectQuoteForm" class="modern-quote-form" novalidate>
 
-        <!-- ── STEP 1: Datos de contacto ── -->
+        <!-- ── PÁGINA 1: Proyecto ── -->
         <section class="quote-section-card" data-form-step="1">
           <h3 class="quote-section-title">
             <span class="step-num">1</span>
-            Datos de contacto
+            Tu proyecto
           </h3>
           <div class="quote-form-grid quote-form-grid-2">
-            <div class="form-group">
-              <label for="projectCustomerName">Tu nombre *</label>
-              <input type="text" id="projectCustomerName" name="projectCustomerName"
-                     required placeholder="Un nombre para comunicarnos">
-              <span class="field-error" id="errName">Por favor, indica tu nombre.</span>
-            </div>
-            <div class="form-group">
-              <label for="projectCustomerContact">Teléfono / Email de contacto *</label>
-              <input type="text" id="projectCustomerContact" name="projectCustomerContact"
-                     required placeholder="Tu método de contacto preferido">
-              <span class="field-error" id="errContact">Por favor, indica cómo contactarte.</span>
-            </div>
-          </div>
-          <div class="quote-step-actions">
-            <button type="button" class="quote-step-button" id="projectNextToDetails">
-              Siguiente <span>→</span>
-            </button>
-          </div>
-        </section>
-
-        <!-- ── STEP 2: Detalles del proyecto ── -->
-        <section class="quote-section-card" data-form-step="2" hidden>
-          <h3 class="quote-section-title">
-            <span class="step-num">2</span>
-            Detalles del proyecto
-          </h3>
-          <!-- Grupo · información del proyecto -->
-          <div class="quote-form-grid quote-form-grid-2">
-            <div class="form-group">
+            <div class="form-group form-group-span-2">
               <label for="projectName">Nombre del proyecto *</label>
               <input type="text" id="projectName" name="projectName"
                      required placeholder="Ej: Prototipo de pieza mecánica">
               <span class="field-error" id="errProjectName">Por favor, indica el nombre del proyecto.</span>
-            </div>
-            <div class="form-group">
-              <label for="projectMeasures">Medidas <span class="label-opt">(en caso de ser necesario)</span></label>
-              <input type="text" id="projectMeasures" name="projectMeasures"
-                     placeholder="Algún valor aproximado...">
             </div>
             <div class="form-group form-group-span-2">
               <label for="projectDescription">Descripción del proyecto *</label>
@@ -1207,93 +118,201 @@
             </div>
           </div>
 
-          <!-- Grupo · plazo de tiempo deseado -->
           <div class="field-divider">
-            <span class="field-divider-label">Plazo deseado *</span>
-            <span class="field-divider-hint">Valoraremos si la petición es viable</span>
+            <span class="field-divider-label">Tipo de proyecto *</span>
           </div>
           <div class="plazo-selector">
             <label class="plazo-option">
-              <input type="radio" name="projectDeadline" value="urgente" required>
-              <span class="plazo-icon">⚡</span>
+              <input type="radio" name="projectPieceType" value="resistentes" required>
+              <span class="plazo-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
               <span class="plazo-text">
-                <span class="plazo-title">Urgente</span>
-                <span class="plazo-desc">Lo antes posible</span>
+                <span class="plazo-title">Piezas resistentes</span>
+                <span class="plazo-desc">Funcionales, diseñadas para soportar esfuerzos, desgaste o la intemperie, en PETG</span>
               </span>
             </label>
             <label class="plazo-option">
-              <input type="radio" name="projectDeadline" value="flexible" required>
-              <span class="plazo-icon">🌿</span>
+              <input type="radio" name="projectPieceType" value="artisticas" required>
+              <span class="plazo-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.3 0 2-.8 2-1.8 0-1.2-1-1.6-1-2.7 0-1 .8-1.5 1.8-1.5H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg></span>
               <span class="plazo-text">
-                <span class="plazo-title">Flexible</span>
-                <span class="plazo-desc">Sin prisa, tarifa estándar</span>
+                <span class="plazo-title">Piezas artísticas</span>
+                <span class="plazo-desc">Figuras decorativas, con elevado nivel de detalle o de interior, en PLA</span>
               </span>
             </label>
           </div>
-          <span class="field-error" id="errDeadline">Por favor, indica el plazo deseado.</span>
+          <span class="field-error" id="errPieceType">Por favor, elige el tipo de proyecto.</span>
 
-          <div class="form-group deadline-date-group" id="deadlineDateGroup" hidden>
-            <label for="projectDeadlineDate">¿Para qué fecha lo necesitas? <span class="label-opt">(no se garantiza la fecha seleccionada)</span> *</label>
-            <input type="date" id="projectDeadlineDate" name="projectDeadlineDate">
-            <span class="field-error" id="errDeadlineDate">Por favor, indica una fecha válida.</span>
-          </div>
-
-          <!-- Grupo · archivos de referencia -->
-          <div class="field-divider">
-            <span class="field-divider-label">Archivos de referencia</span>
-          </div>
-          <div class="form-group">
-            <label for="projectReferenceFiles">¿Dispones de archivos para compartir? *</label>
-            <select id="projectReferenceFiles" name="projectReferenceFiles" required>
-              <option value="" selected disabled>Selecciona una opción</option>
-              <option value="si">Sí, adjuntar archivos</option>
-              <option value="no">No (los podremos solicitar más adelante)</option>
-            </select>
-            <span class="field-error" id="errReference">Por favor, selecciona una opción.</span>
-          </div>
-
-          <div class="reference-upload" id="referenceUpload" hidden>
-              <label class="reference-dropzone" id="referenceDropzone" for="projectFiles">
-                <input type="file" id="projectFiles" name="projectFiles" multiple
-                       accept="image/*,.stl,.step,.stp,.obj,.3mf,.ply,.gltf,.glb,.fbx,.amf,.igs,.iges,.scad,.zip,.rar,.7z"
-                       hidden>
-                <span class="dropzone-icon">⬆️</span>
-                <span class="dropzone-text"><strong>Haz clic o arrastra tus archivos aquí</strong></span>
-                <span class="dropzone-hint">Imágenes y modelos 3D (STL, STEP, OBJ, 3MF…)</span>
-              </label>
-              <div class="reference-files-list" id="referenceFilesList"></div>
-              <div class="reference-files-meta">
-                <span id="referenceFilesTotal">Ningún archivo seleccionado</span>
-              </div>
-              <span class="field-error" id="errFiles">Adjunta al menos un archivo o selecciona “No”.</span>
-            </div>
           <div class="quote-step-actions">
-            <button type="button" class="quote-step-button quote-step-button-secondary" id="projectBackToDetails">
-              ← Anterior
-            </button>
-            <button type="button" class="quote-step-button" id="projectNextToColors">
+            <button type="button" class="quote-step-button" id="projectNext1">
               Siguiente →
             </button>
           </div>
         </section>
 
-        <!-- ── STEP 3: Colores y materiales ── -->
+        <!-- ── PÁGINA 2: Archivos de referencia ── -->
+        <section class="quote-section-card" data-form-step="2" hidden>
+          <h3 class="quote-section-title">
+            <span class="step-num">2</span>
+            Archivos de referencia
+          </h3>
+          <div class="plazo-selector ref-selector">
+            <label class="plazo-option">
+              <input type="radio" name="projectReferenceFiles" value="diseno" required>
+              <span class="plazo-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8 3.5 7.4v9.2l8.5 4.6 8.5-4.6V7.4z"/><path d="m3.5 7.4 8.5 4.6 8.5-4.6M12 12v9.2"/></svg></span>
+              <span class="plazo-text">
+                <span class="plazo-title">Archivos de diseño <span class="plazo-title__extra">(presupuesto instantáneo)</span></span>
+                <span class="plazo-desc">STL, STEP o 3MF</span>
+              </span>
+            </label>
+            <label class="plazo-option">
+              <input type="radio" name="projectReferenceFiles" value="bocetos" required>
+              <span class="plazo-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="1.8"/><path d="m3.5 17.5 5-5 4 4 3-3 5 5"/></svg></span>
+              <span class="plazo-text">
+                <span class="plazo-title">Bocetos o imágenes</span>
+                <span class="plazo-desc">JPG, PNG o WEBP</span>
+              </span>
+            </label>
+            <label class="plazo-option">
+              <input type="radio" name="projectReferenceFiles" value="ninguno" required>
+              <span class="plazo-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg></span>
+              <span class="plazo-text">
+                <span class="plazo-title">Ninguno / otros</span>
+                <span class="plazo-desc">Los podremos solicitar más adelante</span>
+              </span>
+            </label>
+          </div>
+          <span class="field-error" id="errReference">Por favor, selecciona una opción.</span>
+
+          <!-- Archivos de diseño: tasadora (motor del presupuesto instantáneo) -->
+          <div class="ct-tasadora vacia" id="refTasadora" hidden>
+            <div class="ct-visor-col">
+              <div class="ct-acciones" id="piAcciones" hidden>
+                <button type="button" class="pi-chip pi-chip--boton" id="piAnadir">Añadir archivos</button>
+                <button type="button" class="pi-chip pi-chip--boton" id="piCambiar">Cambiar archivos</button>
+                <button type="button" class="pi-chip pi-chip--boton pi-chip--alerta" id="piAlerta" title="Tu diseño supera los límites de impresión: pulsa para ver las opciones" hidden><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 2.7 19.6a1 1 0 0 0 .9 1.5h16.8a1 1 0 0 0 .9-1.5L12 3.2z"/><path d="M12 9.6v4.4M12 17.3v.01"/></svg>Límites superados</button>
+              </div>
+            <div class="pi-visor" id="piVisor" tabindex="-1">
+              <div class="pi-visor__lienzo" id="piLienzo" aria-label="Vista 3D del modelo"></div>
+              <label class="pi-carga" id="piCarga" for="piArchivo">
+                <input type="file" id="piArchivo" accept=".stl,.step,.stp,.3mf" multiple hidden>
+                <span class="pi-carga__icono"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4"/><path d="m7.5 8.5 4.5-4.5 4.5 4.5"/><path d="M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15"/></svg></span>
+                <span class="pi-carga__titulo">Arrastra tus archivos o <u>búscalos</u></span>
+                <span class="pi-carga__ayuda">STL, STEP o 3MF · puedes subir varios · hasta 250 MB</span>
+              </label>
+              <button type="button" class="pi-flecha pi-flecha--ant" id="piAnt" aria-label="Cama anterior" hidden><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5-7 7 7 7"/></svg></button>
+              <button type="button" class="pi-flecha pi-flecha--sig" id="piSig" aria-label="Cama siguiente" hidden><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 5 7 7-7 7"/></svg></button>
+              <div class="pi-visor__estado" id="piEstado" hidden>
+                <span class="pi-spinner" aria-hidden="true"></span><span id="piEstadoTexto">Analizando el modelo…</span>
+              </div>
+              <div class="pi-aviso" id="piUmbral" role="status" hidden>
+                <svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 2.7 19.6a1 1 0 0 0 .9 1.5h16.8a1 1 0 0 0 .9-1.5L12 3.2z"/><path d="M12 9.6v4.4M12 17.3v.01"/></svg>
+                <p class="pi-aviso__titulo" id="piUmbralTitulo">Tu diseño supera los límites de impresión</p>
+                <p class="pi-aviso__texto" id="piUmbralTexto"></p>
+                <div class="pi-seg pi-seg--aviso"><label><input type="radio" name="pi-umbral" value="ajustar"><span><b>Ajustar</b><small>Automáticamente</small></span></label><label><input type="radio" name="pi-umbral" value="dejar"><span><b>Dejar como está</b><small>Lo revisa el equipo</small></span></label></div>
+              </div>
+            </div>
+              <div class="pi-visor__barra" id="piBarra" hidden>
+                <span class="pi-chip pi-chip--archivo" id="piNombre"></span>
+                <span class="pi-chip" id="piPos" hidden></span>
+                <span class="pi-chip" id="piMedidas"></span>
+                <span class="pi-chip pi-chip--voladizo" id="piLeyenda" hidden><i></i>Zonas con soporte</span>
+              </div>
+              <p class="pi-visor__error" id="piError" role="alert" hidden></p>
+  
+              <div class="pi-resultado" id="piResultado" aria-live="polite">
+                <div class="pi-cifras" id="piCifras">
+                  <div class="pi-cifra"><span class="pi-cifra__valor" id="piGramos">—</span><span class="pi-cifra__rotulo">de filamento</span></div>
+                  <div class="pi-cifra"><span class="pi-cifra__valor" id="piTiempo">—</span><span class="pi-cifra__rotulo">de impresión</span></div>
+                </div>
+                <p class="pi-resultado__nota" id="piNota">Sube un modelo para ver la estimación.</p>
+              </div>
+
+              <div class="pi-aviso" id="piRevision" role="status" hidden>
+                <svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>
+                <p class="pi-aviso__titulo">Requiere revisión manual</p>
+                <p class="pi-aviso__texto" id="piRevisionTexto"></p>
+              </div>
+            </div>
+
+            <div class="pi-panel">
+              <fieldset class="pi-opcion pi-modo" id="piModo" hidden><legend>Opciones de impresión</legend>
+                <div class="pi-seg"><label><input type="radio" name="pi-modo" value="normal" checked><span><b>Normal</b><small>Parámetros estándar</small></span></label><label><input type="radio" name="pi-modo" value="personalizado"><span><b>Personalizado</b><small>Elige tú los parámetros</small></span></label></div>
+                <p class="pi-opcion__nota" id="piModoNota"></p>
+              </fieldset>
+
+              <div class="pi-aviso" id="piAviso" role="alert" hidden>
+                <svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 2.7 19.6a1 1 0 0 0 .9 1.5h16.8a1 1 0 0 0 .9-1.5L12 3.2z"/><path d="M12 9.6v4.4M12 17.3v.01"/></svg>
+                <p class="pi-aviso__titulo" id="piAvisoTitulo"></p>
+                <p class="pi-aviso__texto" id="piAvisoTexto"></p>
+              </div>
+
+              <div class="pi-aviso" id="piAvisoMalla" role="alert" hidden>
+                <svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 2.7 19.6a1 1 0 0 0 .9 1.5h16.8a1 1 0 0 0 .9-1.5L12 3.2z"/><path d="M12 9.6v4.4M12 17.3v.01"/></svg>
+                <p class="pi-aviso__titulo">Posible error en la malla</p>
+                <p class="pi-aviso__texto">Tu archivo parece tener partes solapadas o una malla con errores; <strong>revisaremos el presupuesto a mano.</strong></p>
+              </div>
+
+              <div class="pi-opciones" id="piOpciones" role="group" aria-label="Opciones de impresión">
+                <fieldset class="pi-opcion" data-grupo="definicion"><legend>Definición de la pieza</legend></fieldset>
+                <fieldset class="pi-opcion" data-grupo="pared"><legend>Refuerzo de pared</legend></fieldset>
+                <fieldset class="pi-opcion" data-grupo="densidad"><legend>Densidad</legend></fieldset>
+                <fieldset class="pi-opcion" data-grupo="color"><legend>Color</legend>
+                  <div class="pi-extra" id="piColoresExtra" hidden>
+                    <label for="piColores">Número de colores</label>
+                    <select id="piColores"><option>2</option><option>3</option><option>4</option></select>
+                  </div>
+                </fieldset>
+                <fieldset class="pi-opcion" data-grupo="altura"><legend>Tamaño</legend>
+                  <div class="pi-extra pi-dims" id="piAlturaExtra" hidden>
+                    <div class="pi-dims__fila">
+                      <label class="pi-dim"><span>Largo</span><span class="pi-medida"><input type="number" id="piDimX" min="0.1" max="1000" step="0.1" inputmode="decimal"><span>mm</span></span></label>
+                      <label class="pi-dim"><span>Ancho</span><span class="pi-medida"><input type="number" id="piDimY" min="0.1" max="1000" step="0.1" inputmode="decimal"><span>mm</span></span></label>
+                      <label class="pi-dim"><span>Alto</span><span class="pi-medida"><input type="number" id="piDimZ" min="0.1" max="1000" step="0.1" inputmode="decimal"><span>mm</span></span></label>
+                    </div>
+                    <div class="pi-seg pi-seg--prop"><label><input type="radio" name="pi-prop" value="si" checked><span><b>Proporcional</b><small>Mantiene la proporción</small></span></label><label><input type="radio" name="pi-prop" value="no"><span><b>Independiente</b><small>Cada medida por separado</small></span></label></div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+            <span class="field-error" id="errTasadora">Sube tu archivo de diseño o elige otra opción.</span>
+          </div>
+
+          <!-- Bocetos o imágenes / otros archivos -->
+          <div class="reference-upload" id="referenceUpload" hidden>
+            <label class="reference-dropzone" id="referenceDropzone" for="projectFiles">
+              <input type="file" id="projectFiles" name="projectFiles" multiple hidden>
+              <span class="dropzone-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></span>
+              <span class="dropzone-text"><strong id="dropzoneTitle">Haz clic o arrastra tus archivos aquí</strong></span>
+              <span class="dropzone-hint" id="dropzoneHint">JPG, PNG o WEBP</span>
+            </label>
+            <div class="reference-files-list" id="referenceFilesList"></div>
+            <div class="reference-files-meta">
+              <span id="referenceFilesTotal">Ningún archivo seleccionado</span>
+            </div>
+            <span class="field-error" id="errFiles">Adjunta al menos una imagen o elige otra opción.</span>
+          </div>
+
+          <div class="form-group ref-medidas" id="measuresGroup" hidden>
+            <label for="projectMeasures">Medidas <span class="label-opt">(en caso de ser necesario)</span></label>
+            <input type="text" id="projectMeasures" name="projectMeasures"
+                   placeholder="Algún valor aproximado...">
+          </div>
+
+          <div class="quote-step-actions">
+            <button type="button" class="quote-step-button quote-step-button-secondary" id="projectBack2">
+              ← Anterior
+            </button>
+            <button type="button" class="quote-step-button" id="projectNext2">
+              Siguiente →
+            </button>
+          </div>
+        </section>
+
+        <!-- ── PÁGINA 3: Colores y plazo ── -->
         <section class="quote-section-card" data-form-step="3" hidden>
           <h3 class="quote-section-title">
             <span class="step-num">3</span>
-            Colores y materiales
+            Colores y plazo
           </h3>
-
-          <div class="quote-form-grid quote-form-grid-2" style="margin-bottom: 18px;">
-            <div class="form-group form-group-span-2">
-              <label for="projectPieceType">¿De qué tipo de proyecto se trata? *</label>
-              <select id="projectPieceType" name="projectPieceType" required>
-                <option value="" selected disabled>Selecciona una opción</option>
-                <option value="resistentes">Piezas resistentes</option>
-                <option value="artisticas">Piezas artísticas</option>
-              </select>
-            </div>
-          </div>
 
           <div class="form-group form-group-colors">
             <label>Explora nuestras opciones… o lo dejamos para más tarde</label>
@@ -1301,23 +320,23 @@
 
               <!-- Material category cards -->
               <div class="color-material-selector">
-                <button type="button" class="color-material-card" data-color-group="indeterminado" data-icon="❓">
-                  <span class="card-icon">❓</span>
+                <button type="button" class="color-material-card" data-color-group="indeterminado">
+                  <span class="card-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .8c0 1.8-2.5 2.2-2.5 3.8"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></span>
                   <span class="card-title">Indeterminado</span>
                   <span class="card-subtitle">Decidir después</span>
                 </button>
-                <button type="button" class="color-material-card" data-color-group="pla-basico" data-icon="🎨">
-                  <span class="card-icon">🎨</span>
+                <button type="button" class="color-material-card" data-color-group="pla-basico">
+                  <span class="card-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.3 0 2-.8 2-1.8 0-1.2-1-1.6-1-2.7 0-1 .8-1.5 1.8-1.5H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg></span>
                   <span class="card-title">PLA Básico</span>
                   <span class="card-color-count" data-count="0">0 colores</span>
                 </button>
-                <button type="button" class="color-material-card" data-color-group="pla-premium" data-icon="✨">
-                  <span class="card-icon">✨</span>
+                <button type="button" class="color-material-card" data-color-group="pla-premium">
+                  <span class="card-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16v4M17 18h4"/></svg></span>
                   <span class="card-title">PLA Premium</span>
                   <span class="card-color-count" data-count="0">0 colores</span>
                 </button>
-                <button type="button" class="color-material-card" data-color-group="petg" data-icon="💎">
-                  <span class="card-icon">💎</span>
+                <button type="button" class="color-material-card" data-color-group="petg">
+                  <span class="card-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
                   <span class="card-title">PETG</span>
                   <span class="card-color-count" data-count="0">0 colores</span>
                 </button>
@@ -1330,7 +349,7 @@
                 </p>
                 <div id="projectSelectedColorChips" class="color-chips-container">
                   <div class="color-chips-empty">
-                    <span class="empty-icon">🎯</span>
+                    <span class="empty-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.3 0 2-.8 2-1.8 0-1.2-1-1.6-1-2.7 0-1 .8-1.5 1.8-1.5H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg></span>
                     <span class="empty-text">Elige una categoría para comenzar</span>
                   </div>
                 </div>
@@ -1344,67 +363,121 @@
             </div>
           </div>
 
+          <!-- Grupo · plazo de tiempo deseado -->
+          <div class="field-divider">
+            <span class="field-divider-label">Plazo deseado *</span>
+            <span class="field-divider-hint">Valoraremos si la petición es viable</span>
+          </div>
+          <div class="plazo-selector">
+            <label class="plazo-option">
+              <input type="radio" name="projectDeadline" value="flexible" required>
+              <span class="plazo-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15"/><path d="M5 19c3-4 6-6 10-8"/></svg></span>
+              <span class="plazo-text">
+                <span class="plazo-title">Flexible</span>
+                <span class="plazo-desc">Sin prisa, tarifa estándar</span>
+              </span>
+            </label>
+            <label class="plazo-option">
+              <input type="radio" name="projectDeadline" value="urgente" required>
+              <span class="plazo-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>
+              <span class="plazo-text">
+                <span class="plazo-title">Urgente</span>
+                <span class="plazo-desc">Lo antes posible</span>
+              </span>
+            </label>
+          </div>
+          <span class="field-error" id="errDeadline">Por favor, indica el plazo deseado.</span>
+
+          <div class="form-group deadline-date-group" id="deadlineDateGroup" hidden>
+            <label for="projectDeadlineDate">¿Para qué fecha lo necesitas? <span class="label-opt">(no se garantiza la fecha seleccionada)</span> *</label>
+            <input type="date" id="projectDeadlineDate" name="projectDeadlineDate">
+            <span class="field-error" id="errDeadlineDate">Por favor, indica una fecha válida.</span>
+          </div>
+
           <div class="quote-step-actions">
-            <button type="button" class="quote-step-button quote-step-button-secondary" id="projectBackToProjectDetails">
+            <button type="button" class="quote-step-button quote-step-button-secondary" id="projectBack3">
               ← Anterior
             </button>
-            <button type="button" class="quote-step-button" id="projectShowContactOptions">
+            <button type="button" class="quote-step-button" id="projectNext3">
               Siguiente →
             </button>
           </div>
         </section>
 
-      </form>
+        <!-- ── PÁGINA 4: Enviar ── -->
+        <section class="quote-section-card" data-form-step="4" hidden>
+          <h3 class="quote-section-title">
+            <span class="step-num">4</span>
+            Enviar
+          </h3>
+          <p class="send-lead">Déjanos tu nombre y teléfono para enviarte el presupuesto.</p>
+          <div class="quote-form-grid quote-form-grid-2">
+            <div class="form-group">
+              <label for="projectCustomerName">Tu nombre *</label>
+              <input type="text" id="projectCustomerName" name="projectCustomerName"
+                     required autocomplete="name" placeholder="Un nombre para dirigirnos a ti">
+              <span class="field-error" id="errName">Por favor, indica tu nombre.</span>
+            </div>
+            <div class="form-group">
+              <label for="projectCustomerContact">Teléfono *</label>
+              <input type="tel" id="projectCustomerContact" name="projectCustomerContact"
+                     required autocomplete="tel" inputmode="tel" pattern="[0-9 +]{9,}"
+                     placeholder="Ej.: 644 07 04 87">
+              <span class="field-error" id="errContact">Por favor, indica un teléfono válido.</span>
+            </div>
+          </div>
+          <div class="ct-solicitar" id="projectSolicitarCaja" hidden>
+            <button type="button" class="quote-step-button ct-solicitar__boton" id="projectSolicitar">Solicitar presupuesto</button>
+            <p class="field-error" id="errSolicitar" role="alert"></p>
+            <p class="ct-legal">Usamos tus datos solo para preparar el presupuesto: lee la <a href="/privacidad/" data-legal data-titulo="Política de privacidad">política de privacidad</a> y las <a href="/terminos/" data-legal data-titulo="Condiciones">condiciones</a>. No se cierra ninguna compra: te confirmaremos precio y plazo antes de empezar.</p>
+          </div>
+          <div id="projectContactOptions" class="quote-page-contact" hidden>
+            <div class="ct-enviado" id="projectEnviado">
+              <p class="ct-enviado__rotulo">Tu localizador de presupuesto</p>
+              <p class="ct-enviado__localizador" id="projectLocalizador"></p>
+              <div class="ct-enviado__precio" id="projectPrecioCaja" hidden>
+                <span class="ct-enviado__precio-rotulo">Precio de tu pedido</span>
+                <span class="ct-enviado__precio-valor" id="projectPrecio"></span>
+              </div>
+              <p class="ct-enviado__texto" id="projectEnviadoTexto"></p>
+              <div class="ct-copia" id="projectCopia">
+                <label class="ct-copia__rotulo" for="projectCopiaEmail">¿Quieres una copia del resumen en tu email?</label>
+                <div class="ct-copia__fila">
+                  <input type="email" id="projectCopiaEmail" autocomplete="email" inputmode="email" placeholder="tu@email.com">
+                  <button type="button" class="quote-step-button" id="projectCopiaEnviar">Enviarme una copia</button>
+                </div>
+                <p class="ct-copia__nota">Solo usaremos tu email para enviarte esta copia.</p>
+                <p class="ct-copia__estado" id="projectCopiaEstado" role="status"></p>
+              </div>
+            </div>
+            <h4 class="contact-options-title">¿Quieres hablar con nosotros? Escríbenos con tu localizador</h4>
+            <div class="contact-options-grid">
+              <a id="projectWhatsApp" href="https://wa.me/34644070487" target="_blank" rel="noopener" class="contact-option-card">
+                <div class="contact-option-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg></div>
+                <h3>WhatsApp</h3>
+                <p>Respuesta inmediata</p>
+              </a>
+              <a id="projectEmail" href="mailto:silab3d@gmail.com" target="_blank" rel="noopener" class="contact-option-card">
+                <div class="contact-option-icon"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg></div>
+                <h3>Email</h3>
+                <p>Comunicación formal</p>
+              </a>
+            </div>
+          </div>
+          <div class="quote-step-actions">
+            <button type="button" class="quote-step-button quote-step-button-secondary" id="projectBack4">
+              <span>←</span> Anterior
+            </button>
+          </div>
+        </section>
 
-      <!-- ── STEP 4: Método de contacto ── -->
-      <div id="projectContactOptions" class="quote-page-contact" data-form-step="4" hidden>
-        <h2 class="contact-options-title">
-          ¡Listo! 🎉 Comparte con nosotros tu proyecto<br>
-          para hacerlo <span class="accent">realidad</span>
-        </h2>
-        <p style="font-size:0.95rem;color:var(--gray-text);margin-bottom:32px;">
-          Escoge tu método de contacto preferido
-        </p>
-        <div class="contact-options-grid">
-          <a id="projectWhatsApp" href="https://wa.me/34644070487" target="_blank" rel="noopener" class="contact-option-card">
-            <div class="contact-option-icon">📱</div>
-            <h3>WhatsApp</h3>
-            <p>Respuesta inmediata</p>
-          </a>
-          <a id="projectEmail" href="mailto:silab3d@gmail.com" target="_blank" rel="noopener" class="contact-option-card">
-            <div class="contact-option-icon">📧</div>
-            <h3>Email</h3>
-            <p>Comunicación formal</p>
-          </a>
-        </div>
-        <div class="quote-step-actions" style="justify-content:center;">
-          <button type="button" class="quote-step-button quote-step-button-secondary" id="projectBackToColors">
-            ← Anterior
-          </button>
-        </div>
-      </div>
+      </form>
+      
 
     </div><!-- /quote-wrapper -->
   </section>
 
-
-  <!-- ======================================================
-       FOOTER
-  ====================================================== -->
-  <footer class="footer">
-    <div class="container">
-      <p>© 2026 SILAB 3D. Todos los derechos reservados.</p>
-      <p>📧 silab3d@gmail.com | 📱 +34 644 07 04 87</p>
-      <p><a href="/terminos/">Términos y Condiciones</a><span class="sep">|</span><a href="/privacidad/">Política de Privacidad</a><span class="sep">|</span><a href="/aviso-legal/">Aviso Legal</a></p>
-    </div>
-  </footer>
-
-
-  <!-- ======================================================
-       JAVASCRIPT
-  ====================================================== -->
   <script>
-    /* --- Navbar scroll --- */
     /* ============================================================
        STEP INDICATOR
     ============================================================ */
@@ -1444,15 +517,14 @@
     }
 
     // Clear on input
-    ['projectCustomerName','projectCustomerContact','projectName','projectDescription','projectReferenceFiles'].forEach(id => {
+    ['projectCustomerName','projectCustomerContact','projectName','projectDescription'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('input', () => {
         const errorMap = {
           projectCustomerName:    'errName',
           projectCustomerContact: 'errContact',
           projectName:            'errProjectName',
-          projectDescription:     'errDescription',
-          projectReferenceFiles:  'errReference'
+          projectDescription:     'errDescription'
         };
         clearError(id, errorMap[id]);
       });
@@ -1465,35 +537,84 @@
   <!-- Supabase (subida de archivos de referencia a Storage) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Reutiliza el mismo proyecto de Supabase que el panel de administración.
-    // La "anon / publishable key" es pública por diseño (igual que en admin/index.html).
+    // Mismo proyecto de Supabase que el panel de administración. La clave publicable es pública por diseño.
     window.SILAB_SUPABASE = {
       url: 'https://yyezkumbjqnushwgqkzf.supabase.co',
       anonKey: 'sb_publishable_S-YCLKYozH7T9DFE1gMtUw_1jWLZnIf',
       bucket: 'solicitudes',
+      // Permiso para cada adjunto (límite de 2 GB al mes por procedencia, supabase/functions/autorizar-subida)
+      autorizarSubida: 'https://yyezkumbjqnushwgqkzf.supabase.co/functions/v1/autorizar-subida',
       edgeFunction: '',
+      // «Solicitar presupuesto»: guarda la solicitud, calcula el precio con 3DCalc y avisa por email (supabase/functions/solicitar-presupuesto)
+      solicitudes: 'https://yyezkumbjqnushwgqkzf.supabase.co/functions/v1/solicitar-presupuesto',
       maxFileMB: 50
     };
   </script>
-
-  <!-- Existing project logic (color catalog, WhatsApp/email generation, etc.) -->
-  <script defer src="../js/script.js"></script>
-  <script defer src="../js/configura-tu-proyecto.js?v=20260826a"></script>
-
-  <script>
-    const navbar=document.getElementById('navbar');
-    if(navbar)window.addEventListener('scroll',()=>{navbar.classList.toggle('scrolled',window.scrollY>20)},{passive:true});
-    const hamburger=document.getElementById('hamburgerMenu'),mobileMenu=document.getElementById('mobileMenu'),overlay=document.getElementById('menuOverlay');
-    function openMenu(){mobileMenu.classList.add('open');hamburger.classList.add('open');overlay.classList.add('show');document.body.style.overflow='hidden'}
-    function closeMenu(){mobileMenu.classList.remove('open');hamburger.classList.remove('open');overlay.classList.remove('show');document.body.style.overflow=''}
-    if(hamburger)hamburger.addEventListener('click',()=>mobileMenu.classList.contains('open')?closeMenu():openMenu());
-    if(overlay)overlay.addEventListener('click',closeMenu);
-    mobileMenu.querySelectorAll('.mobile-menu-link').forEach(l=>l.addEventListener('click',closeMenu));
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mobileMenu.classList.contains('open'))closeMenu();});
-    if(overlay)overlay.addEventListener('click',closeMenu);
+  <script defer src="/js/configura-tu-proyecto.js?v=20261008s"></script>
+  <!-- Tasadora (archivos de diseño): motor del presupuesto instantáneo; three.js solo se carga al subir un modelo -->
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+  } }
   </script>
+  <script type="module" src="/js/configura-tasadora.js?v=20261008a"></script>
+
+  </main>
+
+  <!-- Pie común (base.css) -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div class="site-footer__brand">
+        <img src="/img/logo-silab3d.png" alt="SILAB 3D" width="857" height="282" loading="lazy">
+        <p class="site-footer__motto">Innovación <em>capa a capa</em></p>
+        <p>Estudio de impresión 3D en Salamanca. Regalos personalizados, figuras, litofanías y piezas a medida.</p>
+      </div>
+      <div>
+        <p class="site-footer__title">Explora</p>
+        <ul class="site-footer__list">
+          <li><a href="/productos/">Productos</a></li>
+          <li><a href="/materiales/">Materiales</a></li>
+          <li><a href="/valoraciones/">Valoraciones</a></li>
+          <li><a href="/configura-tu-proyecto/">Configura tu proyecto</a></li>
+          <li><a href="/pedidos/">Seguimiento de pedidos</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="site-footer__title">Contacto</p>
+        <ul class="site-footer__list">
+          <li><a href="https://wa.me/34644070487" target="_blank" rel="noopener"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg>+34 644 07 04 87</a></li>
+          <li><a href="mailto:silab3d@gmail.com"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg>silab3d@gmail.com</a></li>
+          <li><a href="https://www.instagram.com/silab3d/" target="_blank" rel="noopener"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg>@silab3d</a></li>
+          <li><a href="https://www.google.com/maps?cid=13396822311427547363" target="_blank" rel="noopener"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Salamanca · recogida o envío</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="site-footer__title">Horario</p>
+        <dl class="site-footer__hours">
+          <dt>Lun – Vie</dt><dd>9:00 – 21:00</dd>
+          <dt>Sábado</dt><dd>10:00 – 20:00</dd>
+          <dt>Domingo</dt><dd>Cerrado</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="site-footer__bottom">
+      <span>© 2026 SILAB 3D · Impresión 3D en Salamanca</span>
+      <nav class="site-footer__legal" aria-label="Legal">
+        <a href="/terminos/">Términos y condiciones</a>
+        <a href="/privacidad/">Privacidad</a>
+        <a href="/aviso-legal/">Aviso legal</a>
+      </nav>
+    </div>
+  </footer>
+
+
+
+  <a class="wa-fab" href="https://wa.me/34644070487?text=%C2%A1Hola!%20Me%20gustar%C3%ADa%20pedir%20un%20presupuesto." target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg></a>
+
+  <script src="/js/legal-inline.js" defer></script>
+  <script src="/js/site.js" defer></script>
+  <script src="/js/analitica.js" defer></script>
+
 </body>
 </html>
-
-
-

@@ -1,4 +1,4 @@
-// COPIA AUTOMÁTICA de new-version/js/presupuesto-motor.js (node supabase/sincronizar-motor.mjs). No editar aquí.
+// COPIA AUTOMÁTICA de js/presupuesto-motor.js (node supabase/sincronizar-motor.mjs). No editar aquí.
 /* ============================================================
    SILAB 3D · Motor del Presupuesto instantáneo
    Estima gramos de filamento y tiempo de impresión a partir de la

@@ -1,6 +1,6 @@
 // Copia el motor de la tasadora a la función de Supabase.
 //
-//   node supabase/sincronizar-motor.mjs            copia «new-version/js/presupuesto-motor.js» a
+//   node supabase/sincronizar-motor.mjs            copia «js/presupuesto-motor.js» a
 //                                                   «supabase/functions/_shared/presupuesto-motor.js»
 //   node supabase/sincronizar-motor.mjs --comprobar solo comprueba que la copia está al día (no escribe nada)
 //
@@ -14,7 +14,7 @@
 import fs from 'fs'; import path from 'path'; import crypto from 'crypto'; import { fileURLToPath } from 'url';
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
-const ORIGEN = path.join(AQUI, '..', 'new-version', 'js', 'presupuesto-motor.js');
+const ORIGEN = path.join(AQUI, '..', 'js', 'presupuesto-motor.js');
 const DESTINO_DIR = path.join(AQUI, 'functions', '_shared');
 const DESTINO = path.join(DESTINO_DIR, 'presupuesto-motor.js');
 const SELLO = path.join(DESTINO_DIR, 'presupuesto-motor.sello.json');
@@ -41,6 +41,6 @@ if (sello && sello.revision === rev && sello.hash !== h) {
   process.exit(1);
 }
 fs.mkdirSync(DESTINO_DIR, { recursive: true });
-fs.writeFileSync(DESTINO, '// COPIA AUTOMÁTICA de new-version/js/presupuesto-motor.js (node supabase/sincronizar-motor.mjs). No editar aquí.\n' + texto);
+fs.writeFileSync(DESTINO, '// COPIA AUTOMÁTICA de js/presupuesto-motor.js (node supabase/sincronizar-motor.mjs). No editar aquí.\n' + texto);
 fs.writeFileSync(SELLO, JSON.stringify({ revision: rev, hash: h }, null, 1) + '\n');
 console.log('Copiado. Revisión del motor: ' + rev + '.\nAhora redespliega la función:  supabase functions deploy solicitar-presupuesto --no-verify-jwt');
