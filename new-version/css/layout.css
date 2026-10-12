@@ -425,15 +425,24 @@ body.s3d-page {
 .ig-foto__video { position: absolute; top: 8px; right: 10px; color: #fff; font-size: 14px; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
 @media (max-width: 480px) { .ig-rejilla { gap: 6px; } .ig-foto { border-radius: 10px; } }
 
-/* ---------- Galería de trabajos (js/galeria.js) ---------- */
-.galeria { display: flex; gap: 14px; align-items: flex-start; max-width: 1100px; margin: 0 auto; }
-.galeria__col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+/* ---------- Galería de trabajos (js/galeria.js) · carrusel continuo ---------- */
+.galeria { --g-alto: 300px; --g-gap: 14px; position: relative; max-width: 1100px; margin: 0 auto; }
+.galeria__ventana {
+  overflow: hidden; padding: 4px 0 8px; touch-action: pan-y; cursor: grab;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+          mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+.galeria.is-arrastrando .galeria__ventana { cursor: grabbing; }
+.galeria.is-arrastrando .galeria__foto { pointer-events: none; }
+.galeria__pista { display: flex; gap: var(--g-gap); width: max-content; will-change: transform; }
 .galeria__foto {
-  position: relative; display: block; width: 100%; margin: 0; padding: 0; border: 0; cursor: zoom-in;
+  position: relative; flex: 0 0 auto; height: var(--g-alto); width: calc(var(--g-alto) * var(--r, 1));
+  margin: 0; padding: 0; border: 0; cursor: zoom-in; user-select: none; -webkit-user-select: none;
   border-radius: 16px; overflow: hidden; background: var(--s3d-mist-soft);
   box-shadow: 0 1px 2px rgba(34,28,31,.06);
 }
-.galeria__foto img { display: block; width: 100%; height: auto; transition: transform .4s ease; }
+.galeria__foto:focus-visible { outline: 3px solid var(--s3d-brand); outline-offset: -3px; }
+.galeria__foto img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; -webkit-user-drag: none; }
 .galeria__foto:hover img, .galeria__foto:focus-visible img { transform: scale(1.04); }
 .galeria__pie {
   position: absolute; left: 0; right: 0; bottom: 0; padding: 28px 14px 12px;
@@ -443,7 +452,19 @@ body.s3d-page {
 }
 .galeria__foto:hover .galeria__pie, .galeria__foto:focus-visible .galeria__pie { opacity: 1; transform: none; }
 @media (hover: none) { .galeria__pie { opacity: 1; transform: none; } }
-@media (max-width: 480px) { .galeria, .galeria__col { gap: 8px; } .galeria__foto { border-radius: 12px; } .galeria__pie { font-size: 12.5px; padding: 20px 10px 8px; } }
+/* «Reducir movimiento»: tira quieta que se desliza a mano */
+.galeria.is-quieto .galeria__ventana { overflow-x: auto; touch-action: auto; cursor: auto; scroll-snap-type: x mandatory; -webkit-mask-image: none; mask-image: none; }
+.galeria.is-quieto .galeria__ventana:focus-visible { outline: 2px solid var(--s3d-brand); outline-offset: 2px; border-radius: 16px; }
+.galeria.is-quieto .galeria__foto { scroll-snap-align: start; }
+@media (prefers-reduced-motion: reduce) { .galeria__foto img, .galeria__pie { transition: none; } }
+@media (max-width: 860px) { .galeria { --g-alto: 250px; } }
+@media (max-width: 560px) {
+  .galeria { --g-alto: 210px; --g-gap: 10px; margin-inline: calc(-1 * var(--s3d-gutter)); }
+  .galeria__ventana { -webkit-mask-image: none; mask-image: none; }
+  .galeria.is-quieto .galeria__ventana { padding-inline: var(--s3d-gutter); scroll-padding-inline: var(--s3d-gutter); }
+  .galeria__foto { border-radius: 12px; }
+  .galeria__pie { font-size: 12.5px; padding: 20px 10px 8px; }
+}
 
 .visor {
   position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center;
