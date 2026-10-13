@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/admin.css?v=20261006e">
   <link rel="stylesheet" href="/css/visualizador.css?v=20261018">
+  <link rel="stylesheet" href="/css/admin-almacenamiento.css?v=20261014e">
   <!-- three.js para la tasadora y el visualizador: la misma versión que «Configura tu proyecto» -->
   <script type="importmap">
   { "imports": {
@@ -75,6 +76,7 @@
       <button data-tab="tasadora">Tasadora</button>
       <button data-tab="notas">Notas</button>
       <button data-tab="analitica">Analítica</button>
+      <button data-tab="almacenamiento">Almacenamiento</button>
     </nav>
 
     <main>
@@ -228,6 +230,9 @@
         <div data-tasadora><div class="panel"><p class="vacio">Cargando la tasadora…</p></div></div>
       </section>
 
+      <!-- ALMACENAMIENTO: espacio en Supabase y Firestore y reglas de limpieza (js/admin-almacenamiento.js) -->
+      <section id="tab-almacenamiento" class="oculto"></section>
+
       <!-- ANALÍTICA -->
       <section id="tab-analitica" class="oculto">
         <div class="panel panel-analitica">
@@ -309,13 +314,16 @@
       btn.addEventListener('click', () => {
         document.querySelectorAll('nav.pestanas button').forEach((b) => b.classList.remove('activa'));
         btn.classList.add('activa');
-        ['resumen', 'notas', 'productos', 'filamentos', 'trabajos', 'galeria', 'visualizador', 'tasadora', 'analitica'].forEach((t) => $('tab-' + t).classList.add('oculto'));
+        ['resumen', 'notas', 'productos', 'filamentos', 'trabajos', 'galeria', 'visualizador', 'tasadora', 'analitica', 'almacenamiento'].forEach((t) => $('tab-' + t).classList.add('oculto'));
         $('tab-' + btn.dataset.tab).classList.remove('oculto');
         if (btn.dataset.tab === 'tasadora') abrirTasadora();
         if (btn.dataset.tab === 'galeria' && window.abrirGaleria) window.abrirGaleria();
         if (btn.dataset.tab === 'visualizador') import('/js/admin-visualizador.js?v=20261018')
           .then((m) => m.abrir({ sb, raiz: $('tab-visualizador') }))
           .catch((err) => { $('tab-visualizador').innerHTML = `<div class="panel"><p class="vacio">No se pudo cargar el visualizador: ${esc(err.message)}</p></div>`; });
+        if (btn.dataset.tab === 'almacenamiento') import('/js/admin-almacenamiento.js?v=20261014e')
+          .then((m) => m.abrir({ sb, raiz: $('tab-almacenamiento') }))
+          .catch((err) => { $('tab-almacenamiento').innerHTML = `<div class="panel"><p class="vacio">No se pudo cargar el almacenamiento: ${esc(err.message)}</p></div>`; });
       });
     });
 
