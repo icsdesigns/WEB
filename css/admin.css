@@ -194,13 +194,6 @@ input[type="checkbox"] { accent-color: var(--primario); width: 17px; height: 17p
 .mini { width: 48px; height: 48px; object-fit: cover; border-radius: 10px; border: 1px solid var(--borde); display: block; }
 .mini-vacia { width: 48px; height: 48px; border-radius: 10px; border: 1.5px dashed var(--borde-input); display: flex; align-items: center; justify-content: center; color: var(--borde-input); }
 
-/* Notas */
-.nota-card { border: 1px solid var(--borde); border-radius: var(--radio-sm); padding: 16px 18px; margin-bottom: 10px; transition: border-color .2s; }
-.nota-card:hover { border-color: var(--s3d-mist); }
-.nota-card h3 { font-size: 15.5px; font-weight: 600; margin-bottom: 6px; }
-.nota-card p { font-size: 14.5px; color: var(--texto); white-space: pre-wrap; }
-.nota-card .meta { margin-top: 10px; display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--gris); }
-
 /* ============================================================
    RESUMEN (KPI)
    ============================================================ */
@@ -567,15 +560,16 @@ form.fila .campo-archivo input[type="file"] { min-width: 0; width: 100%; flex-ba
 .kpi-leyenda { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; white-space: nowrap; max-width: 100%; }
 .kpi-leyenda i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
 
-/* Resumen centrado: con sitio para 4 carteles por fila, el noveno queda centrado en la rejilla de 8 columnas */
+/* Resumen centrado: con sitio para 4 carteles por fila, la última fila (3) queda centrada en la rejilla de 8 columnas */
 #tab-resumen { container-type: inline-size; }
 @container (min-width: 1000px) {
   .kpis { grid-template-columns: repeat(8, 1fr); }
   .kpis .kpi { grid-column: span 2; }
-  .kpis .kpi:nth-child(9) { grid-column: 4 / span 2; }
+  .kpis .kpi:nth-child(5) { grid-column: 2 / span 2; }
 }
 @container (min-width: 740px) and (max-width: 999px) {
   .kpis { grid-template-columns: repeat(6, 1fr); }
   .kpis .kpi { grid-column: span 2; }
+  .kpis .kpi:nth-child(7) { grid-column: 3 / span 2; }
 }
 .kpi-leyenda__libre { background: linear-gradient(90deg, #BC556D 50%, #EBC4CE 50%); }

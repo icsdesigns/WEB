@@ -70,11 +70,9 @@
       <button data-tab="resumen" class="activa">Resumen</button>
       <button data-tab="filamentos">Filamentos</button>
       <button data-tab="productos">Productos</button>
-      <button data-tab="trabajos">Trabajos</button>
       <button data-tab="galeria">Galería</button>
       <button data-tab="visualizador">Visualizador</button>
       <button data-tab="tasadora">Tasadora</button>
-      <button data-tab="notas">Notas</button>
       <button data-tab="almacenamiento">Almacenamiento</button>
     </nav>
 
@@ -82,25 +80,6 @@
       <!-- RESUMEN -->
       <section id="tab-resumen">
         <div class="kpis" id="kpis"></div>
-      </section>
-
-      <!-- NOTAS -->
-      <section id="tab-notas" class="oculto">
-        <div class="panel">
-          <h2>Nueva nota</h2>
-          <form class="fila" id="form-nota">
-            <input type="text" id="nota-titulo" placeholder="Título" required>
-            <textarea id="nota-contenido" placeholder="Contenido de la nota..." required></textarea>
-            <button type="submit" class="btn">Guardar nota</button>
-          </form>
-        </div>
-        <div class="panel">
-          <h2>Notas</h2>
-          <div class="toolbar">
-            <input type="search" id="buscar-notas" placeholder="Buscar en las notas...">
-          </div>
-          <div id="lista-notas"></div>
-        </div>
       </section>
 
       <!-- FILAMENTOS (STOCK) -->
@@ -184,27 +163,6 @@
         </div>
       </section>
 
-      <!-- TRABAJOS REALIZADOS -->
-      <section id="tab-trabajos" class="oculto">
-        <div class="panel">
-          <h2>Nuevo trabajo realizado</h2>
-          <form class="fila" id="form-trabajo">
-            <input type="text" id="trabajo-titulo" placeholder="Título del trabajo" required>
-            <input type="text" id="trabajo-cliente" placeholder="Cliente (opcional)">
-            <input type="date" id="trabajo-fecha">
-            <input type="number" id="trabajo-precio" placeholder="Precio cobrado (€)" step="0.01" min="0">
-            <textarea id="trabajo-descripcion" placeholder="Descripción, materiales usados, tiempo de impresión..."></textarea>
-            <button type="submit" class="btn">Guardar</button>
-          </form>
-        </div>
-        <div class="panel">
-          <h2>Historial de trabajos</h2>
-          <div class="toolbar">
-            <input type="search" id="buscar-trabajos" placeholder="Buscar título o cliente...">
-          </div>
-          <div id="lista-trabajos"></div>
-        </div>
-      </section>
       <!-- GALERÍA: fotos de trabajos realizados que se ven en Valoraciones (js/admin-galeria.js) -->
       <section id="tab-galeria" class="oculto">
         <div class="panel">
@@ -259,9 +217,7 @@
       pantallaDash.classList.remove('oculto');
       $('usuario-email').textContent = user.email;
       cargarCategorias().then(cargarProductos);
-      cargarNotas();
       cargarFilamentos();
-      cargarTrabajos();
     }
 
     $('form-login').addEventListener('submit', async (e) => {
@@ -293,7 +249,7 @@
       btn.addEventListener('click', () => {
         document.querySelectorAll('nav.pestanas button').forEach((b) => b.classList.remove('activa'));
         btn.classList.add('activa');
-        ['resumen', 'notas', 'productos', 'filamentos', 'trabajos', 'galeria', 'visualizador', 'tasadora', 'almacenamiento'].forEach((t) => $('tab-' + t).classList.add('oculto'));
+        ['resumen', 'productos', 'filamentos', 'galeria', 'visualizador', 'tasadora', 'almacenamiento'].forEach((t) => $('tab-' + t).classList.add('oculto'));
         $('tab-' + btn.dataset.tab).classList.remove('oculto');
         if (btn.dataset.tab === 'tasadora') abrirTasadora();
         if (btn.dataset.tab === 'galeria' && window.abrirGaleria) window.abrirGaleria();
@@ -337,9 +293,7 @@
 
     // Buscadores y filtros: re-renderizan la lista al escribir o cambiar
     [['buscar-filamentos', () => renderFilamentos()], ['filtro-material', () => renderFilamentos()],
-     ['buscar-productos', () => renderProductos()], ['filtro-categoria', () => renderProductos()],
-     ['buscar-trabajos', () => renderTrabajos()],
-     ['buscar-notas', () => renderNotas()]].forEach(([id, fn]) => {
+     ['buscar-productos', () => renderProductos()], ['filtro-categoria', () => renderProductos()]].forEach(([id, fn]) => {
       $(id).addEventListener('input', fn);
       $(id).addEventListener('change', fn);
     });
@@ -373,51 +327,6 @@
       await cargarCategorias();
       $('producto-categoria').value = nombre;
     });
-
-    // ================= NOTAS =================
-    let notasCache = [];
-
-    async function cargarNotas() {
-      const { data, error } = await sb.from('notas').select('*').order('creado_en', { ascending: false });
-      if (error) { $('lista-notas').innerHTML = `<p class="vacio">Error: ${error.message}</p>`; return; }
-      notasCache = data;
-      renderNotas();
-    }
-
-    function renderNotas() {
-      const cont = $('lista-notas');
-      if (!notasCache.length) { cont.innerHTML = '<p class="vacio">No hay notas todavía.</p>'; return; }
-      const q = $('buscar-notas').value.toLowerCase().trim();
-      const data = notasCache.filter((n) => !q || (n.titulo + ' ' + n.contenido).toLowerCase().includes(q));
-      if (!data.length) { cont.innerHTML = '<p class="vacio">Sin resultados para esta búsqueda.</p>'; return; }
-      cont.innerHTML = data.map((n) => `
-        <div class="nota-card">
-          <h3>${esc(n.titulo)}</h3>
-          <p>${esc(n.contenido)}</p>
-          <div class="meta">
-            <span>${new Date(n.creado_en).toLocaleString('es-ES')}</span>
-            <button class="btn-borrar" onclick="borrarNota('${n.id}')">Borrar</button>
-          </div>
-        </div>`).join('');
-    }
-
-    $('form-nota').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const { error } = await sb.from('notas').insert({
-        titulo: $('nota-titulo').value.trim(),
-        contenido: $('nota-contenido').value.trim(),
-      });
-      if (error) { alert('Error al guardar: ' + error.message); return; }
-      e.target.reset();
-      cargarNotas();
-    });
-
-    window.borrarNota = async (id) => {
-      if (!confirm('¿Borrar esta nota?')) return;
-      const { error } = await sb.from('notas').delete().eq('id', id);
-      if (error) alert('Error: ' + error.message);
-      cargarNotas();
-    };
 
     // ================= PRODUCTOS =================
     let productosCache = [];
@@ -833,65 +742,7 @@
       cargarFilamentos();
     };
 
-    // ================= TRABAJOS REALIZADOS =================
-    let trabajosCache = [];
-
-    async function cargarTrabajos() {
-      const { data, error } = await sb.from('trabajos').select('*').order('fecha', { ascending: false });
-      if (error) { $('lista-trabajos').innerHTML = `<p class="vacio">Error: ${error.message}</p>`; return; }
-      trabajosCache = data;
-      renderTrabajos();
-      renderResumen();
-    }
-
-    function renderTrabajos() {
-      const cont = $('lista-trabajos');
-      if (!trabajosCache.length) { cont.innerHTML = '<p class="vacio">No hay trabajos registrados todavía.</p>'; return; }
-      const q = $('buscar-trabajos').value.toLowerCase().trim();
-      const data = trabajosCache.filter((t) =>
-        !q || (t.titulo + ' ' + (t.cliente || '') + ' ' + (t.descripcion || '')).toLowerCase().includes(q));
-      if (!data.length) { cont.innerHTML = '<p class="vacio">Sin resultados para esta búsqueda.</p>'; return; }
-      const total = data.reduce((s, t) => s + (Number(t.precio) || 0), 0);
-      cont.innerHTML = `<p class="pista" style="margin-bottom:.7rem">
-          ${data.length} trabajos · ${total.toFixed(2)} € en total</p>
-        <table>
-        <thead><tr><th>Título</th><th>Cliente</th><th>Fecha</th><th>Precio</th><th></th></tr></thead>
-        <tbody>${data.map((t) => `
-          <tr>
-            <td data-label="Título"><strong>${esc(t.titulo)}</strong><br><span class="pista">${esc(t.descripcion || '')}</span></td>
-            <td data-label="Cliente">${esc(t.cliente || '—')}</td>
-            <td data-label="Fecha">${t.fecha ? new Date(t.fecha).toLocaleDateString('es-ES') : '—'}</td>
-            <td data-label="Precio">${t.precio != null ? Number(t.precio).toFixed(2) + ' €' : '—'}</td>
-            <td data-label=""><button class="btn-borrar" onclick="borrarTrabajo('${t.id}')">Borrar</button></td>
-          </tr>`).join('')}
-        </tbody></table>`;
-    }
-
-    $('form-trabajo').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const precio = $('trabajo-precio').value;
-      const { error } = await sb.from('trabajos').insert({
-        titulo: $('trabajo-titulo').value.trim(),
-        cliente: $('trabajo-cliente').value.trim() || null,
-        fecha: $('trabajo-fecha').value || null,
-        precio: precio === '' ? null : Number(precio),
-        descripcion: $('trabajo-descripcion').value.trim() || null,
-      });
-      if (error) { alert('Error al guardar: ' + error.message); return; }
-      e.target.reset();
-      cargarTrabajos();
-    });
-
-    window.borrarTrabajo = async (id) => {
-      if (!confirm('¿Borrar este trabajo?')) return;
-      const { error } = await sb.from('trabajos').delete().eq('id', id);
-      if (error) alert('Error: ' + error.message);
-      cargarTrabajos();
-    };
-
     const ICO_RES = {
-      trabajos: '<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"/></svg>',
-      notas: '<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg>',
       galeria: '<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>',
       visualizador: '<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 3.5 7v10L12 21.5 20.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg>',
       tasadora: '<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8.5 6.5h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>',
@@ -982,10 +833,6 @@
       const visibles = productosCache.filter((p) => p.visible).length;
 
       const x = resumenExtra || {};
-      const totalIngresos = trabajosCache.reduce((s, t) => s + (Number(t.precio) || 0), 0);
-      const detalleTrabajos = trabajosCache.length
-        ? `${totalIngresos.toFixed(2)} € acumulados`
-        : 'Registra tu primer trabajo';
       const detalleFilamentos = filamentosCache.length
         ? `${materiales} ${materiales === 1 ? 'material' : 'materiales'}` +
           (bajos ? ` · <span class="alerta-texto">${bajos} con poca cantidad</span>` : ' · stock al día')
@@ -997,11 +844,9 @@
       $('kpis').innerHTML =
         kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 2.5 7 12 11.5 21.5 7z"/><path d="m2.5 12 9.5 4.5L21.5 12"/><path d="m2.5 17 9.5 4.5L21.5 17"/></svg>', 'Filamentos', filamentosCache.length, detalleFilamentos, 'filamentos') +
         kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/><path d="m7.8 5.3 8.5 4.5"/></svg>', 'Productos', productosCache.length, detalleProductos, 'productos') +
-        kpiHtml(ICO_RES.trabajos, 'Trabajos realizados', trabajosCache.length, detalleTrabajos, 'trabajos') +
         kpiHtml(ICO_RES.galeria, 'Galería', x.galeria ? x.galeria.n : '–', x.galeria ? `${x.galeria.vis} visibles en la web` : 'Fotos de trabajos', 'galeria') +
         kpiHtml(ICO_RES.visualizador, 'Visualizador', x.visualizador ? x.visualizador.n : '–', x.visualizador ? `${x.visualizador.vis} opciones visibles` : 'Opciones 3D', 'visualizador') +
         kpiHtml(ICO_RES.tasadora, 'Tasadora', x.tasadora ? x.tasadora.n : '–', x.tasadora && x.tasadora.ult ? `Ajustes · editada el ${new Date(x.tasadora.ult).toLocaleDateString('es-ES')}` : 'Ajustes del presupuesto', 'tasadora') +
-        kpiHtml(ICO_RES.notas, 'Notas', notasCache.length, notasCache.length ? 'Notas guardadas' : 'Aún no hay notas', 'notas') +
         kpiAlmacenamientoHtml() +
         kpiUmamiHtml();
       cargarResumenExtra();
