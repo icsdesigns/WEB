@@ -765,3 +765,10 @@ h1,.page-title,.modal-title{font-family:'DM Serif Display',serif;font-style:ital
 .grp-more { margin-left: auto; font-size: .72rem; font-weight: 600; background: none; border: 1px solid var(--border, rgba(255,255,255,.15)); color: inherit; border-radius: 999px; padding: .15rem .65rem; cursor: pointer; }
 .state-sel { font: inherit; font-size: .75rem; font-weight: 600; border-radius: 999px; padding: .2rem .5rem; border: 1px solid currentColor; background: transparent; cursor: pointer; }
 .state-sel option { color: #111; background: #fff; }
+/* Móvil: la cabecera de sección no es una tarjeta ni lleva etiqueta (data-label) */
+@media(max-width:760px){
+  .orders-table-wrap tbody tr.grp-row{background:transparent;border:none;border-radius:0;padding:0;margin:.9rem 0 .45rem}
+  .orders-table-wrap tbody tr.grp-row:hover{background:transparent}
+  .orders-table-wrap tr.grp-row td{display:block;padding:0 .2rem .35rem !important;text-align:left}
+  .orders-table-wrap tr.grp-row td::before{content:none;display:none}
+}

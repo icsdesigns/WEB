@@ -3632,7 +3632,7 @@ function reclassifySel(est){ if(!est)return; var ids=S.orders.filter(function(o)
   billingSel={}; renderOrders(); toast3(ids.length+(ids.length===1?' pedido reclasificado':' pedidos reclasificados')+' como '+est.toLowerCase()+(est==='Pendiente'||est==='Activo'||est==='Finalizado'||est==='Rechazado'?'':''),estColor(est)); }
 function setOrdField(id,f,v){ var o=getOrder(id); if(!o)return; if(['precio_final','importe_pagado','peso_g','horas','cantidad','gasto_misc'].indexOf(f)>=0)v=num(v); o[f]=v; if(f==='importe_pagado'||f==='precio_final')autoArchive(o); save(); updateOrdBadge(); }
 function setOrderEstado(id,estado){ var o=getOrder(id); if(!o)return; o.estado=estado; o.status_updated_at=Date.now(); o.notif_snooze_until=0; save(); updateOrdBadge(); trackerLink(o); cajonSync(o); }
-/* Mantiene el pedido de 3DTracker alineado con 3DCalc: pendiente/activo/finalizado lo crean o actualizan; rechazado lo quita. */
+/* Mantiene el pedido de 3DTracker alineado con 3DCalc: pendiente/activo/finalizado lo crean o actualizan; rechazado lo marca (no lo borra). */
 function trackerLink(o){ try{ if(!o)return;
   if(ordState(o)==='Rechazado'){ trackerRemove(o); return; }
   if(!o.tracked){ trackerEnsure(o).catch(function(){}); return; }
@@ -3710,7 +3710,7 @@ function trackerEnsure(o){
     .then(function(ex){ return ex?null:mk(); }).then(function(){ o.tracked=true; syncTracker(o); save(); });
 }
 /* Lleva a la configuración del pedido en 3DTracker (sin cambiar su estado); si aún no existe allí, lo crea. */
-function openInTracker(id){ var o=getOrder(id); if(!o)return; if(ordState(o)==='Rechazado'){ toast3('Los pedidos rechazados no están en 3DTracker','#FF6B8A'); return; } var code=o.order_code||o.number;
+function openInTracker(id){ var o=getOrder(id); if(!o)return; if(ordState(o)==='Rechazado'&&!o.tracked){ toast3('Este pedido rechazado no está en 3DTracker','#FF6B8A'); return; } var code=o.order_code||o.number;
   function nav(){ try{ window.parent.postMessage({__dp3:true,type:'openTrackerOrder',code:code},'*'); }catch(e){} closeModal(); }
   if(o.tracked){ nav(); return; }
   toast3('Creando el pedido en 3DTracker\u2026','#4D9FFF');
@@ -4671,6 +4671,7 @@ function _purge(){ try{localStorage.removeItem(SK);localStorage.removeItem(SK+'_
     if((d.updated||0)<=myTs)return;
     if(_cfgDirty){ _cfgHeldRemote=d; return; }   /* hay cambios de Configuración sin confirmar: se aplica al terminar */
     S=d.data; migNames(S); applyBrand(); render(); _migFlush();
+    trackerPull(_trkDocs);   /* el estado recibido puede no traer aún los cambios hechos en 3DTracker */
   }
   function startCloud(){
     try{ window.DPCloud.onAuth(function(){ try{ webWatchSync(); }catch(e){} }); }catch(e){}   /* solicitudes web: engancha/suelta la escucha si cambia la sesión */
