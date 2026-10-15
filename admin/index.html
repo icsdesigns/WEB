@@ -982,6 +982,10 @@
       const visibles = productosCache.filter((p) => p.visible).length;
 
       const x = resumenExtra || {};
+      const totalIngresos = trabajosCache.reduce((s, t) => s + (Number(t.precio) || 0), 0);
+      const detalleTrabajos = trabajosCache.length
+        ? `${totalIngresos.toFixed(2)} € acumulados`
+        : 'Registra tu primer trabajo';
       const detalleFilamentos = filamentosCache.length
         ? `${materiales} ${materiales === 1 ? 'material' : 'materiales'}` +
           (bajos ? ` · <span class="alerta-texto">${bajos} con poca cantidad</span>` : ' · stock al día')
@@ -993,7 +997,7 @@
       $('kpis').innerHTML =
         kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 2.5 7 12 11.5 21.5 7z"/><path d="m2.5 12 9.5 4.5L21.5 12"/><path d="m2.5 17 9.5 4.5L21.5 17"/></svg>', 'Filamentos', filamentosCache.length, detalleFilamentos, 'filamentos') +
         kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/><path d="m7.8 5.3 8.5 4.5"/></svg>', 'Productos', productosCache.length, detalleProductos, 'productos') +
-        kpiHtml(ICO_RES.trabajos, 'Trabajos', trabajosCache.length, trabajosCache.length ? 'Trabajos realizados' : 'Registra tu primer trabajo', 'trabajos') +
+        kpiHtml(ICO_RES.trabajos, 'Trabajos realizados', trabajosCache.length, detalleTrabajos, 'trabajos') +
         kpiHtml(ICO_RES.galeria, 'Galería', x.galeria ? x.galeria.n : '–', x.galeria ? `${x.galeria.vis} visibles en la web` : 'Fotos de trabajos', 'galeria') +
         kpiHtml(ICO_RES.visualizador, 'Visualizador', x.visualizador ? x.visualizador.n : '–', x.visualizador ? `${x.visualizador.vis} opciones visibles` : 'Opciones 3D', 'visualizador') +
         kpiHtml(ICO_RES.tasadora, 'Tasadora', x.tasadora ? x.tasadora.n : '–', x.tasadora && x.tasadora.ult ? `Ajustes · editada el ${new Date(x.tasadora.ult).toLocaleDateString('es-ES')}` : 'Ajustes del presupuesto', 'tasadora') +
