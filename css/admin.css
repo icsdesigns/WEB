@@ -241,9 +241,14 @@ input[type="checkbox"] { accent-color: var(--primario); width: 17px; height: 17p
   .panel td .mini, .panel td .mini-vacia { margin-left: auto; }
 }
 
-/* Analítica (Umami incrustado) */
-.analitica-frame { width: 100%; height: min(1400px, 80vh); border: 1px solid var(--borde); border-radius: var(--radio-sm); background: var(--card); }
-.panel-analitica a { color: var(--s3d-brand-ink); font-weight: 600; }
+.kpi-enlace { text-decoration: none; color: inherit; }
+.kpi-enlace .kpi-valor { font-size: 32px; }
+
+/* Alineación horizontal entre carteles del Resumen: icono, cifra, título y detalle quedan a la misma altura en cada fila (subgrid) */
+@supports (grid-template-rows: subgrid) {
+  .kpis { row-gap: 16px; }
+  .kpis .kpi { display: grid; grid-row: span 4; grid-template-rows: subgrid; row-gap: 12px; justify-items: center; align-items: center; }
+}
 
 /* ============ Tasadora (pestaña) ============
    La tasadora va dentro de .quote-wrapper.is-ancho, como en el formulario: su distribución
@@ -555,3 +560,22 @@ form.fila .campo-archivo input[type="file"] { min-width: 0; width: 100%; flex-ba
 .gal-zona:focus-within { outline: 2px solid var(--primario); outline-offset: 2px; }
 .gal-foto input[type="text"], .gal-foto select, .gal-cola__campos input, .gal-cola__campos select { min-height: 40px; }
 .gal-foto__fila .btn { min-height: 40px; }
+
+/* Cartel de Almacenamiento del Resumen: gráfico circular (db, archivos, Firestore) */
+.kpi-circular { width: 76px; height: 76px; border-radius: 50%; -webkit-mask: radial-gradient(circle, transparent 0 46%, #000 47%); mask: radial-gradient(circle, transparent 0 46%, #000 47%); }
+.kpi-leyendas { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.kpi-leyenda { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; white-space: nowrap; max-width: 100%; }
+.kpi-leyenda i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+
+/* Resumen centrado: con sitio para 4 carteles por fila, el noveno queda centrado en la rejilla de 8 columnas */
+#tab-resumen { container-type: inline-size; }
+@container (min-width: 1000px) {
+  .kpis { grid-template-columns: repeat(8, 1fr); }
+  .kpis .kpi { grid-column: span 2; }
+  .kpis .kpi:nth-child(9) { grid-column: 4 / span 2; }
+}
+@container (min-width: 740px) and (max-width: 999px) {
+  .kpis { grid-template-columns: repeat(6, 1fr); }
+  .kpis .kpi { grid-column: span 2; }
+}
+.kpi-leyenda__libre { background: linear-gradient(90deg, #BC556D 50%, #EBC4CE 50%); }

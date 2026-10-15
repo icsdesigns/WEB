@@ -15,7 +15,7 @@
    ============================================================ */
 (function () {
   var CONFIG = {
-    websiteId: '',                                   // ← pega aquí el Website ID de Umami
+    websiteId: '5a0ee249-2095-4b98-8b7d-449d9c8c2eb8',                                 // ← pega aquí el Website ID de Umami
     script: 'https://cloud.umami.is/script.js',
     dominios: 'silab3d.com,www.silab3d.com'          // no cuenta las visitas en local
   };

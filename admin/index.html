@@ -75,7 +75,6 @@
       <button data-tab="visualizador">Visualizador</button>
       <button data-tab="tasadora">Tasadora</button>
       <button data-tab="notas">Notas</button>
-      <button data-tab="analitica">Analítica</button>
       <button data-tab="almacenamiento">Almacenamiento</button>
     </nav>
 
@@ -233,29 +232,9 @@
       <!-- ALMACENAMIENTO: espacio en Supabase y Firestore y reglas de limpieza (js/admin-almacenamiento.js) -->
       <section id="tab-almacenamiento" class="oculto"></section>
 
-      <!-- ANALÍTICA -->
-      <section id="tab-analitica" class="oculto">
-        <div class="panel panel-analitica">
-          <h2>Tráfico de la web <span class="pista">(visitas, páginas, procedencia y clics en contacto y presupuesto)</span></h2>
-          <div id="analitica-contenido"></div>
-        </div>
-      </section>
     </main>
   </div>
 
-  <script>
-    // Enlace compartido de Umami (Ajustes del sitio → Compartir → activar URL compartida). Es de solo lectura.
-    const UMAMI_SHARE_URL = '';
-    (function () {
-      const cont = document.getElementById('analitica-contenido');
-      if (!UMAMI_SHARE_URL) {
-        cont.innerHTML = '<p class="vacio">La analítica aún no está conectada. Pega el enlace compartido de Umami en UMAMI_SHARE_URL (parte superior del script de esta página).</p>';
-        return;
-      }
-      cont.innerHTML = '<iframe class="analitica-frame" src="' + UMAMI_SHARE_URL + '" title="Estadísticas de silab3d.com" loading="lazy"></iframe>' +
-        '<p class="pista" style="margin-top:10px"><a href="' + UMAMI_SHARE_URL + '" target="_blank" rel="noopener">Abrir en pantalla completa</a></p>';
-    })();
-  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // ================= INICIALIZACIÓN =================
@@ -314,7 +293,7 @@
       btn.addEventListener('click', () => {
         document.querySelectorAll('nav.pestanas button').forEach((b) => b.classList.remove('activa'));
         btn.classList.add('activa');
-        ['resumen', 'notas', 'productos', 'filamentos', 'trabajos', 'galeria', 'visualizador', 'tasadora', 'analitica', 'almacenamiento'].forEach((t) => $('tab-' + t).classList.add('oculto'));
+        ['resumen', 'notas', 'productos', 'filamentos', 'trabajos', 'galeria', 'visualizador', 'tasadora', 'almacenamiento'].forEach((t) => $('tab-' + t).classList.add('oculto'));
         $('tab-' + btn.dataset.tab).classList.remove('oculto');
         if (btn.dataset.tab === 'tasadora') abrirTasadora();
         if (btn.dataset.tab === 'galeria' && window.abrirGaleria) window.abrirGaleria();
@@ -910,13 +889,99 @@
       cargarTrabajos();
     };
 
+    const ICO_RES = {
+      trabajos: '<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"/></svg>',
+      notas: '<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg>',
+      galeria: '<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>',
+      visualizador: '<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 3.5 7v10L12 21.5 20.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg>',
+      tasadora: '<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8.5 6.5h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>',
+      almacenamiento: '<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>'
+    };
+    // Cartel de Almacenamiento: gráfico circular con base de datos, archivos y Firestore (misma función que la pestaña)
+    let almResumen = null;
+    function bytesLegibles(n) {
+      n = Number(n) || 0;
+      if (n >= 1073741824) return (n / 1073741824).toFixed(2).replace('.', ',') + ' GB';
+      if (n >= 1048576) return (n / 1048576).toFixed(n >= 104857600 ? 0 : 1).replace('.', ',') + ' MB';
+      return Math.round(n / 1024) + ' KB';
+    }
+    // «12,3/500 MB»: usado y límite en una sola línea; si lo usado es <10 % de la unidad del límite, usa su propia unidad («11,1 MB/1 GB»)
+    function fraccionBytes(b, lim) {
+      if (!lim) return bytesLegibles(b);
+      const unidad = (n) => (n >= 1073741824 ? [1073741824, 'GB'] : n >= 1048576 ? [1048576, 'MB'] : [1024, 'KB']);
+      const num = (v) => (v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2)).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '').replace('.', ',');
+      const ul = unidad(lim), ub = b / ul[0] < 0.1 ? unidad(b) : ul;
+      const usado = num(b / ub[0]) + (ub === ul ? '' : ' ' + ub[1]);
+      return usado + '/' + num(lim / ul[0]) + ' ' + ul[1];
+    }
+    async function cargarAlmResumen() {
+      if (almResumen !== null || !sb) return;
+      almResumen = false;
+      try {
+        const { data, error } = await sb.functions.invoke('gestor-almacenamiento', { body: { accion: 'uso' } });
+        if (error || !data || data.error || !data.supabase) return;
+        const archivos = (data.supabase.buckets || []).reduce((t, b) => t + Number(b.bytes), 0);
+        const f = data.firestore || {};
+        almResumen = [
+          { n: 'Base de datos', b: Number(data.supabase.db_bytes) || 0, lim: Number(data.limites && data.limites.db) || 0, c: '#BC556D', cl: '#EBC4CE' },
+          { n: 'Archivos', b: archivos, lim: Number(data.limites && data.limites.storage) || 0, c: '#5A4750', cl: '#C9BEC3' },
+          { n: 'Firestore', b: f.disponible ? Number(f.bytes) || 0 : 0, lim: Number(data.limites && data.limites.firestore) || 0, c: '#C9A227', cl: '#EEDFA6', off: !f.disponible }
+        ];
+        renderResumen();
+      } catch (_) { /* sin función desplegada: el cartel queda como enlace */ }
+    }
+    function kpiAlmacenamientoHtml() {
+      if (!almResumen) {
+        return `<div class="kpi" onclick="irATab('almacenamiento')" title="Ir a almacenamiento">
+        <div class="kpi-icono">${ICO_RES.almacenamiento}</div>
+        <div class="kpi-valor">Ver</div>
+        <div class="kpi-titulo">Almacenamiento</div>
+        <div class="kpi-detalle">Espacio usado y limpieza</div>
+      </div>`;
+      }
+      // Cada partición ocupa su capacidad: tramo oscuro = usado, tramo claro = libre
+      const activas = almResumen.filter((p) => !p.off);
+      const total = activas.reduce((t, p) => t + Math.max(p.lim, p.b), 0) || 1;
+      let acum = 0;
+      const tramos = activas.map((p) => {
+        const cap = Math.max(p.lim, p.b), a = acum, m = acum + (p.b / total) * 100;
+        acum += (cap / total) * 100;
+        return `${p.c} ${a.toFixed(2)}% ${m.toFixed(2)}%, ${p.cl} ${m.toFixed(2)}% ${acum.toFixed(2)}%`;
+      }).join(', ');
+      const usado = activas.reduce((t, p) => t + p.b, 0);
+      const leyenda = activas.map((p) => `<span class="kpi-leyenda"><i style="background:${p.c}"></i>${p.n} ${fraccionBytes(p.b, p.lim)}</span>`).join('') +
+        '<span class="kpi-leyenda"><i class="kpi-leyenda__libre"></i>Claro: libre</span>';
+      return `<div class="kpi" onclick="irATab('almacenamiento')" title="Ir a almacenamiento">
+        <div class="kpi-circular" style="background:conic-gradient(${tramos})" role="img" aria-label="Reparto del almacenamiento"></div>
+        <div class="kpi-valor">${bytesLegibles(usado)}</div>
+        <div class="kpi-titulo">Almacenamiento</div>
+        <div class="kpi-detalle kpi-leyendas">${leyenda}</div>
+      </div>`;
+    }
+
+    // Datos de las demás pestañas para el resumen (se piden una vez; fallo = tarjeta sin cifra)
+    let resumenExtra = null;
+    async function cargarResumenExtra() {
+      if (resumenExtra || !sb) return;
+      resumenExtra = {};
+      const [gal, vis, tas] = await Promise.all([
+        sb.from('galeria').select('visible'),
+        sb.from('visualizador').select('visible'),
+        sb.from('config_tasadora').select('clave, actualizado').order('actualizado', { ascending: false })
+      ]);
+      if (!gal.error) resumenExtra.galeria = { n: gal.data.length, vis: gal.data.filter((f) => f.visible).length };
+      if (!vis.error) resumenExtra.visualizador = { n: vis.data.length, vis: vis.data.filter((o) => o.visible !== false).length };
+      if (!tas.error) resumenExtra.tasadora = { n: tas.data.length, ult: tas.data[0] && tas.data[0].actualizado };
+      renderResumen();
+    }
+
     // ================= RESUMEN (KPIs) =================
     function renderResumen() {
       const materiales = [...new Set(filamentosCache.map((f) => f.material))].length;
       const bajos = filamentosCache.filter((f) => cantidadDe(f) <= STOCK_BAJO).length;
       const visibles = productosCache.filter((p) => p.visible).length;
-      const totalIngresos = trabajosCache.reduce((s, t) => s + (Number(t.precio) || 0), 0);
 
+      const x = resumenExtra || {};
       const detalleFilamentos = filamentosCache.length
         ? `${materiales} ${materiales === 1 ? 'material' : 'materiales'}` +
           (bajos ? ` · <span class="alerta-texto">${bajos} con poca cantidad</span>` : ' · stock al día')
@@ -924,14 +989,30 @@
       const detalleProductos = productosCache.length
         ? `${visibles} visibles en la web`
         : 'Añade tu primer producto';
-      const detalleTrabajos = trabajosCache.length
-        ? `${totalIngresos.toFixed(2)} € acumulados`
-        : 'Registra tu primer trabajo';
 
       $('kpis').innerHTML =
         kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 2.5 7 12 11.5 21.5 7z"/><path d="m2.5 12 9.5 4.5L21.5 12"/><path d="m2.5 17 9.5 4.5L21.5 17"/></svg>', 'Filamentos', filamentosCache.length, detalleFilamentos, 'filamentos') +
         kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/><path d="m7.8 5.3 8.5 4.5"/></svg>', 'Productos', productosCache.length, detalleProductos, 'productos') +
-        kpiHtml('<svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.75 5.57 6.15.9-4.45 4.34 1.05 6.12L12 17.35 6.5 20.13l1.05-6.12L3.1 9.67l6.15-.9z"/></svg>', 'Trabajos realizados', trabajosCache.length, detalleTrabajos, 'trabajos');
+        kpiHtml(ICO_RES.trabajos, 'Trabajos', trabajosCache.length, trabajosCache.length ? 'Trabajos realizados' : 'Registra tu primer trabajo', 'trabajos') +
+        kpiHtml(ICO_RES.galeria, 'Galería', x.galeria ? x.galeria.n : '–', x.galeria ? `${x.galeria.vis} visibles en la web` : 'Fotos de trabajos', 'galeria') +
+        kpiHtml(ICO_RES.visualizador, 'Visualizador', x.visualizador ? x.visualizador.n : '–', x.visualizador ? `${x.visualizador.vis} opciones visibles` : 'Opciones 3D', 'visualizador') +
+        kpiHtml(ICO_RES.tasadora, 'Tasadora', x.tasadora ? x.tasadora.n : '–', x.tasadora && x.tasadora.ult ? `Ajustes · editada el ${new Date(x.tasadora.ult).toLocaleDateString('es-ES')}` : 'Ajustes del presupuesto', 'tasadora') +
+        kpiHtml(ICO_RES.notas, 'Notas', notasCache.length, notasCache.length ? 'Notas guardadas' : 'Aún no hay notas', 'notas') +
+        kpiAlmacenamientoHtml() +
+        kpiUmamiHtml();
+      cargarResumenExtra();
+      cargarAlmResumen();
+    }
+
+    // Tarjeta de estadísticas: enlace a Umami (su panel no se puede incrustar: X-Frame-Options)
+    const UMAMI_SHARE_URL = 'https://cloud.umami.is/share/Xjw3LitNvFV3cPWU';
+    function kpiUmamiHtml() {
+      return `<a class="kpi kpi-enlace" href="${UMAMI_SHARE_URL}" target="_blank" rel="noopener" title="Abrir las estadísticas en Umami">
+        <div class="kpi-icono"><svg class="s3d-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+        <div class="kpi-valor">Umami</div>
+        <div class="kpi-titulo">Estadísticas</div>
+        <div class="kpi-detalle">Visitas y clics de la web ↗</div>
+      </a>`;
     }
 
     function kpiHtml(icono, titulo, valor, detalle, tab) {
