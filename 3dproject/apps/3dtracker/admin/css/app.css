@@ -277,6 +277,8 @@ body::before {
 }
 .stat-value.green  { color: var(--success); }
 .stat-value.yellow { color: var(--warning); }
+.stat-value.red    { color: #FF6B8A; }
+.stats-grid.stats-4 { grid-template-columns: repeat(4, 1fr); }
 
 /* ── Orders Table ── */
 .section-header {
@@ -684,7 +686,7 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
 .sidebar-cta:hover{filter:brightness(1.07)}
 
 /* ── Responsive (móvil / ventanas estrechas) ── */
-@media(max-width:860px){ .stats-grid{grid-template-columns:repeat(3,1fr)} }
+@media(max-width:860px){ .stats-grid{grid-template-columns:repeat(3,1fr)} .stats-grid.stats-4{grid-template-columns:repeat(2,1fr)} }
 @media(max-width:760px){
   /* Barra lateral como panel superpuesto */
   .sidebar{position:fixed;top:52px;bottom:0;left:0;z-index:300;width:74vw;max-width:280px;transition:transform .25s ease;box-shadow:8px 0 30px rgba(0,0,0,.45)}
@@ -699,6 +701,7 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
   .detail-grid{grid-template-columns:1fr}
   /* Estadísticas compactas en una fila */
   .stats-grid{grid-template-columns:repeat(3,1fr);gap:.55rem;margin-bottom:1.1rem}
+  .stats-grid.stats-4{grid-template-columns:repeat(2,1fr)}
   .stat-card{padding:.8rem .7rem}
   .stat-label{font-size:.62rem}
   .stat-value{font-size:1.35rem}
@@ -752,3 +755,13 @@ h1,.page-title,.modal-title{font-family:'DM Serif Display',serif;font-style:ital
 .sidebar .nav-item.active{border:1px solid rgba(52,211,153,.22)}
 
 @media(max-width:600px){ .appbar{gap:6px;padding:0 8px} .appbar .btn-primary{display:none} .appbar .ab-search{width:auto;flex:1;min-width:60px} }
+
+/* ── Categorías de pedidos (iguales que en 3DCalc) ── */
+.grp-row td { padding: .7rem 1rem .45rem !important; background: transparent !important; border-bottom: 1px solid var(--border, rgba(255,255,255,.08)); cursor: default; }
+.grp-row:hover td { background: transparent !important; }
+.grp-h { display: flex; align-items: center; gap: .55rem; font-size: .8rem; font-weight: 700; letter-spacing: .02em; }
+.grp-h i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.grp-h .grp-n { font-weight: 500; opacity: .6; }
+.grp-more { margin-left: auto; font-size: .72rem; font-weight: 600; background: none; border: 1px solid var(--border, rgba(255,255,255,.15)); color: inherit; border-radius: 999px; padding: .15rem .65rem; cursor: pointer; }
+.state-sel { font: inherit; font-size: .75rem; font-weight: 600; border-radius: 999px; padding: .2rem .5rem; border: 1px solid currentColor; background: transparent; cursor: pointer; }
+.state-sel option { color: #111; background: #fff; }

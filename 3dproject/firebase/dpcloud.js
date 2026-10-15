@@ -173,6 +173,14 @@ function watchOrders(cb) {
     () => cb(), (err) => console.warn("watchOrders", err && err.message)); }
   catch (e) { return function(){}; }
 }
+// Como watchOrders, pero entrega los documentos (sin etapas): 3DCalc los usa para aplicar los cambios de estado hechos en 3DTracker.
+function watchOrderDocs(cb) {
+  const u = auth.currentUser; if (!u) return function(){};
+  try { return onSnapshot(collection(db, "orders"),
+    (snap) => { cb(snap.docs.map(d => ({ id: d.id, ...d.data() }))); },
+    (err) => console.warn("watchOrderDocs", err && err.message)); }
+  catch (e) { return function(){}; }
+}
 function watchFeedback(cb) {
   const u = auth.currentUser; if (!u) return function(){};
   try { return onSnapshot(query(collection(db, "feedback"), orderBy("created", "desc")),
@@ -215,7 +223,7 @@ window.DPCloud = {
   listOrders, createOrder, updateOrder, getOrderById, getOrderByCode,
   addStep, setStepStatus, updateStep, deleteStep, deleteOrder,
   listFeedback, addFeedback, updateFeedback, deleteFeedback,
-  loadState, saveState, watchState, watchOrders, watchFeedback, watchOrderByCode,
+  loadState, saveState, watchState, watchOrders, watchOrderDocs, watchFeedback, watchOrderByCode,
   listPresets, createPreset, deletePreset,
   watchWebOrders, markWebOrderImported
 };

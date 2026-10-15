@@ -59,23 +59,36 @@ function formatDate(iso) {
   });
 }
 
-// ── Calcular estado del pedido ────────────────
-function getOrderStatus(order) {
-  // Si el pedido viene de 3DCalc con seguimiento activado, manda su clasificación.
-  const sync = order.calc_status;
-  if (sync === 'archivado')  return { label: 'Archivado',  css: 'pending' };
-  if (sync === 'pendiente')  return { label: 'Pendiente',  css: 'pending' };
-  if (sync === 'rechazado')  return { label: 'Rechazado',  css: 'rejected' };
-  if (sync === 'finalizado') return { label: 'Finalizado', css: 'done' };
-  if (sync === 'activo')     return { label: 'Activo',     css: 'partial' };
+// ── Estado del pedido ─────────────────────────
+// Mismas categorías que Pedidos de 3DCalc (activo / pendiente / finalizado / rechazado), definidas en
+// firebase/order-states.js. El estado vive en orders/{código}.calc_status y lo comparten ambas apps.
+const ST = window.DPOrderStates;
+let showAll = { finalizado: false, rechazado: false };   // como «Ver todos» de 3DCalc: finalizados y rechazados muestran 3
+const FIN_N = 3;
 
-  const steps = order.order_steps;
-  // Supabase puede devolver el conteo como array [{count: N}]
-  const count = Array.isArray(steps) ? steps[0]?.count ?? steps.length : 0;
-  if (count === 0) return { label: 'Sin etapas', css: 'pending' };
-  // Para el dashboard solo tenemos el conteo, así que mostramos genérico
-  return { label: 'En progreso', css: 'partial' };
+function getOrderStatus(order) {
+  const k = ST.keyOf(order);
+  return { key: k, label: ST.INFO[k].label, css: ST.INFO[k].css };
 }
+
+// Reclasifica un pedido: lo escribe en Firestore y 3DCalc lo aplica al recibirlo.
+async function setOrderState(code, key) {
+  const o = allOrders.find(x => x.order_code === code || x.id === code);
+  if (!o || !ST.INFO[key] || ST.keyOf(o) === key) { renderTable(filterOrders(searchTerm)); return; }
+  const campos = { calc_status: key, calc_synced_at: Date.now() };
+  if (key === 'activo' && !o.activated_at) campos.activated_at = new Date().toISOString();
+  try {
+    await window.DPCloud.updateOrder(o.id, campos);
+    Object.assign(o, campos);
+    showToast('Pedido ' + o.order_code + ' → ' + ST.INFO[key].label.toLowerCase(), 'success');
+  } catch (e) {
+    showToast('No se pudo cambiar el estado: ' + (e.message || e), 'error');
+  }
+  updateStats(allOrders);
+  renderTable(filterOrders(searchTerm));
+}
+window.setOrderState = setOrderState;
+window.toggleGroup = function (k) { showAll[k] = !showAll[k]; renderTable(filterOrders(searchTerm)); };
 
 // ── Días que lleva activo ─────────────────────
 // Cuenta desde que se activó el pedido en 3DTracker hasta que se completan
@@ -103,8 +116,6 @@ function activeDaysLabel(order){
 
 // ── Renderizar tabla ──────────────────────────
 function renderTable(orders) {
-  // Los pedidos rechazados en 3DCalc no se muestran en 3DTracker.
-  orders = (orders || []).filter(o => o.calc_status !== 'rechazado');
   const tbody     = document.getElementById('orders-tbody');
   const table     = document.getElementById('orders-table');
   const emptyEl   = document.getElementById('table-empty');
@@ -121,7 +132,9 @@ function renderTable(orders) {
   emptyEl.style.display  = 'none';
   table.style.display    = '';
 
-  tbody.innerHTML = orders.map(order => {
+  const stateSelect = (order, status) => `<select class="state-sel" style="color:${ST.INFO[status.key].color}" onclick="event.stopPropagation()" onchange="setOrderState('${escapeHtml(order.order_code)}', this.value)">${
+    ST.KEYS.map(k => `<option value="${k}"${k === status.key ? ' selected' : ''}>${ST.INFO[k].label}</option>`).join('')}</select>`;
+  const rowHtml = order => {
     const status = getOrderStatus(order);
     const stepsArr = order.order_steps;
     const count = Array.isArray(stepsArr) ? (stepsArr[0]?.count ?? stepsArr.length) : 0;
@@ -133,14 +146,26 @@ function renderTable(orders) {
         <td data-label="Descripción" style="color:var(--text-secondary);">${escapeHtml(order.description || '—')}</td>
         <td data-label="Pasos" style="color:var(--text-secondary);">${count}</td>
         <td data-label="Días activo" style="color:var(--text-secondary);">${activeDaysLabel(order)}</td>
-        <td data-label="Estado"><span class="badge ${status.css}">${status.label}</span></td>
+        <td data-label="Estado">${stateSelect(order, status)}</td>
         <td data-label="Fecha de creación" style="color:var(--text-muted);">${formatDate(order.created_at)}</td>
         <td data-label="" style="text-align:center;width:46px"><button class="ord-del" title="Eliminar pedido" onclick="event.stopPropagation();deleteOrderUI('${order.id}','${escapeHtml(order.order_code)}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg></button></td>
       </tr>`;
-  }).join('');
+  };
+  // Secciones en el mismo orden y con las mismas categorías que Pedidos de 3DCalc
+  let html = '';
+  ST.KEYS.forEach(k => {
+    const list = orders.filter(o => ST.keyOf(o) === k);
+    if (!list.length) return;
+    const limited = (k === 'finalizado' || k === 'rechazado') && list.length > FIN_N;
+    const shown = limited && !showAll[k] ? list.slice(0, FIN_N) : list;
+    html += `<tr class="grp-row"><td colspan="8"><div class="grp-h"><i style="background:${ST.INFO[k].color}"></i>${ST.INFO[k].plural} <span class="grp-n">(${list.length})</span>${
+      limited ? `<button class="grp-more" onclick="event.stopPropagation();toggleGroup('${k}')">${showAll[k] ? 'Ver menos' : 'Ver todos'}</button>` : ''}</div></td></tr>`;
+    html += shown.map(rowHtml).join('');
+  });
+  tbody.innerHTML = html;
 
   // Click en fila → navegar al detalle
-  tbody.querySelectorAll('tr').forEach(row => {
+  tbody.querySelectorAll('tr[data-id]').forEach(row => {
     row.addEventListener('click', async () => {
       await window.electronAPI.setSharedData({
         orderId:   row.dataset.id,
@@ -153,12 +178,9 @@ function renderTable(orders) {
 
 // ── Actualizar stats ──────────────────────────
 function updateStats(orders) {
-  orders = (orders || []).filter(o => o.calc_status !== 'rechazado');
-  document.getElementById('stat-total').textContent    = orders.length;
-
-  // Nota: sin datos de steps detallados en listado, stats básicos
-  document.getElementById('stat-done').textContent     = '—';
-  document.getElementById('stat-progress').textContent = orders.length;
+  const n = {}; ST.KEYS.forEach(k => n[k] = 0);
+  (orders || []).forEach(o => { n[ST.keyOf(o)]++; });
+  ST.KEYS.forEach(k => { document.getElementById('stat-' + k).textContent = n[k]; });
 }
 
 // ── Filtrar pedidos ───────────────────────────

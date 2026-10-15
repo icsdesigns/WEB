@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script type="module" src="firebase/dpcloud.js"></script>
+<script src="firebase/order-states.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1771,10 +1772,8 @@ window.addEventListener('message',function(e){var d=e.data;if(d&&d.__dp3&&d.type
   }
   function activeList(){
     return (orders||[]).filter(function(o){
-      if(o.calc_status==='rechazado') return false; /* rechazados en 3DCalc: fuera de 3DTracker */
-      var st=Array.isArray(o.order_steps)?o.order_steps:[];
-      var total=st.length, done=st.filter(function(x){return x.status==='done';}).length;
-      return !(total>0 && done===total);
+      /* solo los pedidos activos (misma categoría que en Pedidos de 3DCalc); pendientes, finalizados y rechazados no cuentan */
+      return window.DPOrderStates ? window.DPOrderStates.keyOf(o)==='activo' : o.calc_status==='activo';
     });
   }
   function render(){

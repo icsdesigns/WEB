@@ -8,6 +8,7 @@
   <title>Dashboard — 3DProject Admin</title>
   <link rel="stylesheet" href="css/app.css" />
   <script type="module" src="../../../firebase/dpcloud.js"></script>
+  <script src="../../../firebase/order-states.js"></script>
 <link rel="stylesheet" href="../../../css/light-theme.css?v=20260731">
 </head>
 <body>
@@ -48,18 +49,22 @@
       <div class="page-body">
 
         <!-- Stats -->
-        <div class="stats-grid">
+        <div class="stats-grid stats-4">
           <div class="stat-card">
-            <div class="stat-label">Total pedidos</div>
-            <div class="stat-value accent" id="stat-total">—</div>
+            <div class="stat-label">Pedidos activos</div>
+            <div class="stat-value accent" id="stat-activo">—</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Completados</div>
-            <div class="stat-value green" id="stat-done">—</div>
+            <div class="stat-label">Pedidos pendientes</div>
+            <div class="stat-value yellow" id="stat-pendiente">—</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">En progreso</div>
-            <div class="stat-value yellow" id="stat-progress">—</div>
+            <div class="stat-label">Pedidos finalizados</div>
+            <div class="stat-value green" id="stat-finalizado">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pedidos rechazados</div>
+            <div class="stat-value red" id="stat-rechazado">—</div>
           </div>
         </div>
 
@@ -87,7 +92,7 @@
                 <th>Descripción</th>
                 <th>Pasos</th>
                 <th>Días activo</th>
-                <th>Estado</th>
+                <th>Estado <span style="font-weight:400;opacity:.6">(cambiar)</span></th>
                 <th>Fecha de creación</th>
                 <th></th>
               </tr>

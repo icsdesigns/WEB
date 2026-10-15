@@ -3637,12 +3637,30 @@ function trackerLink(o){ try{ if(!o)return;
   if(ordState(o)==='Rechazado'){ trackerRemove(o); return; }
   if(!o.tracked){ trackerEnsure(o).catch(function(){}); return; }
   syncTracker(o); }catch(e){} }
-function trackerRemove(o){ var code=o&&(o.order_code||o.number);
-  if(!o||!o.tracked||!code||!(window.DPCloud&&window.DPCloud.deleteOrder))return;
-  syncTracker(o); /* marca calc_status:'rechazado' (el dashboard lo oculta aunque el borrado falle) */
-  var id=o.id;
-  window.DPCloud.deleteOrder(code).then(function(){ var c=getOrder(id)||o; c.tracked=false; c.tracker_activated_at=null; save();
-    if(ordState(c)!=='Rechazado') trackerLink(c); /* se reclasificó mientras se borraba: se recrea */ }).catch(function(){}); }
+/* Un pedido rechazado se queda en 3DTracker, en su sección «Rechazados» (misma categoría que aquí), con calc_status:'rechazado'. */
+function trackerRemove(o){ if(!o||!o.tracked)return; syncTracker(o); }
+/* Aplica aquí los cambios de estado hechos en 3DTracker (orders/{código}.calc_status + calc_synced_at); gana el más reciente.
+   Si 3DCalc va por delante (o el pedido aún no tiene estado allí), es 3DCalc quien lo escribe. */
+var _trkDocs=null;
+function trackerPull(docs){
+  try{
+    if(!loaded||!Array.isArray(docs)||!Array.isArray(S.orders))return;
+    var by={}; docs.forEach(function(d){ if(d&&d.id)by[d.id]=d; });
+    var ch=false;
+    S.orders.forEach(function(o){
+      if(!o||!o.tracked)return;
+      var d=by[o.order_code||o.number]; if(!d)return;
+      var mine=trackerStateOf(o), theirs=d.calc_status;
+      if(mine==='archivado'||theirs===mine)return;
+      var est={activo:'Activo',pendiente:'Pendiente',finalizado:'Finalizado',rechazado:'Rechazado'}[theirs];
+      if(!est||num(d.calc_synced_at)<=num(o.status_updated_at)){ syncTracker(o); return; }
+      o.estado=est; o.status_updated_at=num(d.calc_synced_at); o.notif_snooze_until=0;
+      if(est==='Activo'&&!o.tracker_activated_at)o.tracker_activated_at=Date.now();
+      try{ cajonSync(o); }catch(e){} ch=true;
+    });
+    if(ch){ save(); updateOrdBadge(); if(!_cfgDirty)render(); }
+  }catch(e){}
+}
 /* ── Sincronización con 3DTracker ────────────────────────────────────────────
    Los pedidos con seguimiento activado (o.tracked) replican su clasificación
    de 3DCalc en 3DTracker: activo / finalizado / archivado. */
@@ -4658,6 +4676,7 @@ function _purge(){ try{localStorage.removeItem(SK);localStorage.removeItem(SK+'_
     try{ window.DPCloud.onAuth(function(){ try{ webWatchSync(); }catch(e){} }); }catch(e){}   /* solicitudes web: engancha/suelta la escucha si cambia la sesión */
     try{ window.DPCloud.onAuth(function(_u){
       if(!_u||_sub)return; _sub=true;
+      if(window.DPCloud.watchOrderDocs){ try{ window.DPCloud.watchOrderDocs(function(docs){ _trkDocs=docs; (function t(k){ if(loaded)trackerPull(_trkDocs); else if(k<20)setTimeout(function(){t(k+1);},1000); })(0); }); }catch(e){} }   /* estados de 3DTracker */
       if(window.DPCloud.watchState){ window.DPCloud.watchState('3dcalc', applyRemote); }
       else { window.DPCloud.loadState('3dcalc').then(function(data){ applyRemote(data?{data:data,updated:Date.now()}:null); }).catch(function(){ loaded=true; go('dash'); }); }
     }); }catch(e){}
