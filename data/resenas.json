@@ -1,15 +1,23 @@
 {
   "_ayuda": "Reseñas de Google que muestra la web (portada y Valoraciones). Las actualiza cada semana .github/workflows/resenas-google.yml con scripts/resenas-google.mjs; también se pueden editar a mano. La web solo muestra las de 4 o 5 estrellas con texto. idsElfsight = reseñas ya contadas.",
-  "actualizado": "2026-10-06",
+  "actualizado": "2026-10-16",
   "lugar": {
     "nombre": "SILAB 3D",
     "placeId": "ChIJGQ63KweGFG8R46Cqr-kS67k",
     "nota": 5,
-    "total": 27,
+    "total": 32,
     "url": "https://www.google.com/maps?cid=13396822311427547363",
     "escribir": "https://g.page/r/CeOgqq_pEuu5EBM/review"
   },
   "resenas": [
+    {
+      "id": "elfsight-c663c5c0-78e8-4541-b100-adc8ca3c99af",
+      "autor": "Shem Nor",
+      "nota": 5,
+      "texto": "Very professional and skilled in making high precision parts. High quality print",
+      "fecha": "2026-10-10",
+      "url": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT25GNGEzbDVaMGRGZUZwaVVXUXRUQzFCYUZKbE1XYxAB!2m1!1s0x0:0xb9eb12e9afaaa0e3!3m1!1s2@1:CAIQACodChtycF9oOnF4a3l5Z0dFeFpiUWQtTC1BaFJlMWc%7C%7C"
+    },
     {
       "id": "elfsight-8a3123e8-8060-4301-902f-83c43241a41f",
       "autor": "Beatriz Perez",
@@ -247,6 +255,11 @@
     "4bb128ca-902e-43b8-89c3-82f152e244e4",
     "d744005d-916b-4d8c-992e-305932c1f238",
     "28691007-7461-455c-9cd4-93baf246fac9",
-    "8gdWEt"
+    "8gdWEt",
+    "c663c5c0-78e8-4541-b100-adc8ca3c99af",
+    "40b3f88f-36b7-4eee-a746-c493334e4cea",
+    "cddc4ec1-0ecd-46f3-92d5-f436ada9d325",
+    "c5800382-2f99-4e76-a238-0c159c372daf",
+    "eb98e28d-cf2d-4ae2-ad62-aedf7feecf24"
   ]
 }
