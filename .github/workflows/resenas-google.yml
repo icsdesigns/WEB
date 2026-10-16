@@ -1,0 +1,35 @@
+name: Reseñas de Google
+
+# Cada lunes añade a data/resenas.json las reseñas nuevas de la ficha de Google.
+# No necesita claves: las lee del servicio de datos de Elfsight (cuenta gratuita activa).
+# Opcional: con el secreto GOOGLE_PLACES_KEY las lee de la API oficial de Google (pide facturación).
+on:
+  schedule:
+    - cron: '0 6 * * 1'      # lunes a las 6:00 UTC
+  workflow_dispatch:          # y a mano (Actions → Run workflow)
+
+jobs:
+  resenas:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Actualizar data/resenas.json
+        env:
+          GOOGLE_PLACES_KEY: ${{ secrets.GOOGLE_PLACES_KEY }}
+        run: node scripts/resenas-google.mjs data/resenas.json
+      - name: Commit si hay cambios
+        run: |
+          if [[ -n "$(git status --porcelain data/resenas.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add data/resenas.json
+            git commit -m "chore: reseñas de Google de la semana"
+            git pull --rebase origin main && git push
+          else
+            echo "Sin cambios."
+          fi
