@@ -37,7 +37,10 @@ async function desdeElfsight() {
   const ids = todas.map((x) => String(x.id));
   let { nota, total } = datos.lugar;
   if (Array.isArray(datos.idsElfsight)) {
-    const nuevasTodas = todas.filter((x) => !datos.idsElfsight.includes(String(x.id)));
+    // Elfsight a veces reasigna el id de una reseña ya conocida: se descarta si coincide autor y día con una guardada
+    const conocidas = new Set(datos.resenas.map((x) => x.autor.toLowerCase() + '|' + x.fecha));
+    const dia = (x) => (x.reviewer_name || 'Cliente de Google').trim().toLowerCase() + '|' + new Date(x.published_at * 1000).toISOString().slice(0, 10);
+    const nuevasTodas = todas.filter((x) => !datos.idsElfsight.includes(String(x.id)) && !conocidas.has(dia(x)));
     if (nuevasTodas.length) {
       nota = Math.round((nota * total + nuevasTodas.reduce((s, x) => s + x.rating, 0)) / (total + nuevasTodas.length) * 10) / 10;
       total += nuevasTodas.length;
