@@ -144,7 +144,7 @@
   // Fondo del escenario que contrasta con el jarrón: oscuro en colores claros y claro en los oscuros
   function stage(c) {
     var l = hsl(c.hex).l, st = document.getElementById('modalBanner').style;
-    if (c.marble || l > 72) { st.setProperty('--stage-1', '#E6DBDF'); st.setProperty('--stage-2', '#BBAAB2'); }
+    if (c.marble || l > 72) { st.setProperty('--stage-1', '#F5F0F2'); st.setProperty('--stage-2', '#DACFD4'); }
     else if (l < 30) { st.setProperty('--stage-1', '#FFFFFF'); st.setProperty('--stage-2', '#EADDE2'); }
     else { st.setProperty('--stage-1', '#FFFFFF'); st.setProperty('--stage-2', 'color-mix(in srgb, ' + c.hex + ' 24%, #FBF7F8)'); }
   }
