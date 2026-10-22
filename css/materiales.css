@@ -118,7 +118,7 @@
 }
 /* Escenario a todo el ancho, con fondo que contrasta con el color del jarrón */
 .color-modal__stage {
-  --stage-1: #FFFFFF; --stage-2: #F1E4E8;
+  --stage-1: #FFFFFF; --stage-2: #E3E4E8;
   width: calc(100% + 48px); margin: 0 -24px 20px; aspect-ratio: 4 / 3; overflow: hidden;
   background: radial-gradient(circle at 50% 38%, var(--stage-1), var(--stage-2) 80%);
   transition: background .3s;
