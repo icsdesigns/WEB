@@ -51,13 +51,13 @@
 
 /* ---------- Tarjetas de color (compactas) ---------- */
 .color-grid {
-  --color-margin: 14px; --color-space: 10px;
+  --color-margin: 18px; --color-space: 12px;
   --cols: 7; --gap: 10px;
   display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap);
   max-width: 1080px; margin-inline: auto;
 }
-/* Catálogo: tarjetas centradas en la fila (también la última) y componentes alineados
-   entre tarjetas: el nombre reserva dos líneas. */
+/* Catálogo: tarjetas centradas en la fila (también la última) y contenido centrado en cada
+   tarjeta (sin forzar alineación entre tarjetas). */
 .color-card {
   flex: 0 1 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
   min-width: 0;
@@ -68,9 +68,7 @@
   transition: border-color .2s, box-shadow .2s, transform .2s;
 }
 .color-card:hover { border-color: var(--s3d-mist); box-shadow: var(--s3d-shadow); transform: translateY(-2px); }
-.color-card h3 { font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
-/* Si algún nombre de la rejilla ocupa dos líneas, todos reservan dos para seguir alineados */
-.color-grid.names-2 .color-card h3 { min-height: 2.6em; }
+.color-card h3 { font-size: 14px; font-weight: 600; line-height: 1.3; margin-block: -.15em; }
 .color-card p { font-size: 12px; }
 .color-card .tag { color: var(--s3d-brand-ink); font-weight: 500; }
 .swatch {
