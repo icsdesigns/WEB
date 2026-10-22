@@ -146,7 +146,7 @@
     var lista = c.marble ? ['#D7D4CC'] : (c.colores && c.colores.length ? c.colores : [c.hex]);
     var l = lista.reduce(function (s, h) { return s + hsl(h).l; }, 0) / lista.length;
     var st = document.getElementById('modalBanner').style;
-    if (l >= 58) { st.setProperty('--stage-1', '#92929A'); st.setProperty('--stage-2', '#686870'); }
+    if (l >= 58) { st.setProperty('--stage-1', '#4B4B50'); st.setProperty('--stage-2', '#212124'); }
     else { st.setProperty('--stage-1', '#FFFFFF'); st.setProperty('--stage-2', '#E3E4E8'); }
   }
   function open(name, hex, mat) {
