@@ -573,3 +573,28 @@ form.fila .campo-archivo input[type="file"] { min-width: 0; width: 100%; flex-ba
   .kpis .kpi:nth-child(7) { grid-column: 3 / span 2; }
 }
 .kpi-leyenda__libre { background: linear-gradient(90deg, #BC556D 50%, #EBC4CE 50%); }
+
+/* Reordenar fotos arrastrando */
+.gal-foto { position: relative; }
+.gal-foto > a { cursor: grab; }
+.gal-asa {
+  position: absolute; top: 16px; left: 16px; z-index: 2; width: 34px; height: 34px; padding: 0;
+  display: grid; place-items: center; border: 0; border-radius: 10px; cursor: grab; touch-action: none;
+  background: rgba(255, 255, 255, .92); color: var(--texto); box-shadow: 0 2px 8px rgba(34, 28, 31, .22);
+  opacity: .9; transition: opacity .15s, transform .15s;
+}
+.gal-asa svg { width: 20px; height: 20px; fill: currentColor; }
+.gal-foto:hover .gal-asa, .gal-asa:focus-visible { opacity: 1; transform: scale(1.06); }
+.gal-asa:active { cursor: grabbing; }
+.gal-foto.is-arrastrando {
+  opacity: .45; background: var(--s3d-mist-soft); border-style: dashed; border-color: var(--primario);
+}
+.gal-foto.is-arrastrando > * { visibility: hidden; }
+.gal-fantasma {
+  position: fixed; z-index: 2000; margin: 0; pointer-events: none; transform: scale(1); background: var(--card);
+  box-shadow: 0 6px 16px rgba(34, 28, 31, .14); transition: transform .15s ease, box-shadow .15s ease;
+}
+.gal-fantasma.is-alzada { transform: scale(1.04) rotate(1.2deg); box-shadow: 0 24px 48px rgba(34, 28, 31, .3); }
+.gal-fantasma .gal-asa { cursor: grabbing; }
+body.gal-arrastrando, body.gal-arrastrando * { cursor: grabbing !important; user-select: none; -webkit-user-select: none; }
+@media (prefers-reduced-motion: reduce) { .gal-fantasma, .gal-asa { transition: none; } }
