@@ -79,13 +79,54 @@
   function linear(hex) {
     return [1, 3, 5].map(function (i) { return Math.pow(parseInt(hex.substr(i, 2), 16) / 255, 2.2); });
   }
-  function paintViewer(hex) {
+  /* Textura del jarrón para colores complejos (el modelo trae UV: u = vuelta, v = altura) */
+  function hexRgb(h) { return [1, 3, 5].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }
+  function degradado(colores) {
+    var cv = document.createElement('canvas'); cv.width = 8; cv.height = 512;
+    var g = cv.getContext('2d'), grad = g.createLinearGradient(0, 0, 0, 512);
+    // 3 o más colores: dos pasadas suaves de arriba abajo, como el filamento que va cambiando de color
+    var tramo = colores.length > 2 ? colores.concat(colores).concat([colores[0]]) : colores;
+    tramo.forEach(function (c, i) { grad.addColorStop(i / (tramo.length - 1), c); });
+    g.fillStyle = grad; g.fillRect(0, 0, 8, 512);
+    return cv.toDataURL('image/png');
+  }
+  function marmol() {
+    // La imagen y su espejo, para que la costura del jarrón no se note
+    return new Promise(function (ok) {
+      var img = new Image();
+      img.onload = function () {
+        var cv = document.createElement('canvas'), w = 512, h = 512; cv.width = w * 2; cv.height = h;
+        var g = cv.getContext('2d');
+        g.drawImage(img, 0, 0, w, h);
+        g.save(); g.translate(w * 2, 0); g.scale(-1, 1); g.drawImage(img, 0, 0, w, h); g.restore();
+        ok(cv.toDataURL('image/jpeg', .9));
+      };
+      img.onerror = function () { ok(null); };
+      img.src = '/img/marble-texture.webp';
+    });
+  }
+  var pintado = 0;
+  function paintViewer(c) {
     if (!viewer) return;
+    var id = ++pintado;
     var apply = function () {
-      if (viewer.model && viewer.model.materials[0]) {
-        var rgb = linear(hex);
-        viewer.model.materials[0].pbrMetallicRoughness.setBaseColorFactor([rgb[0], rgb[1], rgb[2], 1]);
-      }
+      var mat = viewer.model && viewer.model.materials[0];
+      if (!mat || id !== pintado) return;
+      var pbr = mat.pbrMetallicRoughness, brillo = c.silk, luz = /fosfor|glow|luminis/i.test(c.name);
+      var rgb = linear(c.hex);
+      pbr.setBaseColorFactor([1, 1, 1, 1]);
+      pbr.setMetallicFactor(brillo ? 0.55 : 0);
+      pbr.setRoughnessFactor(brillo ? 0.28 : c.marble ? 0.35 : 0.6);
+      mat.setEmissiveFactor(luz ? [0.05, 0.14, 0.3] : [0, 0, 0]);
+      var fuente = null;
+      if (c.marble) fuente = marmol();
+      else if (c.colores && c.colores.length > 1) fuente = Promise.resolve(degradado(c.colores));
+      if (!fuente) { pbr.baseColorTexture.setTexture(null); pbr.setBaseColorFactor([rgb[0], rgb[1], rgb[2], 1]); return; }
+      fuente.then(function (url) {
+        if (id !== pintado) return;
+        if (!url) { pbr.baseColorTexture.setTexture(null); pbr.setBaseColorFactor([rgb[0], rgb[1], rgb[2], 1]); return; }
+        return viewer.createTexture(url).then(function (t) { if (id === pintado) pbr.baseColorTexture.setTexture(t); });
+      });
     };
     if (viewer.model) apply(); else viewer.addEventListener('load', apply, { once: true });
   }
@@ -107,7 +148,7 @@
     document.getElementById('modalColorName').textContent = name;
     document.getElementById('modalMaterialChip').textContent = mat === 'pla' ? 'PLA' : 'PETG';
     document.getElementById('modalBanner').style.setProperty('--tint', hex);
-    paintViewer(hex);
+    paintViewer(c);
     var list = matches(hex, mat);
     var grid = document.getElementById('modalMatchingColors');
     grid.innerHTML = list.map(function (m) {
@@ -120,7 +161,6 @@
       document.body.style.overflow = 'hidden';
       modal.querySelector('.color-modal-close').focus();
     }
-    void c;
   }
   function close() {
     modal.classList.remove('active');
