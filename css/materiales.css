@@ -140,21 +140,25 @@
   font-size: 12.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--s3d-muted);
 }
 .color-modal__box > p::before, .color-modal__box > p::after { content: ''; flex: 1; height: 1px; background: var(--s3d-line); }
+/* Colores que combinan: mini tarjetas iguales, como las del catálogo */
 .color-modal__box .match-grid { margin-bottom: 22px; }
 .color-modal__box #modalCta { width: 100%; min-height: 50px; }
-/* Colores que combinan: mini tarjetas iguales, como las del catálogo */
 .match-grid {
-  --match-margin: 14px; --match-space: 10px;
-  width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;
+  --match-margin: 18px; --match-space: 12px;
+  width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;
 }
 .match {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: var(--match-space); padding: var(--match-margin);
-  text-align: center; cursor: pointer; border-radius: 14px;
-  border: 1px solid var(--s3d-line); background: var(--s3d-white);
-  font: 600 13px/1.3 var(--s3d-sans); color: var(--s3d-ink);
-  transition: border-color .2s, box-shadow .2s, transform .2s;
+  text-align: center; cursor: pointer; border-radius: 16px;
+  border: 1px solid var(--s3d-line); background: var(--s3d-paper);
+  font: 600 13.5px/1.3 var(--s3d-sans); color: var(--s3d-ink);
+  transition: border-color .2s, box-shadow .2s, transform .2s, background .2s;
+}
+.match .swatch--sm {
+  width: 44px; height: 44px; box-shadow: inset 0 0 0 1px rgba(34,28,31,.14), 0 0 0 3px var(--s3d-white), 0 0 0 4px var(--s3d-line), 0 6px 12px rgba(34,28,31,.12);
 }
 .match span:last-child { min-height: 2.6em; margin-block: -.15em; display: flex; align-items: center; }
-.match:hover { border-color: var(--s3d-mist); box-shadow: var(--s3d-shadow); transform: translateY(-2px); }
-@media (max-width: 480px) { .match-grid { --match-margin: 10px; --match-space: 8px; gap: 8px; } }
+.match:hover { border-color: var(--s3d-brand); background: var(--s3d-white); box-shadow: var(--s3d-shadow); transform: translateY(-2px); }
+.match:focus-visible { outline: 2px solid var(--s3d-brand); outline-offset: 2px; }
+@media (max-width: 480px) { .match-grid { --match-margin: 12px; --match-space: 10px; gap: 8px; } .match { font-size: 12.5px; } .match .swatch--sm { width: 38px; height: 38px; } }
