@@ -113,13 +113,35 @@
 @media (max-width: 480px) { .choose-grid { --elegir-margin: 20px; --elegir-space: 12px; } }
 
 /* ---------- Ventana del color ---------- */
-.color-modal__box { width: min(460px, 100%); padding-top: 22px; gap: 12px; }
+.color-modal__box {
+  width: min(460px, 100%); padding: 0 24px 26px; gap: 0; overflow-x: hidden; outline: 0;
+}
+/* Escenario a todo el ancho, con fondo que contrasta con el color del jarrón */
 .color-modal__stage {
-  --tint: #BC556D;
-  width: 100%; aspect-ratio: 4 / 3; border-radius: 16px; overflow: hidden;
-  background: radial-gradient(circle at 50% 40%, #FFFFFF, var(--s3d-paper) 70%);
+  --stage-1: #FFFFFF; --stage-2: #F1E4E8;
+  width: calc(100% + 48px); margin: 0 -24px 20px; aspect-ratio: 4 / 3; overflow: hidden;
+  background: radial-gradient(circle at 50% 38%, var(--stage-1), var(--stage-2) 80%);
+  transition: background .3s;
 }
 .color-modal__stage model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
+.color-modal__box .color-modal-close {
+  top: 12px; right: 12px; z-index: 2; width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255, 255, 255, .92); color: var(--s3d-ink); box-shadow: 0 2px 10px rgba(34, 28, 31, .18);
+}
+.color-modal__box .color-modal-close:hover { background: var(--s3d-white); transform: scale(1.06); }
+.color-modal__box .color-modal-close:focus-visible { outline: 2px solid var(--s3d-brand); outline-offset: 2px; }
+.color-modal__box .eyebrow {
+  padding: 5px 12px; border-radius: 999px; background: var(--s3d-mist-soft); color: var(--s3d-brand-ink);
+  font-size: 11.5px; font-weight: 600; margin-bottom: 10px;
+}
+.color-modal__box h2 { font-size: 28px; line-height: 1.15; margin-bottom: 20px; }
+.color-modal__box > p {
+  width: 100%; display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+  font-size: 12.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--s3d-muted);
+}
+.color-modal__box > p::before, .color-modal__box > p::after { content: ''; flex: 1; height: 1px; background: var(--s3d-line); }
+.color-modal__box .match-grid { margin-bottom: 22px; }
+.color-modal__box #modalCta { width: 100%; min-height: 50px; }
 /* Colores que combinan: mini tarjetas iguales, como las del catálogo */
 .match-grid {
   --match-margin: 14px; --match-space: 10px;

@@ -141,13 +141,20 @@
   }
   document.addEventListener('pointerover', function (e) { if (e.target.closest && e.target.closest('.color-card')) cargarVisor(); }, { passive: true });
   document.addEventListener('focusin', function (e) { if (e.target.closest && e.target.closest('.color-card')) cargarVisor(); });
+  // Fondo del escenario que contrasta con el jarrón: oscuro en colores claros y claro en los oscuros
+  function stage(c) {
+    var l = hsl(c.hex).l, st = document.getElementById('modalBanner').style;
+    if (c.marble || l > 72) { st.setProperty('--stage-1', '#E6DBDF'); st.setProperty('--stage-2', '#BBAAB2'); }
+    else if (l < 30) { st.setProperty('--stage-1', '#FFFFFF'); st.setProperty('--stage-2', '#EADDE2'); }
+    else { st.setProperty('--stage-1', '#FFFFFF'); st.setProperty('--stage-2', 'color-mix(in srgb, ' + c.hex + ' 24%, #FBF7F8)'); }
+  }
   function open(name, hex, mat) {
     if (!modal) return;
     cargarVisor();
     var c = data[mat].filter(function (x) { return x.hex === hex && x.name === name; })[0] || { name: name, hex: hex };
     document.getElementById('modalColorName').textContent = name;
     document.getElementById('modalMaterialChip').textContent = mat === 'pla' ? 'PLA' : 'PETG';
-    document.getElementById('modalBanner').style.setProperty('--tint', hex);
+    stage(c);
     paintViewer(c);
     var list = matches(hex, mat);
     var grid = document.getElementById('modalMatchingColors');
@@ -159,7 +166,7 @@
       lastFocus = document.activeElement;
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
-      modal.querySelector('.color-modal-close').focus();
+      modal.querySelector('.color-modal__box').focus();
     }
   }
   function close() {
