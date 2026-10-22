@@ -9,7 +9,7 @@
   <link rel="preload" href="/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/css/fuentes.css">
   <link rel="stylesheet" href="/css/base.css">
-  <link rel="stylesheet" href="/css/admin.css?v=20261023">
+  <link rel="stylesheet" href="/css/admin.css?v=20261023b">
   <link rel="stylesheet" href="/css/visualizador.css?v=20261018">
   <link rel="stylesheet" href="/css/admin-almacenamiento.css?v=20261014e">
   <!-- three.js para la tasadora y el visualizador: la misma versión que «Configura tu proyecto» -->
@@ -177,6 +177,10 @@
         </div>
         <div class="panel">
           <h2>Fotos publicadas <span class="pista" id="gal-cuenta"></span></h2>
+          <label class="gal-aleatorio" id="gal-aleatorio-caja" hidden>
+            <input type="checkbox" id="gal-aleatorio">
+            <span class="gal-aleatorio__texto"><strong>Orden aleatorio en la web</strong><span class="pista">Cada vez que alguien abre Valoraciones, las fotos salen en un orden distinto. Desactivado, se ve el orden de abajo.</span></span>
+          </label>
           <div id="gal-lista"><p class="vacio">Cargando…</p></div>
         </div>
       </section>
@@ -899,6 +903,6 @@
 
     comprobarSesion();
   </script>
-  <script src="/js/admin-galeria.js?v=20261023"></script>
+  <script src="/js/admin-galeria.js?v=20261023b"></script>
 </body>
 </html>

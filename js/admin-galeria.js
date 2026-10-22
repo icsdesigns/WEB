@@ -16,7 +16,25 @@
   var cola = [];
   var cargada = false;
 
-  window.abrirGaleria = function () { if (!cargada) { cargada = true; cargar(); } };
+  window.abrirGaleria = function () { if (!cargada) { cargada = true; cargar(); cargarAleatorio(); } };
+
+  /* ---------- Orden aleatorio en la web (tabla ajustes_web, supabase/galeria-aleatorio.sql) ---------- */
+  async function cargarAleatorio() {
+    var caja = $('gal-aleatorio-caja'), chk = $('gal-aleatorio');
+    var r = await sb.from('ajustes_web').select('valor').eq('clave', 'galeria_aleatoria').maybeSingle();
+    caja.hidden = false;
+    if (r.error) {
+      chk.disabled = true; caja.classList.add('is-falta');
+      caja.querySelector('.pista').innerHTML = 'Falta ejecutar una vez <code>supabase/galeria-aleatorio.sql</code> en Supabase › SQL Editor para activar este ajuste.';
+      return;
+    }
+    chk.checked = !!(r.data && r.data.valor === true);
+  }
+  $('gal-aleatorio').addEventListener('change', async function (e) {
+    var chk = e.target, valor = chk.checked;
+    var r = await sb.from('ajustes_web').upsert({ clave: 'galeria_aleatoria', valor: valor, actualizado: new Date().toISOString() });
+    if (r.error) { chk.checked = !valor; alert('No se pudo guardar el ajuste: ' + r.error.message); }
+  });
 
   /* ---------- Conversión: mejor calidad al menor peso ---------- */
   async function abrir(file) {

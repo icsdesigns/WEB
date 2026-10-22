@@ -598,3 +598,14 @@ form.fila .campo-archivo input[type="file"] { min-width: 0; width: 100%; flex-ba
 .gal-fantasma .gal-asa { cursor: grabbing; }
 body.gal-arrastrando, body.gal-arrastrando * { cursor: grabbing !important; user-select: none; -webkit-user-select: none; }
 @media (prefers-reduced-motion: reduce) { .gal-fantasma, .gal-asa { transition: none; } }
+
+/* Interruptor «Orden aleatorio» de la galería */
+.gal-aleatorio {
+  display: flex; align-items: flex-start; gap: 12px; margin: 0 0 16px; padding: 14px 16px; cursor: pointer;
+  border: 1px solid var(--borde); border-radius: var(--radio-sm); background: var(--s3d-paper);
+}
+.gal-aleatorio[hidden] { display: none; }
+.gal-aleatorio input { width: 20px; height: 20px; margin-top: 2px; flex: none; accent-color: var(--primario); cursor: pointer; }
+.gal-aleatorio__texto { display: flex; flex-direction: column; gap: 2px; font-size: 14.5px; color: var(--texto); }
+.gal-aleatorio__texto .pista { font-size: 13px; }
+.gal-aleatorio.is-falta { cursor: default; opacity: .85; }

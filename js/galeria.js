@@ -12,14 +12,26 @@
   function esc(t) { var d = document.createElement('div'); d.textContent = t == null ? '' : String(t); return d.innerHTML; }
 
   var fotos = [];
-  window.silabGaleria = fetch(SB.url + '/rest/v1/galeria?select=titulo,material,imagen,miniatura,ancho,alto&visible=eq.true&order=orden.asc,creado.desc', {
-    headers: { apikey: SB.key, Authorization: 'Bearer ' + SB.key }
-  })
+  var cab = { headers: { apikey: SB.key, Authorization: 'Bearer ' + SB.key } };
+  // Ajuste del panel (Galería › Orden aleatorio); si no existe o falla, se respeta el orden del panel
+  var aleatorio = fetch(SB.url + '/rest/v1/ajustes_web?select=valor&clave=eq.galeria_aleatoria', cab)
     .then(function (r) { return r.ok ? r.json() : []; })
-    .then(function (rows) {
+    .then(function (a) { return !!(a && a[0] && a[0].valor === true); })
+    .catch(function () { return false; });
+  function barajar(a) {
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  window.silabGaleria = Promise.all([
+    fetch(SB.url + '/rest/v1/galeria?select=titulo,material,imagen,miniatura,ancho,alto&visible=eq.true&order=orden.asc,creado.desc', cab)
+      .then(function (r) { return r.ok ? r.json() : []; }),
+    aleatorio
+  ])
+    .then(function (res) {
+      var rows = res[0];
       // Con menos de 3 fotos el carrusel no luce: la caja se queda para Instagram/Elfsight
       if (!Array.isArray(rows) || rows.length < 3) return false;
-      fotos = rows;
+      fotos = res[1] ? barajar(rows.slice()) : rows;
       caja.removeAttribute('data-elfsight-lazy');
       caja.removeAttribute('data-instagram');
       caja.className = 'galeria';
