@@ -141,12 +141,13 @@
   }
   document.addEventListener('pointerover', function (e) { if (e.target.closest && e.target.closest('.color-card')) cargarVisor(); }, { passive: true });
   document.addEventListener('focusin', function (e) { if (e.target.closest && e.target.closest('.color-card')) cargarVisor(); });
-  // Fondo del escenario que contrasta con el jarrón: oscuro en colores claros y claro en los oscuros
+  // Fondo del escenario: el de mayor contraste con la luminosidad media del jarrón (oscuro tras colores claros, claro tras oscuros)
   function stage(c) {
-    var l = hsl(c.hex).l, st = document.getElementById('modalBanner').style;
-    if (c.marble || l > 72) { st.setProperty('--stage-1', '#F5F0F2'); st.setProperty('--stage-2', '#DACFD4'); }
-    else if (l < 30) { st.setProperty('--stage-1', '#FFFFFF'); st.setProperty('--stage-2', '#EADDE2'); }
-    else { st.setProperty('--stage-1', '#FFFFFF'); st.setProperty('--stage-2', 'color-mix(in srgb, ' + c.hex + ' 24%, #FBF7F8)'); }
+    var lista = c.marble ? ['#D7D4CC'] : (c.colores && c.colores.length ? c.colores : [c.hex]);
+    var l = lista.reduce(function (s, h) { return s + hsl(h).l; }, 0) / lista.length;
+    var st = document.getElementById('modalBanner').style;
+    if (l >= 58) { st.setProperty('--stage-1', '#5B4A52'); st.setProperty('--stage-2', '#2A2226'); }
+    else { st.setProperty('--stage-1', '#FFFFFF'); st.setProperty('--stage-2', '#EFE3E7'); }
   }
   function open(name, hex, mat) {
     if (!modal) return;
