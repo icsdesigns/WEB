@@ -156,9 +156,10 @@
   transition: border-color .2s, box-shadow .2s, transform .2s, background .2s;
 }
 .match .swatch--sm {
+  margin-block: 4px;
   width: 44px; height: 44px; box-shadow: inset 0 0 0 1px rgba(34,28,31,.14), 0 0 0 3px var(--s3d-white), 0 0 0 4px var(--s3d-line), 0 6px 12px rgba(34,28,31,.12);
 }
-.match span:last-child { min-height: 2.6em; margin-block: -.15em; display: flex; align-items: center; }
+.match span:last-child { margin-block: -.15em; }
 .match:hover { border-color: var(--s3d-brand); background: var(--s3d-white); box-shadow: var(--s3d-shadow); transform: translateY(-2px); }
 .match:focus-visible { outline: 2px solid var(--s3d-brand); outline-offset: 2px; }
 @media (max-width: 480px) { .match-grid { --match-margin: 12px; --match-space: 10px; gap: 8px; } .match { font-size: 12.5px; } .match .swatch--sm { width: 38px; height: 38px; } }
