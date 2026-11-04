@@ -536,6 +536,29 @@ function _pdfOpenNamed(blob,name){
   setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(e){} },60000);
   return w;
 }
+/* Movil/tablet tactil: ahi window.open tras una operacion asincrona se bloquea y los
+   navegadores no muestran PDF dentro de un iframe, asi que no se descargaba nada.
+   Se usa la hoja de compartir del sistema (Guardar en Archivos, WhatsApp, etc.) y,
+   si no esta disponible, una descarga directa mediante enlace con "download". */
+function _esMovil(){
+  var ua=navigator.userAgent||'';
+  return /Android|iPhone|iPad|iPod|Mobi/i.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+}
+function _pdfMovil(blob,name){
+  function descargar(){
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.href=url; a.download=name; a.style.display='none';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ try{ document.body.removeChild(a); }catch(e){} try{ URL.revokeObjectURL(url); }catch(e){} },60000);
+  }
+  var file=null; try{ file=new File([blob],name,{type:'application/pdf'}); }catch(e){}
+  if(file && navigator.canShare && navigator.canShare({files:[file]}) && navigator.share){
+    navigator.share({files:[file],title:name}).catch(function(e){
+      if(e&&e.name==='AbortError')return; /* el usuario cerro la hoja */
+      descargar();
+    });
+  }else descargar();
+}
 function _pdfTitleEsc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
 function _staticFromField(el){
@@ -638,7 +661,8 @@ function printPDF(){
     try{ doc.setProperties({title:_docPdfName(r)}); }catch(e){}
     try{
       var b=doc.output('blob');
-      var w=_pdfOpenNamed(b,_docPdfName(r)); if(!w) doc.save(_docPdfName(r));
+      if(_esMovil()){ _pdfMovil(b,_docPdfName(r)); }
+      else{ var w=_pdfOpenNamed(b,_docPdfName(r)); if(!w) doc.save(_docPdfName(r)); }
     }catch(e){ doc.save(_docPdfName(r)); }
   }).catch(function(e){
     try{ document.body.removeChild(wrap); }catch(_){}
