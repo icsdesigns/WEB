@@ -542,7 +542,10 @@ function _pdfOpenNamed(blob,name){
    si no esta disponible, una descarga directa mediante enlace con "download". */
 function _esMovil(){
   var ua=navigator.userAgent||'';
-  return /Android|iPhone|iPad|iPod|Mobi/i.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  /* Ademas del user-agent se mira el puntero tactil principal: con "Sitio de escritorio"
+     activado el movil se presenta como un PC y el user-agent ya no lo delata. */
+  var tactil=false; try{ tactil=navigator.maxTouchPoints>0 && window.matchMedia('(pointer:coarse)').matches; }catch(e){}
+  return tactil || /Android|iPhone|iPad|iPod|Mobi/i.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
 }
 function _pdfMovil(blob,name){
   function descargar(){
