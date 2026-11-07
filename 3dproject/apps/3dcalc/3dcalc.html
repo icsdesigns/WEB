@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+    +'</span>'
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
@@ -254,6 +255,7 @@ option{background-color:#161922;color:#E8EBF4}
 .cal-info-btn:hover{background:var(--ac);color:#fff}
 .ord-cyc:hover{opacity:1;background:rgba(255,255,255,.07)}
 .ord-no{width:96px;min-width:96px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ord-acts{display:contents}
 /* solicitudes web: etiquetas en la lista y sección plegable en la ventana del pedido */
 .ord-web{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:8px;font:700 10px 'Outfit',sans-serif;text-transform:uppercase;letter-spacing:.3px;background:rgba(77,159,255,.16);color:#4D9FFF;border:1px solid rgba(77,159,255,.4);vertical-align:1px}
 .ord-web-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#34D399;margin-right:6px;vertical-align:1px;box-shadow:0 0 0 2px rgba(52,211,153,.25)}
@@ -713,15 +715,28 @@ option{background-color:#161922;color:#E8EBF4}
 }
 </style>
 <style>
-@media(max-width:760px){.side{position:fixed;top:52px;bottom:0;left:0;z-index:60;width:78vw;max-width:280px;margin-left:0;transform:translateX(0);transition:transform .25s ease;box-shadow:8px 0 30px rgba(0,0,0,.4)}body.side-off .side{transform:translateX(-101%);margin-left:0}.main{padding:18px 14px 44px}}
+@media(max-width:760px){.side{position:fixed;top:52px;bottom:0;left:0;z-index:60;width:78vw;max-width:280px;margin-left:0;transform:translateX(0);transition:transform .25s ease;box-shadow:8px 0 30px rgba(0,0,0,.4)}body.side-off .side{transform:translateX(-101%);margin-left:0;box-shadow:none}.main{padding:18px 14px 44px}}
+@media(max-width:980px){
+  /* Fila-ficha: cabecera (casilla · nº · precio), cliente, descripción y pie (fecha · acciones).
+     Zonas táctiles de 44px y ningún texto truncado. */
+  .ord-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"sel no price" "cli cli cli" "desc desc desc" "date date acts";align-items:center;gap:2px 10px;padding:6px 14px 10px 6px}
+  .ord-row .ord-sel-w{grid-area:sel;width:44px;height:44px;justify-content:center}
+  .ord-row .ord-sel{width:22px;height:22px}
+  .ord-row .ord-no{grid-area:no;width:auto;min-width:0;overflow:visible;text-overflow:clip;font-size:13.5px;color:var(--t1)}
+  .ord-row .ord-price{grid-area:price;justify-self:end;margin-left:0;padding-right:4px;font-size:16px;text-align:right}
+  .ord-row .ord-pend{min-height:44px;padding:0 14px;font-size:13px;margin-right:0}
+  .ord-row .ord-cli{grid-area:cli;white-space:normal;overflow:visible;text-overflow:clip;font-size:15.5px;line-height:1.3;padding:0 0 0 8px;overflow-wrap:anywhere}
+  .ord-row .ord-desc{grid-area:desc;white-space:normal;overflow:visible;text-overflow:clip;min-width:0;font-size:13.5px;line-height:1.45;padding:2px 0 8px 8px;overflow-wrap:anywhere}
+  .ord-row .ord-date{grid-area:date;align-self:center;min-width:0;width:auto;font-size:12.5px;line-height:1.5;color:var(--t2);padding:0 0 0 8px;white-space:normal}
+  .ord-row .ord-acts{grid-area:acts;display:flex;gap:6px;align-items:center;justify-content:flex-end;border-top:0}
+  .ord-row .ord-acts>button{width:44px;height:44px;min-width:44px;border:1px solid var(--border);border-radius:12px;background:var(--glass);opacity:1;padding:0;font-size:16px}
+  .ord-row .ord-acts .ord-cal{color:var(--t2)}
+  .ord-row .ord-acts .ord-trk{color:var(--t2)}
+  .ord-row .ord-acts .ord-cal.on{color:var(--ac);border-color:color-mix(in srgb,var(--ac) 45%,transparent)}
+  .ord-row .ord-acts .ord-del{color:#FF6B8A;border-color:rgba(255,107,138,.3)}
+  .ord-row .ord-deliv{white-space:nowrap}
+}
 @media(max-width:640px){
-  /* Pedidos: la fila envuelve y muestra cliente y descripción completos */
-  .ord-row{flex-wrap:wrap;gap:7px 10px}
-  .ord-no{width:auto;min-width:0}
-  .ord-date{font-size:12px;color:var(--t3)}
-  .ord-cli{flex:1 1 100%;order:5;white-space:normal}
-  .ord-desc{flex:1 1 100%;order:6;white-space:normal;overflow:visible;text-overflow:clip;min-width:0}
-  .ord-price{margin-left:auto}
   .ord-search,.ord-sortsel{max-width:none;flex:1 1 100%}
   /* Clientes / Configuración: tablas legibles con scroll horizontal dentro de su tarjeta */
   .card{overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -844,6 +859,7 @@ option{background-color:#161922;color:#E8EBF4}
 .pdf-both svg{opacity:.7}
 .ord-pend{background:rgba(244,183,64,.14);color:#F4B740;border:1px solid rgba(244,183,64,.4);border-radius:8px;padding:3px 10px;font:700 12px 'Outfit',sans-serif;cursor:pointer}
 .ord-pend:hover{background:rgba(244,183,64,.24)}
+[data-theme=light] .ord-pend{color:#8A5200;border-color:rgba(138,82,0,.5)}
 .urg-choose{display:flex;gap:12px;margin-top:14px}
 .urg-opt{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:18px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--sel);cursor:pointer;transition:all .15s}
 .urg-opt:hover{border-color:var(--ac);transform:translateY(-2px)}
@@ -2722,9 +2738,10 @@ function ordRowHTML(o){ var col=estColor(o.estado), st=ordState(o); var I=o.id; 
     +'<label class="ord-sel-w" onclick="event.stopPropagation()"><input type="checkbox" class="ord-sel" '+(billingSel[I]?'checked':'')+' onchange="toggleBillingSel(\''+I+'\',this.checked)"></label>'
     +'<span class="ord-no">#'+esc(o.number||'')+'</span>'
     +'<span class="ord-date" title="Fecha de guardado del pedido">'+esc(fch)+ordDelivHTML(o)+'</span>'
-    +'<span class="ord-cli">'+esc(o.cliente||'—')+'</span>'
-    +'<span class="ord-desc">'+webTagHTML(o)+esc(o.descripcion||'')+'</span>'
+    +'<span class="ord-cli" title="'+esc(o.cliente||'')+'">'+esc(o.cliente||'—')+'</span>'
+    +'<span class="ord-desc" title="'+esc(o.descripcion||'')+'">'+webTagHTML(o)+esc(o.descripcion||'')+'</span>'
     +(o.urgencia_nivel==='Ambos'?'<button class="ord-price ord-pend" title="Elegir tarifa (normal/urgente)" onclick="event.stopPropagation();chooseUrg(\''+I+'\')">Pendiente</button>':'<span class="ord-price">'+eur(o.precio_final)+'</span>')
+    +'<span class="ord-acts">'
     +'<button class="ord-cal'+(_sched?' on':'')+'" title="'+(_sched?'En el calendario · clic para retirar el tiempo':'Fuera del calendario · clic para programar el tiempo')+'" onclick="event.stopPropagation();toggleCalOrder(\''+I+'\')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>'
     +(ordState(o)==='Rechazado'?'':'<button class="ord-trk" title="Abrir este pedido en 3DTracker" onclick="event.stopPropagation();openInTracker(\''+I+'\')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></button>')
     +'<button class="del ord-del" title="Eliminar" onclick="event.stopPropagation();delOrder(\''+I+'\')">✕</button>'
