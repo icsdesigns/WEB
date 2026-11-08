@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-    +'</span>'
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
@@ -735,6 +734,11 @@ option{background-color:#161922;color:#E8EBF4}
   .ord-row .ord-acts .ord-cal.on{color:var(--ac);border-color:color-mix(in srgb,var(--ac) 45%,transparent)}
   .ord-row .ord-acts .ord-del{color:#FF6B8A;border-color:rgba(255,107,138,.3)}
   .ord-row .ord-deliv{white-space:nowrap}
+}
+@media(max-width:430px){
+  /* pantallas estrechas: la fecha ocupa su propia línea y las acciones van debajo */
+  .ord-row{grid-template-areas:"sel no price" "cli cli cli" "desc desc desc" "date date date" "acts acts acts"}
+  .ord-row .ord-date{padding-bottom:4px}
 }
 @media(max-width:640px){
   .ord-search,.ord-sortsel{max-width:none;flex:1 1 100%}
@@ -2745,7 +2749,7 @@ function ordRowHTML(o){ var col=estColor(o.estado), st=ordState(o); var I=o.id; 
     +'<button class="ord-cal'+(_sched?' on':'')+'" title="'+(_sched?'En el calendario · clic para retirar el tiempo':'Fuera del calendario · clic para programar el tiempo')+'" onclick="event.stopPropagation();toggleCalOrder(\''+I+'\')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>'
     +(ordState(o)==='Rechazado'?'':'<button class="ord-trk" title="Abrir este pedido en 3DTracker" onclick="event.stopPropagation();openInTracker(\''+I+'\')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></button>')
     +'<button class="del ord-del" title="Eliminar" onclick="event.stopPropagation();delOrder(\''+I+'\')">✕</button>'
-    +'</div>';
+    +'</span></div>';
 }
 function ordSectionHTML(title,col,arr,key){
   var lim=key?ORD_FIN_N:0, open=!!(key&&ordMore[key]), over=!!(lim&&arr.length>lim);
