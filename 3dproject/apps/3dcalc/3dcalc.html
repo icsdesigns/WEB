@@ -1067,11 +1067,11 @@ table.t td.pr-def input{width:16px;height:16px;accent-color:var(--ac);cursor:poi
 .tar-row{display:grid;gap:8px 10px;align-items:end;padding:10px 13px;border-bottom:1px solid var(--border)}
 .tar-row:last-child{border-bottom:none}
 .tar-row.d{grid-template-columns:minmax(160px,1fr) 100px 100px 100px}
-.tar-row.p{grid-template-columns:minmax(160px,1fr) 100px}
+.tar-row.p{grid-template-columns:minmax(160px,1fr) 100px 120px}
 .tar-c{display:flex;flex-direction:column;gap:3px;min-width:0}
 .tar-cl{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--t3)}
 .tar-c .inp{padding:8px 10px;font-size:13px}
-@media(max-width:620px){.tar-row.d{grid-template-columns:repeat(3,minmax(0,1fr))}.tar-row.p{grid-template-columns:minmax(0,1fr)}.tar-row .tar-n{grid-column:1/-1}}
+@media(max-width:620px){.tar-row.d{grid-template-columns:repeat(3,minmax(0,1fr))}.tar-row.p{grid-template-columns:repeat(2,minmax(0,1fr))}.tar-row .tar-n{grid-column:1/-1}}
 .ut-cfg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 .ut-cfg-grp{border:1px solid var(--border);border-radius:13px;background:var(--glass);overflow:hidden}
 .ut-cfg-h{display:flex;flex-direction:column;gap:3px;padding:11px 13px;border-bottom:1px solid var(--border);background:rgba(127,127,127,.06)}
@@ -1140,8 +1140,10 @@ var SK='dp3_3dcalc';
    DISENO_PRECIO, DESIGN_DAYS_MAP/URG y POSTPROCESADO son mapas «nombre actual → valor» que
    rebuildTarifas() rellena en vivo, de modo que el resto del código no cambia. */
 var DISENO_BASE=[{id:'d0',name:'No necesario',price:0,days:0,daysUrg:0,sin:1},{id:'d1',name:'Búsqueda de modelos',price:3.75,days:1,daysUrg:0,sin:1},{id:'d2',name:'Básica (solo slicer)',price:2.25,days:1,daysUrg:0.5},{id:'d3',name:'Media (Fusion <1h)',price:7.5,days:2,daysUrg:1},{id:'d4',name:'Alta (Fusion >1h / Artístico)',price:15,days:3,daysUrg:2}];
-var POST_BASE=[{id:'p0',name:'Limpio (pocos soportes sin lijado)',price:0},{id:'p1',name:'Sencillo (pocos soportes con lijado)',price:5},{id:'p2',name:'Medio (lijado + ensamblado / soportes comprometidos)',price:10},{id:'p3',name:'Avanzado (lijado/ensamblado/soportes comprometidos + pintura)',price:20}];
-var DISENO_PRECIO={}, DESIGN_DAYS_MAP={}, DESIGN_DAYS_URG={}, POSTPROCESADO={}, _ALIAS_D={}, _ALIAS_P={};
+var POST_BASE=[{id:'p0',name:'Limpio (pocos soportes sin lijado)',price:0,pct:30},{id:'p1',name:'Sencillo (pocos soportes con lijado)',price:4,pct:60},{id:'p2',name:'Medio (lijado + ensamblado / soportes comprometidos)',price:8,pct:100},{id:'p3',name:'Avanzado (lijado/ensamblado/soportes comprometidos + pintura)',price:20,pct:100}];
+/* Precios de fábrica anteriores al % extra: los usan los pedidos sin instantánea. */
+var POST_OLD_PRICE={p0:0,p1:5,p2:10,p3:20};
+var DISENO_PRECIO={}, DESIGN_DAYS_MAP={}, DESIGN_DAYS_URG={}, POSTPROCESADO={}, POSTPROC_PCT={}, _ALIAS_D={}, _ALIAS_P={};
 /* INSTANTÁNEA DE TARIFAS POR PEDIDO (o.tar_snap). Cada pedido guarda las tarifas con las que se
    valoró: {v:1, dis:{id:{name,price,days,daysUrg,aliases}}, post:{id:{name,price,aliases}}, opt, unit}
    (opt y unit = fracciones del cobro por optimización y del post-procesado «Por unidad»).
@@ -1153,27 +1155,29 @@ var DISENO_PRECIO={}, DESIGN_DAYS_MAP={}, DESIGN_DAYS_URG={}, POSTPROCESADO={}, 
    los nombres renombrados sigan resolviéndose; migTarSnap() se la congela en el pedido al cargar.
    La instantánea se renueva con las tarifas actuales solo al modificar un parámetro de precio del pedido. */
 var _TAR_ACTIVE=null;
-function _tarLevelsFrom(kind,ov){ var base=(kind==='dis')?DISENO_BASE:POST_BASE; ov=ov||{};
+function _tarLevelsFrom(kind,ov,snap){ var base=(kind==='dis')?DISENO_BASE:POST_BASE; ov=ov||{};
   return base.map(function(b){ var o=ov[b.id]||{}, L=Object.assign({},b);
     if(o.name!=null&&String(o.name).trim()!=='')L.name=String(o.name).trim();
     if(o.price!=null&&o.price!==''&&isFinite(Number(o.price)))L.price=Math.max(0,Number(o.price));
+    if(kind==='post'){ /* % extra sobre el coste del filamento; una instantánea sin % (pedido antiguo) no lo cobra */
+      if(o.pct!=null&&o.pct!==''&&isFinite(Number(o.pct)))L.pct=Math.max(0,Number(o.pct)); else if(snap)L.pct=0; }
     if(kind==='dis'){
       if(o.days!=null&&o.days!==''&&isFinite(Number(o.days)))L.days=Math.max(0,Number(o.days));
       if(o.daysUrg!=null&&o.daysUrg!==''&&isFinite(Number(o.daysUrg)))L.daysUrg=Math.max(0,Number(o.daysUrg)); }
     L.aliases=[b.name].concat(Array.isArray(o.aliases)?o.aliases:[]); return L; }); }
 function _tarLive(kind){ var g=(typeof S!=='undefined'&&S&&S.global_config)||{}; return (g.tarifas&&typeof g.tarifas==='object'&&g.tarifas[kind])||{}; }
-function tarLevels(kind){ return _tarLevelsFrom(kind,_TAR_ACTIVE?_TAR_ACTIVE[kind]:_tarLive(kind)); }
+function tarLevels(kind){ return _tarLevelsFrom(kind,_TAR_ACTIVE?_TAR_ACTIVE[kind]:_tarLive(kind),!!_TAR_ACTIVE); }
 /* Porcentajes de Configuración (siempre los vivos; withTar los sustituye por los del pedido). */
 function _optLive(){ var v=num(S.global_config&&S.global_config.optimizacion_pct); if(!v)return DISENO_OPT_PCT; return Math.max(0,Math.min(100,v))/100; }
 function _unitLive(){ var v=num(S.global_config&&S.global_config.postproc_unit_pct); if(!v)return POSTPROC_UNIT_PCT/100; return Math.max(0,Math.min(100,v))/100; }
 /* Instantánea de las tarifas vivas (se guarda en el pedido al crearlo/sobrescribirlo/modificarlo). */
 function tarSnapNow(){ var sn={v:1,dis:{},post:{},opt:_optLive(),unit:_unitLive()};
-  ['dis','post'].forEach(function(k){ _tarLevelsFrom(k,_tarLive(k)).forEach(function(l){ var e={name:l.name,price:l.price}; if(k==='dis'){ e.days=l.days; e.daysUrg=l.daysUrg; } if(l.aliases.length>1)e.aliases=l.aliases.slice(1); sn[k][l.id]=e; }); });
+  ['dis','post'].forEach(function(k){ _tarLevelsFrom(k,_tarLive(k)).forEach(function(l){ var e={name:l.name,price:l.price}; if(k==='post')e.pct=l.pct; if(k==='dis'){ e.days=l.days; e.daysUrg=l.daysUrg; } if(l.aliases.length>1)e.aliases=l.aliases.slice(1); sn[k][l.id]=e; }); });
   return sn; }
 /* Tarifas de fábrica + % configurados para los pedidos sin instantánea (nombres renombrados → alias del mismo nivel). */
 function tarLegacy(){ var sn={v:0,legacy:1,dis:{},post:{},opt:_optLive(),unit:_unitLive()};
   ['dis','post'].forEach(function(k){ var ov=_tarLive(k), base=(k==='dis')?DISENO_BASE:POST_BASE;
-    base.forEach(function(b){ var o=ov[b.id]||{}, al=[]; if(o.name!=null&&String(o.name).trim()!=='')al.push(String(o.name).trim()); if(Array.isArray(o.aliases))al=al.concat(o.aliases); sn[k][b.id]={aliases:al}; }); });
+    base.forEach(function(b){ var o=ov[b.id]||{}, al=[]; if(o.name!=null&&String(o.name).trim()!=='')al.push(String(o.name).trim()); if(Array.isArray(o.aliases))al=al.concat(o.aliases); sn[k][b.id]={aliases:al}; if(k==='post'){ sn[k][b.id].price=POST_OLD_PRICE[b.id]; sn[k][b.id].pct=0; } }); });
   return sn; }
 function _tarOk(t){ return !!t&&typeof t==='object'&&t.dis&&typeof t.dis==='object'&&t.post&&typeof t.post==='object'; }
 function ordTar(o){ return (o&&_tarOk(o.tar_snap))?o.tar_snap:tarLegacy(); }
@@ -1184,7 +1188,7 @@ function withTar(snap,fn){ if(!_tarOk(snap)||snap===_TAR_ACTIVE)return fn(); var
 function rebuildTarifas(){
   var D=tarLevels('dis'), P=tarLevels('post');
   function fill(obj,arr,key){ Object.keys(obj).forEach(function(k){ delete obj[k]; }); arr.forEach(function(l){ obj[l.name]=l[key]; }); }
-  fill(DISENO_PRECIO,D,'price'); fill(DESIGN_DAYS_MAP,D,'days'); fill(DESIGN_DAYS_URG,D,'daysUrg'); fill(POSTPROCESADO,P,'price');
+  fill(DISENO_PRECIO,D,'price'); fill(DESIGN_DAYS_MAP,D,'days'); fill(DESIGN_DAYS_URG,D,'daysUrg'); fill(POSTPROCESADO,P,'price'); fill(POSTPROC_PCT,P,'pct');
   _ALIAS_D={}; D.forEach(function(l){ l.aliases.forEach(function(a){ _ALIAS_D[a]=l.name; }); _ALIAS_D[l.name]=l.name; });
   _ALIAS_P={}; P.forEach(function(l){ l.aliases.forEach(function(a){ _ALIAS_P[a]=l.name; }); _ALIAS_P[l.name]=l.name; }); }
 /* Nombre actual de un nivel de post-procesado (resuelve alias); undefined si no es un nivel nuevo. */
@@ -1219,8 +1223,9 @@ function postprocPorUnidad(o){ return String((o&&o.postproc_modo)||'Total')==='P
 function postprocFactor(o){ if(!postprocPorUnidad(o))return 1;
   return postprocUnitPct()*Math.max(1,Math.floor(num(o&&o.cantidad)||1)); }
 /* Desglose en € {soportes,postproc}: en los niveles nuevos todo va a postproc. */
-function postprocPartes(o,labor){ var v=String((o&&o.postprocesado)||''), k=postprocFactor(o);
-  if(postprocNuevo(v))return {soportes:0,postproc:roundMoney(POSTPROCESADO[postprocCanon(v)]*k)};
+function postprocPartes(o,labor,fil){ var v=String((o&&o.postprocesado)||''), k=postprocFactor(o);
+  /* Nivel nuevo = tarifa base × k + % extra sobre el coste del filamento (el filamento ya cubre todas las unidades: no se multiplica por k). */
+  if(postprocNuevo(v)){ var cn=postprocCanon(v), pc=(POSTPROC_PCT[cn]||0)/100; return {soportes:0,postproc:roundMoney(POSTPROCESADO[cn]*k+pc*num(fil))}; }
   return {soportes:round4(((ELIMINACION_SOPORTES_LEGACY[(o&&o.eliminacion_soportes)]||0)/60)*num(labor)*k),
           postproc:round4(((POSTPROCESADO_LEGACY[v]||0)/60)*num(labor)*k)}; }
 /* Opciones del desplegable: si el pedido guarda un nivel antiguo se mantiene en la
@@ -1409,7 +1414,7 @@ function _compute(c){
   var electricidad=round4(horas*num(printer.energy_consumption_kwh)*num(g.energy_cost_kwh));
   var diseno=round4(disenoImporte(c.diseno_modelado,c.diseno_opt));
   var busqueda=0;   // integrado como un nivel más del propio diseño
-  var _pp=postprocPartes(c,labor), soportes=_pp.soportes, postproc=_pp.postproc;
+  var _pp=postprocPartes(c,labor,filamento), soportes=_pp.soportes, postproc=_pp.postproc;
   var deterioro=round4(horas*depPerHour(printer));
   var gastoMisc=round4(Math.max(0,num(c.gasto_misc)));
   /* ── MODELO DE BLOQUES ──────────────────────────────────────────────────────
@@ -1540,7 +1545,7 @@ function render(){
    poder refrescarlos sin repintar todo el formulario (repintar haría perder el
    foco y el cursor de los campos de texto que se están editando). */
 function hintDisenoHTML(c){ return eur(disenoImporte(c.diseno_modelado,c.diseno_opt))+(c.diseno_opt?(' · optimización ('+Math.round(disenoOptPct()*100)+'%)'):''); }
-function hintPostprocHTML(c){ return eur(postprocPartes(c,num(S.global_config&&S.global_config.labor_cost_h)).postproc); }
+function hintPostprocHTML(c){ var f=0; try{ f=compute(c).filamento; }catch(e){} return eur(postprocPartes(c,num(S.global_config&&S.global_config.labor_cost_h),f).postproc); }
 /* Sin esto los importes junto a «Diseño / modelado» y «Post-procesado» se
    quedaban con la tarifa anterior hasta cambiar de vista. */
 function hintCantHTML(c){ var n=Math.max(1,Math.floor(num(c.cantidad)||1)); return cantModo(c)==='mul'?('datos de 1 ud. · × '+n):('presupuesto para '+n+(n===1?' ud.':' uds')); }
@@ -3117,7 +3122,7 @@ function _tplCardSync(i){ var c=ensureTpl().client.conds[i]; if(!c)return;
 /* ── Tokens ── */
 var TPL_TOKENS=[['{cliente}','Nombre del cliente'],['{fecha}','Fecha del presupuesto'],['{número pedido}','Nº de pedido: el mismo con el que se guarda en Pedidos y se sigue en 3DTracker'],['{descripcion}','Descripción del proyecto'],
   ['{precio}','Precio final (en cada panel, el de su tarifa)'],['{anticipo}','Anticipo redondeado: el resto en la entrega es múltiplo de 5'],['{resto}','Diferencia que se paga en la entrega (múltiplo de 5)'],['{anticipo50}','50% exacto del total'],
-  ['{plazo}','Plazo de entrega: Inicios (L-M) / Mediados (X-J) / Finales (V-S) de la semana del…'],['{cantidad}','Unidades'],['{material}','Material'],['{peso}','Peso'],['{tiempo}','Tiempo de impresión'],['{empresa}','Nombre de la empresa'],['{lema}','Lema']];
+  ['{plazo}','Plazo de entrega: Inicios (L-M) / Mediados (X-J) / Finales (V-S) de la semana del…'],['{cantidad}','Unidades'],['{segunda unidad}','Coste de la segunda unidad: precio con 2 uds (multiplicador) − precio con 1 ud (multiplicador)'],['{material}','Material'],['{peso}','Peso'],['{tiempo}','Tiempo de impresión'],['{empresa}','Nombre de la empresa'],['{lema}','Lema']];
 function tplFocus(el){ if(!el)return; if(el.hasAttribute('data-tok'))_tplFocused=el; var f=el.getAttribute('data-pf'); tplBlur(); if(f)[].forEach.call(document.querySelectorAll('#tplPaper [data-f="'+f+'"]'),function(n){ n.classList.add('hl'); }); }
 function tplBlur(){ [].forEach.call(document.querySelectorAll('#tplPaper .hl'),function(n){ n.classList.remove('hl'); }); }
 function _tplInsert(el,tok){ var v=el.value, s=el.selectionStart, e=el.selectionEnd; if(s==null||isNaN(s)){ s=v.length; e=s; } if(e==null||e<s)e=s;
@@ -3142,17 +3147,34 @@ function updatePreset(id){ var p=pdfPresets().filter(function(x){return x.id===i
 function delPreset(id){ if(!Array.isArray(S.global_config.pdf_presets))return; var p=pdfPresets().filter(function(x){return x.id===id;})[0]; if(!p)return;
   if(!confirm('¿Eliminar el preset «'+p.name+'»? No se puede deshacer.'))return;
   S.global_config.pdf_presets=S.global_config.pdf_presets.filter(function(x){return x.id!==id;}); save(); renderPlantillas(); }
-function pdfTokens(o,r,priceOverride,plazoText){
+/* Coste de la SEGUNDA unidad = precio de 2 uds (modo multiplicador) − precio de 1 ud (modo multiplicador).
+   La base de una unidad es el peso/tiempo/gramos de UNA ud: en un pedido en multiplicador ya vienen así (ordBase);
+   en uno en divisor son los totales ÷ N. Con la tarifa urgente se aplica el mismo recargo por días ganados a ambos
+   precios. Devuelve null si no se puede calcular. */
+function secondUnitCost(o,urgente){
+  try{
+    var n=Math.max(1,Math.floor(num(o&&o.cantidad)||1)), mul=(cantModo(o)==='mul'), b=ordBase(o), f=mul?1:1/n;
+    var cs=orderToCalcState(o); cs.cant_modo='mul'; cs.peso_g=String(round4(num(b.peso)*f)); cs.tiempo_h=String(round4(num(b.horas)*f));
+    if(Array.isArray(cs.material_breakdown))cs.material_breakdown=cs.material_breakdown.map(function(it){ return Object.assign({},it,{grams:round4(num(it.grams)*f)}); });
+    var days=null; if(urgente){ var d=orderDual(o); days=d.days; }
+    function pr(q){ var c1=Object.assign({},cs,{cantidad:q}), r=computeUrg(c1,'Normal'); return urgente?urgSurcharge(r.precio,days||0,r.bloqueA).total:roundMoney(r.precio); }
+    var v=roundMoney(pr(2)-pr(1)); return isFinite(v)?v:null;
+  }catch(e){ return null; } }
+function pdfTokens(o,r,priceOverride,plazoText,urgente){
   var precio=(priceOverride!=null?priceOverride:(Number(o.precio_final)||(r?r.precio:0)));
   var anticipo50=roundMoney(precio/2);
   var resto=Math.floor((precio/2)/5)*5;
   var anticipo=roundMoney(precio-resto);
   var br=pdfBrand();
-  return { '{empresa}':br.company,'{lema}':br.slogan,'{cliente}':(o.cliente||'—'),'{fecha}':_fmtDMY(o.fecha||''),'{número pedido}':(o.number||''),'{numero}':(o.number||''),'{descripcion}':(o.descripcion||'—'),
+  var tk={ '{empresa}':br.company,'{lema}':br.slogan,'{cliente}':(o.cliente||'—'),'{fecha}':_fmtDMY(o.fecha||''),'{número pedido}':(o.number||''),'{numero}':(o.number||''),'{descripcion}':(o.descripcion||'—'),
     '{precio}':eur(precio),'{cantidad}':String(o.cantidad||1),'{material}':(o.filamento||'—'),'{peso}':((o.peso_g||0)+' g'),'{tiempo}':(decToHM(o.horas)+' h'),
     '{anticipo50}':eur(anticipo50),'{anticipo}':eur(anticipo),'{resto}':eur(resto),'{plazo}':(plazoText||'—') };
+  /* Se calcula solo si alguna frase lo usa (getter perezoso: applyTokens/_tplRich comprueban antes de leer). */
+  var isU=(urgente!=null?!!urgente:(o.urgencia_nivel==='Urgente'));
+  Object.defineProperty(tk,'{segunda unidad}',{enumerable:true,get:function(){ var v=secondUnitCost(o,isU); return v==null?'—':eur(v); }});
+  return tk;
 }
-function applyTokens(text,tok){ text=String(text==null?'':text); Object.keys(tok).forEach(function(k){ text=text.split(k).join(tok[k]); }); return text; }
+function applyTokens(text,tok){ text=String(text==null?'':text); Object.keys(tok).forEach(function(k){ if(text.indexOf(k)>=0)text=text.split(k).join(tok[k]); }); return text; }
 /* ── Pestaña Plantillas ────────────────────────────────────────────────────────
    Tres pestañas (PDF de cliente, PDF interno y Marca) con la misma estructura: a la izquierda lo que se
    edita y a la derecha una vista previa esquemática del PDF que se actualiza al escribir. En el PDF de
@@ -3291,11 +3313,11 @@ function tplPaperHTML(){ var br=pdfBrand(), T=pdfTpl(), internal=(tplTab==='inte
     var keep=function(idx,tok){ return idx.filter(function(i){ return String(applyTokens(cs[i].t||'',tok)).trim(); }); };
     var pan=function(cls,title,idx,tok,gen){ idx.forEach(function(i){ shown[i]=1; });
       return '<div class="tpp-pan '+cls+'"><div class="tpp-pt"'+(gen?' data-f="t_cond"':'')+'>'+title+'</div><ul>'+idx.map(function(i){ return '<li data-i="'+i+'" title="Frase '+(i+1)+': clic para editarla" onclick="tplJump('+i+')">'+_tplRich(cs[i].t,tok)+'</li>'; }).join('')+'</ul></div>'; };
-    if(amb){ var tA=pdfTokens(o,null,s.pn,plazo), tB=pdfTokens(o,null,s.pu,plazo);
+    if(amb){ var tA=pdfTokens(o,null,s.pn,plazo), tB=pdfTokens(o,null,s.pu,plazo,true);
       var A=keep(condPick(cs,COND_PANEL.n,o,s.pn),tA), B=keep(condPick(cs,COND_PANEL.u,o,s.pu),tB), G=keep(condPick(cs,COND_PANEL.g,o,s.pn),tA);
       if(A.length||B.length)body+='<div class="tpp-pans">'+(A.length?pan('n','Tarifa estándar',A,tA):'<div></div>')+(B.length?pan('u','Tarifa urgente',B,tB):'<div></div>')+'</div>';
       if(G.length)body+=pan('g',_tplRich(T.client.t_cond,tA),G,tA,true);
-    } else { var tk=pdfTokens(o,null,pr,plazo), Tt=keep(condPick(cs,isU?COND_PANEL.u:COND_PANEL.n,o,pr),tk), G2=keep(condPick(cs,COND_PANEL.g,o,pr),tk);
+    } else { var tk=pdfTokens(o,null,pr,plazo,isU), Tt=keep(condPick(cs,isU?COND_PANEL.u:COND_PANEL.n,o,pr),tk), G2=keep(condPick(cs,COND_PANEL.g,o,pr),tk);
       if(Tt.length)body+=pan(isU?'u':'n',G2.length?(isU?'Tarifa urgente':'Tarifa estándar'):_tplRich(T.client.t_cond,tk),Tt,tk,!G2.length);
       if(G2.length)body+=pan('g',_tplRich(T.client.t_cond,tk),G2,tk,true); }
     _tplShown=shown;
@@ -3438,7 +3460,8 @@ function tarRowHTML(kind,l){ var H=function(f){ return 'tarSet(\''+kind+'\',\''+
   function num2(f,val,lbl,st){ return c(lbl,'<input class="inp" type="number" step="'+st+'" min="0" value="'+esc(String(val))+'" onchange="'+H(f)+'">'); }
   return '<div class="tar-row '+(kind==='dis'?'d':'p')+'">'
     +c('Nombre','<div class="tar-nm"><span class="tar-no" title="Número de orden de la tarifa" aria-label="Tarifa número '+(l.idx+1)+'">'+(l.idx+1)+'</span><input class="inp" value="'+esc(l.name)+'" onchange="'+H('name')+'"></div>','tar-n')
-    +num2('price',l.price,'Precio (€)','0.01')
+    +num2('price',l.price,kind==='post'?'Tarifa base (€)':'Precio (€)','0.01')
+    +(kind==='post'?num2('pct',l.pct,'% extra filamento','1'):'')
     +(kind==='dis'?(num2('days',l.days,'Días estándar','0.5')+num2('daysUrg',l.daysUrg,'Días urgente','0.5')):'')
     +'</div>'; }
 function tarifasPanelHTML(){ var labor=num(S.global_config.labor_cost_h);
@@ -3949,7 +3972,7 @@ function _computeOrder(o){
   var electricidad=round4(horas*num(printer.energy_consumption_kwh)*num(g.energy_cost_kwh));
   var diseno=round4(disenoImporte(o.diseno_modelado,o.diseno_opt));
   var busqueda=0;   // integrado como un nivel más del propio diseño
-  var _pp=postprocPartes(o,labor), soportes=_pp.soportes, postproc=_pp.postproc;
+  var _pp=postprocPartes(o,labor,filamento), soportes=_pp.soportes, postproc=_pp.postproc;
   var deterioro=round4(horas*depPerHour(printer));
   var gastoMisc=round4(Math.max(0,num(o.gasto_misc)));
   var bruto=filamento+electricidad+deterioro, resto=diseno+busqueda+soportes+postproc+gastoMisc;
@@ -4283,7 +4306,7 @@ function _renderTicketPage(doc,o,kind){
     if(o.urgencia_nivel==='Ambos'){
       var _dd2=orderDual(o), colGap=8, colW=(W-2*M-colGap)/2, cwP=colW-2*PAD-4;
       var _txA=_condTexts(COND_PANEL.n,pdfTokens(o,r,_dd2.normal,_delivStd||_deliv),_dd2.normal);
-      var _txB=_condTexts(COND_PANEL.u,pdfTokens(o,r,_dd2.urgente,_delivUrg||_deliv),_dd2.urgente);
+      var _txB=_condTexts(COND_PANEL.u,pdfTokens(o,r,_dd2.urgente,_delivUrg||_deliv,true),_dd2.urgente);
       var hP=Math.max(_txA.length?hOf(_txA,cwP,4.8):0,_txB.length?hOf(_txB,cwP,4.8):0);
       if(hP>PAGE_H){ unboxed('Tarifa estándar',ac,_txA); unboxed('Tarifa urgente',YEL,_txB); }
       else if(hP>0){
