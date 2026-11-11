@@ -1160,6 +1160,8 @@ function _tarLevelsFrom(kind,ov,snap){ var base=(kind==='dis')?DISENO_BASE:POST_
     if(o.name!=null&&String(o.name).trim()!=='')L.name=String(o.name).trim();
     if(o.price!=null&&o.price!==''&&isFinite(Number(o.price)))L.price=Math.max(0,Number(o.price));
     if(kind==='post'){ /* % extra sobre el coste del filamento; una instantánea sin % (pedido antiguo) no lo cobra */
+      /* Instantánea legacy ya congelada por migTarSnap antes del cambio: solo guarda alias, sin precio → tarifa de fábrica antigua. */
+      if(snap&&!(o.price!=null&&o.price!==''&&isFinite(Number(o.price)))&&POST_OLD_PRICE[b.id]!=null)L.price=POST_OLD_PRICE[b.id];
       if(o.pct!=null&&o.pct!==''&&isFinite(Number(o.pct)))L.pct=Math.max(0,Number(o.pct)); else if(snap)L.pct=0; }
     if(kind==='dis'){
       if(o.days!=null&&o.days!==''&&isFinite(Number(o.days)))L.days=Math.max(0,Number(o.days));
@@ -1224,9 +1226,10 @@ function postprocFactor(o){ if(!postprocPorUnidad(o))return 1;
   return postprocUnitPct()*Math.max(1,Math.floor(num(o&&o.cantidad)||1)); }
 /* Desglose en € {soportes,postproc}: en los niveles nuevos todo va a postproc. */
 function postprocPartes(o,labor,fil){ var v=String((o&&o.postprocesado)||''), k=postprocFactor(o);
-  /* Nivel nuevo = tarifa base × k + % extra sobre el coste del filamento (el filamento ya cubre todas las unidades: no se multiplica por k). */
-  if(postprocNuevo(v)){ var cn=postprocCanon(v), pc=(POSTPROC_PCT[cn]||0)/100; return {soportes:0,postproc:roundMoney(POSTPROCESADO[cn]*k+pc*num(fil))}; }
-  return {soportes:round4(((ELIMINACION_SOPORTES_LEGACY[(o&&o.eliminacion_soportes)]||0)/60)*num(labor)*k),
+  /* Nivel nuevo = tarifa base × k. El % extra sobre el coste del filamento NO va aquí: se suma al fondo de error
+     (extraFil, sin markup y sin multiplicar por k, porque el filamento ya cubre todas las unidades). Regla de Iván. */
+  if(postprocNuevo(v)){ var cn=postprocCanon(v), pc=(POSTPROC_PCT[cn]||0)/100; return {soportes:0,postproc:roundMoney(POSTPROCESADO[cn]*k),extraFil:roundMoney(pc*num(fil)),extraPct:pc}; }
+  return {extraFil:0,extraPct:0,soportes:round4(((ELIMINACION_SOPORTES_LEGACY[(o&&o.eliminacion_soportes)]||0)/60)*num(labor)*k),
           postproc:round4(((POSTPROCESADO_LEGACY[v]||0)/60)*num(labor)*k)}; }
 /* Opciones del desplegable: si el pedido guarda un nivel antiguo se mantiene en la
    lista, para no perder su tarifa al abrir la ficha. */
@@ -1414,7 +1417,7 @@ function _compute(c){
   var electricidad=round4(horas*num(printer.energy_consumption_kwh)*num(g.energy_cost_kwh));
   var diseno=round4(disenoImporte(c.diseno_modelado,c.diseno_opt));
   var busqueda=0;   // integrado como un nivel más del propio diseño
-  var _pp=postprocPartes(c,labor,filamento), soportes=_pp.soportes, postproc=_pp.postproc;
+  var _pp=postprocPartes(c,labor,filamento), soportes=_pp.soportes, postproc=_pp.postproc, extraFil=_pp.extraFil;
   var deterioro=round4(horas*depPerHour(printer));
   var gastoMisc=round4(Math.max(0,num(c.gasto_misc)));
   /* ── MODELO DE BLOQUES ──────────────────────────────────────────────────────
@@ -1428,7 +1431,7 @@ function _compute(c){
   var bruto=filamento+electricidad+deterioro;
   var resto=diseno+busqueda+soportes+postproc+gastoMisc;
   var precioMin=num(g.precio_minimo);
-  var bloqueA=bruto*markup+bruto*errorRate+resto;
+  var bloqueA=bruto*markup+bruto*errorRate+extraFil+resto;   /* extraFil: % extra de filamento del post-procesado, como fondo de error */
   var accesorios=accessoriesTotal(c);         // bloque C
   var bloqueC=accesorios;
   var recargo=bloqueA*urg;                    // bloque B · urgencia
@@ -1446,7 +1449,7 @@ function _compute(c){
   var precioPrevio=roundUpToNickel(Math.max(bloqueA+recargo+bloqueC,precioMin));   // total antes de la tasa
   var cant=Math.max(1,Math.floor(num(c.cantidad)||1));
   var markupVal=Math.max(0,bruto*(markup-1));
-  var errorVal=Math.max(0,bruto*errorRate);
+  var errorVal=Math.max(0,bruto*errorRate)+extraFil;
   /* Subtotal margen: markup + fondo de error + plus de urgencia + tasa de ahorro. */
   var subtotalMargen=roundMoney(markupVal+errorVal+recargo+cajonTasa);
   /* «Otros»: accesorios y ajuste a la tarifa mínima. */
@@ -1545,7 +1548,8 @@ function render(){
    poder refrescarlos sin repintar todo el formulario (repintar haría perder el
    foco y el cursor de los campos de texto que se están editando). */
 function hintDisenoHTML(c){ return eur(disenoImporte(c.diseno_modelado,c.diseno_opt))+(c.diseno_opt?(' · optimización ('+Math.round(disenoOptPct()*100)+'%)'):''); }
-function hintPostprocHTML(c){ var f=0; try{ f=compute(c).filamento; }catch(e){} return eur(postprocPartes(c,num(S.global_config&&S.global_config.labor_cost_h),f).postproc); }
+function hintPostprocHTML(c){ var f=0; try{ f=compute(c).filamento; }catch(e){} var pp=postprocPartes(c,num(S.global_config&&S.global_config.labor_cost_h),f);
+  return eur(pp.postproc)+(pp.extraFil>0?(' · +'+eur(pp.extraFil)+' al fondo de error ('+Math.round(pp.extraPct*100)+'% filamento)'):''); }
 /* Sin esto los importes junto a «Diseño / modelado» y «Post-procesado» se
    quedaban con la tarifa anterior hasta cambiar de vista. */
 function hintCantHTML(c){ var n=Math.max(1,Math.floor(num(c.cantidad)||1)); return cantModo(c)==='mul'?('datos de 1 ud. · × '+n):('presupuesto para '+n+(n===1?' ud.':' uds')); }
@@ -3972,16 +3976,16 @@ function _computeOrder(o){
   var electricidad=round4(horas*num(printer.energy_consumption_kwh)*num(g.energy_cost_kwh));
   var diseno=round4(disenoImporte(o.diseno_modelado,o.diseno_opt));
   var busqueda=0;   // integrado como un nivel más del propio diseño
-  var _pp=postprocPartes(o,labor,filamento), soportes=_pp.soportes, postproc=_pp.postproc;
+  var _pp=postprocPartes(o,labor,filamento), soportes=_pp.soportes, postproc=_pp.postproc, extraFil=_pp.extraFil;
   var deterioro=round4(horas*depPerHour(printer));
   var gastoMisc=round4(Math.max(0,num(o.gasto_misc)));
   var bruto=filamento+electricidad+deterioro, resto=diseno+busqueda+soportes+postproc+gastoMisc;
   var precioMin=num(g.precio_minimo);
   /* La tarifa mínima es suelo del total, no del bloque A (ver compute()). */
-  var bloqueA=bruto*markup+bruto*errorRate+resto;
+  var bloqueA=bruto*markup+bruto*errorRate+extraFil+resto;   /* extraFil: % extra de filamento del post-procesado, como fondo de error */
   var recargo=bloqueA*urg;
   var cant=Math.max(1,Math.floor(num(o.cantidad)||1));
-  var markupVal=Math.max(0,bruto*(markup-1)), errorVal=Math.max(0,bruto*errorRate);
+  var markupVal=Math.max(0,bruto*(markup-1)), errorVal=Math.max(0,bruto*errorRate)+extraFil;
   /* Tasa del cajón: se guardó con el pedido, así que se refleja tal cual se cobró. */
   var cajonTipo=(o.tipo_proyecto||(o.prod&&o.prod.tipo)||'Técnico');
   var cajonBase=num(o.precio_base_cajon);
