@@ -115,7 +115,8 @@
     }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
   }
 
-  // Visualizadores vinculados a un producto (admin › Visualizador): el botón «Solicitar» de ese producto abre su visualizador
+  // Un visualizador por producto (admin › Visualizador). Habilitado: el botón «Solicitar» de ese producto abre su visualizador;
+  // deshabilitado (o sin fila): abre el configurador del proyecto
   var visualizadores = api('visualizador_grupos?select=slug,producto&visible=eq.true&producto=not.is.null')
     .then(function (g) { var m = {}; (Array.isArray(g) ? g : []).forEach(function (x) { if (x.producto && x.slug) m[x.producto] = x.slug; }); return m; })
     .catch(function () { return {}; });
@@ -143,7 +144,7 @@
           var img = imgUrl(p.imagen);
           var btn = explorar
             ? '<button type="button" class="btn-explorar" id="btnExplorarBibliotecas">Explorar</button>'
-            : '<button type="button" class="btn-comprar" data-product="' + esc(p.nombre) + '" data-category="' + esc(p.categoria || '') + '"' + (vis[p.nombre] ? ' data-config-url="/llaveros-logo/"' : '') + '>Solicitar</button>';
+            : '<button type="button" class="btn-comprar" data-product="' + esc(p.nombre) + '" data-category="' + esc(p.categoria || '') + '"' + (vis[p.nombre] ? ' data-config-url="/llaveros-logo/?p=' + encodeURIComponent(vis[p.nombre]) + '"' : '') + '>Solicitar</button>';
           return '<div class="product-card" data-category="' + esc(p.categoria || '') + '">' +
             '<div class="product-image">' + (img ? '<img src="' + esc(img) + '" alt="' + esc(p.nombre) + '" width="240" height="240" loading="lazy" decoding="async">' : '') + '</div>' +
             '<h3>' + esc(p.nombre) + '</h3>' +

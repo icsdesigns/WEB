@@ -1,6 +1,9 @@
 /* ============================================================
    SILAB 3D · Panel admin › Visualizador
-   Opciones del visualizador 3D de la web (/visualizador/):
+   Un visualizador 3D por cada producto del catálogo (/productos/). Se elige el
+   producto y se activa o desactiva su visualizador: activado, el botón «Solicitar»
+   del producto abre su visualizador (/llaveros-logo/?p=<producto>); desactivado,
+   abre el configurador del proyecto. Para cada producto:
    1. Se sube un 3MF y se eligen sus camas (placas); cada cama es una
       opción con su nombre. Se conservan los colores del proyecto.
    2. Cada opción se convierte aquí, en el navegador, a un .s3dv
@@ -49,14 +52,13 @@ function iniciar({ sb, raiz }) {
   const borradas = [];  // filas guardadas que se quitan al guardar
   let proyecto = null;  // 3MF abierto: { nombre, p (abrir3MF), camas: [{ n, usar, nombre, url }] }
   let vista = null, vistaId = null, paleta = null, sinTabla = false;
-  let grupos = [];       // visualizadores: { slug, nombre, producto, visible, nuevo? }  («general» siempre existe: /visualizador/)
-  let grupoActual = 'general', sinGrupos = false, productos = [], gruposOriginales = '';
-  let grupoExtra = [];
+  let grupos = [];       // un visualizador por producto: { slug, nombre, producto, visible, nuevo? } (visible = habilitado)
+  let grupoActual = null, sinGrupos = false, productos = [], gruposOriginales = '';
   const ORIGEN = location.origin;
 
   raiz.innerHTML = `
     <div class="panel" data-panel-grupos>
-      <h2>Dirección y producto <span class="pista">· el visualizador tiene una única dirección y puede vincularse al botón «Solicitar» de un producto</span></h2>
+      <h2>Producto <span class="pista">· cada producto del catálogo tiene su propio visualizador; actívalo para que su botón «Solicitar» lo abra</span></h2>
       <div data-grupos></div>
     </div>
     <div class="panel">
@@ -74,46 +76,61 @@ function iniciar({ sb, raiz }) {
       <div data-lista><p class="vacio">Cargando…</p></div>
     </div>
     <div class="panel">
-      <h2>Vista previa <span class="pista">· así lo verán tus clientes en <a href="/visualizador/" target="_blank" rel="noopener">/visualizador/</a></span></h2>
+      <h2>Vista previa <span class="pista">· así lo verán tus clientes al pulsar «Solicitar» en el producto</span></h2>
       <div data-vista><p class="vacio">Añade una opción para verla aquí.</p></div>
     </div>`;
   const q = (s) => raiz.querySelector(s);
 
-  /* ---------- 0. Un solo visualizador: dirección y producto vinculado ---------- */
-  // Todas las opciones son de este visualizador. El producto vinculado se guarda en la fila «general» de visualizador_grupos.
-  const delGrupo = () => opciones;
+  /* ---------- 0. Un visualizador por producto: elegir producto, habilitarlo y su dirección ---------- */
   const baseUrl = ORIGEN + location.pathname.replace(/admin\/?(index\.html)?$/, '');
-  const URL_PUBLICA = baseUrl + 'llaveros-logo/';
-  const grupoSel = () => grupos.find((g) => g.slug === 'general') || grupos[0];
-  const firmaGrupos = () => JSON.stringify([grupoSel() && (grupoSel().producto || null)]);
+  const slugDe = (n) => String(n).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'producto';
+  const urlDe = (g) => baseUrl + 'llaveros-logo/?p=' + g.slug;
+  const grupoSel = () => grupos.find((g) => g.slug === grupoActual);
+  const delGrupo = () => opciones.filter((o) => o.grupo === grupoActual);
+  const firmaGrupos = () => JSON.stringify(grupos.map((g) => [g.slug, !!g.visible]).sort());
   const hayCambiosGrupos = () => firmaGrupos() !== gruposOriginales;
+  // Una ficha por producto (los que aún no tienen se crean en memoria, deshabilitadas, y solo se guardan si se usan)
+  function asegurarGrupos() {
+    const usados = new Set(grupos.map((g) => g.slug));
+    productos.forEach((nom) => {
+      if (grupos.some((g) => g.producto === nom)) return;
+      let slug = slugDe(nom), n = 2;
+      while (usados.has(slug)) slug = slugDe(nom) + '-' + n++;
+      usados.add(slug);
+      grupos.push({ slug, nombre: nom, producto: nom, visible: false, nuevo: true });
+    });
+  }
+  const gruposDeProducto = () => grupos.filter((g) => g.producto).sort((a, b) => a.producto.localeCompare(b.producto, 'es'));
 
   function pintarGrupos() {
     const caja = q('[data-grupos]');
+    if (sinGrupos) { caja.innerHTML = '<div class="aviso-sql"><p><strong>Falta preparar los visualizadores por producto.</strong> En Supabase › SQL Editor ejecuta de nuevo <code>supabase/visualizador.sql</code> (bloque 3) y vuelve a abrir esta pestaña.</p></div>'; return; }
     const g = grupoSel();
+    const lista = gruposDeProducto();
     caja.innerHTML = `
-      <div class="avis-grupo-ficha">
-        <label class="avis-campo-et"><span>Producto vinculado <i>(su botón «Solicitar» abrirá el visualizador)</i></span>
-          <select data-g="producto" ${sinGrupos ? 'disabled' : ''}>
-            <option value="">Ninguno</option>
-            ${productos.map((nom) => `<option ${g.producto === nom ? 'selected' : ''}>${esc(nom)}</option>`).join('')}
-            ${g.producto && !productos.includes(g.producto) ? `<option selected>${esc(g.producto)}</option>` : ''}
-          </select>
-          ${sinGrupos ? '<span class="pista">Para vincular un producto ejecuta de nuevo <code>supabase/visualizador.sql</code> (bloque 3).</span>' : ''}</label>
-        <div class="avis-campo-et avis-grupo-url"><span>Dirección para compartir</span>
-          <div class="avis-url"><code>${esc(URL_PUBLICA.replace(/^https?:\/\//, ''))}</code>
+      <div class="avis-grupos">${lista.map((x) => `
+        <button type="button" class="avis-grupo${x.slug === grupoActual ? ' is-activo' : ''}${x.visible ? '' : ' is-oculto'}" data-grupo="${esc(x.slug)}" aria-pressed="${x.slug === grupoActual}" title="${x.visible ? 'Visualizador habilitado' : 'Visualizador deshabilitado'}">${esc(x.producto)}<small>${opciones.filter((o) => o.grupo === x.slug).length}</small></button>`).join('')}</div>
+      ${g ? `<div class="avis-grupo-ficha">
+        <div class="avis-campo-et"><span>Visualizador de «${esc(g.producto)}»</span>
+          <label class="avis-op__visible"><span class="adm-interruptor"><input type="checkbox" data-g="visible" ${g.visible ? 'checked' : ''} aria-label="Habilitar el visualizador de ${esc(g.producto)}"><span aria-hidden="true"></span></span>${g.visible ? 'Habilitado' : 'Deshabilitado'}
+            <span class="avis-estado ${g.visible ? 'is-ok' : 'is-aviso'}">${g.visible ? 'Activo en la web' : 'Inactivo'}</span></label>
+          <span class="pista">${g.visible ? 'El botón «Solicitar» de este producto lleva directo a su visualizador.' : 'El botón «Solicitar» de este producto lleva al configurador del proyecto, como hasta ahora.'}</span></div>
+        <div class="avis-campo-et avis-grupo-url"><span>Dirección del visualizador</span>
+          <div class="avis-url"><code>${esc(urlDe(g).replace(/^https?:\/\//, ''))}</code>
             <button type="button" class="avis-boton avis-boton--suave" data-copiar-url>${ICONO.copiar}<span>Copiar</span></button>
-            <a class="avis-boton avis-boton--suave" href="${esc(URL_PUBLICA)}" target="_blank" rel="noopener">Abrir</a></div></div>
-      </div>`;
+            <a class="avis-boton avis-boton--suave" href="${esc(urlDe(g))}" target="_blank" rel="noopener">Abrir</a></div></div>
+      </div>` : '<p class="vacio">Aún no hay productos en el catálogo.</p>'}`;
   }
   q('[data-grupos]').addEventListener('click', (e) => {
+    const c = e.target.closest('[data-grupo]');
+    if (c) { grupoActual = c.dataset.grupo; vistaId = null; pintarGrupos(); pintarLista(); return; }
     const b = e.target.closest('[data-copiar-url]');
     if (!b) return;
-    const txt = b.querySelector('span');
-    (navigator.clipboard ? navigator.clipboard.writeText(URL_PUBLICA) : Promise.reject()).then(() => { txt.textContent = 'Copiada'; setTimeout(() => { txt.textContent = 'Copiar'; }, 1600); }, () => prompt('Copia la dirección:', URL_PUBLICA));
+    const url = urlDe(grupoSel()), txt = b.querySelector('span');
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => { txt.textContent = 'Copiada'; setTimeout(() => { txt.textContent = 'Copiar'; }, 1600); }, () => prompt('Copia la dirección:', url));
   });
   q('[data-grupos]').addEventListener('change', (e) => {
-    if (e.target.dataset.g === 'producto') { grupoSel().producto = e.target.value || null; pintarBarra(); }
+    if (e.target.dataset.g === 'visible') { grupoSel().visible = e.target.checked; pintarGrupos(); pintarBarra(); }
   });
 
   /* ---------- 1. Leer el 3MF ---------- */
@@ -224,12 +241,10 @@ function iniciar({ sb, raiz }) {
     const rg = await sb.from('visualizador_grupos').select('*').order('orden', { ascending: true }).order('creado', { ascending: true });
     sinGrupos = !!rg.error;
     grupos = sinGrupos ? [] : (rg.data || []).map((g) => ({ slug: g.slug, nombre: g.nombre, producto: g.producto || null, visible: g.visible !== false }));
-    grupoExtra = grupos.filter((g) => g.slug !== 'general');   // grupos de pruebas anteriores: se limpian al guardar
-    if (!grupos.some((g) => g.slug === 'general')) grupos.unshift({ slug: 'general', nombre: 'Visualizador general', producto: null, visible: true });
-    const general = grupos.find((g) => g.slug === 'general');
-    if (!general.producto) { const c = grupoExtra.find((g) => g.producto); if (c) general.producto = c.producto; }
-    try { const rp = await sb.from('productos').select('nombre').order('nombre', { ascending: true }); productos = rp.error ? [] : (rp.data || []).map((x) => x.nombre).filter(Boolean); } catch (e) { productos = []; }
+    try { const rp = await sb.from('productos').select('nombre').order('nombre', { ascending: true }); productos = rp.error ? [] : (rp.data || []).map((x) => x.nombre).filter((n) => n && n !== 'Figura con diseño predefinido'); } catch (e) { productos = []; }
     opciones = (r.data || []).map((f) => ({ ...f, grupo: f.grupo || 'general', colores: Array.isArray(f.colores) ? f.colores : [], precios: Array.isArray(f.precios) ? f.precios : [] }));
+    if (!sinGrupos) asegurarGrupos();
+    if (!grupoSel()) { const l = gruposDeProducto(); grupoActual = (l.find((g) => g.visible) || l.find((g) => opciones.some((o) => o.grupo === g.slug)) || l[0] || {}).slug || null; }
     originales = firma(); gruposOriginales = firmaGrupos();
     pintarGrupos();
     pintarLista();
@@ -241,10 +256,10 @@ function iniciar({ sb, raiz }) {
   function pintarLista() {
     const lista = q('[data-lista]');
     const total = opciones.reduce((s, o) => s + (o.kb || 0), 0);
-    const lote = delGrupo(), tit = grupoSel() ? grupoSel().nombre : '';
+    const lote = delGrupo(), tit = grupoSel() ? grupoSel().producto || grupoSel().nombre : '';
     q('[data-cuenta]').textContent = opciones.length ? '· «' + tit + '»: ' + lote.length + (lote.length === 1 ? ' opción' : ' opciones') + ' · ' + kb(total) + ' en Supabase Storage (plan gratis: 1 GB)' : '';
     if (sinTabla && !opciones.length) { lista.innerHTML = SQL_AVISO; pintarBarra(); pintarVista(); return; }
-    if (!lote.length) { lista.innerHTML = '<p class="vacio">Este visualizador aún no tiene opciones. Sube un 3MF arriba y elige sus camas.</p>'; pintarBarra(); pintarVista(); return; }
+    if (!lote.length) { lista.innerHTML = '<p class="vacio">Este producto aún no tiene opciones en su visualizador. Sube un 3MF arriba y elige sus camas.</p>'; pintarBarra(); pintarVista(); return; }
     lista.innerHTML = (sinTabla ? SQL_AVISO : '') + '<div class="avis-lista">' + lote.map((o, i) => `
       <article class="avis-op${o.nueva ? ' adm-ficha--nueva' : ''}${o.visible ? '' : ' is-oculta'}${o.id === vistaId ? ' is-vista' : ''}" data-i="${opciones.indexOf(o)}">
         <header class="avis-op__cab">
@@ -334,14 +349,14 @@ function iniciar({ sb, raiz }) {
     const qt = e.target.closest('[data-quitar-tramo]');
     if (qt) { o.precios.splice(+qt.dataset.quitarTramo, 1); pintarLista(); return; }
     if (e.target.closest('[data-copiar-precios]')) {
-      if (!confirm('¿Copiar estos precios a las demás opciones de este visualizador? Se sustituyen los que tengan.')) return;
-      delGrupo(o.grupo).forEach((x) => { if (x !== o) x.precios = o.precios.map((t) => ({ ...t })); });
+      if (!confirm('¿Copiar estos precios a las demás opciones de este producto? Se sustituyen los que tengan.')) return;
+      delGrupo().forEach((x) => { if (x !== o) x.precios = o.precios.map((t) => ({ ...t })); });
       pintarLista(); return;
     }
     if (e.target.closest('[data-ver]')) { vistaId = o.id; pintarLista(); q('[data-vista]').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     const m = e.target.closest('[data-mover]');
     if (m) {
-      const lote = delGrupo(o.grupo), k = lote.indexOf(o) + +m.dataset.mover, otro = lote[k];
+      const lote = delGrupo(), k = lote.indexOf(o) + +m.dataset.mover, otro = lote[k];
       if (otro) { const j = opciones.indexOf(otro); [opciones[i], opciones[j]] = [opciones[j], opciones[i]]; pintarLista(); }
       return;
     }
@@ -479,12 +494,15 @@ function iniciar({ sb, raiz }) {
     }
     progreso('Guardando…');
     if (!sinGrupos) {
-      const g = grupoSel();
-      const rg = await sb.from('visualizador_grupos').upsert([{ slug: 'general', nombre: g.nombre || 'Visualizador general', producto: g.producto || null, visible: true, orden: 0 }]);
-      if (rg.error) throw paso('al guardar el producto vinculado (tabla visualizador_grupos)', rg.error);
+      const lista = grupos.filter((g) => !g.nuevo || g.visible || opciones.some((o) => o.grupo === g.slug));
+      lista.forEach((g) => {
+        if (g.visible && !opciones.some((o) => o.grupo === g.slug && o.visible)) throw new Error('«' + (g.producto || g.nombre) + '» está habilitado pero no tiene ninguna opción visible: añade una opción o desactívalo.');
+      });
+      const rg = await sb.from('visualizador_grupos').upsert(lista.map((g, i) => ({ slug: g.slug, nombre: g.nombre || g.producto, producto: g.producto || null, visible: !!g.visible, orden: i })));
+      if (rg.error) throw paso('al guardar los productos (tabla visualizador_grupos)', rg.error);
     }
     const filas = opciones.map((o, i) => ({
-      id: o.id, grupo: sinGrupos ? undefined : 'general', nombre: (o.nombre || '').trim() || 'Opción ' + (i + 1), material: o.material, modelo: o.modelo, miniatura: o.miniatura,
+      id: o.id, grupo: sinGrupos ? undefined : o.grupo, nombre: (o.nombre || '').trim() || 'Opción ' + (i + 1), material: o.material, modelo: o.modelo, miniatura: o.miniatura,
       colores: o.colores.map((c, n) => ({ slot: c.slot, nombre: 'Color ' + letra(n), hex: c.hex, ...(c.predef ? { predef: c.predef } : {}) })),
       precios: tramos(o).map((t) => ({ desde: t.desde, unidad: t.unidad })),
       origen: o.origen || null, kb: o.kb || null, orden: i, visible: !!o.visible
@@ -498,10 +516,6 @@ function iniciar({ sb, raiz }) {
       const rutas = [rutaDe(o.modelo), rutaDe(o.miniatura)].filter(Boolean);
       if (rutas.length) await st.remove(rutas); // si falla, el archivo queda huérfano pero la web ya no lo usa
       borradas.shift();
-    }
-    if (!sinGrupos && grupoExtra.length) { // los grupos de pruebas anteriores desaparecen: ya solo hay un visualizador
-      const r = await sb.from('visualizador_grupos').delete().neq('slug', 'general');
-      if (r.error) throw paso('al limpiar grupos anteriores', r.error);
     }
   }
 
