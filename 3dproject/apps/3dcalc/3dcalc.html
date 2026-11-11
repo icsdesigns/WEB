@@ -3006,6 +3006,7 @@ function pdfPresets(){ return (S.global_config&&Array.isArray(S.global_config.pd
          'b' en el panel de cada tarifa (con doble tarifa se repite en los dos, comparando el precio de cada uno);
          'g' una sola vez, en el panel gris común (con doble tarifa se compara con el precio estándar).
    · Precio (gt: mayor o igual a · lt: menor o igual a; los límites son siempre inclusivos).
+   · Unidades (ugt: mayor o igual a · ult: menor o igual a; enteros, inclusivos; se compara con la cantidad del pedido).
    · Tiempo de producción (prod: 'on' formulario activo · 'off' desactivado · '' sin condición).
    · Modalidad de diseño (dis: lista acumulable; vacía = sin condición).
    El modelo guardado no cambia: las frases antiguas sin tarifa (o en texto plano) son «Ambas, en cada tarifa». */
@@ -3020,12 +3021,15 @@ function _disLiveName(id){ var l=_tarLevelsFrom('dis',_tarLive('dis')).filter(fu
 function _condOne(c){ c=c||{};
   var dis=Array.isArray(c.dis)?c.dis.map(function(x){ var id=disIdOf(x,true); return id?_disLiveName(id):null; }).filter(function(x,i,a){return x!=null&&a.indexOf(x)===i;}):[];
   return {t:(c.t!=null?String(c.t):(c.text!=null?String(c.text):'')),on:c.on!==false,u:(c.u==='n'||c.u==='u'||c.u==='g')?c.u:'b',
-    x:!!c.x&&c.u!=='g',gt:_condNum(c.gt),lt:_condNum(c.lt),prod:(c.prod==='on'||c.prod==='off')?c.prod:'',dis:dis}; }
+    x:!!c.x&&c.u!=='g',gt:_condNum(c.gt),lt:_condNum(c.lt),ugt:_condNum(c.ugt),ult:_condNum(c.ult),prod:(c.prod==='on'||c.prod==='off')?c.prod:'',dis:dis}; }
 function normConds(arr){ if(!Array.isArray(arr))return []; return arr.map(function(c){ if(typeof c==='string')return _condOne({t:c}); if(c&&typeof c==='object')return _condOne(c); return _condOne({}); }); }
 /* ¿Se cumplen las condiciones de precio, producción y diseño de la frase para este pedido y este precio? */
 function condMatch(c,o,price){ if(!c)return true; var pr=num(price);
   if(c.gt!=null&&c.gt!==''&&!(pr>=num(c.gt)))return false;
   if(c.lt!=null&&c.lt!==''&&!(pr<=num(c.lt)))return false;
+  if((c.ugt!=null&&c.ugt!=='')||(c.ult!=null&&c.ult!=='')){ var un=Math.max(1,Math.floor(num(o&&o.cantidad)||1));
+    if(c.ugt!=null&&c.ugt!==''&&!(un>=num(c.ugt)))return false;
+    if(c.ult!=null&&c.ult!==''&&!(un<=num(c.ult)))return false; }
   if(c.prod==='on'&&!(o&&o.prod))return false;
   if(c.prod==='off'&&(o&&o.prod))return false;
   if(Array.isArray(c.dis)&&c.dis.length){ var oid=disIdOf(o&&o.diseno_modelado,false); if(!oid||!c.dis.some(function(x){ return disIdOf(x,true)===oid; }))return false; }
@@ -3044,6 +3048,9 @@ function condChips(c){ var u=c.u||'b', a=[{cls:'tar-'+u,dots:COND_DOT[u],txt:CON
   if(c.x)a.push({txt:'Anexa al precio'});
   if(g&&l)a.push({txt:(num(c.gt)===num(c.lt)?('Precio = '+eur(c.gt)):('Precio '+eur(c.gt)+' – '+eur(c.lt))),warn:num(c.gt)>num(c.lt)});
   else if(g)a.push({txt:'Precio ≥ '+eur(c.gt)}); else if(l)a.push({txt:'Precio ≤ '+eur(c.lt)});
+  var ug=(c.ugt!=null&&c.ugt!==''), ul=(c.ult!=null&&c.ult!=='');
+  if(ug&&ul)a.push({txt:(num(c.ugt)===num(c.ult)?('Uds = '+num(c.ugt)):('Uds '+num(c.ugt)+' – '+num(c.ult))),warn:num(c.ugt)>num(c.ult)});
+  else if(ug)a.push({txt:'Uds ≥ '+num(c.ugt)}); else if(ul)a.push({txt:'Uds ≤ '+num(c.ult)});
   if(c.prod==='on')a.push({txt:'Con producción'}); else if(c.prod==='off')a.push({txt:'Sin producción'});
   if(c.dis&&c.dis.length)a.push({txt:'Diseño: '+(c.dis.length<=2?c.dis.map(_disShort).join(' o '):(c.dis.length+' modalidades'))});
   return a; }
@@ -3057,10 +3064,14 @@ function condSentence(c){ var u=c.u||'b', T=esc(pdfTpl().client.t_cond||'Condici
   if(c.x)s=s.replace(/^Sale en el panel (verde|amarillo) <b>([^<]*)<\/b>:/,'Sale <b>anexa al precio</b>, dentro del recuadro de la tarifa ($2):').replace(/^Sale con cualquier tarifa, en el panel de la tarifa del presupuesto;/,'Sale anexa al precio, dentro del recuadro de la tarifa del presupuesto;');
   if(g&&l)cond.push('el precio esté entre <b>'+eur(c.gt)+'</b> y <b>'+eur(c.lt)+'</b> (ambos incluidos)');
   else if(g)cond.push('el precio sea mayor o igual a <b>'+eur(c.gt)+'</b>'); else if(l)cond.push('el precio sea menor o igual a <b>'+eur(c.lt)+'</b>');
+  var ug=(c.ugt!=null&&c.ugt!==''), ul=(c.ult!=null&&c.ult!=='');
+  if(ug&&ul)cond.push('el número de unidades esté entre <b>'+num(c.ugt)+'</b> y <b>'+num(c.ult)+'</b> (ambos incluidos)');
+  else if(ug)cond.push('el número de unidades sea mayor o igual a <b>'+num(c.ugt)+'</b>'); else if(ul)cond.push('el número de unidades sea menor o igual a <b>'+num(c.ult)+'</b>');
   if(c.prod==='on')cond.push('el formulario de tiempo de producción esté <b>activo</b>'); else if(c.prod==='off')cond.push('el formulario de tiempo de producción esté <b>desactivado</b>');
   if(c.dis&&c.dis.length)cond.push('la modalidad de diseño sea <b>'+c.dis.map(esc).join('</b> o <b>')+'</b>');
   if(cond.length)s+=' Siempre que '+(cond.length>1?cond.slice(0,-1).join(', ')+' y '+cond[cond.length-1]:cond[0])+'.';
   if((g||l)&&u!=='n'&&u!=='u')s+=' Con doble tarifa, el precio que cuenta es '+(u==='b'?'el de cada panel':'el estándar')+'.';
+  if(ug&&ul&&num(c.ugt)>num(c.ult))s+=' <span class="tpl-warn">El mínimo de unidades supera al máximo: así no saldrá nunca.</span>';
   if(g&&l&&num(c.gt)>num(c.lt))s+=' <span class="tpl-warn">El mínimo supera al máximo: así no saldrá nunca.</span>';
   if(c.on===false)s='<span class="tpl-warn">Desactivada: no sale en ningún PDF.</span> Si la activas: '+s;
   if(!String(c.t||'').trim())s+=' <span class="tpl-warn">La frase está vacía y no se imprimirá.</span>';
@@ -3070,6 +3081,7 @@ function condSentence(c){ var u=c.u||'b', T=esc(pdfTpl().client.t_cond||'Condici
 var _tplRows={}, _tplOpen={}, _tplTok={}, _tplUndo=null, _tplFlash=-1, _tplFocused=null;
 function condHas(c,type){ if(type==='tarifa')return true;
   if(type==='precio')return (c.gt!=null&&c.gt!=='')||(c.lt!=null&&c.lt!=='');
+  if(type==='uds')return (c.ugt!=null&&c.ugt!=='')||(c.ult!=null&&c.ult!=='');
   if(type==='prod')return c.prod==='on'||c.prod==='off';
   if(type==='dis')return Array.isArray(c.dis)&&c.dis.length>0; return false; }
 function condShown(c,type,i){ return condHas(c,type)||!!(_tplRows[i]&&_tplRows[i][type]); }
@@ -3105,12 +3117,13 @@ function setCondTar(i,v){ var c=ensureTpl().client.conds[i]; if(!c)return; c.u=(
 function setCondU(i,v){ setCondTar(i,v); }
 /* Frase anexa al precio: sale dentro del recuadro del precio. «Una vez, en el panel común» no tiene recuadro de precio: pasa a «cada tarifa». */
 function setCondX(i,v){ var c=ensureTpl().client.conds[i]; if(!c)return; c.x=!!v; if(c.x&&c.u==='g')c.u='b'; _tplTouch(false); save(); renderPlantillas(); }
-function addCondType(i,type){ if(!type||type==='tarifa')return; (_tplRows[i]=_tplRows[i]||{})[type]=true; _tplOpen[i]=true; renderPlantillas(type==='precio'?('gt'+i):(type==='prod'?('pr'+i+'on'):('ds'+i+'_0'))); }
+function addCondType(i,type){ if(!type||type==='tarifa')return; (_tplRows[i]=_tplRows[i]||{})[type]=true; _tplOpen[i]=true; renderPlantillas(type==='precio'?('gt'+i):type==='uds'?('ugt'+i):(type==='prod'?('pr'+i+'on'):('ds'+i+'_0'))); }
 function delCondType(i,type){ var c=ensureTpl().client.conds[i]; if(!c||type==='tarifa')return;
-  if(type==='precio'){ c.gt=null; c.lt=null; } else if(type==='prod')c.prod=''; else if(type==='dis')c.dis=[];
+  if(type==='precio'){ c.gt=null; c.lt=null; } else if(type==='uds'){ c.ugt=null; c.ult=null; } else if(type==='prod')c.prod=''; else if(type==='dis')c.dis=[];
   if(_tplRows[i])delete _tplRows[i][type]; _tplTouch(false); save(); renderPlantillas('ad'+type+i); }
 /* Precio: se guarda al teclear y solo se refrescan los chips y la vista previa, para no perder el foco. */
 function setCondF(i,f,v){ var c=ensureTpl().client.conds[i]; if(!c)return;
+  if(f==='ugt'||f==='ult'){ var nn=_condNum(v); c[f]=(nn==null?null:Math.max(1,Math.round(nn))); save(); _tplTouch(false); _tplCardSync(i); return; }
   if(f==='gt'||f==='lt'){ c[f]=_condNum(v); save(); _tplTouch(false); _tplCardSync(i); return; }
   if(f==='prod'){ c.prod=(v==='on'||v==='off')?v:''; save(); _tplTouch(false); renderPlantillas(); } }
 function toggleCondDis(i,ki){ var c=ensureTpl().client.conds[i], k=Object.keys(DISENO_PRECIO)[ki]; if(!c||k==null)return;
@@ -3235,11 +3248,13 @@ function _tplCondRows(c,i){ var u=c.u||'b', amb=(u==='b'||u==='g'), dk=Object.ke
     +sb('tr'+i+'eg',u==='g','g',COND_DOT.g+'Una vez, en el panel común','setCondTar('+i+',\'g\')','Una sola vez, en el panel gris común; con doble tarifa el precio se compara con el estándar')+'</div></div>';
   var rows=row('tarifa','Tarifa',tar,false);
   if(condShown(c,'precio',i))rows+=row('precio','Precio','<label class="tpl-pin"><span class="tpl-k">mayor o igual a</span>'+_tplNum('gt',i,c.gt)+'</label><label class="tpl-pin"><span class="tpl-k">menor o igual a</span>'+_tplNum('lt',i,c.lt)+'</label>',true);
+  if(condShown(c,'uds',i))rows+=row('uds','Unidades','<label class="tpl-pin"><span class="tpl-k">mayor o igual a</span>'+_tplNumU('ugt',i,c.ugt)+'</label><label class="tpl-pin"><span class="tpl-k">menor o igual a</span>'+_tplNumU('ult',i,c.ult)+'</label>',true);
   if(condShown(c,'prod',i))rows+=row('prod','Tiempo de producción','<div class="tpl-seg" role="group" aria-label="Formulario de tiempo de producción">'+sb('pr'+i+'on',c.prod==='on','','Formulario activo','setCondF('+i+',\'prod\',\'on\')')+sb('pr'+i+'off',c.prod==='off','','Formulario desactivado','setCondF('+i+',\'prod\',\'off\')')+'</div>'+(c.prod?'':'<span class="tpl-k tpl-pend">Elige una opción</span>'),true);
   if(condShown(c,'dis',i))rows+=row('dis','Modalidad de diseño','<div class="tpl-dchips">'+dk.map(function(k,ki){ var on=(c.dis||[]).indexOf(k)>=0; return '<button type="button" data-fk="ds'+i+'_'+ki+'" class="tpl-dchip'+(on?' on':'')+'" aria-pressed="'+on+'" onclick="toggleCondDis('+i+','+ki+')">'+esc(tarLbl('dis',k))+'</button>'; }).join('')+'</div>'+((c.dis&&c.dis.length)?'':'<span class="tpl-k tpl-pend">Elige una o varias</span>'),true);
-  var avail=[['precio','Precio'],['prod','Tiempo de producción'],['dis','Modalidad de diseño']].filter(function(t){ return !condShown(c,t[0],i); });
+  var avail=[['precio','Precio'],['uds','Unidades'],['prod','Tiempo de producción'],['dis','Modalidad de diseño']].filter(function(t){ return !condShown(c,t[0],i); });
   if(avail.length)rows+='<div class="tpl-cadd"><span class="tpl-k">Añadir condición</span>'+avail.map(function(t){ return '<button type="button" class="tpl-addb" data-fk="ad'+t[0]+i+'" onclick="addCondType('+i+',\''+t[0]+'\')">'+_ico(TPL_IC.plus,12)+t[1]+'</button>'; }).join('')+'</div>';
   return rows; }
+function _tplNumU(f,i,v){ return '<span class="suffix tpl-num"><input class="inp" type="text" inputmode="numeric" autocomplete="off" data-fk="'+f+i+'" aria-label="Unidades '+(f==='ugt'?'mayor':'menor')+' o igual a" value="'+(v!=null&&v!==''?escA(String(v)):'')+'" placeholder="—" oninput="setCondF('+i+',\''+f+'\',this.value)"><span class="u">uds</span></span>'; }
 function _tplNum(f,i,v){ return '<span class="suffix tpl-num"><input class="inp" type="text" inputmode="decimal" autocomplete="off" data-fk="'+f+i+'" aria-label="Precio '+(f==='gt'?'mayor':'menor')+' o igual a" value="'+(v!=null&&v!==''?escA(String(v).replace('.',',')):'')+'" placeholder="—" oninput="setCondF('+i+',\''+f+'\',this.value)"><span class="u">€</span></span>'; }
 function tplPhraseBlock(c,i,n){ var on=c.on!==false, op=!!_tplOpen[i], tk=!!_tplTok[i];
   var top='<div class="tpl-ph-top"><label class="tpl-sw" title="'+(on?'Activa: sale en el PDF si cumple sus condiciones':'Desactivada: no sale en ningún PDF')+'"><input type="checkbox" data-fk="on'+i+'" aria-label="Frase '+(i+1)+' activa"'+(on?' checked':'')+' onchange="toggleCond('+i+')"><span></span></label>'
@@ -3289,20 +3304,21 @@ function tokensRefCard(){ var ex='';
     +'<div class="tpl-tokgrid">'+TPL_TOKENS.map(function(t){ return '<button type="button" class="tpl-tokr" onmousedown="event.preventDefault()" onclick="insertTokenCond(\''+t[0]+'\')"><code>'+esc(t[0])+'</code><span>'+esc(t[1])+'</span></button>'; }).join('')+'</div>'+ex+'</details>';
 }
 /* ── Vista previa ── */
-function _tplScnGet(){ if(_tplScn)return _tplScn; var s={u:'Normal',pn:30,pu:36,prod:false,dis:'No necesario'};
+function _tplScnGet(){ if(_tplScn)return _tplScn; var s={u:'Normal',pn:30,pu:36,prod:false,dis:'No necesario',uds:1};
   try{ var c=S.calc_state||{}; if(c.urgencia_nivel==='Urgente'||c.urgencia_nivel==='Ambos')s.u=c.urgencia_nivel;
     var rn=roundMoney(computeUrg(c,'Normal').precio), ru=roundMoney(computeUrg(c,'Urgente').precio); if(rn>0){ s.pn=rn; s.pu=Math.max(ru,rn); }
-    s.prod=!!(c.prod_on&&c.prod); var d=disenoNivel(c.diseno_modelado); if(Object.keys(DISENO_PRECIO).indexOf(d)>=0)s.dis=d; }catch(e){}
+    s.uds=Math.max(1,Math.floor(num(c.cantidad)||1)); s.prod=!!(c.prod_on&&c.prod); var d=disenoNivel(c.diseno_modelado); if(Object.keys(DISENO_PRECIO).indexOf(d)>=0)s.dis=d; }catch(e){}
   return (_tplScn=s); }
 function tplScnSet(k,v){ var s=_tplScnGet();
   if(k==='pn'||k==='pu'){ var n=_condNum(v); s[k]=(n==null?0:n); _tplPrevUpd(); return; }
+  if(k==='uds'){ var nu=_condNum(v); s.uds=Math.max(1,Math.round(nu==null?1:nu)); _tplPrevUpd(); return; }
   if(k==='u')s.u=(v==='Urgente'||v==='Ambos')?v:'Normal'; else if(k==='prod')s.prod=!!v; else if(k==='dis')s.dis=String(v);
   _tplSwap(document.getElementById('tplAsideB'),_tplAsideBody()); }
 /* Pedido de ejemplo para la vista previa: datos de la calculadora (sin tocarla) y el escenario elegido. */
 function _tplSampleOrder(){ var s=_tplScnGet();
   if(!_tplSample){ var c=S.calc_state||{}; _tplSample={number:(c.draft_number||'3DP-000000'),fecha:(c.fecha||todayISO()),cliente:(c.cliente||'Cliente de ejemplo'),descripcion:(c.descripcion||'Pieza de ejemplo'),cantidad:1,filamento:(c.filamento_tipo||'PLA'),peso_g:0,horas:0};
     try{ var r=compute(); _tplSample.cantidad=r.cant||1; _tplSample.filamento=r.filName||_tplSample.filamento; _tplSample.peso_g=r.peso||0; _tplSample.horas=r.horas||0; }catch(e){} }
-  var o=Object.assign({},_tplSample); o.urgencia_nivel=s.u; o.prod=s.prod?{tipo:'Técnico',diseno:'Nulo',tests:[],printh:''}:null; o.diseno_modelado=s.dis;
+  var o=Object.assign({},_tplSample); o.urgencia_nivel=s.u; o.prod=s.prod?{tipo:'Técnico',diseno:'Nulo',tests:[],printh:''}:null; o.diseno_modelado=s.dis; o.cantidad=s.uds||1;
   if(s.u==='Ambos'){ o.precio_normal=s.pn; o.precio_urgente=s.pu; o.precio_final=s.pn; } else o.precio_final=(s.u==='Urgente'?s.pu:s.pn);
   return o; }
 function _tplRich(tx,tok){ var s=esc(String(tx==null?'':tx)).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
@@ -3347,6 +3363,7 @@ function _tplScnHTML(){ var s=_tplScnGet(), dk=Object.keys(DISENO_PRECIO);
   return '<div class="tpl-scn"><div class="tpl-scn-t">Presupuesto de ejemplo</div>'
     +'<span class="tpl-scn-l">Tarifa</span><div class="tpl-seg sm" role="group" aria-label="Tarifa del ejemplo">'+sb('Normal',COND_DOT.n+'Básica','n')+sb('Urgente',COND_DOT.u+'Urgente','u')+sb('Ambos',COND_DOT.b+'Ambas','b')+'</div>'
     +'<span class="tpl-scn-l">Precio</span><div class="tpl-scn-ps">'+(s.u==='Ambos'?pin('pn','Estándar')+pin('pu','Urgente'):pin(s.u==='Urgente'?'pu':'pn',''))+'</div>'
+    +'<span class="tpl-scn-l">Unidades</span><label class="tpl-scn-p"><span class="suffix tpl-num"><input class="inp" type="text" inputmode="numeric" autocomplete="off" data-fk="spuds" aria-label="Unidades del ejemplo" value="'+escA(String(s.uds||1))+'" oninput="tplScnSet(\'uds\',this.value)"><span class="u">uds</span></span></label>'
     +'<span class="tpl-scn-l">Producción</span><label class="tpl-scn-c"><span class="tpl-sw sm"><input type="checkbox" data-fk="scprod"'+(s.prod?' checked':'')+' onchange="tplScnSet(\'prod\',this.checked)"><span></span></span>Formulario '+(s.prod?'activo':'desactivado')+'</label>'
     +'<span class="tpl-scn-l">Diseño</span><select class="selx" data-fk="scdis" aria-label="Modalidad de diseño del ejemplo" onchange="tplScnSet(\'dis\',this.value)">'+dk.map(function(k){ return '<option value="'+esc(k)+'"'+(s.dis===k?' selected':'')+'>'+esc(tarLbl('dis',k))+'</option>'; }).join('')+'</select></div>'; }
 function _tplAsideBody(){ var cl=(tplTab==='cliente');
@@ -3366,7 +3383,7 @@ function tplJump(i){ var el=document.getElementById('tplph'+i); if(!el)return; t
   el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); var ta=el.querySelector('.tpl-ta'); if(ta){ try{ ta.focus({preventScroll:true}); }catch(e){ ta.focus(); } } }
 /* PDF real con el presupuesto de la calculadora; en el PDF de cliente, con la tarifa, precio, producción y diseño del ejemplo. */
 function tplTestPdf(){ if(!_pdfOk())return; var o; try{ o=calcStateToOrder(); }catch(e){ toast3('No se pudo preparar el PDF de prueba','#FF6B8A'); return; }
-  if(tplTab==='cliente'){ var s=_tplScnGet(); o.urgencia_nivel=s.u; o.diseno_modelado=s.dis; if(s.prod){ if(!o.prod)o.prod={tipo:(o.tipo_proyecto||'Técnico'),diseno:'Nulo',tests:[],printh:''}; } else o.prod=null;
+  if(tplTab==='cliente'){ var s=_tplScnGet(); o.urgencia_nivel=s.u; o.diseno_modelado=s.dis; o.cantidad=s.uds||1; if(s.prod){ if(!o.prod)o.prod={tipo:(o.tipo_proyecto||'Técnico'),diseno:'Nulo',tests:[],printh:''}; } else o.prod=null;
     if(s.u==='Ambos'){ o.precio_normal=s.pn; o.precio_urgente=s.pu; o.precio_final=s.pn; } else o.precio_final=(s.u==='Urgente'?s.pu:s.pn); }
   if(!o.cliente)o.cliente='Cliente de ejemplo'; var k=(tplTab==='interno'?'empresa':'cliente');
   try{ _pdfOpenNamed(_pdfDoc(o,k).output('blob'),'Prueba - '+pdfFileName(o,k)); }catch(e){ toast3('No se pudo generar el PDF de prueba','#FF6B8A'); } }
