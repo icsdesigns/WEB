@@ -25,17 +25,30 @@
   /* Origen 1: productos marcados como «Novedad» en el panel de admin (Supabase).
      Origen 2 (respaldo): data/destacados.json */
   var SUPABASE = { url: 'https://yyezkumbjqnushwgqkzf.supabase.co', key: 'sb_publishable_S-YCLKYozH7T9DFE1gMtUw_1jWLZnIf' };
-  function fromAdmin() {
-    return fetch(SUPABASE.url + '/rest/v1/productos?select=nombre,descripcion,imagen&visible=eq.true&destacado=eq.true&order=nombre.asc', {
+  function api(route) {
+    return fetch(SUPABASE.url + '/rest/v1/' + route, {
       headers: { apikey: SUPABASE.key, Authorization: 'Bearer ' + SUPABASE.key }, cache: 'no-store'
-    }).then(function (r) { return r.ok ? r.json() : null; }).then(function (rows) {
+    }).then(function (r) { return r.ok ? r.json() : null; });
+  }
+  /* Visualizadores habilitados por producto (admin › Visualizador): si el producto tiene uno, el botón lo abre;
+     si no, lleva al configurador del proyecto */
+  function visualizadores() {
+    return api('visualizador_grupos?select=slug,producto&visible=eq.true&producto=not.is.null')
+      .then(function (g) { var m = {}; (Array.isArray(g) ? g : []).forEach(function (x) { if (x.producto && x.slug) m[x.producto] = x.slug; }); return m; })
+      .catch(function () { return {}; });
+  }
+  function fromAdmin() {
+    return Promise.all([fetch(SUPABASE.url + '/rest/v1/productos?select=nombre,descripcion,imagen&visible=eq.true&destacado=eq.true&order=nombre.asc', {
+      headers: { apikey: SUPABASE.key, Authorization: 'Bearer ' + SUPABASE.key }, cache: 'no-store'
+    }).then(function (r) { return r.ok ? r.json() : null; }), visualizadores()]).then(function (res) {
+      var rows = res[0], vis = res[1];
       if (!Array.isArray(rows) || !rows.length) return null;
       return rows.map(function (p) {
         var img = !p.imagen ? '' : /^https?:/.test(p.imagen) ? p.imagen : '/img/' + p.imagen;
         return {
           id: p.nombre, etiqueta: 'Novedad', titulo: p.nombre, texto: p.descripcion || '',
           imagenes: img ? [{ src: img, alt: p.nombre }] : [],
-          url: '/configura-tu-proyecto/?producto=' + encodeURIComponent(p.nombre),
+          url: vis[p.nombre] ? '/llaveros-logo/?p=' + encodeURIComponent(vis[p.nombre]) : '/configura-tu-proyecto/?producto=' + encodeURIComponent(p.nombre),
           boton: 'Configura tu proyecto'
         };
       });
