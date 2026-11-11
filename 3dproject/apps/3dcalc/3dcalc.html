@@ -578,6 +578,7 @@ option{background-color:#161922;color:#E8EBF4}
 .tpp-price.u{background:#FFFAEE;border-left-color:#F4B740}
 .tpp-price small{display:block;font-size:7px;font-weight:700;color:#787C86;overflow-wrap:anywhere}
 .tpp-price b{font-size:13px;color:#14161C}
+.tpp-ann{font-size:7px;line-height:1.35;color:#5A5E68;margin-top:3px;cursor:pointer;overflow-wrap:anywhere}
 .tpp-prices{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .tpp-pans{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
 .tpp-pan{border:1.4px solid #167F6F;border-radius:5px;padding:6px 6px 5px;margin-bottom:6px;min-width:0}
@@ -1326,7 +1327,7 @@ function roundMoney(v){return Math.round(Math.max(0,num(v))*100)/100;}
 /* Los precios nunca son negativos, pero el balance del cajón sí puede serlo. */
 function roundSigned(v){return Math.round(num(v)*100)/100;}
 function roundUpToNickel(v){var a=Math.max(0,num(v));return Math.ceil((a+Number.EPSILON)/0.05)*0.05;}
-function eur(n){ return (Number(n)||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+function eur(n){ return (Number(n)||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }   /* espacio de no separación: el número y el € nunca se parten en dos líneas */
 function esc(s){var d=document.createElement('div');d.appendChild(document.createTextNode(s==null?'':String(s)));return d.innerHTML.replace(/"/g,'&quot;').replace(/'/g,'&#39;');}   /* también comillas: se usa dentro de atributos (title, href) con textos que pueden venir de la web */
 function optList(keys,cur){return keys.map(function(k){return '<option value="'+esc(k)+'"'+(cur===k?' selected':'')+'>'+esc(k)+'</option>';}).join('');}
 function load(){ try{var d=JSON.parse(localStorage.getItem(SK)); if(d&&typeof d==='object'){
@@ -1388,10 +1389,10 @@ function ordBase(o){ var k=cantMul(o); if(k<=1)return {peso:o.peso_g,horas:o.hor
   var h=(o.horas_base!=null&&o.horas_base!=='')?o.horas_base:String(round4(num(o.horas)/k));
   return {peso:p,horas:h}; }
 /* Texto «N uds (X € / ud.)» de los PDF. */
-function udsTxt(o,precio){ var cant=Math.max(1,Math.floor(num(o&&o.cantidad)||1)); function nf(v){ return eur(roundMoney(v/cant)).replace(' €',''); }
+function udsTxt(o,precio){ var cant=Math.max(1,Math.floor(num(o&&o.cantidad)||1)); function nf(v){ return eur(roundMoney(v/cant)).replace(' €',''); }
   var lbl=cant+(cant===1?' ud.':' uds');
-  if(precio==null&&o&&o.urgencia_nivel==='Ambos'){ try{ var d=orderDual(o); return lbl+' ('+(nf(d.normal)===nf(d.urgente)?nf(d.normal):(nf(d.normal)+' / '+nf(d.urgente)))+' € / ud.)'; }catch(e){} }
-  var p=(precio!=null?precio:num(o&&o.precio_final)); return lbl+' ('+nf(p)+' € / ud.)'; }
+  if(precio==null&&o&&o.urgencia_nivel==='Ambos'){ try{ var d=orderDual(o); return lbl+' ('+(nf(d.normal)===nf(d.urgente)?nf(d.normal):(nf(d.normal)+' / '+nf(d.urgente)))+' € / ud.)'; }catch(e){} }
+  var p=(precio!=null?precio:num(o&&o.precio_final)); return lbl+' ('+nf(p)+' € / ud.)'; }
 function orderToCalcState(o){ var _ob=ordBase(o); return { impresora:o.impresora, filamento_tipo:o.filamento, filamento_color:o.filamento_color, tipo_proyecto:(o.tipo_proyecto||(o.prod&&o.prod.tipo)||'Técnico'), diseno_opt:!!o.diseno_opt, is_multimaterial:!!o.is_multimaterial, material_breakdown:o.material_breakdown||[], peso_g:_ob.peso, tiempo_h:_ob.horas, cant_modo:cantModo(o), diseno_modelado:o.diseno_modelado, busqueda_modelos:o.busqueda_modelos, eliminacion_soportes:o.eliminacion_soportes, postprocesado:o.postprocesado, postproc_modo:o.postproc_modo, probabilidad_error:o.probabilidad_error, markup:o.markup, urgencia_nivel:o.urgencia_nivel, gasto_misc:o.gasto_misc, cantidad:o.cantidad, util:o.util, _tar:ordTar(o) }; }
 /* Con c._tar (estado de un pedido guardado) se calcula con la instantánea de tarifas del pedido. */
 function compute(c){ c=c||S.calc_state; return withTar(c._tar,function(){ return _compute(c); }); }
@@ -3019,7 +3020,7 @@ function _disLiveName(id){ var l=_tarLevelsFrom('dis',_tarLive('dis')).filter(fu
 function _condOne(c){ c=c||{};
   var dis=Array.isArray(c.dis)?c.dis.map(function(x){ var id=disIdOf(x,true); return id?_disLiveName(id):null; }).filter(function(x,i,a){return x!=null&&a.indexOf(x)===i;}):[];
   return {t:(c.t!=null?String(c.t):(c.text!=null?String(c.text):'')),on:c.on!==false,u:(c.u==='n'||c.u==='u'||c.u==='g')?c.u:'b',
-    gt:_condNum(c.gt),lt:_condNum(c.lt),prod:(c.prod==='on'||c.prod==='off')?c.prod:'',dis:dis}; }
+    x:!!c.x&&c.u!=='g',gt:_condNum(c.gt),lt:_condNum(c.lt),prod:(c.prod==='on'||c.prod==='off')?c.prod:'',dis:dis}; }
 function normConds(arr){ if(!Array.isArray(arr))return []; return arr.map(function(c){ if(typeof c==='string')return _condOne({t:c}); if(c&&typeof c==='object')return _condOne(c); return _condOne({}); }); }
 /* ¿Se cumplen las condiciones de precio, producción y diseño de la frase para este pedido y este precio? */
 function condMatch(c,o,price){ if(!c)return true; var pr=num(price);
@@ -3033,12 +3034,14 @@ function condMatch(c,o,price){ if(!c)return true; var pr=num(price);
 var COND_PANEL={n:['n','b'],u:['u','b'],g:['g']};
 /* Índices de las frases que van en un panel: activas, con la tarifa admitida y con sus condiciones cumplidas.
    La usan el PDF y la vista previa de Plantillas, así las dos siguen siempre la misma regla. */
-function condPick(conds,allow,o,price){ var out=[]; (conds||[]).forEach(function(c,i){ if(!c||c.on===false)return; if(allow.indexOf(c.u||'b')<0)return; if(!condMatch(c,o,price))return; out.push(i); }); return out; }
+/* anexo=true: solo las frases «anexas al precio» (c.x), que van dentro del recuadro del precio; si no, solo las de los paneles. */
+function condPick(conds,allow,o,price,anexo){ var out=[]; (conds||[]).forEach(function(c,i){ if(!c||c.on===false)return; if(!!c.x!==!!anexo)return; if(allow.indexOf(c.u||'b')<0)return; if(!condMatch(c,o,price))return; out.push(i); }); return out; }
 var COND_TAR={n:'Tarifa básica',u:'Tarifa urgente',b:'Ambas tarifas',g:'Ambas · panel común'};
 var COND_DOT={n:'<i class="dot n"></i>',u:'<i class="dot u"></i>',b:'<i class="dot n"></i><i class="dot u"></i>',g:'<i class="dot g"></i>'};
 function _disShort(k){ return String(k).replace(/\s*\(.*\)\s*$/,''); }
 /* Lista de condiciones de la frase en forma de chips; la tarifa va siempre la primera. */
 function condChips(c){ var u=c.u||'b', a=[{cls:'tar-'+u,dots:COND_DOT[u],txt:COND_TAR[u]}], g=(c.gt!=null&&c.gt!==''), l=(c.lt!=null&&c.lt!=='');
+  if(c.x)a.push({txt:'Anexa al precio'});
   if(g&&l)a.push({txt:(num(c.gt)===num(c.lt)?('Precio = '+eur(c.gt)):('Precio '+eur(c.gt)+' – '+eur(c.lt))),warn:num(c.gt)>num(c.lt)});
   else if(g)a.push({txt:'Precio ≥ '+eur(c.gt)}); else if(l)a.push({txt:'Precio ≤ '+eur(c.lt)});
   if(c.prod==='on')a.push({txt:'Con producción'}); else if(c.prod==='off')a.push({txt:'Sin producción'});
@@ -3051,6 +3054,7 @@ function condSentence(c){ var u=c.u||'b', T=esc(pdfTpl().client.t_cond||'Condici
     u:'Sale en el panel amarillo <b>Tarifa urgente</b>: en los presupuestos urgentes y en los de doble tarifa.',
     b:'Sale con cualquier tarifa, en el panel de la tarifa del presupuesto; con doble tarifa, en los dos (verde y amarillo).',
     g:'Sale con cualquier tarifa, una sola vez, en el panel gris común <b>«'+T+'»</b>.'}[u];
+  if(c.x)s=s.replace(/^Sale en el panel (verde|amarillo) <b>([^<]*)<\/b>:/,'Sale <b>anexa al precio</b>, dentro del recuadro de la tarifa ($2):').replace(/^Sale con cualquier tarifa, en el panel de la tarifa del presupuesto;/,'Sale anexa al precio, dentro del recuadro de la tarifa del presupuesto;');
   if(g&&l)cond.push('el precio esté entre <b>'+eur(c.gt)+'</b> y <b>'+eur(c.lt)+'</b> (ambos incluidos)');
   else if(g)cond.push('el precio sea mayor o igual a <b>'+eur(c.gt)+'</b>'); else if(l)cond.push('el precio sea menor o igual a <b>'+eur(c.lt)+'</b>');
   if(c.prod==='on')cond.push('el formulario de tiempo de producción esté <b>activo</b>'); else if(c.prod==='off')cond.push('el formulario de tiempo de producción esté <b>desactivado</b>');
@@ -3099,6 +3103,8 @@ function toggleCond(i){ var t=ensureTpl(); var c=t.client.conds[i]; if(c)c.on=(c
 /* Tarifa de la frase: n básica · u urgente · b ambas (en cada panel) · g ambas (una vez, panel común). */
 function setCondTar(i,v){ var c=ensureTpl().client.conds[i]; if(!c)return; c.u=(v==='n'||v==='u'||v==='g')?v:'b'; _tplTouch(false); save(); renderPlantillas(); }
 function setCondU(i,v){ setCondTar(i,v); }
+/* Frase anexa al precio: sale dentro del recuadro del precio. «Una vez, en el panel común» no tiene recuadro de precio: pasa a «cada tarifa». */
+function setCondX(i,v){ var c=ensureTpl().client.conds[i]; if(!c)return; c.x=!!v; if(c.x&&c.u==='g')c.u='b'; _tplTouch(false); save(); renderPlantillas(); }
 function addCondType(i,type){ if(!type||type==='tarifa')return; (_tplRows[i]=_tplRows[i]||{})[type]=true; _tplOpen[i]=true; renderPlantillas(type==='precio'?('gt'+i):(type==='prod'?('pr'+i+'on'):('ds'+i+'_0'))); }
 function delCondType(i,type){ var c=ensureTpl().client.conds[i]; if(!c||type==='tarifa')return;
   if(type==='precio'){ c.gt=null; c.lt=null; } else if(type==='prod')c.prod=''; else if(type==='dis')c.dis=[];
@@ -3178,7 +3184,7 @@ function pdfTokens(o,r,priceOverride,plazoText,urgente){
   Object.defineProperty(tk,'{segunda unidad}',{enumerable:true,get:function(){ var v=secondUnitCost(o,isU); return v==null?'—':eur(v); }});
   return tk;
 }
-function applyTokens(text,tok){ text=String(text==null?'':text); Object.keys(tok).forEach(function(k){ if(text.indexOf(k)>=0)text=text.split(k).join(tok[k]); }); return text; }
+function applyTokens(text,tok){ text=String(text==null?'':text); Object.keys(tok).forEach(function(k){ if(text.indexOf(k)>=0)text=text.split(k).join(tok[k]); }); return text.replace(/(\d) +€/g,'$1 €'); /* también los importes escritos a mano en la frase */ }
 /* ── Pestaña Plantillas ────────────────────────────────────────────────────────
    Tres pestañas (PDF de cliente, PDF interno y Marca) con la misma estructura: a la izquierda lo que se
    edita y a la derecha una vista previa esquemática del PDF que se actualiza al escribir. En el PDF de
@@ -3221,7 +3227,10 @@ function _tplCondRows(c,i){ var u=c.u||'b', amb=(u==='b'||u==='g'), dk=Object.ke
     +sb('tr'+i+'n',u==='n','n',COND_DOT.n+'Básica','setCondTar('+i+',\'n\')','Solo con tarifa básica (estándar): panel verde')
     +sb('tr'+i+'u',u==='u','u',COND_DOT.u+'Urgente','setCondTar('+i+',\'u\')','Solo con tarifa urgente: panel amarillo')
     +sb('tr'+i+'b',amb,'b',COND_DOT.b+'Ambas','setCondTar('+i+',\''+(u==='g'?'g':'b')+'\')','Con cualquier tarifa')+'</div>';
-  if(amb)tar+='<div class="tpl-amb"><span class="tpl-k">Se muestra</span><div class="tpl-seg" role="group" aria-label="Dónde se muestra">'
+  tar+='<div class="tpl-amb"><span class="tpl-k">Ubicación</span><div class="tpl-seg" role="group" aria-label="Ubicación en el PDF">'
+    +sb('tr'+i+'px',!c.x,'','En el panel de condiciones','setCondX('+i+',false)','La frase va en el panel de su tarifa')
+    +sb('tr'+i+'xx',!!c.x,'','Anexa al precio','setCondX('+i+',true)','La frase va dentro del recuadro del precio, bajo la línea de entrega')+'</div></div>';
+  if(amb&&!c.x)tar+='<div class="tpl-amb"><span class="tpl-k">Se muestra</span><div class="tpl-seg" role="group" aria-label="Dónde se muestra">'
     +sb('tr'+i+'eb',u==='b','','En el panel de cada tarifa','setCondTar('+i+',\'b\')','Con doble tarifa se repite en los paneles verde y amarillo, y el precio se compara con el de cada uno')
     +sb('tr'+i+'eg',u==='g','g',COND_DOT.g+'Una vez, en el panel común','setCondTar('+i+',\'g\')','Una sola vez, en el panel gris común; con doble tarifa el precio se compara con el estándar')+'</div></div>';
   var rows=row('tarifa','Tarifa',tar,false);
@@ -3307,8 +3316,9 @@ function tplPaperHTML(){ var br=pdfBrand(), T=pdfTpl(), internal=(tplTab==='inte
     +(internal?'<div class="tpp-tag" data-f="tag">'+TT(X.tag)+'</div>':'')+'</div><div class="tpp-rule"></div>';
   h+='<div class="tpp-st" data-f="t_datos">'+TT(X.t_datos)+'</div>'+sk(6);
   var amb=(s.u==='Ambos'), isU=(s.u==='Urgente'), pr=isU?s.pu:s.pn;
-  if(amb)h+='<div class="tpp-prices"><div class="tpp-price"><small>Tarifa estándar</small><b>'+eur(s.pn)+'</b></div><div class="tpp-price u"><small>Tarifa urgente</small><b>'+eur(s.pu)+'</b></div></div>';
-  else h+='<div class="tpp-price"><small data-f="t_precio">'+TT(X.t_precio)+(isU?' · TARIFA URGENTE':'')+'</small><b>'+eur(pr)+'</b></div>';
+  var annP=function(allow,tok,price){ if(internal)return ''; var cs0=T.client.conds||[]; return condPick(cs0,allow,o,price,true).map(function(i){ return '<div class="tpp-ann" data-i="'+i+'" title="Frase '+(i+1)+' (anexa al precio): clic para editarla" onclick="tplJump('+i+')">'+_tplRich(cs0[i].t,tok)+'</div>'; }).join(''); };
+  if(amb)h+='<div class="tpp-prices"><div class="tpp-price"><small>Tarifa estándar</small><b>'+eur(s.pn)+'</b>'+annP(COND_PANEL.n,pdfTokens(o,null,s.pn,plazo),s.pn)+'</div><div class="tpp-price u"><small>Tarifa urgente</small><b>'+eur(s.pu)+'</b>'+annP(COND_PANEL.u,pdfTokens(o,null,s.pu,plazo,true),s.pu)+'</div></div>';
+  else h+='<div class="tpp-price"><small data-f="t_precio">'+TT(X.t_precio)+(isU?' · TARIFA URGENTE':'')+'</small><b>'+eur(pr)+'</b>'+annP(isU?COND_PANEL.u:COND_PANEL.n,pdfTokens(o,null,pr,plazo,isU),pr)+'</div>';
   if(internal){
     h+='<div class="tpp-st" data-f="t_params">'+TT(X.t_params)+'</div>'+sk(8)+'<div class="tpp-pg">Página 2</div><div class="tpp-st">Resumen de costes</div><div class="tpp-boxes"><i></i><i></i><i></i></div>'
       +'<div class="tpp-st" data-f="t_desglose">'+TT(X.t_desglose)+'</div><div class="tpp-tb">'+new Array(7).join('<i></i>')+'</div>';
@@ -4120,7 +4130,7 @@ function _pdfRich(doc,tx,x,y,maxW,lineH,noDraw){
   var segs=[]; var re=/\*\*([^*]+)\*\*/g; var last=0,mm;
   while((mm=re.exec(tx))){ if(mm.index>last)segs.push([tx.slice(last,mm.index),false]); segs.push([mm[1],true]); last=re.lastIndex; }
   if(last<String(tx).length)segs.push([String(tx).slice(last),false]);
-  var words=[]; segs.forEach(function(s){ s[0].split(/\s+/).forEach(function(w){ if(!w)return;
+  var words=[]; segs.forEach(function(s){ s[0].split(/[^\S ]+/).forEach(function(w){ if(!w)return;
     /* Una palabra más ancha que la columna (p. ej. una URL) se trocea para que no se salga del recuadro. */
     doc.setFont('helvetica',s[1]?'bold':'normal');
     while(w.length>1&&doc.getTextWidth(w)>maxW){ var k=w.length-1; while(k>1&&doc.getTextWidth(w.slice(0,k))>maxW)k--; words.push([w.slice(0,k),s[1],1]); w=w.slice(k); }
@@ -4176,6 +4186,10 @@ function _renderTicketPage(doc,o,kind){
   y=_pdfSection(doc,M,W,y,TT(CS.t_datos),ac,_datos);
   // ===== caja PRECIO FINAL (compartido) =====
   var _amb=(o.urgencia_nivel==='Ambos');
+  /* Frases «anexas al precio» (solo PDF de cliente): van dentro del recuadro del precio, bajo la línea de entrega. */
+  var _annTx=function(allow,tok,pr){ if(internal)return []; var cs=TPL.client.conds||[], out=[]; condPick(cs,allow,o,pr,true).forEach(function(i){ var tx=applyTokens(cs[i].t||'',tok); if(String(tx).trim())out.push(tx); }); return out; };
+  var _annH=function(tx,w,lh){ doc.setFont('helvetica','normal'); var tot=0; tx.forEach(function(t){ tot+=(_pdfRich(doc,t,0,0,w,lh,true)/lh+1)*lh+1.2; }); return tot?tot+0.8:0; };
+  var _annDraw=function(tx,x,y0,w,lh){ doc.setTextColor(112,116,126); doc.setFont('helvetica','normal'); var yy=y0; tx.forEach(function(t){ var cy=_pdfRich(doc,t,x,yy,w,lh); yy=cy+lh+1.2; }); };
   if(_amb){
     var _dd=orderDual(o); var gap2=6, bw2=(W-2*M-gap2)/2;
     /* La caja se mide antes de dibujarla: si el plazo ocupa varias líneas, crece
@@ -4184,23 +4198,27 @@ function _renderTicketPage(doc,o,kind){
     var _lnS=_delivStd?doc.splitTextToSize('Entrega: '+_delivStd,bw2-13):[];
     var _lnU=_delivUrg?doc.splitTextToSize('Entrega: '+_delivUrg,bw2-13):[];
     var _nl=Math.max(_lnS.length,_lnU.length), bh=22+(_nl?(_nl*3.9+2.6):0);
+    doc.setFontSize(8); var _aS=_annTx(COND_PANEL.n,pdfTokens(o,r,_dd.normal,_delivStd||_deliv),_dd.normal), _aU=_annTx(COND_PANEL.u,pdfTokens(o,r,_dd.urgente,_delivUrg||_deliv,true),_dd.urgente);
+    var _bhBase=bh; bh+=Math.max(_annH(_aS,bw2-13,3.9),_annH(_aU,bw2-13,3.9));
     if(y+9+bh+11>PDF_BOTTOM){ doc.addPage(); y=PDF_TOP; }
     var py=y+9;
-    var _pbox=function(bx,lbl,val,urg,lines){ var c1=urg?[255,250,238]:[245,247,250], c2=urg?[244,183,64]:ac;
+    var _pbox=function(bx,lbl,val,urg,lines,ann){ var c1=urg?[255,250,238]:[245,247,250], c2=urg?[244,183,64]:ac;
       doc.setFillColor(c1[0],c1[1],c1[2]); doc.rect(bx,py,bw2,bh,'F'); doc.setFillColor(c2[0],c2[1],c2[2]); doc.rect(bx,py,2.6,bh,'F');
       doc.setTextColor(120,124,134); doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.text(lbl,bx+9,py+8.5);
       doc.setTextColor(20,22,28); doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.text(val.toFixed(2)+' €',bx+9,py+18);
       if(lines&&lines.length){ doc.setTextColor(112,116,126); doc.setFont('helvetica','normal'); doc.setFontSize(8);
-        lines.forEach(function(ln,i){ doc.text(ln,bx+9,py+25.2+i*3.9); }); } };
-    _pbox(M, 'Tarifa estándar', _dd.normal, false, _lnS);
-    _pbox(M+bw2+gap2, 'Tarifa urgente', _dd.urgente, true, _lnU);
+        lines.forEach(function(ln,i){ doc.text(ln,bx+9,py+25.2+i*3.9); }); }
+      if(ann&&ann.length){ doc.setFontSize(8); _annDraw(ann,bx+9,py+_bhBase+1.8,bw2-13,3.9); } };
+    _pbox(M, 'Tarifa estándar', _dd.normal, false, _lnS, _aS);
+    _pbox(M+bw2+gap2, 'Tarifa urgente', _dd.urgente, true, _lnU, _aU);
     y=py+bh+11;
   } else {
   var _dv1=(o.urgencia_nivel==='Urgente')?(_delivUrg||_deliv):(_delivStd||_deliv);
   var bw=W-2*M;
   doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
   var _ln1=_dv1?doc.splitTextToSize('Entrega: '+_dv1,bw-18):[];
-  var bh=22+(_ln1.length?(_ln1.length*4.1+2):0);
+  var bh=22+(_ln1.length?(_ln1.length*4.1+2):0), _bhBase1=bh;
+  doc.setFontSize(8.5); var _a1=_annTx((o.urgencia_nivel==='Urgente')?COND_PANEL.u:COND_PANEL.n,TOK,precio); bh+=_annH(_a1,bw-18,4.1);
   if(y+9+bh+11>PDF_BOTTOM){ doc.addPage(); y=PDF_TOP; }
   var py=y+9;
   doc.setFillColor(245,247,250); doc.rect(M,py,bw,bh,'F'); doc.setFillColor(ac[0],ac[1],ac[2]); doc.rect(M,py,2.6,bh,'F');
@@ -4209,6 +4227,7 @@ function _renderTicketPage(doc,o,kind){
   if(r&&r.cant>1){ doc.setTextColor(120,124,134); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text(r.precioUnit.toFixed(2)+' € / ud  ·  '+r.cant+' uds',W-M-4,py+18,{align:'right'}); }
   if(_ln1.length){ doc.setTextColor(112,116,126); doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
     _ln1.forEach(function(ln,i){ doc.text(ln,M+9,py+25.6+i*4.1); }); }
+  if(_a1.length){ doc.setFontSize(8.5); _annDraw(_a1,M+9,py+_bhBase1+1.8,bw-18,4.1); }
   y=py+bh+11;
   }
   if(internal){
