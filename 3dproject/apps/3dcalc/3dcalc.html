@@ -4194,7 +4194,7 @@ function _renderTicketPage(doc,o,kind){
     var _dd=orderDual(o); var gap2=6, bw2=(W-2*M-gap2)/2;
     /* La caja se mide antes de dibujarla: si el plazo ocupa varias líneas, crece
        en lugar de que el texto se salga por debajo del recuadro. */
-    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
     var _lnS=_delivStd?doc.splitTextToSize('Entrega: '+_delivStd,bw2-13):[];
     var _lnU=_delivUrg?doc.splitTextToSize('Entrega: '+_delivUrg,bw2-13):[];
     var _nl=Math.max(_lnS.length,_lnU.length), bh=22+(_nl?(_nl*3.9+2.6):0);
@@ -4206,7 +4206,7 @@ function _renderTicketPage(doc,o,kind){
       doc.setFillColor(c1[0],c1[1],c1[2]); doc.rect(bx,py,bw2,bh,'F'); doc.setFillColor(c2[0],c2[1],c2[2]); doc.rect(bx,py,2.6,bh,'F');
       doc.setTextColor(120,124,134); doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.text(lbl,bx+9,py+8.5);
       doc.setTextColor(20,22,28); doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.text(val.toFixed(2)+' €',bx+9,py+18);
-      if(lines&&lines.length){ doc.setTextColor(112,116,126); doc.setFont('helvetica','normal'); doc.setFontSize(8);
+      if(lines&&lines.length){ doc.setTextColor(112,116,126); doc.setFont('helvetica','bold'); doc.setFontSize(8);
         lines.forEach(function(ln,i){ doc.text(ln,bx+9,py+25.2+i*3.9); }); }
       if(ann&&ann.length){ doc.setFontSize(8); _annDraw(ann,bx+9,py+_bhBase+1.8,bw2-13,3.9); } };
     _pbox(M, 'Tarifa estándar', _dd.normal, false, _lnS, _aS);
@@ -4215,7 +4215,7 @@ function _renderTicketPage(doc,o,kind){
   } else {
   var _dv1=(o.urgencia_nivel==='Urgente')?(_delivUrg||_deliv):(_delivStd||_deliv);
   var bw=W-2*M;
-  doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+  doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
   var _ln1=_dv1?doc.splitTextToSize('Entrega: '+_dv1,bw-18):[];
   var bh=22+(_ln1.length?(_ln1.length*4.1+2):0), _bhBase1=bh;
   doc.setFontSize(8.5); var _a1=_annTx((o.urgencia_nivel==='Urgente')?COND_PANEL.u:COND_PANEL.n,TOK,precio); bh+=_annH(_a1,bw-18,4.1);
@@ -4225,7 +4225,7 @@ function _renderTicketPage(doc,o,kind){
   doc.setTextColor(120,124,134); doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.text(TT(CS.t_precio)+((o.urgencia_nivel==='Urgente')?'  ·  TARIFA URGENTE':''),M+9,py+8);
   doc.setTextColor(20,22,28); doc.setFont('helvetica','bold'); doc.setFontSize(23); doc.text(precio.toFixed(2)+' €',M+9,py+18);
   if(r&&r.cant>1){ doc.setTextColor(120,124,134); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text(r.precioUnit.toFixed(2)+' € / ud  ·  '+r.cant+' uds',W-M-4,py+18,{align:'right'}); }
-  if(_ln1.length){ doc.setTextColor(112,116,126); doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+  if(_ln1.length){ doc.setTextColor(112,116,126); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
     _ln1.forEach(function(ln,i){ doc.text(ln,M+9,py+25.6+i*4.1); }); }
   if(_a1.length){ doc.setFontSize(8.5); _annDraw(_a1,M+9,py+_bhBase1+1.8,bw-18,4.1); }
   y=py+bh+11;
